@@ -213,7 +213,7 @@ def build(welcome_page, annotation_page):
                     '<span class="cond-tag">conditional</span></div>'
                 )
                 q3 = gr.Radio(
-                    choices=[("1\nConfused", "1"), ("2\n Not Clear", "2"), ("3\nClear", "3"), ("4\nTransparent", "4"), ("N/A", "NA")],
+                    choices=[("1\nConfused", "1"), ("2", "2"), ("3\nClear", "3"), ("4\nTransparent", "4"), ("N/A", "NA")],
                     label="", show_label=False,
                     elem_classes=["scale-radio"],
                 )
