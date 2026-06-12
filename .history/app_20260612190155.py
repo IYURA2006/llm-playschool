@@ -154,13 +154,7 @@ div:focus, div:focus-visible {
 .turn-anno-card:not(:has(.turn-anno-card)) {
     background: transparent !important; border: none !important; padding: 0 !important; margin: 0 !important;
 }
-#annot-col .turn-anno-card .block,
-#annot-col .turn-anno-card .form,
-#annot-col .turn-anno-card .wrap,
-#annot-col .turn-anno-card .gap,
-#annot-col .turn-anno-card .styler,
-#annot-col .turn-anno-card > div,
-#annot-col .turn-anno-card > div > div {
+.turn-anno-card .block, .turn-anno-card .form, .turn-anno-card .wrap {
     background: transparent !important; border: none !important; box-shadow: none !important;
 }
 /* Rated state: green border once Q1 and Q2 are both answered (pure CSS, scoped to

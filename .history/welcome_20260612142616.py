@@ -76,7 +76,13 @@ def build(welcome_page, annotation_page):
                         with gr.Column(scale=1, elem_classes=["ovr-desc"]):
                             gr.Markdown(desc)
 
-     
+            # ── REASSURANCES ────────────────────────────────────────
+            gr.Markdown(
+                "✅ There are no trick questions — rate what you actually see in the transcript.\n\n"
+                "✅ Use your best judgment. There is no single correct answer for most turns.\n\n"
+                "✅ Your responses are anonymous and used only for research purposes."
+            )
+
             # ── START ───────────────────────────────────────────────
             gr.Button(
                 "Start Annotation →", variant="primary", size="lg",

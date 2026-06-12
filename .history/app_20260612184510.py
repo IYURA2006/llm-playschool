@@ -71,17 +71,22 @@ div:focus, div:focus-visible {
 }
 
 /* ── Left transcript column ───────────────────────────────────── */
-/* Left column sizes to its content but is capped at the right rating column's
-   height (set in JS, see sync_heights script) and scrolls internally past that.
-   Short conversations stay short — no forced fill. */
+/* Left column stretches to the right column's height (set by the row) and the
+   transcript scrolls inside it. The absolutely-positioned scroll area means the
+   left column contributes no intrinsic height, so the row height is driven by
+   the right rating column — left then matches it. Short conversations just leave
+   empty space at the bottom. */
+.anno-main-row { align-items: stretch !important; }
 .tx-col {
     background: #f1f5f9 !important;
     border-radius: 10px !important;
     overflow: hidden !important;
     padding: 0 !important;
-    align-self: flex-start !important;
+    position: relative !important;
 }
 .txscroll {
+    position: absolute;
+    inset: 0;
     padding: 16px 18px;
     overflow-y: auto;
 }
@@ -142,25 +147,16 @@ div:focus, div:focus-visible {
    card is two .turn-anno-card nodes. Style the outer wrapper as the visual card and
    pass the inner one through transparently. */
 .turn-anno-card:has(.turn-anno-card) {
-    background: #0e1a30 !important;
-    border: 1px solid #1e3a5f !important;
+    background: #111a2c !important;
+    border: 1px solid #2d3748 !important;
     border-radius: 12px !important;
     padding: 14px 16px !important;
     margin-bottom: 14px !important;
 }
-.turn-anno-card{
-    background: black !important;
-}
 .turn-anno-card:not(:has(.turn-anno-card)) {
     background: transparent !important; border: none !important; padding: 0 !important; margin: 0 !important;
 }
-#annot-col .turn-anno-card .block,
-#annot-col .turn-anno-card .form,
-#annot-col .turn-anno-card .wrap,
-#annot-col .turn-anno-card .gap,
-#annot-col .turn-anno-card .styler,
-#annot-col .turn-anno-card > div,
-#annot-col .turn-anno-card > div > div {
+.turn-anno-card .block, .turn-anno-card .form, .turn-anno-card .wrap {
     background: transparent !important; border: none !important; box-shadow: none !important;
 }
 /* Rated state: green border once Q1 and Q2 are both answered (pure CSS, scoped to
@@ -624,39 +620,6 @@ force_dark = """
     }
 
     // Gradio renders asynchronously; retry until the cards exist.
-    if (!init()) {
-        var tries = 0;
-        var iv = setInterval(function () {
-            if (init() || ++tries > 100) clearInterval(iv);
-        }, 100);
-    }
-})();
-</script>
-<script>
-// Cap the left transcript's height to the right rating column so the two panels
-// line up, while letting a short transcript stay short. Gradio's flexbox won't
-// transfer the height reliably, so measure it directly and re-sync on resize and
-// whenever the visible rating card changes (which changes the right column height).
-(function () {
-    function sync() {
-        var annot = document.getElementById('annot-col');
-        var scroll = document.querySelector('.txscroll');
-        if (!annot || !scroll) return;
-        var h = annot.offsetHeight;
-        if (h > 0) scroll.style.maxHeight = h + 'px';
-    }
-    function init() {
-        var annot = document.getElementById('annot-col');
-        var scroll = document.querySelector('.txscroll');
-        if (!annot || !scroll) return false;
-        sync();
-        if (window.ResizeObserver) { new ResizeObserver(sync).observe(annot); }
-        window.addEventListener('resize', sync);
-        // Selecting a turn / answering a question can resize the right column.
-        document.addEventListener('click', function () { setTimeout(sync, 50); });
-        document.addEventListener('change', function () { setTimeout(sync, 50); });
-        return true;
-    }
     if (!init()) {
         var tries = 0;
         var iv = setInterval(function () {

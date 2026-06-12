@@ -34,31 +34,12 @@ def _progress_html(rated: int) -> str:
     )
 
 
-def _card_header_html(idx: int) -> str:
+def _turn_header_html(idx: int) -> str:
     return (
-        f'<div class="ta-head">'
-        f'<span class="ta-badge">{idx + 1}</span>'
-        f'<span class="ta-title">Turn {idx + 1} of {N_TURNS}</span>'
-        f'<span class="rated-badge">✓ Rated</span>'
+        f'<div class="turn-header-box">'
+        f'<span class="turn-num-badge">{idx + 1}</span>'
+        f'<span class="turn-title">Turn {idx + 1} of {N_TURNS}</span>'
         f'</div>'
-    )
-
-
-def _turn_nav_html() -> str:
-    chips = "".join(
-        f'<button type="button" class="tn-chip" role="tab" id="tn-chip-{i}" '
-        f'data-turn="{i}" aria-selected="{"true" if i == 0 else "false"}" '
-        f'tabindex="{"0" if i == 0 else "-1"}">{i + 1}</button>'
-        for i in range(N_TURNS)
-    )
-    return (
-        '<div class="turn-nav" role="tablist" aria-label="Annotation turns">'
-        '<button type="button" class="tn-arrow" data-nav="prev" '
-        'aria-label="Previous turn" title="Previous turn">‹</button>'
-        f'<div class="tn-chips">{chips}</div>'
-        '<button type="button" class="tn-arrow" data-nav="next" '
-        'aria-label="Next turn" title="Next turn">›</button>'
-        '</div>'
     )
 
 
@@ -121,30 +102,47 @@ def _build_transcript_html(current_idx: int) -> str:
     return '<div class="txscroll">' + "".join(parts) + "</div>"
 
 
-_FLAG_CHOICES = [
-    "Repeated a previous failed move",
-    "Invented or misquoted a game fact",
-    "Self-corrected after error",
-    "Reasoning-Action Mismatch",
-]
+def _initial_annotations():
+    return {i: {"q1": None, "q2": None, "q3": None, "flags": [], "comment": ""} for i in range(N_TURNS)}
 
 
-def _submit(*vals):
-    n = N_TURNS
-    q1v, q2v, q3v = vals[0:n], vals[n:2 * n], vals[2 * n:3 * n]
-    fv, cv = vals[3 * n:4 * n], vals[4 * n:5 * n]
+def _navigate(direction, turn_idx, anns, q1v, q2v, q3v, fv, cv):
+    anns = dict(anns)
+    anns[turn_idx] = {"q1": q1v, "q2": q2v, "q3": q3v, "flags": fv or [], "comment": cv or ""}
+    new_idx = max(0, min(N_TURNS - 1, turn_idx + direction))
+    ann = anns[new_idx]
+    rated = sum(1 for a in anns.values() if a["q1"] and a["q2"])
+    return (
+        new_idx,
+        anns,
+        _build_transcript_html(new_idx),
+        _turn_header_html(new_idx),
+        ann["q1"],
+        ann["q2"],
+        ann["q3"],
+        ann["flags"] or [],
+        ann["comment"] or "",
+        _progress_html(rated),
+        "",
+    )
+
+
+def _submit(turn_idx, anns, q1v, q2v, q3v, fv, cv):
+    anns = dict(anns)
+    anns[turn_idx] = {"q1": q1v, "q2": q2v, "q3": q3v, "flags": fv or [], "comment": cv or ""}
     turns_out = []
     for i, msg in enumerate(_ai_turns):
+        a = anns[i]
         turns_out.append({
             "turn_index": i,
             "from": msg["from"],
             "role": _players.get(msg["from"], {}).get("game_role", msg["from"]),
             "content": msg["action"]["content"],
-            "prior_information_use": q1v[i],
-            "strategic_logic": q2v[i],
-            "reasoning_clarity": q3v[i],
-            "flags": fv[i] or [],
-            "comment": cv[i] or "",
+            "prior_information_use": a["q1"],
+            "strategic_logic": a["q2"],
+            "reasoning_clarity": a["q3"],
+            "flags": a["flags"],
+            "comment": a["comment"],
         })
     with open(OUTPUT_PATH, "w") as f:
         json.dump({
@@ -153,11 +151,13 @@ def _submit(*vals):
             "annotated_at": datetime.now().isoformat(),
             "turns": turns_out,
         }, f, indent=2)
-    return "✅ Saved!", gr.update(visible=False), gr.update(visible=True)
+    return anns, "✅ Saved!", gr.update(visible=False), gr.update(visible=True)
 
 
 def build(welcome_page, annotation_page, verdict_page):
     with annotation_page:
+        current_turn = gr.State(0)
+        annotations = gr.State(_initial_annotations())
 
         # ── TOP NAV ──────────────────────────────────────────────────
         with gr.Row(elem_classes=["annot-topnav"]):
@@ -167,60 +167,69 @@ def build(welcome_page, annotation_page, verdict_page):
                 f'<span class="game-name-tag">{_meta["game_name"].title()}</span>'
                 f'</div>'
             )
-            gr.HTML(_progress_html(0), elem_classes=["nav-center"])
+            progress_disp = gr.HTML(_progress_html(0), elem_classes=["nav-center"])
             gr.HTML('<div class="nav-right"><div class="nav-timer">00:00</div></div>')
             rules_btn = gr.Button("Rules", variant="secondary", size="sm", elem_classes=["rules-nav-btn"])
 
         # ── MAIN LAYOUT ──────────────────────────────────────────────
-        with gr.Row(equal_height=False, elem_classes=["anno-main-row"]):
+        with gr.Row(equal_height=False):
 
             # LEFT: scrollable transcript
             with gr.Column(scale=3, elem_classes=["tx-col"]):
-                gr.HTML(_build_transcript_html(0))
+                transcript = gr.HTML(_build_transcript_html(0))
 
-            # RIGHT: paginated annotation cards (one shown at a time, client-side)
+            # RIGHT: annotation form
             with gr.Column(scale=2, elem_id="annot-col"):
-                gr.HTML(_turn_nav_html())
-                q1s, q2s, q3s, flagss, comments = [], [], [], [], []
+                turn_header = gr.HTML(_turn_header_html(0))
 
-                for i in range(N_TURNS):
-                    with gr.Group(elem_classes=["turn-anno-card"]):
-                        gr.HTML(_card_header_html(i))
+                gr.Markdown('**Q1 — Prior Information Use**\n\nDid the AI correctly use information established in earlier turns?')
+                q1 = gr.Radio(
+                    choices=[("1\nNone", "1"), ("2\nPartial", "2"), ("3\nGood", "3"), ("4\nExcellent", "4")],
+                    label="", show_label=False,
+                    elem_classes=["scale-radio"],
+                )
 
-                        gr.Markdown("**Q1 — Prior Information Use**\n\nDid the AI correctly use information established in earlier turns?")
-                        q1 = gr.Radio(
-                            choices=[("1\nNone", "1"), ("2\nPartial", "2"), ("3\nGood", "3"), ("4\nExcellent", "4")],
-                            show_label=False, elem_classes=["scale-radio", "q1-scale"],
-                        )
+                gr.Markdown('**Q2 — Strategic Logic**\n\nRegardless of constraints, did this move make strategic sense?')
+                q2 = gr.Radio(
+                    choices=[("1\nNonsensical", "1"), ("2\nPoor", "2"), ("3\nReasonable", "3"), ("4\nStrong", "4")],
+                    label="", show_label=False,
+                    elem_classes=["scale-radio"],
+                )
 
-                        gr.Markdown("**Q2 — Strategic Logic**\n\nRegardless of constraints, did this move make strategic sense?")
-                        q2 = gr.Radio(
-                            choices=[("1\nNonsensical", "1"), ("2\nPoor", "2"), ("3\nReasonable", "3"), ("4\nStrong", "4")],
-                            show_label=False, elem_classes=["scale-radio", "q2-scale"],
-                        )
+                gr.Markdown('**Q3 — Reasoning Clarity**')
+                gr.HTML('<span class="cond-tag">conditional</span>')
+                gr.Markdown('How clearly does the AI explain what it is doing and why in this turn?')
+                q3 = gr.Radio(
+                    choices=[("1\nConfused", "1"), ("2\nNot Clear", "2"), ("3\nClear", "3"), ("4\nTransparent", "4"), ("N/A", "NA")],
+                    label="", show_label=False,
+                    elem_classes=["scale-radio"],
+                )
 
-                        gr.Markdown("**Q3 — Reasoning Clarity** · conditional")
-                        q3 = gr.Radio(
-                            choices=[("1\nUnclear", "1"), ("2\nConfused", "2"), ("3\nClear", "3"), ("4\nTransparent", "4"), ("N/A", "NA")],
-                            show_label=False, elem_classes=["scale-radio", "q3-scale"],
-                        )
+                gr.HTML('<div class="flags-lbl">Flags <span class="flags-sub">— tick all that apply</span></div>')
+                flags = gr.CheckboxGroup(
+                    choices=[
+                        "Repeated a previous failed move",
+                        "Invented or misquoted a game fact",
+                        "Self-corrected after error",
+                        "Reasoning-Action Mismatch",
+                    ],
+                    label="", show_label=False,
+                    elem_classes=["flags-check"],
+                )
 
-                        gr.HTML('<div class="flags-lbl">Flags <span class="flags-sub">— tick all that apply</span></div>')
-                        fl = gr.CheckboxGroup(
-                            choices=_FLAG_CHOICES, show_label=False,
-                            elem_classes=["flags-check"],
-                        )
+                comment = gr.Textbox(
+                    placeholder="Optional turn comment…",
+                    label="", show_label=False,
+                    lines=2,
+                    elem_classes=["turn-comment"],
+                )
 
-                        cm = gr.Textbox(
-                            placeholder="Optional turn comment…",
-                            show_label=False, lines=2,
-                            elem_classes=["turn-comment"],
-                        )
-
-                    q1s.append(q1); q2s.append(q2); q3s.append(q3)
-                    flagss.append(fl); comments.append(cm)
+                with gr.Row():
+                    prev_btn = gr.Button("← Prev", variant="secondary", size="sm")
+                    next_btn = gr.Button("Next →", variant="primary", size="sm")
 
                 status = gr.Markdown("")
+
                 with gr.Row():
                     back_btn = gr.Button("← Back", variant="secondary")
                     submit_btn = gr.Button("Submit All", variant="primary")
@@ -232,10 +241,26 @@ def build(welcome_page, annotation_page, verdict_page):
             close_rules = gr.Button("Close", variant="secondary")
 
         # ── EVENT WIRING ─────────────────────────────────────────────
+        nav_outputs = [
+            current_turn, annotations, transcript, turn_header,
+            q1, q2, q3, flags, comment, progress_disp, status,
+        ]
+
+        prev_btn.click(
+            fn=lambda *a: _navigate(-1, *a),
+            inputs=[current_turn, annotations, q1, q2, q3, flags, comment],
+            outputs=nav_outputs,
+        )
+        next_btn.click(
+            fn=lambda *a: _navigate(1, *a),
+            inputs=[current_turn, annotations, q1, q2, q3, flags, comment],
+            outputs=nav_outputs,
+        )
+
         submit_btn.click(
             fn=_submit,
-            inputs=[*q1s, *q2s, *q3s, *flagss, *comments],
-            outputs=[status, annotation_page, verdict_page],
+            inputs=[current_turn, annotations, q1, q2, q3, flags, comment],
+            outputs=[annotations, status, annotation_page, verdict_page],
         )
 
         rules_btn.click(fn=lambda: gr.update(visible=True), outputs=[rules_col])
