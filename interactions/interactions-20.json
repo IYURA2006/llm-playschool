@@ -1,0 +1,244 @@
+{
+  "meta": {
+    "game_name": "wordle",
+    "experiment_name": "medium_frequency_words_no_clue_no_critic",
+    "game_id": 2,
+    "results_folder": "gemini-3-flash-t1.0",
+    "clem_version": "3.3.4"
+  },
+  "player_models": {
+    "0": {
+      "model_name": "gemini-3-flash",
+      "backend": "google",
+      "context_size": "1000k",
+      "languages": [
+        "af",
+        "am",
+        "as",
+        "az",
+        "be",
+        "bs",
+        "ca",
+        "ceb",
+        "co",
+        "cy",
+        "dv",
+        "eo",
+        "eu",
+        "fa",
+        "fil",
+        "fy",
+        "ga",
+        "gd",
+        "gl",
+        "gu",
+        "ha",
+        "haw",
+        "hmn",
+        "ht",
+        "hy",
+        "ig",
+        "is",
+        "jv",
+        "ka",
+        "kk",
+        "km",
+        "kn",
+        "kri",
+        "ku",
+        "ky",
+        "la",
+        "lb",
+        "lo",
+        "mg",
+        "mi",
+        "mk",
+        "ml",
+        "mn",
+        "mni-Mtei",
+        "mr",
+        "ms",
+        "mt",
+        "my",
+        "ne",
+        "ny",
+        "or",
+        "pa",
+        "ps",
+        "sd",
+        "si",
+        "sm",
+        "sn",
+        "so",
+        "sq",
+        "st",
+        "su",
+        "ta",
+        "te",
+        "tg",
+        "ug",
+        "ur",
+        "uz",
+        "xh",
+        "yi",
+        "yo",
+        "zu"
+      ],
+      "license": {
+        "name": "Meta",
+        "url": "https://www.llama.com/llama3/license/"
+      },
+      "lookup_source": "/project/hakimov/clembench-v3.0/model_registry.json",
+      "model_config": {
+        "multimodality": {
+          "single_image": true,
+          "multiple_images": true,
+          "audio": true,
+          "video": true
+        },
+        "reasoning_model": true,
+        "reasoning_budget": 400,
+        "include_thoughts": true
+      },
+      "model_id": "gemini-3-flash-preview",
+      "open_weight": false,
+      "parameters": "1000B",
+      "release_date": "2025-12-10"
+    }
+  },
+  "players": {
+    "GM": {
+      "game_role": "Game Master",
+      "model_name": "programmatic"
+    },
+    "Player 1": {
+      "game_role": "WordGuesser",
+      "model_name": "gemini-3-flash"
+    }
+  },
+  "turns": [
+    [
+      {
+        "from": "GM",
+        "to": "Player 1",
+        "timestamp": "2026-01-14T09:55:32.158123",
+        "action": {
+          "type": "send message",
+          "content": "You are a language wizard who likes to guess words by using the given rules.\n\nWelcome to Wordle! You have six attempts to guess the target word, a valid English word of five lowercase letters (a-z). Please use the tags \"explanation:\" and \"guess:\" to provide a concise explanation for each guess.\n\nFor instance, if your guess is \"apple\", your response should be\nexplanation: this is a common five-letter English word, and I am starting my guess with this word.\nguess: apple\n\nAfter each guess, your answer will be validated, and you will receive feedback indicating which letters are correct (green), which letters are correct but in the wrong position (yellow), and which letters are incorrect (red). This feedback can be useful in determining which letters to include or exclude in your next guess.\n\nFor example, the feedback for \"apple\" might be:\nguess_feedback: a<yellow> p<yellow> p<green> l<yellow> e<red>\n\nThe explanation should contain details about how the guess_feedback is used to arrive at a new guess.\n\nDo not generate any other text.\n\nLet's begin with your first guess.",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 1",
+        "to": "GM",
+        "timestamp": "2026-01-14T09:55:35.810932",
+        "action": {
+          "type": "get message",
+          "content": "explanation: I'm starting with a common five-letter word that contains three frequently used vowels (A, I, E) and two common consonants (R, S) to maximize the initial feedback.\nguess: arise",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-01-14T09:55:35.811123",
+        "action": {
+          "type": "metadata",
+          "content": "attempts = 1\ntarget_word = resin\nguess = arise\nguess_feedback = a<red> r<yellow> i<yellow> s<yellow> e<yellow>"
+        }
+      }
+    ],
+    [
+      {
+        "from": "GM",
+        "to": "Player 1",
+        "timestamp": "2026-01-14T09:55:35.811203",
+        "action": {
+          "type": "send message",
+          "content": "guess_feedback: a<red> r<yellow> i<yellow> s<yellow> e<yellow>\n\nProvide your response only in this format.\nexplanation: details\nguess: word",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 1",
+        "to": "GM",
+        "timestamp": "2026-01-14T09:55:42.385045",
+        "action": {
+          "type": "get message",
+          "content": "explanation: The feedback indicates that 'r', 'i', 's', and 'e' are all in the word but in the wrong positions, while 'a' is not in the word at all. I am choosing \"siren\" to test these letters in new positions and introduce the common consonant 'n'.\nguess: siren",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-01-14T09:55:42.385501",
+        "action": {
+          "type": "metadata",
+          "content": "attempts = 2\ntarget_word = resin\nguess = siren\nguess_feedback = s<yellow> i<yellow> r<yellow> e<yellow> n<green>"
+        }
+      }
+    ],
+    [
+      {
+        "from": "GM",
+        "to": "Player 1",
+        "timestamp": "2026-01-14T09:55:42.385594",
+        "action": {
+          "type": "send message",
+          "content": "guess_feedback: s<yellow> i<yellow> r<yellow> e<yellow> n<green>\n\nProvide your response only in this format.\nexplanation: details\nguess: word",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 1",
+        "to": "GM",
+        "timestamp": "2026-01-14T09:55:55.387514",
+        "action": {
+          "type": "get message",
+          "content": "explanation: From the feedback, we know 'n' is at the fifth position. The letters 'r', 'i', 's', and 'e' are all present but misplaced. Specifically, 'r' is not at 1 or 2, 'i' is not at 1 or 2, 's' is not at 0 or 3, and 'e' is not at 3 or 4. By testing 'r' at 0, 'e' at 1, 's' at 2, and 'i' at 3, we get the valid English word \"resin\".\nguess: resin",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-01-14T09:55:55.387932",
+        "action": {
+          "type": "metadata",
+          "content": "attempts = 3\ntarget_word = resin\nguess = resin\nguess_feedback = r<green> e<green> s<green> i<green> n<green>"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-01-14T09:55:55.387962",
+        "action": {
+          "type": "correct guess",
+          "content": "game_result = WIN"
+        }
+      }
+    ]
+  ],
+  "Aborted": 0,
+  "Lose": 0,
+  "Success": 1,
+  "Request Count": 3,
+  "Parsed Request Count": 3,
+  "Violated Request Count": 0,
+  "Guesser Guesses": [
+    "arise",
+    "siren",
+    "resin"
+  ],
+  "Guesser Feedbacks": [
+    "a<red> r<yellow> i<yellow> s<yellow> e<yellow>",
+    "s<yellow> i<yellow> r<yellow> e<yellow> n<green>",
+    "r<green> e<green> s<green> i<green> n<green>"
+  ],
+  "Guesser Explanations": [
+    "I'm starting with a common five-letter word that contains three frequently used vowels (A, I, E) and two common consonants (R, S) to maximize the initial feedback.",
+    "The feedback indicates that 'r', 'i', 's', and 'e' are all in the word but in the wrong positions, while 'a' is not in the word at all. I am choosing \"siren\" to test these letters in new positions and introduce the common consonant 'n'.",
+    "From the feedback, we know 'n' is at the fifth position. The letters 'r', 'i', 's', and 'e' are all present but misplaced. Specifically, 'r' is not at 1 or 2, 'i' is not at 1 or 2, 's' is not at 0 or 3, and 'e' is not at 3 or 4. By testing 'r' at 0, 'e' at 1, 's' at 2, and 'i' at 3, we get the valid English word \"resin\"."
+  ]
+}

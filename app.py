@@ -97,12 +97,13 @@ div:focus, div:focus-visible {
     color: #3b82f6; letter-spacing: .08em;
     margin-bottom: 6px;
 }
-.goal-text { font-size: 13px; color: #374151; line-height: 1.5; margin: 0; }
+.goal-text { font-size: 13px; color: #374151; line-height: 1.5; margin: 0; white-space: pre-line; }
 .gm-msg {
     font-size: 12px; color: #6b7280;
     padding: 5px 10px; margin: 6px 0;
     border-left: 2px solid #cbd5e1;
     line-height: 1.5;
+    white-space: pre-line;
 }
 .gm-tag { font-weight: 700; color: #94a3b8; font-size: 10px; letter-spacing: .06em; margin-right: 4px; }
 .turn-card {
@@ -119,6 +120,22 @@ div:focus, div:focus-visible {
     border-color: #3b82f6 !important;
     box-shadow: 0 0 0 4px rgba(59,130,246,.25);
 }
+/* Player 2 — purple */
+.turn-card.p2 { background: #1e1b4b; }
+.turn-card.p2 .card-header { color: #a78bfa !important; }
+.turn-card.p2.active-turn {
+    background: #2e1b69 !important;
+    border-color: #7c3aed !important;
+    box-shadow: 0 0 0 4px rgba(124,58,237,.25) !important;
+}
+/* Player 3 — teal */
+.turn-card.p3 { background: #0d2f2f; }
+.turn-card.p3 .card-header { color: #2dd4bf !important; }
+.turn-card.p3.active-turn {
+    background: #0f3d3d !important;
+    border-color: #14b8a6 !important;
+    box-shadow: 0 0 0 4px rgba(20,184,166,.25) !important;
+}
 .card-header {
     font-size: 10px; font-weight: 700;
     color: #7dd3fc; letter-spacing: .1em;
@@ -131,6 +148,21 @@ div:focus, div:focus-visible {
     font-size: 13px; margin: 8px 0;
 }
 .game-end-msg { text-align: center; color: #9ca3af; font-size: 13px; padding: 10px 0; }
+.game-win-msg {
+    text-align: center;
+    background: #052e16; border: 1px solid #166534; border-radius: 8px;
+    color: #4ade80; font-size: 15px; font-weight: 700;
+    padding: 12px 0; margin: 10px 0;
+    letter-spacing: .02em;
+}
+.game-loss-msg {
+    text-align: center;
+    background: #2d0808; border: 1px solid #7f1d1d; border-radius: 8px;
+    color: #f87171; font-size: 15px; font-weight: 700;
+    padding: 12px 0; margin: 10px 0;
+    letter-spacing: .02em;
+}
+
 
 /* ── Right annotation column (stacked turn cards) ─────────────── */
 #annot-col { background: #0a0e1a !important; border-radius: 10px !important; padding: 10px 12px !important; }
@@ -148,20 +180,31 @@ div:focus, div:focus-visible {
     padding: 14px 16px !important;
     margin-bottom: 14px !important;
 }
-.turn-anno-card{
-    background: black !important;
-}
+
 .turn-anno-card:not(:has(.turn-anno-card)) {
     background: transparent !important; border: none !important; padding: 0 !important; margin: 0 !important;
 }
-#annot-col .turn-anno-card .block,
-#annot-col .turn-anno-card .form,
-#annot-col .turn-anno-card .wrap,
-#annot-col .turn-anno-card .gap,
-#annot-col .turn-anno-card .styler,
-#annot-col .turn-anno-card > div,
-#annot-col .turn-anno-card > div > div {
-    background: transparent !important; border: none !important; box-shadow: none !important;
+/* Force ALL inner Gradio containers to the same solid dark-blue so no grey leaks through */
+.turn-anno-card .block,
+.turn-anno-card .form,
+.turn-anno-card .wrap,
+.turn-anno-card > div,
+.turn-anno-card fieldset,
+.turn-anno-card .svelte-phx28p,
+.turn-anno-card [data-testid] {
+    background: #0e1a30 !important;
+    border: none !important;
+    box-shadow: none !important;
+}
+/* But the inner .turn-anno-card node itself stays transparent */
+.turn-anno-card .turn-anno-card,
+.turn-anno-card .turn-anno-card .block,
+.turn-anno-card .turn-anno-card .form,
+.turn-anno-card .turn-anno-card .wrap,
+.turn-anno-card .turn-anno-card > div {
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
 }
 /* Rated state: green border once Q1 and Q2 are both answered (pure CSS, scoped to
    the outer wrapper so the ring isn't drawn twice). */
@@ -179,16 +222,41 @@ div:focus, div:focus-visible {
 }
 .turn-anno-card:has(.q1-scale input:checked):has(.q2-scale input:checked) .ta-badge { background: #22c55e !important; }
 .ta-title { font-size: 15px; font-weight: 600; color: #f1f5f9; }
+.ta-sender {
+    background: rgba(59,130,246,.18);
+    color: #93c5fd;
+    border: 1px solid rgba(59,130,246,.35);
+    border-radius: 5px;
+    font-size: 11px; font-weight: 700;
+    padding: 2px 8px;
+    letter-spacing: .03em;
+}
+.ta-role {
+    background: rgba(100,116,139,.15);
+    color: #94a3b8;
+    border: 1px solid rgba(100,116,139,.25);
+    border-radius: 5px;
+    font-size: 10px; font-weight: 600;
+    padding: 2px 7px;
+    letter-spacing: .02em;
+}
 .rated-badge { margin-left: auto; color: #22c55e; font-size: 12px; font-weight: 600; display: none; }
 .turn-anno-card:has(.q1-scale input:checked):has(.q2-scale input:checked) .rated-badge { display: inline-flex; }
-/* Rating buttons fill the card width, 4–5 equal columns */
+/* Rating buttons always on one row — flex:1 1 0 + min-width:0 makes them share
+   the full card width equally for any number of options (4 or 5). */
 .turn-anno-card .scale-radio .wrap {
-    width: 100% !important; gap: 8px !important;
+    width: 100% !important; gap: 6px !important;
     background: transparent !important; border: none !important;
     padding: 0 !important; margin: 6px 0 10px !important;
     flex-wrap: nowrap !important;
+    overflow: hidden !important;
 }
-.turn-anno-card .scale-radio label { flex: 1 1 0 !important; min-width: 0 !important; }
+.turn-anno-card .scale-radio label {
+    flex: 1 1 0 !important;
+    min-width: 0 !important;
+    padding: 10px 4px !important;
+    font-size: 11px !important;
+}
 
 /* ── Turn navigator (client-side pagination) ──────────────────── */
 .turn-nav {
@@ -266,26 +334,39 @@ div:focus, div:focus-visible {
     width: fit-content !important;
     margin: 4px auto !important;
     padding: 10px 14px !important;
-    background: rgba(100,116,139,.07) !important;
-    border: 1px solid rgba(100,116,139,.12) !important;
+    background: #0e1a30 !important;
+    border: none !important;
     border-radius: 10px !important;
 }
+/* Higher-specificity override so this beats .turn-anno-card .wrap from Fix 1 */
+.turn-anno-card .scale-radio .wrap {
+    background: #0e1a30 !important;
+    border: none !important;
+}
 .scale-radio label {
-    background: #1e293b !important;
-    border: 1px solid #334155 !important;
+    background: #0d1828 !important;
+    border: 1px solid #1e3a5f !important;
     color: #94a3b8 !important;
     border-radius: 6px !important;
-    padding: 8px 14px !important;
+    padding: 12px 18px !important;
     cursor: pointer !important;
-    font-size: 11px !important;
+    font-size: 13px !important;
     text-align: center !important;
-    min-width: 62px !important;
+    min-width: 80px !important;
     white-space: pre-line !important;
     line-height: 1.5 !important;
     transition: all .15s !important;
     display: inline-flex !important;
     align-items: center !important;
     justify-content: center !important;
+}
+/* 3-class specificity wins over any 2-class Gradio or our own rules */
+.turn-anno-card .scale-radio label {
+    background: #0d1828 !important;
+    border: 1px solid #1e3a5f !important;
+    padding: 12px 18px !important;
+    font-size: 13px !important;
+    min-width: 80px !important;
 }
 .scale-radio label:hover { border-color: #3b82f6 !important; color: #93c5fd !important; }
 /* Red error state on the wrap container */
@@ -316,11 +397,26 @@ div:focus, div:focus-visible {
 .flags-check label:hover { border-color: #3b82f6 !important; }
 
 /* ── Comment textbox ──────────────────────────────────────────── */
+/* Strip the Gradio outer wrapper so only the textarea colour shows */
+.turn-comment,
+.turn-comment .block,
+.turn-comment .wrap,
+.turn-comment > div {
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+}
 .turn-comment textarea {
-    background: #1e293b !important;
-    border-color: #334155 !important;
+    background: #0d1828 !important;
+    border: 1px solid #1e3a5f !important;
+    border-radius: 8px !important;
     color: #cbd5e1 !important;
     font-size: 13px !important;
+}
+.turn-anno-card .turn-comment textarea {
+    background: #0d1828 !important;
+    border: 1px solid #1e3a5f !important;
 }
 .turn-comment textarea::placeholder { color: #64748b !important; }
 
@@ -516,6 +612,16 @@ div:focus, div:focus-visible {
     padding: 20px !important;
     margin-top: 10px !important;
 }
+
+/* ── Game selector ────────────────────────────────────────────── */
+.game-select-row { margin-bottom: 10px !important; }
+.game-select { background: transparent !important; }
+.game-select label span { color: #94a3b8 !important; font-size: 12px !important; }
+.game-select input, .game-select .wrap-inner, .game-select .secondary-wrap {
+    background: #0f172a !important; color: #e2e8f0 !important;
+    border-color: #334155 !important;
+}
+.game-select .container { background: transparent !important; }
 """
 
 # Head scripts:
@@ -630,6 +736,36 @@ force_dark = """
             if (init() || ++tries > 100) clearInterval(iv);
         }, 100);
     }
+
+    // Re-initialise when @gr.render swaps the per-game cards in/out
+    // (selecting a different game rebuilds the whole annotation column).
+    // Long games take longer to paint, so we use a retry loop inside the
+    // observer callback rather than a single fixed timeout — this guarantees
+    // refresh() is only called once BOTH cards AND chips are in the DOM.
+    (function () {
+        var host = document.getElementById('annot-page');
+        if (!host || !window.MutationObserver) return;
+        var debounceTimer, retryIv;
+        new MutationObserver(function () {
+            // Debounce rapid mutations (Gradio fires many during render)
+            clearTimeout(debounceTimer);
+            clearInterval(retryIv);
+            debounceTimer = setTimeout(function () {
+                // Poll until both annotation panes and nav chips exist
+                var attempts = 0;
+                retryIv = setInterval(function () {
+                    if (panes().length && chips().length) {
+                        clearInterval(retryIv);
+                        wireAria();
+                        current = 0;
+                        refresh();
+                    } else if (++attempts > 80) {
+                        clearInterval(retryIv);
+                    }
+                }, 50);
+            }, 80);
+        }).observe(host, { childList: true, subtree: true });
+    })();
 })();
 </script>
 <script>
@@ -655,6 +791,12 @@ force_dark = """
         // Selecting a turn / answering a question can resize the right column.
         document.addEventListener('click', function () { setTimeout(sync, 50); });
         document.addEventListener('change', function () { setTimeout(sync, 50); });
+        // Switching games rebuilds both columns — re-measure against the new DOM.
+        var host = document.getElementById('annot-page');
+        if (host && window.MutationObserver) {
+            new MutationObserver(function () { setTimeout(sync, 80); })
+                .observe(host, { childList: true, subtree: true });
+        }
         return true;
     }
     if (!init()) {
@@ -668,12 +810,16 @@ force_dark = """
 """
 
 with gr.Blocks() as app:
+    # Shared selected-game path; the annotation selector writes it and both the
+    # annotation and verdict screens render off it.
+    game_state = gr.State(annotation.DEFAULT_GAME)
+
     welcome_page = gr.Column(visible=True)
     annotation_page = gr.Column(visible=False, elem_id="annot-page")
     verdict_page = gr.Column(visible=False, elem_id="verdict-page")
 
     welcome.build(welcome_page, annotation_page)
-    annotation.build(welcome_page, annotation_page, verdict_page)
-    annotation_verdict.build(welcome_page, annotation_page, verdict_page)
+    annotation.build(welcome_page, annotation_page, verdict_page, game_state)
+    annotation_verdict.build(welcome_page, annotation_page, verdict_page, game_state)
 
 app.launch(css=css, theme=gr.themes.Soft(), head=force_dark, share=True)

@@ -1,0 +1,1391 @@
+{
+  "meta": {
+    "game_name": "codenames",
+    "experiment_name": "opponent_easy",
+    "game_id": 0,
+    "results_folder": "claude-sonnet-4-5-azure-high-t1.0",
+    "clem_version": "3.3.4"
+  },
+  "player_models": {
+    "0": {
+      "model_name": "claude-sonnet-4-5-azure-high",
+      "backend": "azclaude",
+      "context_size": "200k",
+      "languages": [
+        "en"
+      ],
+      "license": {
+        "name": "Apache 2.0",
+        "url": "https://www.apache.org/licenses/LICENSE-2.0"
+      },
+      "lookup_source": "/project/hakimov/clembench-v3.0/model_registry.json",
+      "model_config": {
+        "thinking_mode": true,
+        "thinking_budget": 8192,
+        "multimodality": {
+          "single_image": true,
+          "multiple_images": true,
+          "audio": false,
+          "video": false
+        }
+      },
+      "model_id": "claude-sonnet-4-5",
+      "open_weight": false,
+      "parameters": "",
+      "release_date": "2024-12-18"
+    }
+  },
+  "players": {
+    "GM": {
+      "game_role": "Game Master",
+      "model_name": "programmatic"
+    },
+    "Player 1": {
+      "game_role": "ClueGiver",
+      "model_name": "claude-sonnet-4-5-azure-high"
+    },
+    "Player 2": {
+      "game_role": "Guesser",
+      "model_name": "claude-sonnet-4-5-azure-high"
+    }
+  },
+  "turns": [
+    [
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T17:24:32.805021",
+        "action": {
+          "type": "board status",
+          "content": {
+            "hidden": {
+              "team": [
+                "marble",
+                "octopus",
+                "stadium",
+                "fish",
+                "cover",
+                "hospital",
+                "microscope",
+                "knight",
+                "berlin"
+              ],
+              "innocent": [
+                "england",
+                "bell",
+                "degree",
+                "foot",
+                "wake",
+                "bill",
+                "state"
+              ],
+              "opponent": [
+                "fly",
+                "crane",
+                "turkey",
+                "copper",
+                "line",
+                "square",
+                "cell",
+                "tooth"
+              ],
+              "assassin": [
+                "mammoth"
+              ]
+            },
+            "revealed": {
+              "team": {
+                "team": [],
+                "innocent": [],
+                "opponent": [],
+                "assassin": []
+              },
+              "opponent": {
+                "team": [],
+                "innocent": [],
+                "opponent": [],
+                "assassin": []
+              }
+            }
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 1",
+        "timestamp": "2026-03-02T17:24:32.805256",
+        "action": {
+          "type": "send message",
+          "content": "Provide one single-word clue that relates to some of your team's words from the list below. You can choose to how many and to which words your clue relates to.\nThe goal is to have your partner guess all of your team's words based on the clues you give them, before the other team has uncovered all of theirs. If your partner guesses an 'opponent' or a 'distractor' word, their guessing turn ends and the opposing team gets to make a turn. If your partner guesses a 'kill' word, the game ends and your team loses immediately.\nThe more words your clue relates to, the quicker you can win the game, but the harder the associations may be to guess for your partner, so choose your clue word wisely. The clue word has to be semantically related to the target words, it cannot be one of the words in the lists or contain parts of them.\n\nAlways give your single-word clue and your comma-separated list of related target words in the following format and make your answers as short as possible, never include any other text than is required in this form:\n\nCLUE: <WORD>\nTARGETS: <TARGETS>\n\nYour team words are: marble, octopus, stadium, fish, cover, hospital, microscope, knight, berlin.\nYour opponent's team words are: fly, crane, turkey, copper, line, square, cell, tooth.\nDistractor words are: england, bell, degree, foot, wake, bill, state.\nThe kill words are: mammoth.",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 1",
+        "to": "GM",
+        "timestamp": "2026-03-02T17:25:09.139327",
+        "action": {
+          "type": "get message",
+          "content": "CLUE: Marine\nTARGETS: octopus, fish",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T17:25:09.139744",
+        "action": {
+          "type": "clue",
+          "content": "marine"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T17:25:09.139800",
+        "action": {
+          "type": "targets",
+          "content": [
+            "octopus",
+            "fish"
+          ]
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T17:25:09.139843",
+        "action": {
+          "type": "word targeted",
+          "content": {
+            "word": "octopus",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T17:25:09.139879",
+        "action": {
+          "type": "word targeted",
+          "content": {
+            "word": "fish",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 2",
+        "timestamp": "2026-03-02T17:25:09.141106",
+        "action": {
+          "type": "send message",
+          "content": "Provide a comma-separated list of up to 2 words from the following list that best relate or are most closely associated with the word 'marine'. Always start your list of guess(es) with 'GUESS: ' and do not include any other text in your answer.\n\ncell, stadium, knight, bill, degree, copper, fly, berlin, bell, square, cover, crane, turkey, marble, wake, microscope, england, tooth, state, fish, line, mammoth, foot, hospital, octopus",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 2",
+        "to": "GM",
+        "timestamp": "2026-03-02T17:25:14.266160",
+        "action": {
+          "type": "get message",
+          "content": "GUESS: fish, octopus",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T17:25:14.266365",
+        "action": {
+          "type": "guesses",
+          "content": [
+            "fish",
+            "octopus"
+          ]
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T17:25:14.266429",
+        "action": {
+          "type": "team revealed",
+          "content": {
+            "word": "fish",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T17:25:14.266472",
+        "action": {
+          "type": "target revealed",
+          "content": {
+            "word": "fish",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T17:25:14.266509",
+        "action": {
+          "type": "team revealed",
+          "content": {
+            "word": "octopus",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T17:25:14.266543",
+        "action": {
+          "type": "target revealed",
+          "content": {
+            "word": "octopus",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T17:25:14.266869",
+        "action": {
+          "type": "opponent revealed",
+          "content": {
+            "word": "turkey",
+            "assignment": "opponent"
+          }
+        }
+      }
+    ],
+    [
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T17:25:14.266932",
+        "action": {
+          "type": "board status",
+          "content": {
+            "hidden": {
+              "team": [
+                "marble",
+                "stadium",
+                "cover",
+                "hospital",
+                "microscope",
+                "knight",
+                "berlin"
+              ],
+              "innocent": [
+                "england",
+                "bell",
+                "degree",
+                "foot",
+                "wake",
+                "bill",
+                "state"
+              ],
+              "opponent": [
+                "fly",
+                "crane",
+                "copper",
+                "line",
+                "square",
+                "cell",
+                "tooth"
+              ],
+              "assassin": [
+                "mammoth"
+              ]
+            },
+            "revealed": {
+              "team": {
+                "team": [
+                  "fish",
+                  "octopus"
+                ],
+                "innocent": [],
+                "opponent": [],
+                "assassin": []
+              },
+              "opponent": {
+                "team": [],
+                "innocent": [],
+                "opponent": [
+                  "turkey"
+                ],
+                "assassin": []
+              }
+            }
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 1",
+        "timestamp": "2026-03-02T17:25:14.267071",
+        "action": {
+          "type": "send message",
+          "content": "The words fish, octopus were guessed correctly. Your teammate's turn ended there.\nNow provide another clue relating to some of your remaining team words and a list of the related target words. Remember to start your clue with 'CLUE: ', put a new line, and start your comma-separated list of target words with 'TARGETS: '. Notice: some words have been removed from the lists compared to previous requests.\n\nYour remaining team words are: marble, stadium, cover, hospital, microscope, knight, berlin.\nRemaining words for your opponent are: fly, crane, turkey, copper, line, square, cell, tooth.\nRemaining distractor words are: england, bell, degree, foot, wake, bill, state.\nRemaining kill words are: mammoth.",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 1",
+        "to": "GM",
+        "timestamp": "2026-03-02T17:26:14.411510",
+        "action": {
+          "type": "get message",
+          "content": "CLUE: Defense\nTARGETS: knight, cover",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T17:26:14.411912",
+        "action": {
+          "type": "clue",
+          "content": "defense"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T17:26:14.411967",
+        "action": {
+          "type": "targets",
+          "content": [
+            "knight",
+            "cover"
+          ]
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T17:26:14.412010",
+        "action": {
+          "type": "word targeted",
+          "content": {
+            "word": "knight",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T17:26:14.412048",
+        "action": {
+          "type": "word targeted",
+          "content": {
+            "word": "cover",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 2",
+        "timestamp": "2026-03-02T17:26:14.413862",
+        "action": {
+          "type": "send message",
+          "content": "The words fish, octopus were guessed correctly. Your turn ended there.\nNow provide another comma-separated list of at least 1 and up to 2 words from the following list of words that best relate or are most closely associated with the word 'defense'. Remember to start your answer with 'GUESS: '. Notice: some words have been removed from the list compared to previous requests.\n\ncell, stadium, knight, bill, degree, copper, fly, berlin, bell, square, cover, crane, marble, wake, microscope, england, tooth, state, line, mammoth, foot, hospital",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 2",
+        "to": "GM",
+        "timestamp": "2026-03-02T17:26:21.836501",
+        "action": {
+          "type": "get message",
+          "content": "GUESS: knight, line",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T17:26:21.836715",
+        "action": {
+          "type": "guesses",
+          "content": [
+            "knight",
+            "line"
+          ]
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T17:26:21.836775",
+        "action": {
+          "type": "team revealed",
+          "content": {
+            "word": "knight",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T17:26:21.836816",
+        "action": {
+          "type": "target revealed",
+          "content": {
+            "word": "knight",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T17:26:21.836855",
+        "action": {
+          "type": "team revealed",
+          "content": {
+            "word": "line",
+            "assignment": "opponent"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T17:26:21.836889",
+        "action": {
+          "type": "turn end after",
+          "content": "line"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T17:26:21.837185",
+        "action": {
+          "type": "opponent revealed",
+          "content": {
+            "word": "crane",
+            "assignment": "opponent"
+          }
+        }
+      }
+    ],
+    [
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T17:26:21.837247",
+        "action": {
+          "type": "board status",
+          "content": {
+            "hidden": {
+              "team": [
+                "marble",
+                "stadium",
+                "cover",
+                "hospital",
+                "microscope",
+                "berlin"
+              ],
+              "innocent": [
+                "england",
+                "bell",
+                "degree",
+                "foot",
+                "wake",
+                "bill",
+                "state"
+              ],
+              "opponent": [
+                "fly",
+                "copper",
+                "square",
+                "cell",
+                "tooth"
+              ],
+              "assassin": [
+                "mammoth"
+              ]
+            },
+            "revealed": {
+              "team": {
+                "team": [
+                  "fish",
+                  "octopus",
+                  "knight"
+                ],
+                "innocent": [],
+                "opponent": [
+                  "line"
+                ],
+                "assassin": []
+              },
+              "opponent": {
+                "team": [],
+                "innocent": [],
+                "opponent": [
+                  "turkey",
+                  "crane"
+                ],
+                "assassin": []
+              }
+            }
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 1",
+        "timestamp": "2026-03-02T17:26:21.837384",
+        "action": {
+          "type": "send message",
+          "content": "The word knight was guessed correctly. The word line was guessed but is an opponent word. Your teammate's turn ended there.\nNow provide another clue relating to some of your remaining team words and a list of the related target words. Remember to start your clue with 'CLUE: ', put a new line, and start your comma-separated list of target words with 'TARGETS: '. Notice: some words have been removed from the lists compared to previous requests.\n\nYour remaining team words are: marble, stadium, cover, hospital, microscope, berlin.\nRemaining words for your opponent are: fly, crane, copper, square, cell, tooth.\nRemaining distractor words are: england, bell, degree, foot, wake, bill, state.\nRemaining kill words are: mammoth.",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 1",
+        "to": "GM",
+        "timestamp": "2026-03-02T17:26:58.175364",
+        "action": {
+          "type": "get message",
+          "content": "CLUE: German\nTARGETS: berlin",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T17:26:58.175746",
+        "action": {
+          "type": "clue",
+          "content": "german"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T17:26:58.175801",
+        "action": {
+          "type": "targets",
+          "content": [
+            "berlin"
+          ]
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T17:26:58.175842",
+        "action": {
+          "type": "word targeted",
+          "content": {
+            "word": "berlin",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 2",
+        "timestamp": "2026-03-02T17:26:58.176198",
+        "action": {
+          "type": "send message",
+          "content": "The word knight was guessed correctly. The word line was guessed but is an opponent word. Your turn ended there.\nNow provide another comma-separated list of at least 1 and up to 1 words from the following list of words that best relate or are most closely associated with the word 'german'. Remember to start your answer with 'GUESS: '. Notice: some words have been removed from the list compared to previous requests.\n\ncell, stadium, bill, degree, copper, fly, berlin, bell, square, cover, marble, wake, microscope, england, tooth, state, mammoth, foot, hospital",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 2",
+        "to": "GM",
+        "timestamp": "2026-03-02T17:27:04.356353",
+        "action": {
+          "type": "get message",
+          "content": "GUESS: berlin",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T17:27:04.356565",
+        "action": {
+          "type": "guesses",
+          "content": [
+            "berlin"
+          ]
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T17:27:04.356625",
+        "action": {
+          "type": "team revealed",
+          "content": {
+            "word": "berlin",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T17:27:04.356666",
+        "action": {
+          "type": "target revealed",
+          "content": {
+            "word": "berlin",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T17:27:04.356975",
+        "action": {
+          "type": "opponent revealed",
+          "content": {
+            "word": "cell",
+            "assignment": "opponent"
+          }
+        }
+      }
+    ],
+    [
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T17:27:04.357037",
+        "action": {
+          "type": "board status",
+          "content": {
+            "hidden": {
+              "team": [
+                "marble",
+                "stadium",
+                "cover",
+                "hospital",
+                "microscope"
+              ],
+              "innocent": [
+                "england",
+                "bell",
+                "degree",
+                "foot",
+                "wake",
+                "bill",
+                "state"
+              ],
+              "opponent": [
+                "fly",
+                "copper",
+                "square",
+                "tooth"
+              ],
+              "assassin": [
+                "mammoth"
+              ]
+            },
+            "revealed": {
+              "team": {
+                "team": [
+                  "fish",
+                  "octopus",
+                  "knight",
+                  "berlin"
+                ],
+                "innocent": [],
+                "opponent": [
+                  "line"
+                ],
+                "assassin": []
+              },
+              "opponent": {
+                "team": [],
+                "innocent": [],
+                "opponent": [
+                  "turkey",
+                  "crane",
+                  "cell"
+                ],
+                "assassin": []
+              }
+            }
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 1",
+        "timestamp": "2026-03-02T17:27:04.357174",
+        "action": {
+          "type": "send message",
+          "content": "The word berlin was guessed correctly. Your teammate's turn ended there.\nNow provide another clue relating to some of your remaining team words and a list of the related target words. Remember to start your clue with 'CLUE: ', put a new line, and start your comma-separated list of target words with 'TARGETS: '. Notice: some words have been removed from the lists compared to previous requests.\n\nYour remaining team words are: marble, stadium, cover, hospital, microscope.\nRemaining words for your opponent are: fly, copper, square, cell, tooth.\nRemaining distractor words are: england, bell, degree, foot, wake, bill, state.\nRemaining kill words are: mammoth.",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 1",
+        "to": "GM",
+        "timestamp": "2026-03-02T17:27:29.030923",
+        "action": {
+          "type": "get message",
+          "content": "CLUE: Clinical\nTARGETS: hospital, microscope",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T17:27:29.031311",
+        "action": {
+          "type": "clue",
+          "content": "clinical"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T17:27:29.031368",
+        "action": {
+          "type": "targets",
+          "content": [
+            "hospital",
+            "microscope"
+          ]
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T17:27:29.031412",
+        "action": {
+          "type": "word targeted",
+          "content": {
+            "word": "hospital",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T17:27:29.031450",
+        "action": {
+          "type": "word targeted",
+          "content": {
+            "word": "microscope",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 2",
+        "timestamp": "2026-03-02T17:27:29.033227",
+        "action": {
+          "type": "send message",
+          "content": "The word berlin was guessed correctly. Your turn ended there.\nNow provide another comma-separated list of at least 1 and up to 2 words from the following list of words that best relate or are most closely associated with the word 'clinical'. Remember to start your answer with 'GUESS: '. Notice: some words have been removed from the list compared to previous requests.\n\nstadium, bill, degree, copper, fly, bell, square, cover, marble, wake, microscope, england, tooth, state, mammoth, foot, hospital",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 2",
+        "to": "GM",
+        "timestamp": "2026-03-02T17:27:37.647424",
+        "action": {
+          "type": "get message",
+          "content": "GUESS: hospital, microscope",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T17:27:37.647666",
+        "action": {
+          "type": "guesses",
+          "content": [
+            "hospital",
+            "microscope"
+          ]
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T17:27:37.647733",
+        "action": {
+          "type": "team revealed",
+          "content": {
+            "word": "hospital",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T17:27:37.647776",
+        "action": {
+          "type": "target revealed",
+          "content": {
+            "word": "hospital",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T17:27:37.647815",
+        "action": {
+          "type": "team revealed",
+          "content": {
+            "word": "microscope",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T17:27:37.647850",
+        "action": {
+          "type": "target revealed",
+          "content": {
+            "word": "microscope",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T17:27:37.648203",
+        "action": {
+          "type": "opponent revealed",
+          "content": {
+            "word": "copper",
+            "assignment": "opponent"
+          }
+        }
+      }
+    ],
+    [
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T17:27:37.648267",
+        "action": {
+          "type": "board status",
+          "content": {
+            "hidden": {
+              "team": [
+                "marble",
+                "stadium",
+                "cover"
+              ],
+              "innocent": [
+                "england",
+                "bell",
+                "degree",
+                "foot",
+                "wake",
+                "bill",
+                "state"
+              ],
+              "opponent": [
+                "fly",
+                "square",
+                "tooth"
+              ],
+              "assassin": [
+                "mammoth"
+              ]
+            },
+            "revealed": {
+              "team": {
+                "team": [
+                  "fish",
+                  "octopus",
+                  "knight",
+                  "berlin",
+                  "hospital",
+                  "microscope"
+                ],
+                "innocent": [],
+                "opponent": [
+                  "line"
+                ],
+                "assassin": []
+              },
+              "opponent": {
+                "team": [],
+                "innocent": [],
+                "opponent": [
+                  "turkey",
+                  "crane",
+                  "cell",
+                  "copper"
+                ],
+                "assassin": []
+              }
+            }
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 1",
+        "timestamp": "2026-03-02T17:27:37.648410",
+        "action": {
+          "type": "send message",
+          "content": "The words hospital, microscope were guessed correctly. Your teammate's turn ended there.\nNow provide another clue relating to some of your remaining team words and a list of the related target words. Remember to start your clue with 'CLUE: ', put a new line, and start your comma-separated list of target words with 'TARGETS: '. Notice: some words have been removed from the lists compared to previous requests.\n\nYour remaining team words are: marble, stadium, cover.\nRemaining words for your opponent are: fly, copper, square, tooth.\nRemaining distractor words are: england, bell, degree, foot, wake, bill, state.\nRemaining kill words are: mammoth.",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 1",
+        "to": "GM",
+        "timestamp": "2026-03-02T17:28:25.887991",
+        "action": {
+          "type": "get message",
+          "content": "CLUE: Roof\nTARGETS: stadium, cover",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T17:28:25.888371",
+        "action": {
+          "type": "clue",
+          "content": "roof"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T17:28:25.888427",
+        "action": {
+          "type": "targets",
+          "content": [
+            "stadium",
+            "cover"
+          ]
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T17:28:25.888469",
+        "action": {
+          "type": "word targeted",
+          "content": {
+            "word": "stadium",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T17:28:25.888506",
+        "action": {
+          "type": "word targeted",
+          "content": {
+            "word": "cover",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 2",
+        "timestamp": "2026-03-02T17:28:25.888852",
+        "action": {
+          "type": "send message",
+          "content": "The words hospital, microscope were guessed correctly. Your turn ended there.\nNow provide another comma-separated list of at least 1 and up to 2 words from the following list of words that best relate or are most closely associated with the word 'roof'. Remember to start your answer with 'GUESS: '. Notice: some words have been removed from the list compared to previous requests.\n\nstadium, bill, degree, fly, bell, square, cover, marble, wake, england, tooth, state, mammoth, foot",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 2",
+        "to": "GM",
+        "timestamp": "2026-03-02T17:28:31.972358",
+        "action": {
+          "type": "get message",
+          "content": "GUESS: tooth, cover",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T17:28:31.972605",
+        "action": {
+          "type": "guesses",
+          "content": [
+            "tooth",
+            "cover"
+          ]
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T17:28:31.972672",
+        "action": {
+          "type": "team revealed",
+          "content": {
+            "word": "tooth",
+            "assignment": "opponent"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T17:28:31.972714",
+        "action": {
+          "type": "turn end after",
+          "content": "tooth"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T17:28:31.974273",
+        "action": {
+          "type": "opponent revealed",
+          "content": {
+            "word": "square",
+            "assignment": "opponent"
+          }
+        }
+      }
+    ],
+    [
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T17:28:31.974353",
+        "action": {
+          "type": "board status",
+          "content": {
+            "hidden": {
+              "team": [
+                "marble",
+                "stadium",
+                "cover"
+              ],
+              "innocent": [
+                "england",
+                "bell",
+                "degree",
+                "foot",
+                "wake",
+                "bill",
+                "state"
+              ],
+              "opponent": [
+                "fly"
+              ],
+              "assassin": [
+                "mammoth"
+              ]
+            },
+            "revealed": {
+              "team": {
+                "team": [
+                  "fish",
+                  "octopus",
+                  "knight",
+                  "berlin",
+                  "hospital",
+                  "microscope"
+                ],
+                "innocent": [],
+                "opponent": [
+                  "line",
+                  "tooth"
+                ],
+                "assassin": []
+              },
+              "opponent": {
+                "team": [],
+                "innocent": [],
+                "opponent": [
+                  "turkey",
+                  "crane",
+                  "cell",
+                  "copper",
+                  "square"
+                ],
+                "assassin": []
+              }
+            }
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 1",
+        "timestamp": "2026-03-02T17:28:31.974499",
+        "action": {
+          "type": "send message",
+          "content": "The word tooth was guessed but is an opponent word. Your teammate's turn ended there.\nNow provide another clue relating to some of your remaining team words and a list of the related target words. Remember to start your clue with 'CLUE: ', put a new line, and start your comma-separated list of target words with 'TARGETS: '. Notice: some words have been removed from the lists compared to previous requests.\n\nYour remaining team words are: marble, stadium, cover.\nRemaining words for your opponent are: fly, square.\nRemaining distractor words are: england, bell, degree, foot, wake, bill, state.\nRemaining kill words are: mammoth.",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 1",
+        "to": "GM",
+        "timestamp": "2026-03-02T17:28:59.301523",
+        "action": {
+          "type": "get message",
+          "content": "CLUE: Greek\nTARGETS: marble, stadium",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T17:28:59.301905",
+        "action": {
+          "type": "clue",
+          "content": "greek"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T17:28:59.301966",
+        "action": {
+          "type": "targets",
+          "content": [
+            "marble",
+            "stadium"
+          ]
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T17:28:59.302008",
+        "action": {
+          "type": "word targeted",
+          "content": {
+            "word": "marble",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T17:28:59.302045",
+        "action": {
+          "type": "word targeted",
+          "content": {
+            "word": "stadium",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 2",
+        "timestamp": "2026-03-02T17:28:59.302426",
+        "action": {
+          "type": "send message",
+          "content": "The word tooth was guessed but is an opponent word. Your turn ended there.\nNow provide another comma-separated list of at least 1 and up to 2 words from the following list of words that best relate or are most closely associated with the word 'greek'. Remember to start your answer with 'GUESS: '. Notice: some words have been removed from the list compared to previous requests.\n\nstadium, bill, degree, fly, bell, cover, marble, wake, england, state, mammoth, foot",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 2",
+        "to": "GM",
+        "timestamp": "2026-03-02T17:29:04.435119",
+        "action": {
+          "type": "get message",
+          "content": "GUESS: marble, stadium",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T17:29:04.435376",
+        "action": {
+          "type": "guesses",
+          "content": [
+            "marble",
+            "stadium"
+          ]
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T17:29:04.435442",
+        "action": {
+          "type": "team revealed",
+          "content": {
+            "word": "marble",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T17:29:04.435483",
+        "action": {
+          "type": "target revealed",
+          "content": {
+            "word": "marble",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T17:29:04.435520",
+        "action": {
+          "type": "team revealed",
+          "content": {
+            "word": "stadium",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T17:29:04.435553",
+        "action": {
+          "type": "target revealed",
+          "content": {
+            "word": "stadium",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T17:29:04.435874",
+        "action": {
+          "type": "opponent revealed",
+          "content": {
+            "word": "fly",
+            "assignment": "opponent"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T17:29:04.435927",
+        "action": {
+          "type": "game end",
+          "content": "opponent has won"
+        }
+      }
+    ]
+  ],
+  "board end status": {
+    "hidden": {
+      "team": [
+        "cover"
+      ],
+      "innocent": [
+        "england",
+        "bell",
+        "degree",
+        "foot",
+        "wake",
+        "bill",
+        "state"
+      ],
+      "opponent": [],
+      "assassin": [
+        "mammoth"
+      ]
+    },
+    "revealed": {
+      "team": {
+        "team": [
+          "fish",
+          "octopus",
+          "knight",
+          "berlin",
+          "hospital",
+          "microscope",
+          "marble",
+          "stadium"
+        ],
+        "innocent": [],
+        "opponent": [
+          "line",
+          "tooth"
+        ],
+        "assassin": []
+      },
+      "opponent": {
+        "team": [],
+        "innocent": [],
+        "opponent": [
+          "turkey",
+          "crane",
+          "cell",
+          "copper",
+          "square",
+          "fly"
+        ],
+        "assassin": []
+      }
+    }
+  },
+  "Number of turns": 7,
+  "Aborted": false,
+  "Lose": true,
+  "Game ended through assassin": false,
+  "Request Count": 12,
+  "Parsed Request Count": 12,
+  "Violated Request Count": 0,
+  "Cluegiver engaged flags": {
+    "IGNORE RAMBLING": 0,
+    "IGNORE FALSE TARGETS OR GUESSES": 0,
+    "REPROMPT ON ERROR": 0,
+    "STRIP WORDS": 0,
+    "IGNORE NUMBER OF TARGETS": 0
+  },
+  "Guesser engaged flags": {
+    "IGNORE RAMBLING": 0,
+    "IGNORE FALSE TARGETS OR GUESSES": 0,
+    "REPROMPT ON ERROR": 0,
+    "STRIP WORDS": 0,
+    "IGNORE NUMBER OF TARGETS": 0
+  }
+}

@@ -1,0 +1,1590 @@
+{
+  "meta": {
+    "game_name": "codenames",
+    "experiment_name": "abstract",
+    "game_id": 0,
+    "results_folder": "claude-sonnet-4-5-azure-high-t1.0",
+    "clem_version": "3.3.4"
+  },
+  "player_models": {
+    "0": {
+      "model_name": "claude-sonnet-4-5-azure-high",
+      "backend": "azclaude",
+      "context_size": "200k",
+      "languages": [
+        "en"
+      ],
+      "license": {
+        "name": "Apache 2.0",
+        "url": "https://www.apache.org/licenses/LICENSE-2.0"
+      },
+      "lookup_source": "/project/hakimov/clembench-v3.0/model_registry.json",
+      "model_config": {
+        "thinking_mode": true,
+        "thinking_budget": 8192,
+        "multimodality": {
+          "single_image": true,
+          "multiple_images": true,
+          "audio": false,
+          "video": false
+        }
+      },
+      "model_id": "claude-sonnet-4-5",
+      "open_weight": false,
+      "parameters": "",
+      "release_date": "2024-12-18"
+    }
+  },
+  "players": {
+    "GM": {
+      "game_role": "Game Master",
+      "model_name": "programmatic"
+    },
+    "Player 1": {
+      "game_role": "ClueGiver",
+      "model_name": "claude-sonnet-4-5-azure-high"
+    },
+    "Player 2": {
+      "game_role": "Guesser",
+      "model_name": "claude-sonnet-4-5-azure-high"
+    }
+  },
+  "turns": [
+    [
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T21:33:29.697339",
+        "action": {
+          "type": "board status",
+          "content": {
+            "hidden": {
+              "team": [
+                "affirmation",
+                "lunacy",
+                "adventurousness",
+                "interconnection",
+                "oppressiveness",
+                "insignificance",
+                "perpetration",
+                "dissonance",
+                "anticommunism"
+              ],
+              "innocent": [
+                "fantasy",
+                "endearment",
+                "ethic",
+                "solemnity",
+                "adversity",
+                "manner",
+                "loathsomeness"
+              ],
+              "opponent": [
+                "responsibility",
+                "splendor",
+                "grandiosity",
+                "austerity",
+                "viciousness",
+                "cohesion",
+                "unification",
+                "lessening"
+              ],
+              "assassin": [
+                "optimism"
+              ]
+            },
+            "revealed": {
+              "team": {
+                "team": [],
+                "innocent": [],
+                "opponent": [],
+                "assassin": []
+              },
+              "opponent": {
+                "team": [],
+                "innocent": [],
+                "opponent": [],
+                "assassin": []
+              }
+            }
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 1",
+        "timestamp": "2026-03-02T21:33:29.697538",
+        "action": {
+          "type": "send message",
+          "content": "Provide one single-word clue that relates to some of your team's words from the list below. You can choose to how many and to which words your clue relates to.\nThe goal is to have your partner guess all of your team's words based on the clues you give them, before the other team has uncovered all of theirs. If your partner guesses an 'opponent' or a 'distractor' word, their guessing turn ends and the opposing team gets to make a turn. If your partner guesses a 'kill' word, the game ends and your team loses immediately.\nThe more words your clue relates to, the quicker you can win the game, but the harder the associations may be to guess for your partner, so choose your clue word wisely. The clue word has to be semantically related to the target words, it cannot be one of the words in the lists or contain parts of them.\n\nAlways give your single-word clue and your comma-separated list of related target words in the following format and make your answers as short as possible, never include any other text than is required in this form:\n\nCLUE: <WORD>\nTARGETS: <TARGETS>\n\nYour team words are: affirmation, lunacy, adventurousness, interconnection, oppressiveness, insignificance, perpetration, dissonance, anticommunism.\nYour opponent's team words are: responsibility, splendor, grandiosity, austerity, viciousness, cohesion, unification, lessening.\nDistractor words are: fantasy, endearment, ethic, solemnity, adversity, manner, loathsomeness.\nThe kill words are: optimism.",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 1",
+        "to": "GM",
+        "timestamp": "2026-03-02T21:34:08.934939",
+        "action": {
+          "type": "get message",
+          "content": "CLUE: NETWORK\nTARGETS: interconnection",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T21:34:08.935430",
+        "action": {
+          "type": "clue",
+          "content": "network"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T21:34:08.935486",
+        "action": {
+          "type": "targets",
+          "content": [
+            "interconnection"
+          ]
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T21:34:08.935526",
+        "action": {
+          "type": "word targeted",
+          "content": {
+            "word": "interconnection",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 2",
+        "timestamp": "2026-03-02T21:34:08.937550",
+        "action": {
+          "type": "send message",
+          "content": "Provide a comma-separated list of up to 1 words from the following list that best relate or are most closely associated with the word 'network'. Always start your list of guess(es) with 'GUESS: ' and do not include any other text in your answer.\n\nunification, optimism, responsibility, dissonance, endearment, ethic, perpetration, adversity, cohesion, affirmation, solemnity, insignificance, adventurousness, loathsomeness, manner, lessening, austerity, fantasy, lunacy, interconnection, splendor, viciousness, oppressiveness, anticommunism, grandiosity",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 2",
+        "to": "GM",
+        "timestamp": "2026-03-02T21:34:16.726072",
+        "action": {
+          "type": "get message",
+          "content": "GUESS: interconnection",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T21:34:16.726273",
+        "action": {
+          "type": "guesses",
+          "content": [
+            "interconnection"
+          ]
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T21:34:16.726338",
+        "action": {
+          "type": "team revealed",
+          "content": {
+            "word": "interconnection",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T21:34:16.726379",
+        "action": {
+          "type": "target revealed",
+          "content": {
+            "word": "interconnection",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T21:34:16.727144",
+        "action": {
+          "type": "opponent revealed",
+          "content": {
+            "word": "splendor",
+            "assignment": "opponent"
+          }
+        }
+      }
+    ],
+    [
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T21:34:16.727223",
+        "action": {
+          "type": "board status",
+          "content": {
+            "hidden": {
+              "team": [
+                "affirmation",
+                "lunacy",
+                "adventurousness",
+                "oppressiveness",
+                "insignificance",
+                "perpetration",
+                "dissonance",
+                "anticommunism"
+              ],
+              "innocent": [
+                "fantasy",
+                "endearment",
+                "ethic",
+                "solemnity",
+                "adversity",
+                "manner",
+                "loathsomeness"
+              ],
+              "opponent": [
+                "responsibility",
+                "grandiosity",
+                "austerity",
+                "viciousness",
+                "cohesion",
+                "unification",
+                "lessening"
+              ],
+              "assassin": [
+                "optimism"
+              ]
+            },
+            "revealed": {
+              "team": {
+                "team": [
+                  "interconnection"
+                ],
+                "innocent": [],
+                "opponent": [],
+                "assassin": []
+              },
+              "opponent": {
+                "team": [],
+                "innocent": [],
+                "opponent": [
+                  "splendor"
+                ],
+                "assassin": []
+              }
+            }
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 1",
+        "timestamp": "2026-03-02T21:34:16.727369",
+        "action": {
+          "type": "send message",
+          "content": "The word interconnection was guessed correctly. Your teammate's turn ended there.\nNow provide another clue relating to some of your remaining team words and a list of the related target words. Remember to start your clue with 'CLUE: ', put a new line, and start your comma-separated list of target words with 'TARGETS: '. Notice: some words have been removed from the lists compared to previous requests.\n\nYour remaining team words are: affirmation, lunacy, adventurousness, oppressiveness, insignificance, perpetration, dissonance, anticommunism.\nRemaining words for your opponent are: responsibility, splendor, grandiosity, austerity, viciousness, cohesion, unification, lessening.\nRemaining distractor words are: fantasy, endearment, ethic, solemnity, adversity, manner, loathsomeness.\nRemaining kill words are: optimism.",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 1",
+        "to": "GM",
+        "timestamp": "2026-03-02T21:34:41.945137",
+        "action": {
+          "type": "get message",
+          "content": "CLUE: CRIME\nTARGETS: perpetration",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T21:34:41.945548",
+        "action": {
+          "type": "clue",
+          "content": "crime"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T21:34:41.945606",
+        "action": {
+          "type": "targets",
+          "content": [
+            "perpetration"
+          ]
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T21:34:41.945646",
+        "action": {
+          "type": "word targeted",
+          "content": {
+            "word": "perpetration",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 2",
+        "timestamp": "2026-03-02T21:34:41.946005",
+        "action": {
+          "type": "send message",
+          "content": "The word interconnection was guessed correctly. Your turn ended there.\nNow provide another comma-separated list of at least 1 and up to 1 words from the following list of words that best relate or are most closely associated with the word 'crime'. Remember to start your answer with 'GUESS: '. Notice: some words have been removed from the list compared to previous requests.\n\nunification, optimism, responsibility, dissonance, endearment, ethic, perpetration, adversity, cohesion, affirmation, solemnity, insignificance, adventurousness, loathsomeness, manner, lessening, austerity, fantasy, lunacy, viciousness, oppressiveness, anticommunism, grandiosity",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 2",
+        "to": "GM",
+        "timestamp": "2026-03-02T21:34:47.917573",
+        "action": {
+          "type": "get message",
+          "content": "GUESS: perpetration",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T21:34:47.917782",
+        "action": {
+          "type": "guesses",
+          "content": [
+            "perpetration"
+          ]
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T21:34:47.917846",
+        "action": {
+          "type": "team revealed",
+          "content": {
+            "word": "perpetration",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T21:34:47.917886",
+        "action": {
+          "type": "target revealed",
+          "content": {
+            "word": "perpetration",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T21:34:47.918222",
+        "action": {
+          "type": "opponent revealed",
+          "content": {
+            "word": "grandiosity",
+            "assignment": "opponent"
+          }
+        }
+      }
+    ],
+    [
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T21:34:47.918285",
+        "action": {
+          "type": "board status",
+          "content": {
+            "hidden": {
+              "team": [
+                "affirmation",
+                "lunacy",
+                "adventurousness",
+                "oppressiveness",
+                "insignificance",
+                "dissonance",
+                "anticommunism"
+              ],
+              "innocent": [
+                "fantasy",
+                "endearment",
+                "ethic",
+                "solemnity",
+                "adversity",
+                "manner",
+                "loathsomeness"
+              ],
+              "opponent": [
+                "responsibility",
+                "austerity",
+                "viciousness",
+                "cohesion",
+                "unification",
+                "lessening"
+              ],
+              "assassin": [
+                "optimism"
+              ]
+            },
+            "revealed": {
+              "team": {
+                "team": [
+                  "interconnection",
+                  "perpetration"
+                ],
+                "innocent": [],
+                "opponent": [],
+                "assassin": []
+              },
+              "opponent": {
+                "team": [],
+                "innocent": [],
+                "opponent": [
+                  "splendor",
+                  "grandiosity"
+                ],
+                "assassin": []
+              }
+            }
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 1",
+        "timestamp": "2026-03-02T21:34:47.918423",
+        "action": {
+          "type": "send message",
+          "content": "The word perpetration was guessed correctly. Your teammate's turn ended there.\nNow provide another clue relating to some of your remaining team words and a list of the related target words. Remember to start your clue with 'CLUE: ', put a new line, and start your comma-separated list of target words with 'TARGETS: '. Notice: some words have been removed from the lists compared to previous requests.\n\nYour remaining team words are: affirmation, lunacy, adventurousness, oppressiveness, insignificance, dissonance, anticommunism.\nRemaining words for your opponent are: responsibility, grandiosity, austerity, viciousness, cohesion, unification, lessening.\nRemaining distractor words are: fantasy, endearment, ethic, solemnity, adversity, manner, loathsomeness.\nRemaining kill words are: optimism.",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 1",
+        "to": "GM",
+        "timestamp": "2026-03-02T21:35:15.748223",
+        "action": {
+          "type": "get message",
+          "content": "CLUE: MADNESS\nTARGETS: lunacy",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T21:35:15.748637",
+        "action": {
+          "type": "clue",
+          "content": "madness"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T21:35:15.748694",
+        "action": {
+          "type": "targets",
+          "content": [
+            "lunacy"
+          ]
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T21:35:15.748735",
+        "action": {
+          "type": "word targeted",
+          "content": {
+            "word": "lunacy",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 2",
+        "timestamp": "2026-03-02T21:35:15.749673",
+        "action": {
+          "type": "send message",
+          "content": "The word perpetration was guessed correctly. Your turn ended there.\nNow provide another comma-separated list of at least 1 and up to 1 words from the following list of words that best relate or are most closely associated with the word 'madness'. Remember to start your answer with 'GUESS: '. Notice: some words have been removed from the list compared to previous requests.\n\nunification, optimism, responsibility, dissonance, endearment, ethic, adversity, cohesion, affirmation, solemnity, insignificance, adventurousness, loathsomeness, manner, lessening, austerity, fantasy, lunacy, viciousness, oppressiveness, anticommunism",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 2",
+        "to": "GM",
+        "timestamp": "2026-03-02T21:35:22.726994",
+        "action": {
+          "type": "get message",
+          "content": "GUESS: lunacy",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T21:35:22.727215",
+        "action": {
+          "type": "guesses",
+          "content": [
+            "lunacy"
+          ]
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T21:35:22.727280",
+        "action": {
+          "type": "team revealed",
+          "content": {
+            "word": "lunacy",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T21:35:22.727322",
+        "action": {
+          "type": "target revealed",
+          "content": {
+            "word": "lunacy",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T21:35:22.728246",
+        "action": {
+          "type": "opponent revealed",
+          "content": {
+            "word": "austerity",
+            "assignment": "opponent"
+          }
+        }
+      }
+    ],
+    [
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T21:35:22.728325",
+        "action": {
+          "type": "board status",
+          "content": {
+            "hidden": {
+              "team": [
+                "affirmation",
+                "adventurousness",
+                "oppressiveness",
+                "insignificance",
+                "dissonance",
+                "anticommunism"
+              ],
+              "innocent": [
+                "fantasy",
+                "endearment",
+                "ethic",
+                "solemnity",
+                "adversity",
+                "manner",
+                "loathsomeness"
+              ],
+              "opponent": [
+                "responsibility",
+                "viciousness",
+                "cohesion",
+                "unification",
+                "lessening"
+              ],
+              "assassin": [
+                "optimism"
+              ]
+            },
+            "revealed": {
+              "team": {
+                "team": [
+                  "interconnection",
+                  "perpetration",
+                  "lunacy"
+                ],
+                "innocent": [],
+                "opponent": [],
+                "assassin": []
+              },
+              "opponent": {
+                "team": [],
+                "innocent": [],
+                "opponent": [
+                  "splendor",
+                  "grandiosity",
+                  "austerity"
+                ],
+                "assassin": []
+              }
+            }
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 1",
+        "timestamp": "2026-03-02T21:35:22.728473",
+        "action": {
+          "type": "send message",
+          "content": "The word lunacy was guessed correctly. Your teammate's turn ended there.\nNow provide another clue relating to some of your remaining team words and a list of the related target words. Remember to start your clue with 'CLUE: ', put a new line, and start your comma-separated list of target words with 'TARGETS: '. Notice: some words have been removed from the lists compared to previous requests.\n\nYour remaining team words are: affirmation, adventurousness, oppressiveness, insignificance, dissonance, anticommunism.\nRemaining words for your opponent are: responsibility, austerity, viciousness, cohesion, unification, lessening.\nRemaining distractor words are: fantasy, endearment, ethic, solemnity, adversity, manner, loathsomeness.\nRemaining kill words are: optimism.",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 1",
+        "to": "GM",
+        "timestamp": "2026-03-02T21:35:43.258695",
+        "action": {
+          "type": "get message",
+          "content": "CLUE: DISCORD\nTARGETS: dissonance",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T21:35:43.259101",
+        "action": {
+          "type": "clue",
+          "content": "discord"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T21:35:43.259158",
+        "action": {
+          "type": "targets",
+          "content": [
+            "dissonance"
+          ]
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T21:35:43.259198",
+        "action": {
+          "type": "word targeted",
+          "content": {
+            "word": "dissonance",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 2",
+        "timestamp": "2026-03-02T21:35:43.259576",
+        "action": {
+          "type": "send message",
+          "content": "The word lunacy was guessed correctly. Your turn ended there.\nNow provide another comma-separated list of at least 1 and up to 1 words from the following list of words that best relate or are most closely associated with the word 'discord'. Remember to start your answer with 'GUESS: '. Notice: some words have been removed from the list compared to previous requests.\n\nunification, optimism, responsibility, dissonance, endearment, ethic, adversity, cohesion, affirmation, solemnity, insignificance, adventurousness, loathsomeness, manner, lessening, fantasy, viciousness, oppressiveness, anticommunism",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 2",
+        "to": "GM",
+        "timestamp": "2026-03-02T21:35:48.513171",
+        "action": {
+          "type": "get message",
+          "content": "GUESS: dissonance",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T21:35:48.513398",
+        "action": {
+          "type": "guesses",
+          "content": [
+            "dissonance"
+          ]
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T21:35:48.513463",
+        "action": {
+          "type": "team revealed",
+          "content": {
+            "word": "dissonance",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T21:35:48.513505",
+        "action": {
+          "type": "target revealed",
+          "content": {
+            "word": "dissonance",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T21:35:48.513855",
+        "action": {
+          "type": "opponent revealed",
+          "content": {
+            "word": "viciousness",
+            "assignment": "opponent"
+          }
+        }
+      }
+    ],
+    [
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T21:35:48.513937",
+        "action": {
+          "type": "board status",
+          "content": {
+            "hidden": {
+              "team": [
+                "affirmation",
+                "adventurousness",
+                "oppressiveness",
+                "insignificance",
+                "anticommunism"
+              ],
+              "innocent": [
+                "fantasy",
+                "endearment",
+                "ethic",
+                "solemnity",
+                "adversity",
+                "manner",
+                "loathsomeness"
+              ],
+              "opponent": [
+                "responsibility",
+                "cohesion",
+                "unification",
+                "lessening"
+              ],
+              "assassin": [
+                "optimism"
+              ]
+            },
+            "revealed": {
+              "team": {
+                "team": [
+                  "interconnection",
+                  "perpetration",
+                  "lunacy",
+                  "dissonance"
+                ],
+                "innocent": [],
+                "opponent": [],
+                "assassin": []
+              },
+              "opponent": {
+                "team": [],
+                "innocent": [],
+                "opponent": [
+                  "splendor",
+                  "grandiosity",
+                  "austerity",
+                  "viciousness"
+                ],
+                "assassin": []
+              }
+            }
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 1",
+        "timestamp": "2026-03-02T21:35:48.514077",
+        "action": {
+          "type": "send message",
+          "content": "The word dissonance was guessed correctly. Your teammate's turn ended there.\nNow provide another clue relating to some of your remaining team words and a list of the related target words. Remember to start your clue with 'CLUE: ', put a new line, and start your comma-separated list of target words with 'TARGETS: '. Notice: some words have been removed from the lists compared to previous requests.\n\nYour remaining team words are: affirmation, adventurousness, oppressiveness, insignificance, anticommunism.\nRemaining words for your opponent are: responsibility, viciousness, cohesion, unification, lessening.\nRemaining distractor words are: fantasy, endearment, ethic, solemnity, adversity, manner, loathsomeness.\nRemaining kill words are: optimism.",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 1",
+        "to": "GM",
+        "timestamp": "2026-03-02T21:36:02.483424",
+        "action": {
+          "type": "get message",
+          "content": "CLUE: VALIDATION\nTARGETS: affirmation",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T21:36:02.483840",
+        "action": {
+          "type": "clue",
+          "content": "validation"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T21:36:02.483896",
+        "action": {
+          "type": "targets",
+          "content": [
+            "affirmation"
+          ]
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T21:36:02.483936",
+        "action": {
+          "type": "word targeted",
+          "content": {
+            "word": "affirmation",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 2",
+        "timestamp": "2026-03-02T21:36:02.484293",
+        "action": {
+          "type": "send message",
+          "content": "The word dissonance was guessed correctly. Your turn ended there.\nNow provide another comma-separated list of at least 1 and up to 1 words from the following list of words that best relate or are most closely associated with the word 'validation'. Remember to start your answer with 'GUESS: '. Notice: some words have been removed from the list compared to previous requests.\n\nunification, optimism, responsibility, endearment, ethic, adversity, cohesion, affirmation, solemnity, insignificance, adventurousness, loathsomeness, manner, lessening, fantasy, oppressiveness, anticommunism",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 2",
+        "to": "GM",
+        "timestamp": "2026-03-02T21:36:07.240436",
+        "action": {
+          "type": "get message",
+          "content": "GUESS: affirmation",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T21:36:07.240673",
+        "action": {
+          "type": "guesses",
+          "content": [
+            "affirmation"
+          ]
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T21:36:07.240736",
+        "action": {
+          "type": "team revealed",
+          "content": {
+            "word": "affirmation",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T21:36:07.240777",
+        "action": {
+          "type": "target revealed",
+          "content": {
+            "word": "affirmation",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T21:36:07.241104",
+        "action": {
+          "type": "opponent revealed",
+          "content": {
+            "word": "lessening",
+            "assignment": "opponent"
+          }
+        }
+      }
+    ],
+    [
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T21:36:07.241167",
+        "action": {
+          "type": "board status",
+          "content": {
+            "hidden": {
+              "team": [
+                "adventurousness",
+                "oppressiveness",
+                "insignificance",
+                "anticommunism"
+              ],
+              "innocent": [
+                "fantasy",
+                "endearment",
+                "ethic",
+                "solemnity",
+                "adversity",
+                "manner",
+                "loathsomeness"
+              ],
+              "opponent": [
+                "responsibility",
+                "cohesion",
+                "unification"
+              ],
+              "assassin": [
+                "optimism"
+              ]
+            },
+            "revealed": {
+              "team": {
+                "team": [
+                  "interconnection",
+                  "perpetration",
+                  "lunacy",
+                  "dissonance",
+                  "affirmation"
+                ],
+                "innocent": [],
+                "opponent": [],
+                "assassin": []
+              },
+              "opponent": {
+                "team": [],
+                "innocent": [],
+                "opponent": [
+                  "splendor",
+                  "grandiosity",
+                  "austerity",
+                  "viciousness",
+                  "lessening"
+                ],
+                "assassin": []
+              }
+            }
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 1",
+        "timestamp": "2026-03-02T21:36:07.241305",
+        "action": {
+          "type": "send message",
+          "content": "The word affirmation was guessed correctly. Your teammate's turn ended there.\nNow provide another clue relating to some of your remaining team words and a list of the related target words. Remember to start your clue with 'CLUE: ', put a new line, and start your comma-separated list of target words with 'TARGETS: '. Notice: some words have been removed from the lists compared to previous requests.\n\nYour remaining team words are: adventurousness, oppressiveness, insignificance, anticommunism.\nRemaining words for your opponent are: responsibility, cohesion, unification, lessening.\nRemaining distractor words are: fantasy, endearment, ethic, solemnity, adversity, manner, loathsomeness.\nRemaining kill words are: optimism.",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 1",
+        "to": "GM",
+        "timestamp": "2026-03-02T21:36:20.438680",
+        "action": {
+          "type": "get message",
+          "content": "CLUE: DARING\nTARGETS: adventurousness",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T21:36:20.439079",
+        "action": {
+          "type": "clue",
+          "content": "daring"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T21:36:20.439135",
+        "action": {
+          "type": "targets",
+          "content": [
+            "adventurousness"
+          ]
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T21:36:20.439178",
+        "action": {
+          "type": "word targeted",
+          "content": {
+            "word": "adventurousness",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 2",
+        "timestamp": "2026-03-02T21:36:20.440338",
+        "action": {
+          "type": "send message",
+          "content": "The word affirmation was guessed correctly. Your turn ended there.\nNow provide another comma-separated list of at least 1 and up to 1 words from the following list of words that best relate or are most closely associated with the word 'daring'. Remember to start your answer with 'GUESS: '. Notice: some words have been removed from the list compared to previous requests.\n\nunification, optimism, responsibility, endearment, ethic, adversity, cohesion, solemnity, insignificance, adventurousness, loathsomeness, manner, fantasy, oppressiveness, anticommunism",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 2",
+        "to": "GM",
+        "timestamp": "2026-03-02T21:36:25.922787",
+        "action": {
+          "type": "get message",
+          "content": "GUESS: adventurousness",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T21:36:25.922928",
+        "action": {
+          "type": "guesses",
+          "content": [
+            "adventurousness"
+          ]
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T21:36:25.922967",
+        "action": {
+          "type": "team revealed",
+          "content": {
+            "word": "adventurousness",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T21:36:25.922989",
+        "action": {
+          "type": "target revealed",
+          "content": {
+            "word": "adventurousness",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T21:36:25.923937",
+        "action": {
+          "type": "opponent revealed",
+          "content": {
+            "word": "unification",
+            "assignment": "opponent"
+          }
+        }
+      }
+    ],
+    [
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T21:36:25.923979",
+        "action": {
+          "type": "board status",
+          "content": {
+            "hidden": {
+              "team": [
+                "oppressiveness",
+                "insignificance",
+                "anticommunism"
+              ],
+              "innocent": [
+                "fantasy",
+                "endearment",
+                "ethic",
+                "solemnity",
+                "adversity",
+                "manner",
+                "loathsomeness"
+              ],
+              "opponent": [
+                "responsibility",
+                "cohesion"
+              ],
+              "assassin": [
+                "optimism"
+              ]
+            },
+            "revealed": {
+              "team": {
+                "team": [
+                  "interconnection",
+                  "perpetration",
+                  "lunacy",
+                  "dissonance",
+                  "affirmation",
+                  "adventurousness"
+                ],
+                "innocent": [],
+                "opponent": [],
+                "assassin": []
+              },
+              "opponent": {
+                "team": [],
+                "innocent": [],
+                "opponent": [
+                  "splendor",
+                  "grandiosity",
+                  "austerity",
+                  "viciousness",
+                  "lessening",
+                  "unification"
+                ],
+                "assassin": []
+              }
+            }
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 1",
+        "timestamp": "2026-03-02T21:36:25.924060",
+        "action": {
+          "type": "send message",
+          "content": "The word adventurousness was guessed correctly. Your teammate's turn ended there.\nNow provide another clue relating to some of your remaining team words and a list of the related target words. Remember to start your clue with 'CLUE: ', put a new line, and start your comma-separated list of target words with 'TARGETS: '. Notice: some words have been removed from the lists compared to previous requests.\n\nYour remaining team words are: oppressiveness, insignificance, anticommunism.\nRemaining words for your opponent are: responsibility, cohesion, unification.\nRemaining distractor words are: fantasy, endearment, ethic, solemnity, adversity, manner, loathsomeness.\nRemaining kill words are: optimism.",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 1",
+        "to": "GM",
+        "timestamp": "2026-03-02T21:36:42.103672",
+        "action": {
+          "type": "get message",
+          "content": "CLUE: TYRANNY\nTARGETS: oppressiveness",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T21:36:42.104065",
+        "action": {
+          "type": "clue",
+          "content": "tyranny"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T21:36:42.104121",
+        "action": {
+          "type": "targets",
+          "content": [
+            "oppressiveness"
+          ]
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T21:36:42.104163",
+        "action": {
+          "type": "word targeted",
+          "content": {
+            "word": "oppressiveness",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 2",
+        "timestamp": "2026-03-02T21:36:42.104521",
+        "action": {
+          "type": "send message",
+          "content": "The word adventurousness was guessed correctly. Your turn ended there.\nNow provide another comma-separated list of at least 1 and up to 1 words from the following list of words that best relate or are most closely associated with the word 'tyranny'. Remember to start your answer with 'GUESS: '. Notice: some words have been removed from the list compared to previous requests.\n\noptimism, responsibility, endearment, ethic, adversity, cohesion, solemnity, insignificance, loathsomeness, manner, fantasy, oppressiveness, anticommunism",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 2",
+        "to": "GM",
+        "timestamp": "2026-03-02T21:36:48.527089",
+        "action": {
+          "type": "get message",
+          "content": "GUESS: oppressiveness",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T21:36:48.527343",
+        "action": {
+          "type": "guesses",
+          "content": [
+            "oppressiveness"
+          ]
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T21:36:48.527407",
+        "action": {
+          "type": "team revealed",
+          "content": {
+            "word": "oppressiveness",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T21:36:48.527448",
+        "action": {
+          "type": "target revealed",
+          "content": {
+            "word": "oppressiveness",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T21:36:48.527783",
+        "action": {
+          "type": "opponent revealed",
+          "content": {
+            "word": "responsibility",
+            "assignment": "opponent"
+          }
+        }
+      }
+    ],
+    [
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T21:36:48.527848",
+        "action": {
+          "type": "board status",
+          "content": {
+            "hidden": {
+              "team": [
+                "insignificance",
+                "anticommunism"
+              ],
+              "innocent": [
+                "fantasy",
+                "endearment",
+                "ethic",
+                "solemnity",
+                "adversity",
+                "manner",
+                "loathsomeness"
+              ],
+              "opponent": [
+                "cohesion"
+              ],
+              "assassin": [
+                "optimism"
+              ]
+            },
+            "revealed": {
+              "team": {
+                "team": [
+                  "interconnection",
+                  "perpetration",
+                  "lunacy",
+                  "dissonance",
+                  "affirmation",
+                  "adventurousness",
+                  "oppressiveness"
+                ],
+                "innocent": [],
+                "opponent": [],
+                "assassin": []
+              },
+              "opponent": {
+                "team": [],
+                "innocent": [],
+                "opponent": [
+                  "splendor",
+                  "grandiosity",
+                  "austerity",
+                  "viciousness",
+                  "lessening",
+                  "unification",
+                  "responsibility"
+                ],
+                "assassin": []
+              }
+            }
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 1",
+        "timestamp": "2026-03-02T21:36:48.527987",
+        "action": {
+          "type": "send message",
+          "content": "The word oppressiveness was guessed correctly. Your teammate's turn ended there.\nNow provide another clue relating to some of your remaining team words and a list of the related target words. Remember to start your clue with 'CLUE: ', put a new line, and start your comma-separated list of target words with 'TARGETS: '. Notice: some words have been removed from the lists compared to previous requests.\n\nYour remaining team words are: insignificance, anticommunism.\nRemaining words for your opponent are: responsibility, cohesion.\nRemaining distractor words are: fantasy, endearment, ethic, solemnity, adversity, manner, loathsomeness.\nRemaining kill words are: optimism.",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 1",
+        "to": "GM",
+        "timestamp": "2026-03-02T21:37:00.319034",
+        "action": {
+          "type": "get message",
+          "content": "CLUE: TRIVIAL\nTARGETS: insignificance",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T21:37:00.319413",
+        "action": {
+          "type": "clue",
+          "content": "trivial"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T21:37:00.319467",
+        "action": {
+          "type": "targets",
+          "content": [
+            "insignificance"
+          ]
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T21:37:00.319508",
+        "action": {
+          "type": "word targeted",
+          "content": {
+            "word": "insignificance",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 2",
+        "timestamp": "2026-03-02T21:37:00.319851",
+        "action": {
+          "type": "send message",
+          "content": "The word oppressiveness was guessed correctly. Your turn ended there.\nNow provide another comma-separated list of at least 1 and up to 1 words from the following list of words that best relate or are most closely associated with the word 'trivial'. Remember to start your answer with 'GUESS: '. Notice: some words have been removed from the list compared to previous requests.\n\noptimism, endearment, ethic, adversity, cohesion, solemnity, insignificance, loathsomeness, manner, fantasy, anticommunism",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 2",
+        "to": "GM",
+        "timestamp": "2026-03-02T21:37:04.018650",
+        "action": {
+          "type": "get message",
+          "content": "GUESS: insignificance",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T21:37:04.018893",
+        "action": {
+          "type": "guesses",
+          "content": [
+            "insignificance"
+          ]
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T21:37:04.018951",
+        "action": {
+          "type": "team revealed",
+          "content": {
+            "word": "insignificance",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T21:37:04.018990",
+        "action": {
+          "type": "target revealed",
+          "content": {
+            "word": "insignificance",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T21:37:04.019288",
+        "action": {
+          "type": "opponent revealed",
+          "content": {
+            "word": "cohesion",
+            "assignment": "opponent"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T21:37:04.019340",
+        "action": {
+          "type": "game end",
+          "content": "opponent has won"
+        }
+      }
+    ]
+  ],
+  "board end status": {
+    "hidden": {
+      "team": [
+        "anticommunism"
+      ],
+      "innocent": [
+        "fantasy",
+        "endearment",
+        "ethic",
+        "solemnity",
+        "adversity",
+        "manner",
+        "loathsomeness"
+      ],
+      "opponent": [],
+      "assassin": [
+        "optimism"
+      ]
+    },
+    "revealed": {
+      "team": {
+        "team": [
+          "interconnection",
+          "perpetration",
+          "lunacy",
+          "dissonance",
+          "affirmation",
+          "adventurousness",
+          "oppressiveness",
+          "insignificance"
+        ],
+        "innocent": [],
+        "opponent": [],
+        "assassin": []
+      },
+      "opponent": {
+        "team": [],
+        "innocent": [],
+        "opponent": [
+          "splendor",
+          "grandiosity",
+          "austerity",
+          "viciousness",
+          "lessening",
+          "unification",
+          "responsibility",
+          "cohesion"
+        ],
+        "assassin": []
+      }
+    }
+  },
+  "Number of turns": 9,
+  "Aborted": false,
+  "Lose": true,
+  "Game ended through assassin": false,
+  "Request Count": 16,
+  "Parsed Request Count": 16,
+  "Violated Request Count": 0,
+  "Cluegiver engaged flags": {
+    "IGNORE RAMBLING": 0,
+    "IGNORE FALSE TARGETS OR GUESSES": 0,
+    "REPROMPT ON ERROR": 0,
+    "STRIP WORDS": 0,
+    "IGNORE NUMBER OF TARGETS": 0
+  },
+  "Guesser engaged flags": {
+    "IGNORE RAMBLING": 0,
+    "IGNORE FALSE TARGETS OR GUESSES": 0,
+    "REPROMPT ON ERROR": 0,
+    "STRIP WORDS": 0,
+    "IGNORE NUMBER OF TARGETS": 0
+  }
+}

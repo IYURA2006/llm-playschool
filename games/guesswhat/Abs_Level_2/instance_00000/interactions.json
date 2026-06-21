@@ -1,0 +1,304 @@
+{
+  "meta": {
+    "game_name": "guesswhat",
+    "experiment_name": "Abs_Level_2",
+    "game_id": 0,
+    "results_folder": "claude-sonnet-4-5-azure-high-t1.0",
+    "clem_version": "3.3.4"
+  },
+  "player_models": {
+    "0": {
+      "model_name": "claude-sonnet-4-5-azure-high",
+      "backend": "azclaude",
+      "context_size": "200k",
+      "languages": [
+        "en"
+      ],
+      "license": {
+        "name": "Apache 2.0",
+        "url": "https://www.apache.org/licenses/LICENSE-2.0"
+      },
+      "lookup_source": "/project/hakimov/clembench-v3.0/model_registry.json",
+      "model_config": {
+        "thinking_mode": true,
+        "thinking_budget": 8192,
+        "multimodality": {
+          "single_image": true,
+          "multiple_images": true,
+          "audio": false,
+          "video": false
+        }
+      },
+      "model_id": "claude-sonnet-4-5",
+      "open_weight": false,
+      "parameters": "",
+      "release_date": "2024-12-18"
+    }
+  },
+  "players": {
+    "GM": {
+      "game_role": "Game Master",
+      "model_name": "programmatic"
+    },
+    "Player 1": {
+      "game_role": "Guesser",
+      "model_name": "claude-sonnet-4-5-azure-high"
+    },
+    "Player 2": {
+      "game_role": "Answerer",
+      "model_name": "claude-sonnet-4-5-azure-high"
+    }
+  },
+  "turns": [
+    [
+      {
+        "from": "GM",
+        "to": "Player 1",
+        "timestamp": "2026-03-02T23:12:39.179698",
+        "action": {
+          "type": "send message",
+          "content": "Let's play a guessing game. Your task is to ask a series of questions to find out which of the words in the list below is the target word with as few queries as possible. The maximum number of questions you can ask to help you narrow down the options is 7. Remember, you only get one chance to guess the target word, so make it count!\n\nThe rules of the game are: \n\n1. Only ask one question per turn. DO NOT ASK MORE THAN ONE QUESTION.\n\n2. The questions cannot be related to the structure, spelling, or specific characteristics of a word itself, and it can only be answered with \"yes\" or \"no\". \n\n3. Use the following format for asking questions and DO NOT ADD ANY TEXT OTHER THAN THIS: \n\nQUESTION: <your question>\n\n4. You have only one opportunity to guess the target word. To make your guess, use the following format and DO NOT ADD ANY TEXT OTHER THAN THIS: \n\nGUESS: <target word>\n\nRemember you cannot ask for a hint. Make your question brief. Let’s start!\n\nList of candidate words: ['hurdle', 'fencing', 'surfing', 'swimming', 'hostile', 'friendly', 'leader', 'extrovert']",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 1",
+        "to": "GM",
+        "timestamp": "2026-03-02T23:12:45.133501",
+        "action": {
+          "type": "get message",
+          "content": "QUESTION: Is it a sport or physical activity?",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 2",
+        "timestamp": "2026-03-02T23:12:45.133711",
+        "action": {
+          "type": "send message",
+          "content": "Let’s play a guessing game! Your task is to answer the other player's questions. Based on your knowledge of the word: extrovert, respond to the following questions or guesses. Limit your response to only 'yes' or 'no' with no explanation or other words. Never reveal the answer in your response.\n\nYou must reply using the format below and DO NOT ADD ANY TEXT OTHER THAN THIS:\n\nANSWER: <some text>\n\nTarget Word: extrovert\n\nQUESTION: Is it a sport or physical activity?",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 2",
+        "to": "GM",
+        "timestamp": "2026-03-02T23:12:48.868584",
+        "action": {
+          "type": "get message",
+          "content": "ANSWER: no",
+          "label": "response"
+        }
+      }
+    ],
+    [
+      {
+        "from": "GM",
+        "to": "Player 1",
+        "timestamp": "2026-03-02T23:12:48.868754",
+        "action": {
+          "type": "send message",
+          "content": "ANSWER: no",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 1",
+        "to": "GM",
+        "timestamp": "2026-03-02T23:12:57.988239",
+        "action": {
+          "type": "get message",
+          "content": "QUESTION: Is it an adjective?",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 2",
+        "timestamp": "2026-03-02T23:12:57.988469",
+        "action": {
+          "type": "send message",
+          "content": "QUESTION: Is it an adjective?",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 2",
+        "to": "GM",
+        "timestamp": "2026-03-02T23:13:03.439517",
+        "action": {
+          "type": "get message",
+          "content": "ANSWER: no",
+          "label": "response"
+        }
+      }
+    ],
+    [
+      {
+        "from": "GM",
+        "to": "Player 1",
+        "timestamp": "2026-03-02T23:13:03.439715",
+        "action": {
+          "type": "send message",
+          "content": "ANSWER: no",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 1",
+        "to": "GM",
+        "timestamp": "2026-03-02T23:13:09.615327",
+        "action": {
+          "type": "get message",
+          "content": "QUESTION: Does it describe a personality type?",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 2",
+        "timestamp": "2026-03-02T23:13:09.615560",
+        "action": {
+          "type": "send message",
+          "content": "QUESTION: Does it describe a personality type?",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 2",
+        "to": "GM",
+        "timestamp": "2026-03-02T23:13:13.052310",
+        "action": {
+          "type": "get message",
+          "content": "ANSWER: yes",
+          "label": "response"
+        }
+      }
+    ],
+    [
+      {
+        "from": "GM",
+        "to": "Player 1",
+        "timestamp": "2026-03-02T23:13:13.052499",
+        "action": {
+          "type": "send message",
+          "content": "ANSWER: yes",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 1",
+        "to": "GM",
+        "timestamp": "2026-03-02T23:13:22.276580",
+        "action": {
+          "type": "get message",
+          "content": "QUESTION: Is it a term commonly used in psychology?",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 2",
+        "timestamp": "2026-03-02T23:13:22.276826",
+        "action": {
+          "type": "send message",
+          "content": "QUESTION: Is it a term commonly used in psychology?",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 2",
+        "to": "GM",
+        "timestamp": "2026-03-02T23:13:25.889722",
+        "action": {
+          "type": "get message",
+          "content": "ANSWER: yes",
+          "label": "response"
+        }
+      }
+    ],
+    [
+      {
+        "from": "GM",
+        "to": "Player 1",
+        "timestamp": "2026-03-02T23:13:25.889940",
+        "action": {
+          "type": "send message",
+          "content": "ANSWER: yes",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 1",
+        "to": "GM",
+        "timestamp": "2026-03-02T23:13:32.341750",
+        "action": {
+          "type": "get message",
+          "content": "QUESTION: Does it specifically relate to how a person gains energy from social interaction?",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 2",
+        "timestamp": "2026-03-02T23:13:32.342031",
+        "action": {
+          "type": "send message",
+          "content": "QUESTION: Does it specifically relate to how a person gains energy from social interaction?",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 2",
+        "to": "GM",
+        "timestamp": "2026-03-02T23:13:35.354429",
+        "action": {
+          "type": "get message",
+          "content": "ANSWER: yes",
+          "label": "response"
+        }
+      }
+    ],
+    [
+      {
+        "from": "GM",
+        "to": "Player 1",
+        "timestamp": "2026-03-02T23:13:35.354652",
+        "action": {
+          "type": "send message",
+          "content": "ANSWER: yes",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 1",
+        "to": "GM",
+        "timestamp": "2026-03-02T23:13:39.581611",
+        "action": {
+          "type": "get message",
+          "content": "GUESS: extrovert",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T23:13:39.581806",
+        "action": {
+          "type": "correct guess",
+          "content": "extrovert"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T23:13:39.581849",
+        "action": {
+          "type": "correct guess",
+          "content": "end game"
+        }
+      }
+    ]
+  ]
+}

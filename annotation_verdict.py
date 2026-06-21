@@ -2,14 +2,9 @@ import gradio as gr
 import json
 import os
 
+from annotation import DEFAULT_GAME, load_game, output_path_for
+
 _dir = os.path.dirname(os.path.abspath(__file__))
-DATA_PATH = os.path.join(_dir, "interactions", "interactions-4.json")
-OUTPUT_PATH = os.path.join(_dir, "interactions", "annotations-4.json")
-
-with open(DATA_PATH) as f:
-    _data = json.load(f)
-
-_meta = _data["meta"]
 
 _COHERENCE = [
     ("1", "No plan",   "Each move seems disconnected from the last — no consistent logic across turns."),
@@ -63,7 +58,7 @@ def _overall_select(chosen):
     return (*_ovr_row_updates(chosen), *_ovr_err_col_updates(err=False), *_btn_updates(_OVERALL_RATINGS, chosen), chosen)
 
 
-def _save_verdict(coherence, overall, comment):
+def _save_verdict(game_path, coherence, overall, comment):
     c_err = not coherence
     o_err = not overall
 
@@ -74,8 +69,9 @@ def _save_verdict(coherence, overall, comment):
             *_ovr_err_col_updates(err=o_err),
         )
 
+    output_path = output_path_for(game_path or DEFAULT_GAME)
     try:
-        with open(OUTPUT_PATH) as f:
+        with open(output_path) as f:
             saved = json.load(f)
     except FileNotFoundError:
         return (
@@ -89,27 +85,32 @@ def _save_verdict(coherence, overall, comment):
         "overall_rating": overall,
         "comment": comment or "",
     }
-    with open(OUTPUT_PATH, "w") as f:
+    with open(output_path, "w") as f:
         json.dump(saved, f, indent=2)
 
     return (
-        "✅ Verdict saved to interactions/annotations-4.json",
+        f"✅ Verdict saved to {os.path.relpath(output_path, _dir)}",
         *_col_updates(_COHERENCE, coherence),
         *_ovr_err_col_updates(),
     )
 
 
-def build(welcome_page, annotation_page, verdict_page):
+def build(welcome_page, annotation_page, verdict_page, game_state):
     with verdict_page:
 
         # ── TOP NAV ───────────────────────────────────────────────────
+        # The game id/name reflects whichever game was selected for annotation,
+        # so it re-renders whenever game_state changes.
         with gr.Row(elem_classes=["annot-topnav"]):
-            gr.HTML(
-                f'<div class="nav-left">'
-                f'<span class="game-id-tag">#{_meta["game_id"]}</span>'
-                f'<span class="game-name-tag">{_meta["game_name"].title()}</span>'
-                f'</div>'
-            )
+            @gr.render(inputs=[game_state])
+            def _verdict_nav(path):
+                meta = load_game(path or DEFAULT_GAME).meta
+                gr.HTML(
+                    f'<div class="nav-left">'
+                    f'<span class="game-id-tag">#{meta["game_id"]}</span>'
+                    f'<span class="game-name-tag">{meta["game_name"].title()}</span>'
+                    f'</div>'
+                )
             gr.HTML(
                 '<div class="annot-progress">'
                 '<span>Step 2 of 2</span>'
@@ -195,7 +196,7 @@ def build(welcome_page, annotation_page, verdict_page):
 
         submit_btn.click(
             fn=_save_verdict,
-            inputs=[coherence, overall, comment],
+            inputs=[game_state, coherence, overall, comment],
             outputs=[status, *coh_cols, *ovr_err_cols],
         )
 

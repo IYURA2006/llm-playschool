@@ -1,0 +1,82 @@
+{
+  "meta": {
+    "game_name": "wordle_withcritic",
+    "experiment_name": "medium_frequency_words_clue_with_critic",
+    "game_id": 1,
+    "results_folder": "claude-sonnet-4-5-azure-high",
+    "clem_version": "3.7.2",
+    "round_count": 1,
+    "completed": true
+  },
+  "players": {
+    "GM": {
+      "game_role": "Game Master",
+      "model_name": "programmatic"
+    },
+    "Player 1": {
+      "game_role": "ReflectingWordGuesser",
+      "model_name": "claude-sonnet-4-5-azure-high"
+    },
+    "Player 2": {
+      "game_role": "WordCritic",
+      "model_name": "claude-sonnet-4-5-azure-high"
+    }
+  },
+  "turn scores": {
+    "1": {
+      "Closeness Score": 25,
+      "Strategy Score": 100,
+      "Change-Of-Opinion": 0
+    }
+  },
+  "episode scores": {
+    "Aborted": 0,
+    "Lose": 0,
+    "Success": 1,
+    "Request Count": 3,
+    "Parsed Request Count": 3,
+    "Violated Request Count": 0,
+    "Request Success Ratio": 1.0,
+    "Main Score": 100.0,
+    "Guess Repetitions": 0,
+    "Repetition-Guesser-On-Critic-Agreement": 1.0,
+    "Non-Repetition-Guesser-On-Critic-Agreement": 0.0,
+    "Repetition-Guesser-On-Critic-Disagreement": 0,
+    "Non-Repetition-Guesser-On-Critic-Disagreement": 0
+  },
+  "player_models": {
+    "0": {
+      "model_spec": {
+        "model_name": "claude-sonnet-4-5-azure-high",
+        "backend": "azure",
+        "context_size": "200k",
+        "languages": [
+          "en"
+        ],
+        "license": {
+          "name": "Apache 2.0",
+          "url": "https://www.apache.org/licenses/LICENSE-2.0"
+        },
+        "lookup_source": "/Users/sherzodhakimov/Work/Projects/clembench-v3.0/model_registry.json",
+        "model_config": {
+          "thinking_mode": true,
+          "thinking_budget": 8192,
+          "multimodality": {
+            "single_image": true,
+            "multiple_images": true,
+            "audio": false,
+            "video": false
+          }
+        },
+        "model_id": "claude-sonnet-4-5",
+        "open_weight": false,
+        "parameters": "",
+        "release_date": "2024-12-18"
+      },
+      "gen_args": {
+        "temperature": 1.0,
+        "max_tokens": 500
+      }
+    }
+  }
+}

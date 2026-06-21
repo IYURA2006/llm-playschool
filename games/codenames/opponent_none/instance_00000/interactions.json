@@ -1,0 +1,1311 @@
+{
+  "meta": {
+    "game_name": "codenames",
+    "experiment_name": "opponent_none",
+    "game_id": 0,
+    "results_folder": "claude-sonnet-4-5-azure-high-t1.0",
+    "clem_version": "3.3.4"
+  },
+  "player_models": {
+    "0": {
+      "model_name": "claude-sonnet-4-5-azure-high",
+      "backend": "azclaude",
+      "context_size": "200k",
+      "languages": [
+        "en"
+      ],
+      "license": {
+        "name": "Apache 2.0",
+        "url": "https://www.apache.org/licenses/LICENSE-2.0"
+      },
+      "lookup_source": "/project/hakimov/clembench-v3.0/model_registry.json",
+      "model_config": {
+        "thinking_mode": true,
+        "thinking_budget": 8192,
+        "multimodality": {
+          "single_image": true,
+          "multiple_images": true,
+          "audio": false,
+          "video": false
+        }
+      },
+      "model_id": "claude-sonnet-4-5",
+      "open_weight": false,
+      "parameters": "",
+      "release_date": "2024-12-18"
+    }
+  },
+  "players": {
+    "GM": {
+      "game_role": "Game Master",
+      "model_name": "programmatic"
+    },
+    "Player 1": {
+      "game_role": "ClueGiver",
+      "model_name": "claude-sonnet-4-5-azure-high"
+    },
+    "Player 2": {
+      "game_role": "Guesser",
+      "model_name": "claude-sonnet-4-5-azure-high"
+    }
+  },
+  "turns": [
+    [
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T16:48:42.081232",
+        "action": {
+          "type": "board status",
+          "content": {
+            "hidden": {
+              "team": [
+                "olive",
+                "mammoth",
+                "post",
+                "grace",
+                "superhero",
+                "dance",
+                "laser",
+                "pool",
+                "spring"
+              ],
+              "innocent": [
+                "charge",
+                "genius",
+                "mexico",
+                "paper",
+                "pound",
+                "circle",
+                "phoenix"
+              ],
+              "opponent": [
+                "play",
+                "cotton",
+                "unicorn",
+                "europe",
+                "bill",
+                "scale",
+                "nurse",
+                "chocolate"
+              ],
+              "assassin": [
+                "kiwi"
+              ]
+            },
+            "revealed": {
+              "team": {
+                "team": [],
+                "innocent": [],
+                "opponent": [],
+                "assassin": []
+              },
+              "opponent": {
+                "team": [],
+                "innocent": [],
+                "opponent": [],
+                "assassin": []
+              }
+            }
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 1",
+        "timestamp": "2026-03-02T16:48:42.081362",
+        "action": {
+          "type": "send message",
+          "content": "Provide one single-word clue that relates to some of your team's words from the list below. You can choose to how many and to which words your clue relates to.\nThe goal is to have your partner guess all of your team's words based on the clues you give them, before the other team has uncovered all of theirs. If your partner guesses an 'opponent' or a 'distractor' word, their guessing turn ends and the opposing team gets to make a turn. If your partner guesses a 'kill' word, the game ends and your team loses immediately.\nThe more words your clue relates to, the quicker you can win the game, but the harder the associations may be to guess for your partner, so choose your clue word wisely. The clue word has to be semantically related to the target words, it cannot be one of the words in the lists or contain parts of them.\n\nAlways give your single-word clue and your comma-separated list of related target words in the following format and make your answers as short as possible, never include any other text than is required in this form:\n\nCLUE: <WORD>\nTARGETS: <TARGETS>\n\nYour team words are: olive, mammoth, post, grace, superhero, dance, laser, pool, spring.\nYour opponent's team words are: play, cotton, unicorn, europe, bill, scale, nurse, chocolate.\nDistractor words are: charge, genius, mexico, paper, pound, circle, phoenix.\nThe kill words are: kiwi.",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 1",
+        "to": "GM",
+        "timestamp": "2026-03-02T16:49:21.890961",
+        "action": {
+          "type": "get message",
+          "content": "CLUE: leap\nTARGETS: dance, spring, pool",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T16:49:21.891391",
+        "action": {
+          "type": "clue",
+          "content": "leap"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T16:49:21.891448",
+        "action": {
+          "type": "targets",
+          "content": [
+            "dance",
+            "spring",
+            "pool"
+          ]
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T16:49:21.891492",
+        "action": {
+          "type": "word targeted",
+          "content": {
+            "word": "dance",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T16:49:21.891532",
+        "action": {
+          "type": "word targeted",
+          "content": {
+            "word": "spring",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T16:49:21.891567",
+        "action": {
+          "type": "word targeted",
+          "content": {
+            "word": "pool",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 2",
+        "timestamp": "2026-03-02T16:49:21.892732",
+        "action": {
+          "type": "send message",
+          "content": "Provide a comma-separated list of up to 3 words from the following list that best relate or are most closely associated with the word 'leap'. Always start your list of guess(es) with 'GUESS: ' and do not include any other text in your answer.\n\nplay, mexico, dance, paper, pound, europe, pool, mammoth, circle, olive, phoenix, nurse, unicorn, spring, kiwi, bill, genius, superhero, scale, post, cotton, laser, charge, grace, chocolate",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 2",
+        "to": "GM",
+        "timestamp": "2026-03-02T16:49:30.931445",
+        "action": {
+          "type": "get message",
+          "content": "GUESS: spring, dance",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T16:49:30.931656",
+        "action": {
+          "type": "guesses",
+          "content": [
+            "spring",
+            "dance"
+          ]
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T16:49:30.931724",
+        "action": {
+          "type": "team revealed",
+          "content": {
+            "word": "spring",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T16:49:30.931765",
+        "action": {
+          "type": "target revealed",
+          "content": {
+            "word": "spring",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T16:49:30.931804",
+        "action": {
+          "type": "team revealed",
+          "content": {
+            "word": "dance",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T16:49:30.931838",
+        "action": {
+          "type": "target revealed",
+          "content": {
+            "word": "dance",
+            "assignment": "team"
+          }
+        }
+      }
+    ],
+    [
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T16:49:30.932193",
+        "action": {
+          "type": "board status",
+          "content": {
+            "hidden": {
+              "team": [
+                "olive",
+                "mammoth",
+                "post",
+                "grace",
+                "superhero",
+                "laser",
+                "pool"
+              ],
+              "innocent": [
+                "charge",
+                "genius",
+                "mexico",
+                "paper",
+                "pound",
+                "circle",
+                "phoenix"
+              ],
+              "opponent": [
+                "play",
+                "cotton",
+                "unicorn",
+                "europe",
+                "bill",
+                "scale",
+                "nurse",
+                "chocolate"
+              ],
+              "assassin": [
+                "kiwi"
+              ]
+            },
+            "revealed": {
+              "team": {
+                "team": [
+                  "spring",
+                  "dance"
+                ],
+                "innocent": [],
+                "opponent": [],
+                "assassin": []
+              },
+              "opponent": {
+                "team": [],
+                "innocent": [],
+                "opponent": [],
+                "assassin": []
+              }
+            }
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 1",
+        "timestamp": "2026-03-02T16:49:30.932346",
+        "action": {
+          "type": "send message",
+          "content": "The words spring, dance were guessed correctly. Your teammate's turn ended there.\nNow provide another clue relating to some of your remaining team words and a list of the related target words. Remember to start your clue with 'CLUE: ', put a new line, and start your comma-separated list of target words with 'TARGETS: '. Notice: some words have been removed from the lists compared to previous requests.\n\nYour remaining team words are: olive, mammoth, post, grace, superhero, laser, pool.\nRemaining words for your opponent are: play, cotton, unicorn, europe, bill, scale, nurse, chocolate.\nRemaining distractor words are: charge, genius, mexico, paper, pound, circle, phoenix.\nRemaining kill words are: kiwi.",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 1",
+        "to": "GM",
+        "timestamp": "2026-03-02T16:50:04.229428",
+        "action": {
+          "type": "get message",
+          "content": "CLUE: ray\nTARGETS: superhero, laser",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T16:50:04.229842",
+        "action": {
+          "type": "clue",
+          "content": "ray"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T16:50:04.229914",
+        "action": {
+          "type": "targets",
+          "content": [
+            "superhero",
+            "laser"
+          ]
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T16:50:04.229958",
+        "action": {
+          "type": "word targeted",
+          "content": {
+            "word": "superhero",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T16:50:04.229996",
+        "action": {
+          "type": "word targeted",
+          "content": {
+            "word": "laser",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 2",
+        "timestamp": "2026-03-02T16:50:04.231832",
+        "action": {
+          "type": "send message",
+          "content": "The words spring, dance were guessed correctly. Your turn ended there.\nNow provide another comma-separated list of at least 1 and up to 2 words from the following list of words that best relate or are most closely associated with the word 'ray'. Remember to start your answer with 'GUESS: '. Notice: some words have been removed from the list compared to previous requests.\n\nplay, mexico, paper, pound, europe, pool, mammoth, circle, olive, phoenix, nurse, unicorn, kiwi, bill, genius, superhero, scale, post, cotton, laser, charge, grace, chocolate",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 2",
+        "to": "GM",
+        "timestamp": "2026-03-02T16:50:12.985664",
+        "action": {
+          "type": "get message",
+          "content": "GUESS: laser, pool",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T16:50:12.985901",
+        "action": {
+          "type": "guesses",
+          "content": [
+            "laser",
+            "pool"
+          ]
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T16:50:12.985970",
+        "action": {
+          "type": "team revealed",
+          "content": {
+            "word": "laser",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T16:50:12.986012",
+        "action": {
+          "type": "target revealed",
+          "content": {
+            "word": "laser",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T16:50:12.986050",
+        "action": {
+          "type": "team revealed",
+          "content": {
+            "word": "pool",
+            "assignment": "team"
+          }
+        }
+      }
+    ],
+    [
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T16:50:12.986392",
+        "action": {
+          "type": "board status",
+          "content": {
+            "hidden": {
+              "team": [
+                "olive",
+                "mammoth",
+                "post",
+                "grace",
+                "superhero"
+              ],
+              "innocent": [
+                "charge",
+                "genius",
+                "mexico",
+                "paper",
+                "pound",
+                "circle",
+                "phoenix"
+              ],
+              "opponent": [
+                "play",
+                "cotton",
+                "unicorn",
+                "europe",
+                "bill",
+                "scale",
+                "nurse",
+                "chocolate"
+              ],
+              "assassin": [
+                "kiwi"
+              ]
+            },
+            "revealed": {
+              "team": {
+                "team": [
+                  "spring",
+                  "dance",
+                  "laser",
+                  "pool"
+                ],
+                "innocent": [],
+                "opponent": [],
+                "assassin": []
+              },
+              "opponent": {
+                "team": [],
+                "innocent": [],
+                "opponent": [],
+                "assassin": []
+              }
+            }
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 1",
+        "timestamp": "2026-03-02T16:50:12.986547",
+        "action": {
+          "type": "send message",
+          "content": "The words laser, pool were guessed correctly. Your teammate's turn ended there.\nNow provide another clue relating to some of your remaining team words and a list of the related target words. Remember to start your clue with 'CLUE: ', put a new line, and start your comma-separated list of target words with 'TARGETS: '. Notice: some words have been removed from the lists compared to previous requests.\n\nYour remaining team words are: olive, mammoth, post, grace, superhero.\nRemaining words for your opponent are: play, cotton, unicorn, europe, bill, scale, nurse, chocolate.\nRemaining distractor words are: charge, genius, mexico, paper, pound, circle, phoenix.\nRemaining kill words are: kiwi.",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 1",
+        "to": "GM",
+        "timestamp": "2026-03-02T16:50:46.432585",
+        "action": {
+          "type": "get message",
+          "content": "CLUE: princess\nTARGETS: grace, superhero",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T16:50:46.432998",
+        "action": {
+          "type": "clue",
+          "content": "princess"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T16:50:46.433053",
+        "action": {
+          "type": "targets",
+          "content": [
+            "grace",
+            "superhero"
+          ]
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T16:50:46.433095",
+        "action": {
+          "type": "word targeted",
+          "content": {
+            "word": "grace",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T16:50:46.433132",
+        "action": {
+          "type": "word targeted",
+          "content": {
+            "word": "superhero",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 2",
+        "timestamp": "2026-03-02T16:50:46.433492",
+        "action": {
+          "type": "send message",
+          "content": "The words laser, pool were guessed correctly. Your turn ended there.\nNow provide another comma-separated list of at least 1 and up to 2 words from the following list of words that best relate or are most closely associated with the word 'princess'. Remember to start your answer with 'GUESS: '. Notice: some words have been removed from the list compared to previous requests.\n\nplay, mexico, paper, pound, europe, mammoth, circle, olive, phoenix, nurse, unicorn, kiwi, bill, genius, superhero, scale, post, cotton, charge, grace, chocolate",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 2",
+        "to": "GM",
+        "timestamp": "2026-03-02T16:50:52.740474",
+        "action": {
+          "type": "get message",
+          "content": "GUESS: grace, unicorn",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T16:50:52.740709",
+        "action": {
+          "type": "guesses",
+          "content": [
+            "grace",
+            "unicorn"
+          ]
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T16:50:52.740777",
+        "action": {
+          "type": "team revealed",
+          "content": {
+            "word": "grace",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T16:50:52.740818",
+        "action": {
+          "type": "target revealed",
+          "content": {
+            "word": "grace",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T16:50:52.740858",
+        "action": {
+          "type": "team revealed",
+          "content": {
+            "word": "unicorn",
+            "assignment": "opponent"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T16:50:52.740894",
+        "action": {
+          "type": "turn end after",
+          "content": "unicorn"
+        }
+      }
+    ],
+    [
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T16:50:52.741236",
+        "action": {
+          "type": "board status",
+          "content": {
+            "hidden": {
+              "team": [
+                "olive",
+                "mammoth",
+                "post",
+                "superhero"
+              ],
+              "innocent": [
+                "charge",
+                "genius",
+                "mexico",
+                "paper",
+                "pound",
+                "circle",
+                "phoenix"
+              ],
+              "opponent": [
+                "play",
+                "cotton",
+                "europe",
+                "bill",
+                "scale",
+                "nurse",
+                "chocolate"
+              ],
+              "assassin": [
+                "kiwi"
+              ]
+            },
+            "revealed": {
+              "team": {
+                "team": [
+                  "spring",
+                  "dance",
+                  "laser",
+                  "pool",
+                  "grace"
+                ],
+                "innocent": [],
+                "opponent": [
+                  "unicorn"
+                ],
+                "assassin": []
+              },
+              "opponent": {
+                "team": [],
+                "innocent": [],
+                "opponent": [],
+                "assassin": []
+              }
+            }
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 1",
+        "timestamp": "2026-03-02T16:50:52.741393",
+        "action": {
+          "type": "send message",
+          "content": "The word grace was guessed correctly. The word unicorn was guessed but is an opponent word. Your teammate's turn ended there.\nNow provide another clue relating to some of your remaining team words and a list of the related target words. Remember to start your clue with 'CLUE: ', put a new line, and start your comma-separated list of target words with 'TARGETS: '. Notice: some words have been removed from the lists compared to previous requests.\n\nYour remaining team words are: olive, mammoth, post, superhero.\nRemaining words for your opponent are: play, cotton, europe, bill, scale, nurse, chocolate.\nRemaining distractor words are: charge, genius, mexico, paper, pound, circle, phoenix.\nRemaining kill words are: kiwi.",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 1",
+        "to": "GM",
+        "timestamp": "2026-03-02T16:51:23.991884",
+        "action": {
+          "type": "get message",
+          "content": "CLUE: comic\nTARGETS: superhero",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T16:51:23.992279",
+        "action": {
+          "type": "clue",
+          "content": "comic"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T16:51:23.992335",
+        "action": {
+          "type": "targets",
+          "content": [
+            "superhero"
+          ]
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T16:51:23.992377",
+        "action": {
+          "type": "word targeted",
+          "content": {
+            "word": "superhero",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 2",
+        "timestamp": "2026-03-02T16:51:23.993872",
+        "action": {
+          "type": "send message",
+          "content": "The word grace was guessed correctly. The word unicorn was guessed but is an opponent word. Your turn ended there.\nNow provide another comma-separated list of at least 1 and up to 1 words from the following list of words that best relate or are most closely associated with the word 'comic'. Remember to start your answer with 'GUESS: '. Notice: some words have been removed from the list compared to previous requests.\n\nplay, mexico, paper, pound, europe, mammoth, circle, olive, phoenix, nurse, kiwi, bill, genius, superhero, scale, post, cotton, charge, chocolate",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 2",
+        "to": "GM",
+        "timestamp": "2026-03-02T16:51:31.101871",
+        "action": {
+          "type": "get message",
+          "content": "GUESS: superhero",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T16:51:31.102125",
+        "action": {
+          "type": "guesses",
+          "content": [
+            "superhero"
+          ]
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T16:51:31.102191",
+        "action": {
+          "type": "team revealed",
+          "content": {
+            "word": "superhero",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T16:51:31.102234",
+        "action": {
+          "type": "target revealed",
+          "content": {
+            "word": "superhero",
+            "assignment": "team"
+          }
+        }
+      }
+    ],
+    [
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T16:51:31.102594",
+        "action": {
+          "type": "board status",
+          "content": {
+            "hidden": {
+              "team": [
+                "olive",
+                "mammoth",
+                "post"
+              ],
+              "innocent": [
+                "charge",
+                "genius",
+                "mexico",
+                "paper",
+                "pound",
+                "circle",
+                "phoenix"
+              ],
+              "opponent": [
+                "play",
+                "cotton",
+                "europe",
+                "bill",
+                "scale",
+                "nurse",
+                "chocolate"
+              ],
+              "assassin": [
+                "kiwi"
+              ]
+            },
+            "revealed": {
+              "team": {
+                "team": [
+                  "spring",
+                  "dance",
+                  "laser",
+                  "pool",
+                  "grace",
+                  "superhero"
+                ],
+                "innocent": [],
+                "opponent": [
+                  "unicorn"
+                ],
+                "assassin": []
+              },
+              "opponent": {
+                "team": [],
+                "innocent": [],
+                "opponent": [],
+                "assassin": []
+              }
+            }
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 1",
+        "timestamp": "2026-03-02T16:51:31.102751",
+        "action": {
+          "type": "send message",
+          "content": "The word superhero was guessed correctly. Your teammate's turn ended there.\nNow provide another clue relating to some of your remaining team words and a list of the related target words. Remember to start your clue with 'CLUE: ', put a new line, and start your comma-separated list of target words with 'TARGETS: '. Notice: some words have been removed from the lists compared to previous requests.\n\nYour remaining team words are: olive, mammoth, post.\nRemaining words for your opponent are: play, cotton, europe, bill, scale, nurse, chocolate.\nRemaining distractor words are: charge, genius, mexico, paper, pound, circle, phoenix.\nRemaining kill words are: kiwi.",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 1",
+        "to": "GM",
+        "timestamp": "2026-03-02T16:52:12.600221",
+        "action": {
+          "type": "get message",
+          "content": "CLUE: woolly\nTARGETS: mammoth",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T16:52:12.600628",
+        "action": {
+          "type": "clue",
+          "content": "woolly"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T16:52:12.600682",
+        "action": {
+          "type": "targets",
+          "content": [
+            "mammoth"
+          ]
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T16:52:12.600723",
+        "action": {
+          "type": "word targeted",
+          "content": {
+            "word": "mammoth",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 2",
+        "timestamp": "2026-03-02T16:52:12.601087",
+        "action": {
+          "type": "send message",
+          "content": "The word superhero was guessed correctly. Your turn ended there.\nNow provide another comma-separated list of at least 1 and up to 1 words from the following list of words that best relate or are most closely associated with the word 'woolly'. Remember to start your answer with 'GUESS: '. Notice: some words have been removed from the list compared to previous requests.\n\nplay, mexico, paper, pound, europe, mammoth, circle, olive, phoenix, nurse, kiwi, bill, genius, scale, post, cotton, charge, chocolate",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 2",
+        "to": "GM",
+        "timestamp": "2026-03-02T16:52:18.248714",
+        "action": {
+          "type": "get message",
+          "content": "GUESS: mammoth",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T16:52:18.248960",
+        "action": {
+          "type": "guesses",
+          "content": [
+            "mammoth"
+          ]
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T16:52:18.249025",
+        "action": {
+          "type": "team revealed",
+          "content": {
+            "word": "mammoth",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T16:52:18.249067",
+        "action": {
+          "type": "target revealed",
+          "content": {
+            "word": "mammoth",
+            "assignment": "team"
+          }
+        }
+      }
+    ],
+    [
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T16:52:18.249399",
+        "action": {
+          "type": "board status",
+          "content": {
+            "hidden": {
+              "team": [
+                "olive",
+                "post"
+              ],
+              "innocent": [
+                "charge",
+                "genius",
+                "mexico",
+                "paper",
+                "pound",
+                "circle",
+                "phoenix"
+              ],
+              "opponent": [
+                "play",
+                "cotton",
+                "europe",
+                "bill",
+                "scale",
+                "nurse",
+                "chocolate"
+              ],
+              "assassin": [
+                "kiwi"
+              ]
+            },
+            "revealed": {
+              "team": {
+                "team": [
+                  "spring",
+                  "dance",
+                  "laser",
+                  "pool",
+                  "grace",
+                  "superhero",
+                  "mammoth"
+                ],
+                "innocent": [],
+                "opponent": [
+                  "unicorn"
+                ],
+                "assassin": []
+              },
+              "opponent": {
+                "team": [],
+                "innocent": [],
+                "opponent": [],
+                "assassin": []
+              }
+            }
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 1",
+        "timestamp": "2026-03-02T16:52:18.249554",
+        "action": {
+          "type": "send message",
+          "content": "The word mammoth was guessed correctly. Your teammate's turn ended there.\nNow provide another clue relating to some of your remaining team words and a list of the related target words. Remember to start your clue with 'CLUE: ', put a new line, and start your comma-separated list of target words with 'TARGETS: '. Notice: some words have been removed from the lists compared to previous requests.\n\nYour remaining team words are: olive, post.\nRemaining words for your opponent are: play, cotton, europe, bill, scale, nurse, chocolate.\nRemaining distractor words are: charge, genius, mexico, paper, pound, circle, phoenix.\nRemaining kill words are: kiwi.",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 1",
+        "to": "GM",
+        "timestamp": "2026-03-02T16:52:48.859233",
+        "action": {
+          "type": "get message",
+          "content": "CLUE: wooden\nTARGETS: olive, post",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T16:52:48.859646",
+        "action": {
+          "type": "clue",
+          "content": "wooden"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T16:52:48.859702",
+        "action": {
+          "type": "targets",
+          "content": [
+            "olive",
+            "post"
+          ]
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T16:52:48.859744",
+        "action": {
+          "type": "word targeted",
+          "content": {
+            "word": "olive",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T16:52:48.859781",
+        "action": {
+          "type": "word targeted",
+          "content": {
+            "word": "post",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 2",
+        "timestamp": "2026-03-02T16:52:49.048818",
+        "action": {
+          "type": "send message",
+          "content": "The word mammoth was guessed correctly. Your turn ended there.\nNow provide another comma-separated list of at least 1 and up to 2 words from the following list of words that best relate or are most closely associated with the word 'wooden'. Remember to start your answer with 'GUESS: '. Notice: some words have been removed from the list compared to previous requests.\n\nplay, mexico, paper, pound, europe, circle, olive, phoenix, nurse, kiwi, bill, genius, scale, post, cotton, charge, chocolate",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 2",
+        "to": "GM",
+        "timestamp": "2026-03-02T16:52:58.571523",
+        "action": {
+          "type": "get message",
+          "content": "GUESS: post, olive",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T16:52:58.571780",
+        "action": {
+          "type": "guesses",
+          "content": [
+            "post",
+            "olive"
+          ]
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T16:52:58.571848",
+        "action": {
+          "type": "team revealed",
+          "content": {
+            "word": "post",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T16:52:58.571889",
+        "action": {
+          "type": "target revealed",
+          "content": {
+            "word": "post",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T16:52:58.571927",
+        "action": {
+          "type": "team revealed",
+          "content": {
+            "word": "olive",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T16:52:58.571962",
+        "action": {
+          "type": "target revealed",
+          "content": {
+            "word": "olive",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T16:52:58.572289",
+        "action": {
+          "type": "game end",
+          "content": "team has won"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T16:52:58.572448",
+        "action": {
+          "type": "game end",
+          "content": "team has won"
+        }
+      }
+    ]
+  ],
+  "board end status": {
+    "hidden": {
+      "team": [],
+      "innocent": [
+        "charge",
+        "genius",
+        "mexico",
+        "paper",
+        "pound",
+        "circle",
+        "phoenix"
+      ],
+      "opponent": [
+        "play",
+        "cotton",
+        "europe",
+        "bill",
+        "scale",
+        "nurse",
+        "chocolate"
+      ],
+      "assassin": [
+        "kiwi"
+      ]
+    },
+    "revealed": {
+      "team": {
+        "team": [
+          "spring",
+          "dance",
+          "laser",
+          "pool",
+          "grace",
+          "superhero",
+          "mammoth",
+          "post",
+          "olive"
+        ],
+        "innocent": [],
+        "opponent": [
+          "unicorn"
+        ],
+        "assassin": []
+      },
+      "opponent": {
+        "team": [],
+        "innocent": [],
+        "opponent": [],
+        "assassin": []
+      }
+    }
+  },
+  "Number of turns": 7,
+  "Aborted": false,
+  "Lose": false,
+  "Game ended through assassin": false,
+  "Request Count": 12,
+  "Parsed Request Count": 12,
+  "Violated Request Count": 0,
+  "Cluegiver engaged flags": {
+    "IGNORE RAMBLING": 0,
+    "IGNORE FALSE TARGETS OR GUESSES": 0,
+    "REPROMPT ON ERROR": 0,
+    "STRIP WORDS": 0,
+    "IGNORE NUMBER OF TARGETS": 0
+  },
+  "Guesser engaged flags": {
+    "IGNORE RAMBLING": 0,
+    "IGNORE FALSE TARGETS OR GUESSES": 0,
+    "REPROMPT ON ERROR": 0,
+    "STRIP WORDS": 0,
+    "IGNORE NUMBER OF TARGETS": 0
+  }
+}

@@ -1,0 +1,226 @@
+
+\documentclass{article}
+\usepackage{colortbl}
+\usepackage{makecell}
+\usepackage{multirow}
+\usepackage{supertabular}
+
+\begin{document}
+
+\newcounter{utterance}
+
+\centering \large Interaction Transcript for game `hot\_air\_balloon', experiment `air\_balloon\_survival\_en\_complexity\_easy', episode 0 with claude{-}sonnet{-}4{-}5{-}azure{-}high{-}t1.0.
+\vspace{24pt}
+
+{ \footnotesize  \setcounter{utterance}{1}
+\setlength{\tabcolsep}{0pt}
+\begin{supertabular}{c@{$\;$}|p{.15\linewidth}@{}p{.15\linewidth}p{.15\linewidth}p{.15\linewidth}p{.15\linewidth}p{.15\linewidth}}
+    \# & $\;$A & \multicolumn{4}{c}{Game Master} & $\;\:$B\\
+    \hline
+
+    \theutterance \stepcounter{utterance}  
+    & & \multicolumn{4}{p{0.6\linewidth}}{
+        \cellcolor[rgb]{0.9,0.9,0.9}{
+            \makecell[{{p{\linewidth}}}]{
+                \texttt{\tiny{[P1$\langle$GM]}}
+                \texttt{You are participating in a collaborative negotiation game.} \\
+\\ 
+\texttt{Together with another participant, you must agree on a single set of items that will be kept. Each of you has your own view of how much each item matters to you (importance). You do not know how the other participant values the items. Additionally, you are given the effort each item demands.} \\
+\texttt{You may only agree on a set if the total effort of the selected items does not exceed a shared limit:} \\
+\\ 
+\texttt{LIMIT = 7605} \\
+\\ 
+\texttt{Here are the individual item effort values:} \\
+\\ 
+\texttt{Item effort = \{"B21": 369, "B00": 951, "A08": 156, "A27": 266, "B94": 581, "B53": 287, "A23": 866, "C65": 180, "A89": 800, "B67": 739, "B45": 637, "C34": 86, "C12": 749, "A05": 370, "B60": 345, "C92": 951, "B69": 147, "A84": 265, "C06": 262, "B12": 259, "A16": 358, "B85": 394, "C35": 286, "B10": 580, "C15": 479, "B09": 14, "B16": 153, "C81": 977, "A58": 134, "C24": 982, "A30": 259, "A66": 232, "B75": 202, "B46": 73, "C70": 821\}} \\
+\\ 
+\texttt{Here is your personal view on the importance of each item:} \\
+\\ 
+\texttt{Item importance values = \{"B21": 138, "B00": 583, "A08": 868, "A27": 822, "B94": 783, "B53": 65, "A23": 262, "C65": 121, "A89": 508, "B67": 780, "B45": 461, "C34": 484, "C12": 668, "A05": 389, "B60": 808, "C92": 215, "B69": 97, "A84": 500, "C06": 30, "B12": 915, "A16": 856, "B85": 400, "C35": 444, "B10": 623, "C15": 781, "B09": 786, "B16": 3, "C81": 713, "A58": 457, "C24": 273, "A30": 739, "A66": 822, "B75": 235, "B46": 606, "C70": 968\}} \\
+\\ 
+\texttt{Goal:} \\
+\\ 
+\texttt{Your goal is to negotiate a shared set of items that benefits you as much as possible (i.e., maximizes total importance to YOU), while staying within the LIMIT. You are not required to make a PROPOSAL in every message {-} you can simply negotiate as well. All tactics are allowed!} \\
+\\ 
+\texttt{Interaction Protocol:} \\
+\\ 
+\texttt{You may only use the following structured formats in a message:} \\
+\\ 
+\texttt{PROPOSAL: \{'A', 'B', 'C', …\}} \\
+\texttt{Propose keeping exactly those items.} \\
+\texttt{REFUSE: \{'A', 'B', 'C', …\}} \\
+\texttt{Explicitly reject opponent's proposal.} \\
+\texttt{ARGUMENT: \{'...'\}} \\
+\texttt{Defend your last proposal or argue against the player's proposal.} \\
+\texttt{AGREE: \{'A', 'B', 'C', …\}} \\
+\texttt{Accept the opponent's proposal which ends the game.} \\
+\texttt{STRATEGIC REASONING: \{'...'\}} \\
+\texttt{	Describe your strategic reasoning or anticipation explaining your choice of action. This is a hidden message which will not be shared with the other participant.} \\
+\\ 
+\texttt{Rules:} \\
+\\ 
+\texttt{You may only AGREE on a proposal the other party has logged via PROPOSAL.} \\
+\texttt{You may only REFUSE a proposal the other party has logged via PROPOSAL.} \\
+\texttt{Total effort of any PROPOSAL or AGREE set must be ≤ LIMIT.} \\
+\texttt{Do NOT reveal your hidden importance scores.} \\
+\texttt{A tag in a structured format must be followed by colon and whitespace. The argument must be a python set containing 0 or more strings.} \\
+\texttt{So, it must be of the form TAG: \{...\}} \\
+\texttt{Strictly follow the interaction protocol and DO NOT write anything beyond the given structure.} \\
+\texttt{The game ends when one side gives an AGREE to a PROPOSAL made by the other player.} \\
+\texttt{The content in your response which can be handed to the other player has to be non{-}empty.} \\
+\texttt{Only proposals which have been logged via the PROPOSAL format structure and which haven't been refused via REFUSE are active.} \\
+\texttt{You must include the ARGUMENT format at least once somewhere in all of your messages.} \\
+\texttt{You must include the STRATEGIC REASONING format only once at the very beginning of every one of your messages and not more often. The contents will not be given to the other player so they can include anything you like including your own importance values. Here you should reason step by step to come up with you next move.} \\
+            }
+        }
+    }
+    & \\ \\
+
+    \theutterance \stepcounter{utterance}  
+    & \multicolumn{4}{p{0.6\linewidth}}{
+        \cellcolor[rgb]{0.9,0.9,0.9}{
+            \makecell[{{p{\linewidth}}}]{
+                \texttt{\tiny{[P1$\rangle$GM]}}
+                \texttt{STRATEGIC REASONING: \{'Let me start by analyzing the efficiency (importance/effort ratio) of each item from my perspective. The most efficient items for me are: B09 (56.14), B46 (8.30), C34 (5.63), A08 (5.56), A66 (3.54), B12 (3.53), A58 (3.41), A27 (3.09), A30 (2.85), A16 (2.39), B60 (2.34), A84 (1.89), C15 (1.63), C35 (1.55), B94 (1.35), C70 (1.18), and several others. Building a greedy selection based on efficiency, I can fit items totaling 6899 effort with 14066 importance. I have 706 effort remaining, and adding B45 (637 effort, 461 importance) gives me a total of 7536 effort and 14527 importance. This seems like a strong starting position. I should propose this set but remain flexible to negotiate based on what the other player values.'\}} \\
+\\ 
+\texttt{PROPOSAL: \{'B09', 'B46', 'C34', 'A08', 'A66', 'B12', 'A58', 'A27', 'A30', 'A16', 'B60', 'A84', 'C15', 'C35', 'B94', 'C70', 'B75', 'B10', 'B67', 'A05', 'B85', 'B45'\}} \\
+\\ 
+\texttt{ARGUMENT: \{'I propose this set of 22 items which uses 7536 out of our 7605 effort limit efficiently. This selection prioritizes items with strong value{-}to{-}effort ratios, including several low{-}effort high{-}value items like B09, B46, and C34. The set makes excellent use of our shared budget while leaving only minimal slack. I believe this is a strong foundation for our negotiation.'\}} \\
+            }
+        }
+    }
+    & & \\ \\
+
+    \theutterance \stepcounter{utterance}  
+    & & \multicolumn{4}{p{0.6\linewidth}}{
+        \cellcolor[rgb]{0.9,0.9,0.9}{
+            \makecell[{{p{\linewidth}}}]{
+                \texttt{\tiny{[GM$\rangle$P2]}}
+                \texttt{You are participating in a collaborative negotiation game.} \\
+\\ 
+\texttt{Together with another participant, you must agree on a single set of items that will be kept. Each of you has your own view of how much each item matters to you (importance). You do not know how the other participant values the items. Additionally, you are given the effort each item demands.} \\
+\texttt{You may only agree on a set if the total effort of the selected items does not exceed a shared limit:} \\
+\\ 
+\texttt{LIMIT = 7605} \\
+\\ 
+\texttt{Here are the individual item effort values:} \\
+\\ 
+\texttt{Item effort = \{"B21": 369, "B00": 951, "A08": 156, "A27": 266, "B94": 581, "B53": 287, "A23": 866, "C65": 180, "A89": 800, "B67": 739, "B45": 637, "C34": 86, "C12": 749, "A05": 370, "B60": 345, "C92": 951, "B69": 147, "A84": 265, "C06": 262, "B12": 259, "A16": 358, "B85": 394, "C35": 286, "B10": 580, "C15": 479, "B09": 14, "B16": 153, "C81": 977, "A58": 134, "C24": 982, "A30": 259, "A66": 232, "B75": 202, "B46": 73, "C70": 821\}} \\
+\\ 
+\texttt{Here is your personal view on the importance of each item:} \\
+\\ 
+\texttt{Item importance values = \{"B21": 138, "B00": 583, "A08": 868, "A27": 822, "B94": 783, "B53": 65, "A23": 262, "C65": 121, "A89": 508, "B67": 780, "B45": 461, "C34": 484, "C12": 668, "A05": 389, "B60": 808, "C92": 215, "B69": 97, "A84": 500, "C06": 30, "B12": 915, "A16": 856, "B85": 400, "C35": 444, "B10": 623, "C15": 781, "B09": 786, "B16": 3, "C81": 713, "A58": 457, "C24": 273, "A30": 739, "A66": 822, "B75": 235, "B46": 606, "C70": 968\}} \\
+\\ 
+\texttt{Goal:} \\
+\\ 
+\texttt{Your goal is to negotiate a shared set of items that benefits you as much as possible (i.e., maximizes total importance to YOU), while staying within the LIMIT. You are not required to make a PROPOSAL in every message {-} you can simply negotiate as well. All tactics are allowed!} \\
+\\ 
+\texttt{Interaction Protocol:} \\
+\\ 
+\texttt{You may only use the following structured formats in a message:} \\
+\\ 
+\texttt{PROPOSAL: \{'A', 'B', 'C', …\}} \\
+\texttt{Propose keeping exactly those items.} \\
+\texttt{REFUSE: \{'A', 'B', 'C', …\}} \\
+\texttt{Explicitly reject opponent's proposal.} \\
+\texttt{ARGUMENT: \{'...'\}} \\
+\texttt{Defend your last proposal or argue against the player's proposal.} \\
+\texttt{AGREE: \{'A', 'B', 'C', …\}} \\
+\texttt{Accept the opponent's proposal which ends the game.} \\
+\texttt{STRATEGIC REASONING: \{'...'\}} \\
+\texttt{	Describe your strategic reasoning or anticipation explaining your choice of action. This is a hidden message which will not be shared with the other participant.} \\
+\\ 
+\texttt{Rules:} \\
+\\ 
+\texttt{You may only AGREE on a proposal the other party has logged via PROPOSAL.} \\
+\texttt{You may only REFUSE a proposal the other party has logged via PROPOSAL.} \\
+\texttt{Total effort of any PROPOSAL or AGREE set must be ≤ LIMIT.} \\
+\texttt{Do NOT reveal your hidden importance scores.} \\
+\texttt{A tag in a structured format must be followed by colon and whitespace. The argument must be a python set containing 0 or more strings.} \\
+\texttt{So, it must be of the form TAG: \{...\}} \\
+\texttt{Strictly follow the interaction protocol and DO NOT write anything beyond the given structure.} \\
+\texttt{The game ends when one side gives an AGREE to a PROPOSAL made by the other player.} \\
+\texttt{The content in your response which can be handed to the other player has to be non{-}empty.} \\
+\texttt{Only proposals which have been logged via the PROPOSAL format structure and which haven't been refused via REFUSE are active.} \\
+\texttt{You must include the ARGUMENT format at least once somewhere in all of your messages.} \\
+\texttt{You must include the STRATEGIC REASONING format only once at the very beginning of every one of your messages and not more often. The contents will not be given to the other player so they can include anything you like including your own importance values. Here you should reason step by step to come up with you next move.} \\
+\\ 
+\texttt{You will now receive the first message of the other player.} \\
+\\ 
+\texttt{PROPOSAL: \{'B09', 'B46', 'C34', 'A08', 'A66', 'B12', 'A58', 'A27', 'A30', 'A16', 'B60', 'A84', 'C15', 'C35', 'B94', 'C70', 'B75', 'B10', 'B67', 'A05', 'B85', 'B45'\}} \\
+\\ 
+\texttt{ARGUMENT: \{'I propose this set of 22 items which uses 7536 out of our 7605 effort limit efficiently. This selection prioritizes items with strong value{-}to{-}effort ratios, including several low{-}effort high{-}value items like B09, B46, and C34. The set makes excellent use of our shared budget while leaving only minimal slack. I believe this is a strong foundation for our negotiation.'\}} \\
+            }
+        }
+    }
+    & \\ \\
+
+    \theutterance \stepcounter{utterance}  
+    & & & \multicolumn{4}{p{0.6\linewidth}}{
+        \cellcolor[rgb]{0.9,0.9,0.9}{
+            \makecell[{{p{\linewidth}}}]{
+                \texttt{\tiny{[GM$\langle$P2]}}
+                \texttt{STRATEGIC REASONING: \{'Let me analyze the opponent's proposal. Their set has 22 items with total effort 7536/7605. Calculating total importance to me: B09(786) + B46(606) + C34(484) + A08(868) + A66(822) + B12(915) + A58(457) + A27(822) + A30(739) + A16(856) + B60(808) + A84(500) + C15(781) + C35(444) + B94(783) + C70(968) + B75(235) + B10(623) + B67(780) + A05(389) + B85(400) + B45(461) = 14,526. This is quite good. Let me check if I can improve by swapping items. Looking at excluded items: C12 has importance 668 with effort 749 (ratio 0.892), which is strong. If I remove B45 (effort 637, importance 461) and A05 (effort 370, importance 389), I free up 1007 effort. With 69 slack, I have 1076 total. I could add C12 (749), B69 (147), and C65 (180) for exactly 1076 effort and importance of 668+97+121=886 vs removed 461+389=850. Net gain of 36 points to importance 14,562. Worth proposing.'\}} \\
+\\ 
+\texttt{PROPOSAL: \{'B09', 'B46', 'C34', 'A08', 'A66', 'B12', 'A58', 'A27', 'A30', 'A16', 'B60', 'A84', 'C15', 'C35', 'B94', 'C70', 'B75', 'B10', 'B67', 'B85', 'C12', 'B69', 'C65'\}} \\
+\\ 
+\texttt{ARGUMENT: \{'Your proposal was excellent and used the budget efficiently. I suggest a small refinement: replacing B45, A05 with C12, B69, C65. This uses exactly our full limit of 7605 and includes C12 which has a very strong value{-}to{-}effort ratio of 0.892. The three smaller items B69, C65, and C12 together provide better overall efficiency than B45 and A05. This maximizes our use of the shared budget while maintaining high{-}value items.'\}} \\
+            }
+        }
+    }
+     \\ \\
+
+    \theutterance \stepcounter{utterance}  
+    & & \multicolumn{4}{p{0.6\linewidth}}{
+        \cellcolor[rgb]{0.9,0.9,0.9}{
+            \makecell[{{p{\linewidth}}}]{
+                \texttt{\tiny{[P1$\langle$GM]}}
+                \texttt{PROPOSAL: \{'B09', 'B46', 'C34', 'A08', 'A66', 'B12', 'A58', 'A27', 'A30', 'A16', 'B60', 'A84', 'C15', 'C35', 'B94', 'C70', 'B75', 'B10', 'B67', 'B85', 'C12', 'B69', 'C65'\}} \\
+\\ 
+\texttt{ARGUMENT: \{'Your proposal was excellent and used the budget efficiently. I suggest a small refinement: replacing B45, A05 with C12, B69, C65. This uses exactly our full limit of 7605 and includes C12 which has a very strong value{-}to{-}effort ratio of 0.892. The three smaller items B69, C65, and C12 together provide better overall efficiency than B45 and A05. This maximizes our use of the shared budget while maintaining high{-}value items.'\}} \\
+            }
+        }
+    }
+    & \\ \\
+
+    \theutterance \stepcounter{utterance}  
+    & \multicolumn{4}{p{0.6\linewidth}}{
+        \cellcolor[rgb]{0.9,0.9,0.9}{
+            \makecell[{{p{\linewidth}}}]{
+                \texttt{\tiny{[P1$\rangle$GM]}}
+                \texttt{STRATEGIC REASONING: \{'Let me analyze their proposal. They removed A05 (389 importance, 370 effort) and B45 (461 importance, 637 effort) from my proposal, and added C12 (668 importance, 749 effort), B69 (97 importance, 147 effort), and C65 (121 importance, 180 effort). Net change in importance: {-}389 {-} 461 + 668 + 97 + 121 = +36 importance for me. Their proposal gives me 14562 total importance vs my 14527, so this is actually better for me! While C12 has a lower efficiency ratio (0.892) than A05 (1.051) from my perspective, the combination of C12 + B69 + C65 together provides more total importance than A05 + B45. They used exactly 7605 effort. I should accept this since it improves my outcome.'\}} \\
+\\ 
+\texttt{AGREE: \{'B09', 'B46', 'C34', 'A08', 'A66', 'B12', 'A58', 'A27', 'A30', 'A16', 'B60', 'A84', 'C15', 'C35', 'B94', 'C70', 'B75', 'B10', 'B67', 'B85', 'C12', 'B69', 'C65'\}} \\
+\\ 
+\texttt{ARGUMENT: \{'I agree with your refinement. You are correct that C12, B69, and C65 together provide better overall value than B45 and A05, and your proposal uses our full budget of exactly 7605 effort. This is an efficient allocation that maximizes our use of the shared limit. Well negotiated!'\}} \\
+            }
+        }
+    }
+    & & \\ \\
+
+    \theutterance \stepcounter{utterance}  
+    & & & \multicolumn{2}{p{0.3\linewidth}}{
+        \cellcolor[rgb]{0.9,0.9,0.9}{
+            \makecell[{{p{\linewidth}}}]{
+                \texttt{\tiny{[GM$|$GM]}}
+                \texttt{game successful} \\
+            }
+        }
+    }
+    & & \\ \\
+
+    \theutterance \stepcounter{utterance}  
+    & & & \multicolumn{2}{p{0.3\linewidth}}{
+        \cellcolor[rgb]{0.9,0.9,0.9}{
+            \makecell[{{p{\linewidth}}}]{
+                \texttt{\tiny{[GM$|$GM]}}
+                \texttt{end game} \\
+            }
+        }
+    }
+    & & \\ \\
+
+\end{supertabular}
+}
+
+\end{document}

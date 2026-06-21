@@ -1,0 +1,683 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+    <style>
+        /* This CSS is based on a stack overflow answer by Roko C. Buljan in https://stackoverflow.com/a/71155446 */ 
+
+* {margin: 0; box-sizing: border-box;}
+
+body {
+  background-color: rgb(157, 152, 150);
+}
+
+.top-info {
+	text-align: center;
+	font: 1.25rem/1.5 sans-serif;
+	display: flex;
+	flex-direction: column;
+	padding: 1.25em;
+	width: 80%;
+  max-width: 1200px;
+	margin: auto;
+	background: #3f3e3e;
+	color: #fff;
+}
+
+.chat {
+  --rad: 1.5rem;
+  --rad-sm: .3rem;
+  font: 1rem/1.5 sans-serif;
+  display: flex;
+  flex-direction: column;
+  padding: 1rem;
+  width: 80%;
+  max-width: 1200px;
+  margin: auto;
+  background: #fff;
+}
+
+.msg {
+  position: relative;
+  padding: .6rem 1.2rem;
+  margin-inline: 1rem;
+  margin-block: 2rem;
+}
+
+.game-round {
+  padding: 1.5rem 0 1.5rem 0;
+  background-color: #f0f8ff; /* light background for content */
+  position: relative; /* Important to position the badge */
+  border-radius: 1rem;
+  margin: 1rem;
+  box-shadow: 0 .5rem 1rem rgba(0, 0, 0, .1);
+}
+
+/* Badge in top-right corner */
+.game-round::before {
+  content: "Round " attr(data-round);
+  position: absolute;
+  top: .35rem;
+  right: 1.5rem;
+  color: #c4c3c3;
+  font-size: 0.8rem;
+  font-weight: bold;
+}
+
+/* For fenced code/monospace blocks */
+pre {
+  background: #e0e0e0;
+  border-left: .2rem solid #f36d33;
+  border-radius: .2rem;
+  color: #666;
+  font-family: monospace;
+  line-height: 1.0;
+  margin-top: 0.3rem;
+  margin-bottom: 0.5rem;
+  max-width: 100%;
+  overflow: auto;
+  padding: 0.5rem 0.2rem;
+}/* This CSS is based on a stack overflow answer by Roko C. Buljan in https://stackoverflow.com/a/71155446 */
+/* Player colors are assigned according to number of players */
+
+.msg.player-gm {
+  border-radius: var(--rad-sm) var(--rad) var(--rad) var(--rad-sm);
+  color: #fff;
+  margin-right: 30%;
+}
+
+.msg.gm-player {
+  border-radius: var(--rad) var(--rad-sm) var(--rad-sm) var(--rad);
+  background: #c4c3c3;
+  color: #0c0c0c;
+  margin-left: 30%;
+}
+
+.msg.gm-gm {
+  border-radius: var(--rad-sm) var(--rad-sm) var(--rad-sm) var(--rad-sm);
+  background: #f1f1f1;
+  color: #373636;
+  margin-left: 50%;
+  margin-right: 10%;
+  font-size: 0.8rem;
+}
+
+.msg::before {
+    left: 1rem;
+}.msg.player-gm.p1 { background: darkseagreen; }
+
+    </style>
+</head>
+<body>
+
+<br/>
+
+<div class="top-info">
+    <p>Interaction Transcript for game 'adventuregame', experiment 'new-words_home-delivery_medium_basic_medium', episode 0 with claude-sonnet-4-5-azure-high-t1.0.</p>
+</div>
+
+<br/>
+
+<div class="chat">
+<div class="game-round" data-round="0">
+    <div speaker="GM (Game Master) to Player 1 (Adventurer)" class="msg gm-player p1" style="">
+        <p>You are playing a text adventure game. I will describe what you can perceive in the game. You write the single action you want to take in the game starting with &gt;. Only reply with an action.<br/>For example:<br/>&gt; open cupboard<br/><br/>In addition to common actions, you can inate, pante and eness.<br/><br/>Your goal for this game is: Put the subst in the unsust, the mical on the table and the maten on the dente.<br/><br/>Once you have achieved your goal, write &quot;&gt; done&quot; to end the game.<br/><br/>You are in a bedroom now. There are a book, a scont, a wardrobe and a pillow. The book is on the floor. The wardrobe is closed. The pillow is on the scont. There is a passage to a unree here.</p>
+    </div>
+
+    <div speaker="Player 1 (Adventurer) to GM (Game Master)" class="msg player-gm p1" style="">
+        <p>&gt; open wardrobe</p>
+    </div>
+
+    <div speaker="Game Master: metadata" class="msg gm-gm" style="">
+        <p>Round: 0</p>
+    </div>
+
+    <div speaker="Game Master: action_fail" class="msg gm-gm" style="">
+        <p>{&#x27;phase&#x27;: &#x27;parsing&#x27;, &#x27;fail_type&#x27;: &#x27;malformed_command&#x27;, &#x27;arg&#x27;: &quot;{&#x27;type&#x27;: &#x27;unknown&#x27;, &#x27;arg1&#x27;: &#x27;open&#x27;}&quot;, &#x27;exploration_info&#x27;: {&#x27;action_epistemic&#x27;: False, &#x27;action_pragmatic&#x27;: False, &#x27;effective_epistemic_gain_amount&#x27;: 0, &#x27;known_entities&#x27;: [[&#x27;at&#x27;, &#x27;pillow1&#x27;, &#x27;bedroom1&#x27;], [&#x27;at&#x27;, &#x27;scont1&#x27;, &#x27;bedroom1&#x27;], [&#x27;at&#x27;, &#x27;book1&#x27;, &#x27;bedroom1&#x27;], [&#x27;at&#x27;, &#x27;player1&#x27;, &#x27;bedroom1&#x27;], [&#x27;at&#x27;, &#x27;wardrobe1&#x27;, &#x27;bedroom1&#x27;]], &#x27;known_entities_ratio&#x27;: 0.1724137931034483, &#x27;visited_rooms&#x27;: [&#x27;bedroom1&#x27;], &#x27;visited_rooms_ratio&#x27;: 0.16666666666666666, &#x27;known_goal_entities&#x27;: [], &#x27;known_goal_entities_ratio&#x27;: 0.0}}</p>
+    </div>
+
+    <div speaker="Game Master: goal_status" class="msg gm-gm" style="">
+        <p>{&#x27;goal_states_achieved&#x27;: [], &#x27;turn_goal_score&#x27;: 0}</p>
+    </div>
+</div><div class="game-round" data-round="1">
+    <div speaker="GM (Game Master) to Player 1 (Adventurer)" class="msg gm-player p1" style="">
+        <p>I don&#x27;t know what you mean.<br/></p>
+    </div>
+
+    <div speaker="Player 1 (Adventurer) to GM (Game Master)" class="msg player-gm p1" style="">
+        <p>&gt; examine wardrobe</p>
+    </div>
+
+    <div speaker="Game Master: metadata" class="msg gm-gm" style="">
+        <p>Round: 1</p>
+    </div>
+
+    <div speaker="Game Master: action_info" class="msg gm-gm" style="">
+        <p>{&#x27;action_type&#x27;: &#x27;examine&#x27;, &#x27;exploration_info&#x27;: {&#x27;action_epistemic&#x27;: True, &#x27;action_pragmatic&#x27;: False, &#x27;effective_epistemic_gain_facts&#x27;: [], &#x27;effective_epistemic_gain_amount&#x27;: 0, &#x27;known_entities&#x27;: [[&#x27;at&#x27;, &#x27;pillow1&#x27;, &#x27;bedroom1&#x27;], [&#x27;at&#x27;, &#x27;scont1&#x27;, &#x27;bedroom1&#x27;], [&#x27;at&#x27;, &#x27;book1&#x27;, &#x27;bedroom1&#x27;], [&#x27;at&#x27;, &#x27;player1&#x27;, &#x27;bedroom1&#x27;], [&#x27;at&#x27;, &#x27;wardrobe1&#x27;, &#x27;bedroom1&#x27;]], &#x27;known_entities_ratio&#x27;: 0.1724137931034483, &#x27;visited_rooms&#x27;: [&#x27;bedroom1&#x27;], &#x27;visited_rooms_ratio&#x27;: 0.16666666666666666, &#x27;known_goal_entities&#x27;: [], &#x27;known_goal_entities_ratio&#x27;: 0.0}}</p>
+    </div>
+
+    <div speaker="Game Master: goal_status" class="msg gm-gm" style="">
+        <p>{&#x27;goal_states_achieved&#x27;: [], &#x27;turn_goal_score&#x27;: 0}</p>
+    </div>
+</div><div class="game-round" data-round="2">
+    <div speaker="GM (Game Master) to Player 1 (Adventurer)" class="msg gm-player p1" style="">
+        <p>This is a wardrobe. The wardrobe is closed. You can&#x27;t see the wardrobe&#x27;s contents because it is closed. The wardrobe is openable and currently closed.<br/></p>
+    </div>
+
+    <div speaker="Player 1 (Adventurer) to GM (Game Master)" class="msg player-gm p1" style="">
+        <p>&gt; inate wardrobe</p>
+    </div>
+
+    <div speaker="Game Master: metadata" class="msg gm-gm" style="">
+        <p>Round: 2</p>
+    </div>
+
+    <div speaker="Game Master: action_info" class="msg gm-gm" style="">
+        <p>{&#x27;action_type&#x27;: &#x27;open&#x27;, &#x27;exploration_info&#x27;: {&#x27;action_epistemic&#x27;: True, &#x27;action_pragmatic&#x27;: True, &#x27;effective_epistemic_gain_facts&#x27;: [[&#x27;open&#x27;, &#x27;wardrobe1&#x27;]], &#x27;effective_epistemic_gain_amount&#x27;: 1, &#x27;known_entities&#x27;: [[&#x27;at&#x27;, &#x27;pillow1&#x27;, &#x27;bedroom1&#x27;], [&#x27;at&#x27;, &#x27;scont1&#x27;, &#x27;bedroom1&#x27;], [&#x27;at&#x27;, &#x27;book1&#x27;, &#x27;bedroom1&#x27;], [&#x27;at&#x27;, &#x27;player1&#x27;, &#x27;bedroom1&#x27;], [&#x27;at&#x27;, &#x27;wardrobe1&#x27;, &#x27;bedroom1&#x27;]], &#x27;known_entities_ratio&#x27;: 0.1724137931034483, &#x27;visited_rooms&#x27;: [&#x27;bedroom1&#x27;], &#x27;visited_rooms_ratio&#x27;: 0.16666666666666666, &#x27;known_goal_entities&#x27;: [], &#x27;known_goal_entities_ratio&#x27;: 0.0}}</p>
+    </div>
+
+    <div speaker="Game Master: goal_status" class="msg gm-gm" style="">
+        <p>{&#x27;goal_states_achieved&#x27;: [], &#x27;turn_goal_score&#x27;: 0}</p>
+    </div>
+</div><div class="game-round" data-round="3">
+    <div speaker="GM (Game Master) to Player 1 (Adventurer)" class="msg gm-player p1" style="">
+        <p>The wardrobe is now open. The wardrobe is empty.<br/></p>
+    </div>
+
+    <div speaker="Player 1 (Adventurer) to GM (Game Master)" class="msg player-gm p1" style="">
+        <p>&gt; go unree</p>
+    </div>
+
+    <div speaker="Game Master: metadata" class="msg gm-gm" style="">
+        <p>Round: 3</p>
+    </div>
+
+    <div speaker="Game Master: action_info" class="msg gm-gm" style="">
+        <p>{&#x27;action_type&#x27;: &#x27;go&#x27;, &#x27;exploration_info&#x27;: {&#x27;action_epistemic&#x27;: True, &#x27;action_pragmatic&#x27;: True, &#x27;effective_epistemic_gain_facts&#x27;: [[&#x27;exit&#x27;, &#x27;unree1&#x27;, &#x27;uness1&#x27;], [&#x27;exit&#x27;, &#x27;unree1&#x27;, &#x27;broomcloset1&#x27;], [&#x27;exit&#x27;, &#x27;unree1&#x27;, &#x27;bedroom1&#x27;], [&#x27;at&#x27;, &#x27;player1&#x27;, &#x27;unree1&#x27;], [&#x27;on&#x27;, &#x27;sness1&#x27;, &#x27;unree1floor1&#x27;], [&#x27;at&#x27;, &#x27;sness1&#x27;, &#x27;unree1&#x27;]], &#x27;effective_epistemic_gain_amount&#x27;: 6, &#x27;known_entities&#x27;: [[&#x27;at&#x27;, &#x27;pillow1&#x27;, &#x27;bedroom1&#x27;], [&#x27;at&#x27;, &#x27;scont1&#x27;, &#x27;bedroom1&#x27;], [&#x27;at&#x27;, &#x27;book1&#x27;, &#x27;bedroom1&#x27;], [&#x27;at&#x27;, &#x27;player1&#x27;, &#x27;unree1&#x27;], [&#x27;at&#x27;, &#x27;wardrobe1&#x27;, &#x27;bedroom1&#x27;], [&#x27;at&#x27;, &#x27;sness1&#x27;, &#x27;unree1&#x27;]], &#x27;known_entities_ratio&#x27;: 0.20689655172413793, &#x27;visited_rooms&#x27;: [&#x27;unree1&#x27;, &#x27;bedroom1&#x27;], &#x27;visited_rooms_ratio&#x27;: 0.3333333333333333, &#x27;known_goal_entities&#x27;: [], &#x27;known_goal_entities_ratio&#x27;: 0.0}}</p>
+    </div>
+
+    <div speaker="Game Master: goal_status" class="msg gm-gm" style="">
+        <p>{&#x27;goal_states_achieved&#x27;: [], &#x27;turn_goal_score&#x27;: 0}</p>
+    </div>
+</div><div class="game-round" data-round="4">
+    <div speaker="GM (Game Master) to Player 1 (Adventurer)" class="msg gm-player p1" style="">
+        <p>You are in a unree now. There is a sness. The sness is on the floor. There are passages to a broom closet, a bedroom and a uness here.<br/></p>
+    </div>
+
+    <div speaker="Player 1 (Adventurer) to GM (Game Master)" class="msg player-gm p1" style="">
+        <p>&gt; go broom closet</p>
+    </div>
+
+    <div speaker="Game Master: metadata" class="msg gm-gm" style="">
+        <p>Round: 4</p>
+    </div>
+
+    <div speaker="Game Master: action_info" class="msg gm-gm" style="">
+        <p>{&#x27;action_type&#x27;: &#x27;go&#x27;, &#x27;exploration_info&#x27;: {&#x27;action_epistemic&#x27;: True, &#x27;action_pragmatic&#x27;: True, &#x27;effective_epistemic_gain_facts&#x27;: [[&#x27;on&#x27;, &#x27;maten1&#x27;, &#x27;broomcloset1floor1&#x27;], [&#x27;at&#x27;, &#x27;player1&#x27;, &#x27;broomcloset1&#x27;], [&#x27;at&#x27;, &#x27;mical1&#x27;, &#x27;broomcloset1&#x27;], [&#x27;exit&#x27;, &#x27;broomcloset1&#x27;, &#x27;unree1&#x27;], [&#x27;at&#x27;, &#x27;maten1&#x27;, &#x27;broomcloset1&#x27;], [&#x27;on&#x27;, &#x27;mical1&#x27;, &#x27;broomcloset1floor1&#x27;]], &#x27;effective_epistemic_gain_amount&#x27;: 6, &#x27;known_entities&#x27;: [[&#x27;at&#x27;, &#x27;player1&#x27;, &#x27;broomcloset1&#x27;], [&#x27;at&#x27;, &#x27;pillow1&#x27;, &#x27;bedroom1&#x27;], [&#x27;at&#x27;, &#x27;scont1&#x27;, &#x27;bedroom1&#x27;], [&#x27;at&#x27;, &#x27;book1&#x27;, &#x27;bedroom1&#x27;], [&#x27;at&#x27;, &#x27;mical1&#x27;, &#x27;broomcloset1&#x27;], [&#x27;at&#x27;, &#x27;maten1&#x27;, &#x27;broomcloset1&#x27;], [&#x27;at&#x27;, &#x27;wardrobe1&#x27;, &#x27;bedroom1&#x27;], [&#x27;at&#x27;, &#x27;sness1&#x27;, &#x27;unree1&#x27;]], &#x27;known_entities_ratio&#x27;: 0.27586206896551724, &#x27;visited_rooms&#x27;: [&#x27;unree1&#x27;, &#x27;bedroom1&#x27;, &#x27;broomcloset1&#x27;], &#x27;visited_rooms_ratio&#x27;: 0.5, &#x27;known_goal_entities&#x27;: [[&#x27;at&#x27;, &#x27;maten1&#x27;, &#x27;broomcloset1&#x27;], [&#x27;at&#x27;, &#x27;mical1&#x27;, &#x27;broomcloset1&#x27;]], &#x27;known_goal_entities_ratio&#x27;: 0.3333333333333333}}</p>
+    </div>
+
+    <div speaker="Game Master: goal_status" class="msg gm-gm" style="">
+        <p>{&#x27;goal_states_achieved&#x27;: [], &#x27;turn_goal_score&#x27;: 0}</p>
+    </div>
+</div><div class="game-round" data-round="5">
+    <div speaker="GM (Game Master) to Player 1 (Adventurer)" class="msg gm-player p1" style="">
+        <p>You are in a broom closet now. There are a maten and a mical. The maten is on the floor. The mical is on the floor. There is a passage to a unree here.<br/></p>
+    </div>
+
+    <div speaker="Player 1 (Adventurer) to GM (Game Master)" class="msg player-gm p1" style="">
+        <p>&gt; go unree</p>
+    </div>
+
+    <div speaker="Game Master: metadata" class="msg gm-gm" style="">
+        <p>Round: 5</p>
+    </div>
+
+    <div speaker="Game Master: action_info" class="msg gm-gm" style="">
+        <p>{&#x27;action_type&#x27;: &#x27;go&#x27;, &#x27;exploration_info&#x27;: {&#x27;action_epistemic&#x27;: True, &#x27;action_pragmatic&#x27;: True, &#x27;effective_epistemic_gain_facts&#x27;: [[&#x27;at&#x27;, &#x27;player1&#x27;, &#x27;unree1&#x27;]], &#x27;effective_epistemic_gain_amount&#x27;: 1, &#x27;known_entities&#x27;: [[&#x27;at&#x27;, &#x27;pillow1&#x27;, &#x27;bedroom1&#x27;], [&#x27;at&#x27;, &#x27;scont1&#x27;, &#x27;bedroom1&#x27;], [&#x27;at&#x27;, &#x27;book1&#x27;, &#x27;bedroom1&#x27;], [&#x27;at&#x27;, &#x27;mical1&#x27;, &#x27;broomcloset1&#x27;], [&#x27;at&#x27;, &#x27;player1&#x27;, &#x27;unree1&#x27;], [&#x27;at&#x27;, &#x27;maten1&#x27;, &#x27;broomcloset1&#x27;], [&#x27;at&#x27;, &#x27;wardrobe1&#x27;, &#x27;bedroom1&#x27;], [&#x27;at&#x27;, &#x27;sness1&#x27;, &#x27;unree1&#x27;]], &#x27;known_entities_ratio&#x27;: 0.27586206896551724, &#x27;visited_rooms&#x27;: [&#x27;unree1&#x27;, &#x27;bedroom1&#x27;, &#x27;broomcloset1&#x27;], &#x27;visited_rooms_ratio&#x27;: 0.5, &#x27;known_goal_entities&#x27;: [[&#x27;at&#x27;, &#x27;maten1&#x27;, &#x27;broomcloset1&#x27;], [&#x27;at&#x27;, &#x27;mical1&#x27;, &#x27;broomcloset1&#x27;]], &#x27;known_goal_entities_ratio&#x27;: 0.3333333333333333}}</p>
+    </div>
+
+    <div speaker="Game Master: goal_status" class="msg gm-gm" style="">
+        <p>{&#x27;goal_states_achieved&#x27;: [], &#x27;turn_goal_score&#x27;: 0}</p>
+    </div>
+</div><div class="game-round" data-round="6">
+    <div speaker="GM (Game Master) to Player 1 (Adventurer)" class="msg gm-player p1" style="">
+        <p>You are in a unree now. There is a sness. The sness is on the floor. There are passages to a broom closet, a bedroom and a uness here.<br/></p>
+    </div>
+
+    <div speaker="Player 1 (Adventurer) to GM (Game Master)" class="msg player-gm p1" style="">
+        <p>&gt; go uness</p>
+    </div>
+
+    <div speaker="Game Master: metadata" class="msg gm-gm" style="">
+        <p>Round: 6</p>
+    </div>
+
+    <div speaker="Game Master: action_info" class="msg gm-gm" style="">
+        <p>{&#x27;action_type&#x27;: &#x27;go&#x27;, &#x27;exploration_info&#x27;: {&#x27;action_epistemic&#x27;: True, &#x27;action_pragmatic&#x27;: True, &#x27;effective_epistemic_gain_facts&#x27;: [[&#x27;exit&#x27;, &#x27;uness1&#x27;, &#x27;iness1&#x27;], [&#x27;exit&#x27;, &#x27;uness1&#x27;, &#x27;unree1&#x27;], [&#x27;on&#x27;, &#x27;subst1&#x27;, &#x27;uness1floor1&#x27;], [&#x27;at&#x27;, &#x27;subst1&#x27;, &#x27;uness1&#x27;], [&#x27;closed&#x27;, &#x27;cupboard1&#x27;], [&#x27;at&#x27;, &#x27;cupboard1&#x27;, &#x27;uness1&#x27;], [&#x27;exit&#x27;, &#x27;uness1&#x27;, &#x27;livingroom1&#x27;], [&#x27;at&#x27;, &#x27;counter1&#x27;, &#x27;uness1&#x27;], [&#x27;at&#x27;, &#x27;player1&#x27;, &#x27;uness1&#x27;]], &#x27;effective_epistemic_gain_amount&#x27;: 9, &#x27;known_entities&#x27;: [[&#x27;at&#x27;, &#x27;pillow1&#x27;, &#x27;bedroom1&#x27;], [&#x27;at&#x27;, &#x27;sness1&#x27;, &#x27;unree1&#x27;], [&#x27;at&#x27;, &#x27;scont1&#x27;, &#x27;bedroom1&#x27;], [&#x27;at&#x27;, &#x27;subst1&#x27;, &#x27;uness1&#x27;], [&#x27;at&#x27;, &#x27;book1&#x27;, &#x27;bedroom1&#x27;], [&#x27;at&#x27;, &#x27;mical1&#x27;, &#x27;broomcloset1&#x27;], [&#x27;at&#x27;, &#x27;maten1&#x27;, &#x27;broomcloset1&#x27;], [&#x27;at&#x27;, &#x27;cupboard1&#x27;, &#x27;uness1&#x27;], [&#x27;at&#x27;, &#x27;wardrobe1&#x27;, &#x27;bedroom1&#x27;], [&#x27;at&#x27;, &#x27;counter1&#x27;, &#x27;uness1&#x27;], [&#x27;at&#x27;, &#x27;player1&#x27;, &#x27;uness1&#x27;]], &#x27;known_entities_ratio&#x27;: 0.3793103448275862, &#x27;visited_rooms&#x27;: [&#x27;unree1&#x27;, &#x27;bedroom1&#x27;, &#x27;broomcloset1&#x27;, &#x27;uness1&#x27;], &#x27;visited_rooms_ratio&#x27;: 0.6666666666666666, &#x27;known_goal_entities&#x27;: [[&#x27;at&#x27;, &#x27;maten1&#x27;, &#x27;broomcloset1&#x27;], [&#x27;at&#x27;, &#x27;subst1&#x27;, &#x27;uness1&#x27;], [&#x27;at&#x27;, &#x27;mical1&#x27;, &#x27;broomcloset1&#x27;]], &#x27;known_goal_entities_ratio&#x27;: 0.5}}</p>
+    </div>
+
+    <div speaker="Game Master: goal_status" class="msg gm-gm" style="">
+        <p>{&#x27;goal_states_achieved&#x27;: [], &#x27;turn_goal_score&#x27;: 0}</p>
+    </div>
+</div><div class="game-round" data-round="7">
+    <div speaker="GM (Game Master) to Player 1 (Adventurer)" class="msg gm-player p1" style="">
+        <p>You are in a uness now. There are a subst, a counter and a cupboard. The subst is on the floor. The cupboard is closed. There are passages to a living room, a iness and a unree here.<br/></p>
+    </div>
+
+    <div speaker="Player 1 (Adventurer) to GM (Game Master)" class="msg player-gm p1" style="">
+        <p>&gt; go living room</p>
+    </div>
+
+    <div speaker="Game Master: metadata" class="msg gm-gm" style="">
+        <p>Round: 7</p>
+    </div>
+
+    <div speaker="Game Master: action_info" class="msg gm-gm" style="">
+        <p>{&#x27;action_type&#x27;: &#x27;go&#x27;, &#x27;exploration_info&#x27;: {&#x27;action_epistemic&#x27;: True, &#x27;action_pragmatic&#x27;: True, &#x27;effective_epistemic_gain_facts&#x27;: [[&#x27;at&#x27;, &#x27;couch1&#x27;, &#x27;livingroom1&#x27;], [&#x27;at&#x27;, &#x27;dente1&#x27;, &#x27;livingroom1&#x27;], [&#x27;at&#x27;, &#x27;player1&#x27;, &#x27;livingroom1&#x27;], [&#x27;at&#x27;, &#x27;table1&#x27;, &#x27;livingroom1&#x27;], [&#x27;at&#x27;, &#x27;chair1&#x27;, &#x27;livingroom1&#x27;], [&#x27;exit&#x27;, &#x27;livingroom1&#x27;, &#x27;uness1&#x27;], [&#x27;at&#x27;, &#x27;shelf1&#x27;, &#x27;livingroom1&#x27;]], &#x27;effective_epistemic_gain_amount&#x27;: 7, &#x27;known_entities&#x27;: [[&#x27;at&#x27;, &#x27;couch1&#x27;, &#x27;livingroom1&#x27;], [&#x27;at&#x27;, &#x27;pillow1&#x27;, &#x27;bedroom1&#x27;], [&#x27;at&#x27;, &#x27;counter1&#x27;, &#x27;uness1&#x27;], [&#x27;at&#x27;, &#x27;dente1&#x27;, &#x27;livingroom1&#x27;], [&#x27;at&#x27;, &#x27;player1&#x27;, &#x27;livingroom1&#x27;], [&#x27;at&#x27;, &#x27;scont1&#x27;, &#x27;bedroom1&#x27;], [&#x27;at&#x27;, &#x27;subst1&#x27;, &#x27;uness1&#x27;], [&#x27;at&#x27;, &#x27;mical1&#x27;, &#x27;broomcloset1&#x27;], [&#x27;at&#x27;, &#x27;table1&#x27;, &#x27;livingroom1&#x27;], [&#x27;at&#x27;, &#x27;book1&#x27;, &#x27;bedroom1&#x27;], [&#x27;at&#x27;, &#x27;maten1&#x27;, &#x27;broomcloset1&#x27;], [&#x27;at&#x27;, &#x27;cupboard1&#x27;, &#x27;uness1&#x27;], [&#x27;at&#x27;, &#x27;chair1&#x27;, &#x27;livingroom1&#x27;], [&#x27;at&#x27;, &#x27;wardrobe1&#x27;, &#x27;bedroom1&#x27;], [&#x27;at&#x27;, &#x27;sness1&#x27;, &#x27;unree1&#x27;], [&#x27;at&#x27;, &#x27;shelf1&#x27;, &#x27;livingroom1&#x27;]], &#x27;known_entities_ratio&#x27;: 0.5517241379310345, &#x27;visited_rooms&#x27;: [&#x27;uness1&#x27;, &#x27;livingroom1&#x27;, &#x27;bedroom1&#x27;, &#x27;unree1&#x27;, &#x27;broomcloset1&#x27;], &#x27;visited_rooms_ratio&#x27;: 0.8333333333333334, &#x27;known_goal_entities&#x27;: [[&#x27;at&#x27;, &#x27;dente1&#x27;, &#x27;livingroom1&#x27;], [&#x27;at&#x27;, &#x27;subst1&#x27;, &#x27;uness1&#x27;], [&#x27;at&#x27;, &#x27;table1&#x27;, &#x27;livingroom1&#x27;], [&#x27;at&#x27;, &#x27;mical1&#x27;, &#x27;broomcloset1&#x27;], [&#x27;at&#x27;, &#x27;maten1&#x27;, &#x27;broomcloset1&#x27;]], &#x27;known_goal_entities_ratio&#x27;: 0.8333333333333334}}</p>
+    </div>
+
+    <div speaker="Game Master: goal_status" class="msg gm-gm" style="">
+        <p>{&#x27;goal_states_achieved&#x27;: [], &#x27;turn_goal_score&#x27;: 0}</p>
+    </div>
+</div><div class="game-round" data-round="8">
+    <div speaker="GM (Game Master) to Player 1 (Adventurer)" class="msg gm-player p1" style="">
+        <p>You are in a living room now. There are a couch, a shelf, a chair, a dente and a table. There is a passage to a uness here.<br/></p>
+    </div>
+
+    <div speaker="Player 1 (Adventurer) to GM (Game Master)" class="msg player-gm p1" style="">
+        <p>&gt; go uness</p>
+    </div>
+
+    <div speaker="Game Master: metadata" class="msg gm-gm" style="">
+        <p>Round: 8</p>
+    </div>
+
+    <div speaker="Game Master: action_info" class="msg gm-gm" style="">
+        <p>{&#x27;action_type&#x27;: &#x27;go&#x27;, &#x27;exploration_info&#x27;: {&#x27;action_epistemic&#x27;: True, &#x27;action_pragmatic&#x27;: True, &#x27;effective_epistemic_gain_facts&#x27;: [[&#x27;at&#x27;, &#x27;player1&#x27;, &#x27;uness1&#x27;]], &#x27;effective_epistemic_gain_amount&#x27;: 1, &#x27;known_entities&#x27;: [[&#x27;at&#x27;, &#x27;couch1&#x27;, &#x27;livingroom1&#x27;], [&#x27;at&#x27;, &#x27;counter1&#x27;, &#x27;uness1&#x27;], [&#x27;at&#x27;, &#x27;pillow1&#x27;, &#x27;bedroom1&#x27;], [&#x27;at&#x27;, &#x27;dente1&#x27;, &#x27;livingroom1&#x27;], [&#x27;at&#x27;, &#x27;scont1&#x27;, &#x27;bedroom1&#x27;], [&#x27;at&#x27;, &#x27;subst1&#x27;, &#x27;uness1&#x27;], [&#x27;at&#x27;, &#x27;book1&#x27;, &#x27;bedroom1&#x27;], [&#x27;at&#x27;, &#x27;table1&#x27;, &#x27;livingroom1&#x27;], [&#x27;at&#x27;, &#x27;mical1&#x27;, &#x27;broomcloset1&#x27;], [&#x27;at&#x27;, &#x27;maten1&#x27;, &#x27;broomcloset1&#x27;], [&#x27;at&#x27;, &#x27;cupboard1&#x27;, &#x27;uness1&#x27;], [&#x27;at&#x27;, &#x27;chair1&#x27;, &#x27;livingroom1&#x27;], [&#x27;at&#x27;, &#x27;wardrobe1&#x27;, &#x27;bedroom1&#x27;], [&#x27;at&#x27;, &#x27;sness1&#x27;, &#x27;unree1&#x27;], [&#x27;at&#x27;, &#x27;shelf1&#x27;, &#x27;livingroom1&#x27;], [&#x27;at&#x27;, &#x27;player1&#x27;, &#x27;uness1&#x27;]], &#x27;known_entities_ratio&#x27;: 0.5517241379310345, &#x27;visited_rooms&#x27;: [&#x27;uness1&#x27;, &#x27;livingroom1&#x27;, &#x27;bedroom1&#x27;, &#x27;unree1&#x27;, &#x27;broomcloset1&#x27;], &#x27;visited_rooms_ratio&#x27;: 0.8333333333333334, &#x27;known_goal_entities&#x27;: [[&#x27;at&#x27;, &#x27;dente1&#x27;, &#x27;livingroom1&#x27;], [&#x27;at&#x27;, &#x27;subst1&#x27;, &#x27;uness1&#x27;], [&#x27;at&#x27;, &#x27;mical1&#x27;, &#x27;broomcloset1&#x27;], [&#x27;at&#x27;, &#x27;table1&#x27;, &#x27;livingroom1&#x27;], [&#x27;at&#x27;, &#x27;maten1&#x27;, &#x27;broomcloset1&#x27;]], &#x27;known_goal_entities_ratio&#x27;: 0.8333333333333334}}</p>
+    </div>
+
+    <div speaker="Game Master: goal_status" class="msg gm-gm" style="">
+        <p>{&#x27;goal_states_achieved&#x27;: [], &#x27;turn_goal_score&#x27;: 0}</p>
+    </div>
+</div><div class="game-round" data-round="9">
+    <div speaker="GM (Game Master) to Player 1 (Adventurer)" class="msg gm-player p1" style="">
+        <p>You are in a uness now. There are a subst, a counter and a cupboard. The subst is on the floor. The cupboard is closed. There are passages to a living room, a iness and a unree here.<br/></p>
+    </div>
+
+    <div speaker="Player 1 (Adventurer) to GM (Game Master)" class="msg player-gm p1" style="">
+        <p>&gt; go iness</p>
+    </div>
+
+    <div speaker="Game Master: metadata" class="msg gm-gm" style="">
+        <p>Round: 9</p>
+    </div>
+
+    <div speaker="Game Master: action_info" class="msg gm-gm" style="">
+        <p>{&#x27;action_type&#x27;: &#x27;go&#x27;, &#x27;exploration_info&#x27;: {&#x27;action_epistemic&#x27;: True, &#x27;action_pragmatic&#x27;: True, &#x27;effective_epistemic_gain_facts&#x27;: [[&#x27;in&#x27;, &#x27;sandwich1&#x27;, &#x27;unsust1&#x27;], [&#x27;in&#x27;, &#x27;diale1&#x27;, &#x27;unsust1&#x27;], [&#x27;at&#x27;, &#x27;sandwich1&#x27;, &#x27;iness1&#x27;], [&#x27;at&#x27;, &#x27;unsust1&#x27;, &#x27;iness1&#x27;], [&#x27;in&#x27;, &#x27;peach1&#x27;, &#x27;unsust1&#x27;], [&#x27;at&#x27;, &#x27;apple1&#x27;, &#x27;iness1&#x27;], [&#x27;at&#x27;, &#x27;player1&#x27;, &#x27;iness1&#x27;], [&#x27;at&#x27;, &#x27;cally1&#x27;, &#x27;iness1&#x27;], [&#x27;closed&#x27;, &#x27;unsust1&#x27;], [&#x27;exit&#x27;, &#x27;iness1&#x27;, &#x27;uness1&#x27;], [&#x27;at&#x27;, &#x27;freezer1&#x27;, &#x27;iness1&#x27;], [&#x27;in&#x27;, &#x27;cally1&#x27;, &#x27;unsust1&#x27;], [&#x27;at&#x27;, &#x27;peach1&#x27;, &#x27;iness1&#x27;], [&#x27;at&#x27;, &#x27;diale1&#x27;, &#x27;iness1&#x27;], [&#x27;closed&#x27;, &#x27;freezer1&#x27;], [&#x27;in&#x27;, &#x27;apple1&#x27;, &#x27;unsust1&#x27;]], &#x27;effective_epistemic_gain_amount&#x27;: 16, &#x27;known_entities&#x27;: [[&#x27;at&#x27;, &#x27;unsust1&#x27;, &#x27;iness1&#x27;], [&#x27;at&#x27;, &#x27;apple1&#x27;, &#x27;iness1&#x27;], [&#x27;at&#x27;, &#x27;dente1&#x27;, &#x27;livingroom1&#x27;], [&#x27;at&#x27;, &#x27;player1&#x27;, &#x27;iness1&#x27;], [&#x27;at&#x27;, &#x27;subst1&#x27;, &#x27;uness1&#x27;], [&#x27;at&#x27;, &#x27;table1&#x27;, &#x27;livingroom1&#x27;], [&#x27;at&#x27;, &#x27;cally1&#x27;, &#x27;iness1&#x27;], [&#x27;at&#x27;, &#x27;maten1&#x27;, &#x27;broomcloset1&#x27;], [&#x27;at&#x27;, &#x27;diale1&#x27;, &#x27;iness1&#x27;], [&#x27;at&#x27;, &#x27;couch1&#x27;, &#x27;livingroom1&#x27;], [&#x27;at&#x27;, &#x27;peach1&#x27;, &#x27;iness1&#x27;], [&#x27;at&#x27;, &#x27;counter1&#x27;, &#x27;uness1&#x27;], [&#x27;at&#x27;, &#x27;sness1&#x27;, &#x27;unree1&#x27;], [&#x27;at&#x27;, &#x27;shelf1&#x27;, &#x27;livingroom1&#x27;], [&#x27;at&#x27;, &#x27;scont1&#x27;, &#x27;bedroom1&#x27;], [&#x27;at&#x27;, &#x27;mical1&#x27;, &#x27;broomcloset1&#x27;], [&#x27;at&#x27;, &#x27;freezer1&#x27;, &#x27;iness1&#x27;], [&#x27;at&#x27;, &#x27;wardrobe1&#x27;, &#x27;bedroom1&#x27;], [&#x27;at&#x27;, &#x27;sandwich1&#x27;, &#x27;iness1&#x27;], [&#x27;at&#x27;, &#x27;pillow1&#x27;, &#x27;bedroom1&#x27;], [&#x27;at&#x27;, &#x27;book1&#x27;, &#x27;bedroom1&#x27;], [&#x27;at&#x27;, &#x27;cupboard1&#x27;, &#x27;uness1&#x27;], [&#x27;at&#x27;, &#x27;chair1&#x27;, &#x27;livingroom1&#x27;]], &#x27;known_entities_ratio&#x27;: 0.7931034482758621, &#x27;visited_rooms&#x27;: [&#x27;iness1&#x27;, &#x27;uness1&#x27;, &#x27;livingroom1&#x27;, &#x27;bedroom1&#x27;, &#x27;unree1&#x27;, &#x27;broomcloset1&#x27;], &#x27;visited_rooms_ratio&#x27;: 1.0, &#x27;known_goal_entities&#x27;: [[&#x27;at&#x27;, &#x27;unsust1&#x27;, &#x27;iness1&#x27;], [&#x27;at&#x27;, &#x27;dente1&#x27;, &#x27;livingroom1&#x27;], [&#x27;at&#x27;, &#x27;subst1&#x27;, &#x27;uness1&#x27;], [&#x27;at&#x27;, &#x27;mical1&#x27;, &#x27;broomcloset1&#x27;], [&#x27;at&#x27;, &#x27;table1&#x27;, &#x27;livingroom1&#x27;], [&#x27;at&#x27;, &#x27;maten1&#x27;, &#x27;broomcloset1&#x27;]], &#x27;known_goal_entities_ratio&#x27;: 1.0}}</p>
+    </div>
+
+    <div speaker="Game Master: goal_status" class="msg gm-gm" style="">
+        <p>{&#x27;goal_states_achieved&#x27;: [], &#x27;turn_goal_score&#x27;: 0}</p>
+    </div>
+</div><div class="game-round" data-round="10">
+    <div speaker="GM (Game Master) to Player 1 (Adventurer)" class="msg gm-player p1" style="">
+        <p>You are in a iness now. There are a apple, a cally, a freezer, a diale, a peach, a sandwich and a unsust. The apple is in the unsust. The cally is in the unsust. The freezer is closed. The diale is in the unsust. The peach is in the unsust. The sandwich is in the unsust. The unsust is closed. There is a passage to a uness here.<br/></p>
+    </div>
+
+    <div speaker="Player 1 (Adventurer) to GM (Game Master)" class="msg player-gm p1" style="">
+        <p>&gt; inate unsust</p>
+    </div>
+
+    <div speaker="Game Master: metadata" class="msg gm-gm" style="">
+        <p>Round: 10</p>
+    </div>
+
+    <div speaker="Game Master: action_info" class="msg gm-gm" style="">
+        <p>{&#x27;action_type&#x27;: &#x27;open&#x27;, &#x27;exploration_info&#x27;: {&#x27;action_epistemic&#x27;: True, &#x27;action_pragmatic&#x27;: True, &#x27;effective_epistemic_gain_facts&#x27;: [[&#x27;open&#x27;, &#x27;unsust1&#x27;]], &#x27;effective_epistemic_gain_amount&#x27;: 1, &#x27;known_entities&#x27;: [[&#x27;at&#x27;, &#x27;unsust1&#x27;, &#x27;iness1&#x27;], [&#x27;at&#x27;, &#x27;apple1&#x27;, &#x27;iness1&#x27;], [&#x27;at&#x27;, &#x27;dente1&#x27;, &#x27;livingroom1&#x27;], [&#x27;at&#x27;, &#x27;player1&#x27;, &#x27;iness1&#x27;], [&#x27;at&#x27;, &#x27;subst1&#x27;, &#x27;uness1&#x27;], [&#x27;at&#x27;, &#x27;table1&#x27;, &#x27;livingroom1&#x27;], [&#x27;at&#x27;, &#x27;cally1&#x27;, &#x27;iness1&#x27;], [&#x27;at&#x27;, &#x27;maten1&#x27;, &#x27;broomcloset1&#x27;], [&#x27;at&#x27;, &#x27;diale1&#x27;, &#x27;iness1&#x27;], [&#x27;at&#x27;, &#x27;couch1&#x27;, &#x27;livingroom1&#x27;], [&#x27;at&#x27;, &#x27;peach1&#x27;, &#x27;iness1&#x27;], [&#x27;at&#x27;, &#x27;counter1&#x27;, &#x27;uness1&#x27;], [&#x27;at&#x27;, &#x27;sness1&#x27;, &#x27;unree1&#x27;], [&#x27;at&#x27;, &#x27;shelf1&#x27;, &#x27;livingroom1&#x27;], [&#x27;at&#x27;, &#x27;scont1&#x27;, &#x27;bedroom1&#x27;], [&#x27;at&#x27;, &#x27;mical1&#x27;, &#x27;broomcloset1&#x27;], [&#x27;at&#x27;, &#x27;freezer1&#x27;, &#x27;iness1&#x27;], [&#x27;at&#x27;, &#x27;wardrobe1&#x27;, &#x27;bedroom1&#x27;], [&#x27;at&#x27;, &#x27;sandwich1&#x27;, &#x27;iness1&#x27;], [&#x27;at&#x27;, &#x27;pillow1&#x27;, &#x27;bedroom1&#x27;], [&#x27;at&#x27;, &#x27;book1&#x27;, &#x27;bedroom1&#x27;], [&#x27;at&#x27;, &#x27;cupboard1&#x27;, &#x27;uness1&#x27;], [&#x27;at&#x27;, &#x27;chair1&#x27;, &#x27;livingroom1&#x27;]], &#x27;known_entities_ratio&#x27;: 0.7931034482758621, &#x27;visited_rooms&#x27;: [&#x27;iness1&#x27;, &#x27;uness1&#x27;, &#x27;livingroom1&#x27;, &#x27;bedroom1&#x27;, &#x27;unree1&#x27;, &#x27;broomcloset1&#x27;], &#x27;visited_rooms_ratio&#x27;: 1.0, &#x27;known_goal_entities&#x27;: [[&#x27;at&#x27;, &#x27;unsust1&#x27;, &#x27;iness1&#x27;], [&#x27;at&#x27;, &#x27;dente1&#x27;, &#x27;livingroom1&#x27;], [&#x27;at&#x27;, &#x27;subst1&#x27;, &#x27;uness1&#x27;], [&#x27;at&#x27;, &#x27;mical1&#x27;, &#x27;broomcloset1&#x27;], [&#x27;at&#x27;, &#x27;table1&#x27;, &#x27;livingroom1&#x27;], [&#x27;at&#x27;, &#x27;maten1&#x27;, &#x27;broomcloset1&#x27;]], &#x27;known_goal_entities_ratio&#x27;: 1.0}}</p>
+    </div>
+
+    <div speaker="Game Master: goal_status" class="msg gm-gm" style="">
+        <p>{&#x27;goal_states_achieved&#x27;: [], &#x27;turn_goal_score&#x27;: 0}</p>
+    </div>
+</div><div class="game-round" data-round="11">
+    <div speaker="GM (Game Master) to Player 1 (Adventurer)" class="msg gm-player p1" style="">
+        <p>The unsust is now open. In the unsust there are a apple, a sandwich, a diale, a peach and a cally.<br/></p>
+    </div>
+
+    <div speaker="Player 1 (Adventurer) to GM (Game Master)" class="msg player-gm p1" style="">
+        <p>&gt; go uness</p>
+    </div>
+
+    <div speaker="Game Master: metadata" class="msg gm-gm" style="">
+        <p>Round: 11</p>
+    </div>
+
+    <div speaker="Game Master: action_info" class="msg gm-gm" style="">
+        <p>{&#x27;action_type&#x27;: &#x27;go&#x27;, &#x27;exploration_info&#x27;: {&#x27;action_epistemic&#x27;: True, &#x27;action_pragmatic&#x27;: True, &#x27;effective_epistemic_gain_facts&#x27;: [[&#x27;at&#x27;, &#x27;player1&#x27;, &#x27;uness1&#x27;]], &#x27;effective_epistemic_gain_amount&#x27;: 1, &#x27;known_entities&#x27;: [[&#x27;at&#x27;, &#x27;unsust1&#x27;, &#x27;iness1&#x27;], [&#x27;at&#x27;, &#x27;apple1&#x27;, &#x27;iness1&#x27;], [&#x27;at&#x27;, &#x27;dente1&#x27;, &#x27;livingroom1&#x27;], [&#x27;at&#x27;, &#x27;subst1&#x27;, &#x27;uness1&#x27;], [&#x27;at&#x27;, &#x27;table1&#x27;, &#x27;livingroom1&#x27;], [&#x27;at&#x27;, &#x27;cally1&#x27;, &#x27;iness1&#x27;], [&#x27;at&#x27;, &#x27;maten1&#x27;, &#x27;broomcloset1&#x27;], [&#x27;at&#x27;, &#x27;diale1&#x27;, &#x27;iness1&#x27;], [&#x27;at&#x27;, &#x27;couch1&#x27;, &#x27;livingroom1&#x27;], [&#x27;at&#x27;, &#x27;peach1&#x27;, &#x27;iness1&#x27;], [&#x27;at&#x27;, &#x27;counter1&#x27;, &#x27;uness1&#x27;], [&#x27;at&#x27;, &#x27;sness1&#x27;, &#x27;unree1&#x27;], [&#x27;at&#x27;, &#x27;shelf1&#x27;, &#x27;livingroom1&#x27;], [&#x27;at&#x27;, &#x27;player1&#x27;, &#x27;uness1&#x27;], [&#x27;at&#x27;, &#x27;scont1&#x27;, &#x27;bedroom1&#x27;], [&#x27;at&#x27;, &#x27;mical1&#x27;, &#x27;broomcloset1&#x27;], [&#x27;at&#x27;, &#x27;freezer1&#x27;, &#x27;iness1&#x27;], [&#x27;at&#x27;, &#x27;wardrobe1&#x27;, &#x27;bedroom1&#x27;], [&#x27;at&#x27;, &#x27;sandwich1&#x27;, &#x27;iness1&#x27;], [&#x27;at&#x27;, &#x27;pillow1&#x27;, &#x27;bedroom1&#x27;], [&#x27;at&#x27;, &#x27;book1&#x27;, &#x27;bedroom1&#x27;], [&#x27;at&#x27;, &#x27;cupboard1&#x27;, &#x27;uness1&#x27;], [&#x27;at&#x27;, &#x27;chair1&#x27;, &#x27;livingroom1&#x27;]], &#x27;known_entities_ratio&#x27;: 0.7931034482758621, &#x27;visited_rooms&#x27;: [&#x27;iness1&#x27;, &#x27;uness1&#x27;, &#x27;livingroom1&#x27;, &#x27;bedroom1&#x27;, &#x27;unree1&#x27;, &#x27;broomcloset1&#x27;], &#x27;visited_rooms_ratio&#x27;: 1.0, &#x27;known_goal_entities&#x27;: [[&#x27;at&#x27;, &#x27;unsust1&#x27;, &#x27;iness1&#x27;], [&#x27;at&#x27;, &#x27;dente1&#x27;, &#x27;livingroom1&#x27;], [&#x27;at&#x27;, &#x27;subst1&#x27;, &#x27;uness1&#x27;], [&#x27;at&#x27;, &#x27;mical1&#x27;, &#x27;broomcloset1&#x27;], [&#x27;at&#x27;, &#x27;table1&#x27;, &#x27;livingroom1&#x27;], [&#x27;at&#x27;, &#x27;maten1&#x27;, &#x27;broomcloset1&#x27;]], &#x27;known_goal_entities_ratio&#x27;: 1.0}}</p>
+    </div>
+
+    <div speaker="Game Master: goal_status" class="msg gm-gm" style="">
+        <p>{&#x27;goal_states_achieved&#x27;: [], &#x27;turn_goal_score&#x27;: 0}</p>
+    </div>
+</div><div class="game-round" data-round="12">
+    <div speaker="GM (Game Master) to Player 1 (Adventurer)" class="msg gm-player p1" style="">
+        <p>You are in a uness now. There are a subst, a counter and a cupboard. The subst is on the floor. The cupboard is closed. There are passages to a living room, a iness and a unree here.<br/></p>
+    </div>
+
+    <div speaker="Player 1 (Adventurer) to GM (Game Master)" class="msg player-gm p1" style="">
+        <p>&gt; take subst</p>
+    </div>
+
+    <div speaker="Game Master: metadata" class="msg gm-gm" style="">
+        <p>Round: 12</p>
+    </div>
+
+    <div speaker="Game Master: action_info" class="msg gm-gm" style="">
+        <p>{&#x27;action_type&#x27;: &#x27;take&#x27;, &#x27;exploration_info&#x27;: {&#x27;action_epistemic&#x27;: False, &#x27;action_pragmatic&#x27;: True, &#x27;effective_epistemic_gain_amount&#x27;: 0, &#x27;known_entities&#x27;: [[&#x27;at&#x27;, &#x27;unsust1&#x27;, &#x27;iness1&#x27;], [&#x27;at&#x27;, &#x27;apple1&#x27;, &#x27;iness1&#x27;], [&#x27;at&#x27;, &#x27;dente1&#x27;, &#x27;livingroom1&#x27;], [&#x27;at&#x27;, &#x27;subst1&#x27;, &#x27;uness1&#x27;], [&#x27;at&#x27;, &#x27;table1&#x27;, &#x27;livingroom1&#x27;], [&#x27;at&#x27;, &#x27;cally1&#x27;, &#x27;iness1&#x27;], [&#x27;at&#x27;, &#x27;maten1&#x27;, &#x27;broomcloset1&#x27;], [&#x27;at&#x27;, &#x27;diale1&#x27;, &#x27;iness1&#x27;], [&#x27;at&#x27;, &#x27;couch1&#x27;, &#x27;livingroom1&#x27;], [&#x27;at&#x27;, &#x27;peach1&#x27;, &#x27;iness1&#x27;], [&#x27;at&#x27;, &#x27;counter1&#x27;, &#x27;uness1&#x27;], [&#x27;at&#x27;, &#x27;sness1&#x27;, &#x27;unree1&#x27;], [&#x27;at&#x27;, &#x27;shelf1&#x27;, &#x27;livingroom1&#x27;], [&#x27;at&#x27;, &#x27;player1&#x27;, &#x27;uness1&#x27;], [&#x27;at&#x27;, &#x27;scont1&#x27;, &#x27;bedroom1&#x27;], [&#x27;at&#x27;, &#x27;mical1&#x27;, &#x27;broomcloset1&#x27;], [&#x27;at&#x27;, &#x27;freezer1&#x27;, &#x27;iness1&#x27;], [&#x27;at&#x27;, &#x27;wardrobe1&#x27;, &#x27;bedroom1&#x27;], [&#x27;at&#x27;, &#x27;sandwich1&#x27;, &#x27;iness1&#x27;], [&#x27;at&#x27;, &#x27;pillow1&#x27;, &#x27;bedroom1&#x27;], [&#x27;at&#x27;, &#x27;book1&#x27;, &#x27;bedroom1&#x27;], [&#x27;at&#x27;, &#x27;cupboard1&#x27;, &#x27;uness1&#x27;], [&#x27;at&#x27;, &#x27;chair1&#x27;, &#x27;livingroom1&#x27;]], &#x27;known_entities_ratio&#x27;: 0.7931034482758621, &#x27;visited_rooms&#x27;: [&#x27;iness1&#x27;, &#x27;uness1&#x27;, &#x27;livingroom1&#x27;, &#x27;bedroom1&#x27;, &#x27;unree1&#x27;, &#x27;broomcloset1&#x27;], &#x27;visited_rooms_ratio&#x27;: 1.0, &#x27;known_goal_entities&#x27;: [[&#x27;at&#x27;, &#x27;unsust1&#x27;, &#x27;iness1&#x27;], [&#x27;at&#x27;, &#x27;dente1&#x27;, &#x27;livingroom1&#x27;], [&#x27;at&#x27;, &#x27;subst1&#x27;, &#x27;uness1&#x27;], [&#x27;at&#x27;, &#x27;mical1&#x27;, &#x27;broomcloset1&#x27;], [&#x27;at&#x27;, &#x27;table1&#x27;, &#x27;livingroom1&#x27;], [&#x27;at&#x27;, &#x27;maten1&#x27;, &#x27;broomcloset1&#x27;]], &#x27;known_goal_entities_ratio&#x27;: 1.0}}</p>
+    </div>
+
+    <div speaker="Game Master: goal_status" class="msg gm-gm" style="">
+        <p>{&#x27;goal_states_achieved&#x27;: [], &#x27;turn_goal_score&#x27;: 0}</p>
+    </div>
+</div><div class="game-round" data-round="13">
+    <div speaker="GM (Game Master) to Player 1 (Adventurer)" class="msg gm-player p1" style="">
+        <p>You take the subst. In your inventory you have a subst.<br/></p>
+    </div>
+
+    <div speaker="Player 1 (Adventurer) to GM (Game Master)" class="msg player-gm p1" style="">
+        <p>&gt; go iness</p>
+    </div>
+
+    <div speaker="Game Master: metadata" class="msg gm-gm" style="">
+        <p>Round: 13</p>
+    </div>
+
+    <div speaker="Game Master: action_info" class="msg gm-gm" style="">
+        <p>{&#x27;action_type&#x27;: &#x27;go&#x27;, &#x27;exploration_info&#x27;: {&#x27;action_epistemic&#x27;: True, &#x27;action_pragmatic&#x27;: True, &#x27;effective_epistemic_gain_facts&#x27;: [[&#x27;at&#x27;, &#x27;subst1&#x27;, &#x27;iness1&#x27;], [&#x27;at&#x27;, &#x27;player1&#x27;, &#x27;iness1&#x27;]], &#x27;effective_epistemic_gain_amount&#x27;: 2, &#x27;known_entities&#x27;: [[&#x27;at&#x27;, &#x27;unsust1&#x27;, &#x27;iness1&#x27;], [&#x27;at&#x27;, &#x27;apple1&#x27;, &#x27;iness1&#x27;], [&#x27;at&#x27;, &#x27;dente1&#x27;, &#x27;livingroom1&#x27;], [&#x27;at&#x27;, &#x27;player1&#x27;, &#x27;iness1&#x27;], [&#x27;at&#x27;, &#x27;table1&#x27;, &#x27;livingroom1&#x27;], [&#x27;at&#x27;, &#x27;cally1&#x27;, &#x27;iness1&#x27;], [&#x27;at&#x27;, &#x27;maten1&#x27;, &#x27;broomcloset1&#x27;], [&#x27;at&#x27;, &#x27;diale1&#x27;, &#x27;iness1&#x27;], [&#x27;at&#x27;, &#x27;couch1&#x27;, &#x27;livingroom1&#x27;], [&#x27;at&#x27;, &#x27;peach1&#x27;, &#x27;iness1&#x27;], [&#x27;at&#x27;, &#x27;counter1&#x27;, &#x27;uness1&#x27;], [&#x27;at&#x27;, &#x27;sness1&#x27;, &#x27;unree1&#x27;], [&#x27;at&#x27;, &#x27;shelf1&#x27;, &#x27;livingroom1&#x27;], [&#x27;at&#x27;, &#x27;scont1&#x27;, &#x27;bedroom1&#x27;], [&#x27;at&#x27;, &#x27;mical1&#x27;, &#x27;broomcloset1&#x27;], [&#x27;at&#x27;, &#x27;freezer1&#x27;, &#x27;iness1&#x27;], [&#x27;at&#x27;, &#x27;subst1&#x27;, &#x27;iness1&#x27;], [&#x27;at&#x27;, &#x27;wardrobe1&#x27;, &#x27;bedroom1&#x27;], [&#x27;at&#x27;, &#x27;sandwich1&#x27;, &#x27;iness1&#x27;], [&#x27;at&#x27;, &#x27;pillow1&#x27;, &#x27;bedroom1&#x27;], [&#x27;at&#x27;, &#x27;book1&#x27;, &#x27;bedroom1&#x27;], [&#x27;at&#x27;, &#x27;cupboard1&#x27;, &#x27;uness1&#x27;], [&#x27;at&#x27;, &#x27;chair1&#x27;, &#x27;livingroom1&#x27;]], &#x27;known_entities_ratio&#x27;: 0.7931034482758621, &#x27;visited_rooms&#x27;: [&#x27;iness1&#x27;, &#x27;uness1&#x27;, &#x27;livingroom1&#x27;, &#x27;bedroom1&#x27;, &#x27;unree1&#x27;, &#x27;broomcloset1&#x27;], &#x27;visited_rooms_ratio&#x27;: 1.0, &#x27;known_goal_entities&#x27;: [[&#x27;at&#x27;, &#x27;unsust1&#x27;, &#x27;iness1&#x27;], [&#x27;at&#x27;, &#x27;dente1&#x27;, &#x27;livingroom1&#x27;], [&#x27;at&#x27;, &#x27;mical1&#x27;, &#x27;broomcloset1&#x27;], [&#x27;at&#x27;, &#x27;table1&#x27;, &#x27;livingroom1&#x27;], [&#x27;at&#x27;, &#x27;maten1&#x27;, &#x27;broomcloset1&#x27;], [&#x27;at&#x27;, &#x27;subst1&#x27;, &#x27;iness1&#x27;]], &#x27;known_goal_entities_ratio&#x27;: 1.0}}</p>
+    </div>
+
+    <div speaker="Game Master: goal_status" class="msg gm-gm" style="">
+        <p>{&#x27;goal_states_achieved&#x27;: [], &#x27;turn_goal_score&#x27;: 0}</p>
+    </div>
+</div><div class="game-round" data-round="14">
+    <div speaker="GM (Game Master) to Player 1 (Adventurer)" class="msg gm-player p1" style="">
+        <p>You are in a iness now. There are a apple, a cally, a freezer, a diale, a peach, a sandwich and a unsust. The apple is in the unsust. The cally is in the unsust. The freezer is closed. The diale is in the unsust. The peach is in the unsust. The sandwich is in the unsust. The unsust is open. There is a passage to a uness here.<br/></p>
+    </div>
+
+    <div speaker="Player 1 (Adventurer) to GM (Game Master)" class="msg player-gm p1" style="">
+        <p>&gt; put subst in unsust</p>
+    </div>
+
+    <div speaker="Game Master: metadata" class="msg gm-gm" style="">
+        <p>Round: 14</p>
+    </div>
+
+    <div speaker="Game Master: action_fail" class="msg gm-gm" style="">
+        <p>{&#x27;phase&#x27;: &#x27;parsing&#x27;, &#x27;fail_type&#x27;: &#x27;malformed_command&#x27;, &#x27;arg&#x27;: &quot;{&#x27;type&#x27;: &#x27;unknown&#x27;, &#x27;arg1&#x27;: &#x27;put&#x27;}&quot;, &#x27;exploration_info&#x27;: {&#x27;action_epistemic&#x27;: False, &#x27;action_pragmatic&#x27;: False, &#x27;effective_epistemic_gain_amount&#x27;: 0, &#x27;known_entities&#x27;: [[&#x27;at&#x27;, &#x27;unsust1&#x27;, &#x27;iness1&#x27;], [&#x27;at&#x27;, &#x27;apple1&#x27;, &#x27;iness1&#x27;], [&#x27;at&#x27;, &#x27;dente1&#x27;, &#x27;livingroom1&#x27;], [&#x27;at&#x27;, &#x27;player1&#x27;, &#x27;iness1&#x27;], [&#x27;at&#x27;, &#x27;table1&#x27;, &#x27;livingroom1&#x27;], [&#x27;at&#x27;, &#x27;cally1&#x27;, &#x27;iness1&#x27;], [&#x27;at&#x27;, &#x27;maten1&#x27;, &#x27;broomcloset1&#x27;], [&#x27;at&#x27;, &#x27;diale1&#x27;, &#x27;iness1&#x27;], [&#x27;at&#x27;, &#x27;couch1&#x27;, &#x27;livingroom1&#x27;], [&#x27;at&#x27;, &#x27;peach1&#x27;, &#x27;iness1&#x27;], [&#x27;at&#x27;, &#x27;counter1&#x27;, &#x27;uness1&#x27;], [&#x27;at&#x27;, &#x27;sness1&#x27;, &#x27;unree1&#x27;], [&#x27;at&#x27;, &#x27;shelf1&#x27;, &#x27;livingroom1&#x27;], [&#x27;at&#x27;, &#x27;scont1&#x27;, &#x27;bedroom1&#x27;], [&#x27;at&#x27;, &#x27;mical1&#x27;, &#x27;broomcloset1&#x27;], [&#x27;at&#x27;, &#x27;freezer1&#x27;, &#x27;iness1&#x27;], [&#x27;at&#x27;, &#x27;subst1&#x27;, &#x27;iness1&#x27;], [&#x27;at&#x27;, &#x27;wardrobe1&#x27;, &#x27;bedroom1&#x27;], [&#x27;at&#x27;, &#x27;sandwich1&#x27;, &#x27;iness1&#x27;], [&#x27;at&#x27;, &#x27;pillow1&#x27;, &#x27;bedroom1&#x27;], [&#x27;at&#x27;, &#x27;book1&#x27;, &#x27;bedroom1&#x27;], [&#x27;at&#x27;, &#x27;cupboard1&#x27;, &#x27;uness1&#x27;], [&#x27;at&#x27;, &#x27;chair1&#x27;, &#x27;livingroom1&#x27;]], &#x27;known_entities_ratio&#x27;: 0.7931034482758621, &#x27;visited_rooms&#x27;: [&#x27;iness1&#x27;, &#x27;uness1&#x27;, &#x27;livingroom1&#x27;, &#x27;bedroom1&#x27;, &#x27;unree1&#x27;, &#x27;broomcloset1&#x27;], &#x27;visited_rooms_ratio&#x27;: 1.0, &#x27;known_goal_entities&#x27;: [[&#x27;at&#x27;, &#x27;unsust1&#x27;, &#x27;iness1&#x27;], [&#x27;at&#x27;, &#x27;dente1&#x27;, &#x27;livingroom1&#x27;], [&#x27;at&#x27;, &#x27;mical1&#x27;, &#x27;broomcloset1&#x27;], [&#x27;at&#x27;, &#x27;table1&#x27;, &#x27;livingroom1&#x27;], [&#x27;at&#x27;, &#x27;maten1&#x27;, &#x27;broomcloset1&#x27;], [&#x27;at&#x27;, &#x27;subst1&#x27;, &#x27;iness1&#x27;]], &#x27;known_goal_entities_ratio&#x27;: 1.0}}</p>
+    </div>
+
+    <div speaker="Game Master: goal_status" class="msg gm-gm" style="">
+        <p>{&#x27;goal_states_achieved&#x27;: [], &#x27;turn_goal_score&#x27;: 0}</p>
+    </div>
+</div><div class="game-round" data-round="15">
+    <div speaker="GM (Game Master) to Player 1 (Adventurer)" class="msg gm-player p1" style="">
+        <p>I don&#x27;t know what you mean.<br/></p>
+    </div>
+
+    <div speaker="Player 1 (Adventurer) to GM (Game Master)" class="msg player-gm p1" style="">
+        <p>&gt; pante subst unsust</p>
+    </div>
+
+    <div speaker="Game Master: metadata" class="msg gm-gm" style="">
+        <p>Round: 15</p>
+    </div>
+
+    <div speaker="Game Master: action_info" class="msg gm-gm" style="">
+        <p>{&#x27;action_type&#x27;: &#x27;put&#x27;, &#x27;exploration_info&#x27;: {&#x27;action_epistemic&#x27;: False, &#x27;action_pragmatic&#x27;: True, &#x27;effective_epistemic_gain_amount&#x27;: 0, &#x27;known_entities&#x27;: [[&#x27;at&#x27;, &#x27;unsust1&#x27;, &#x27;iness1&#x27;], [&#x27;at&#x27;, &#x27;apple1&#x27;, &#x27;iness1&#x27;], [&#x27;at&#x27;, &#x27;dente1&#x27;, &#x27;livingroom1&#x27;], [&#x27;at&#x27;, &#x27;player1&#x27;, &#x27;iness1&#x27;], [&#x27;at&#x27;, &#x27;table1&#x27;, &#x27;livingroom1&#x27;], [&#x27;at&#x27;, &#x27;cally1&#x27;, &#x27;iness1&#x27;], [&#x27;at&#x27;, &#x27;maten1&#x27;, &#x27;broomcloset1&#x27;], [&#x27;at&#x27;, &#x27;diale1&#x27;, &#x27;iness1&#x27;], [&#x27;at&#x27;, &#x27;couch1&#x27;, &#x27;livingroom1&#x27;], [&#x27;at&#x27;, &#x27;peach1&#x27;, &#x27;iness1&#x27;], [&#x27;at&#x27;, &#x27;counter1&#x27;, &#x27;uness1&#x27;], [&#x27;at&#x27;, &#x27;sness1&#x27;, &#x27;unree1&#x27;], [&#x27;at&#x27;, &#x27;shelf1&#x27;, &#x27;livingroom1&#x27;], [&#x27;at&#x27;, &#x27;scont1&#x27;, &#x27;bedroom1&#x27;], [&#x27;at&#x27;, &#x27;mical1&#x27;, &#x27;broomcloset1&#x27;], [&#x27;at&#x27;, &#x27;freezer1&#x27;, &#x27;iness1&#x27;], [&#x27;at&#x27;, &#x27;subst1&#x27;, &#x27;iness1&#x27;], [&#x27;at&#x27;, &#x27;wardrobe1&#x27;, &#x27;bedroom1&#x27;], [&#x27;at&#x27;, &#x27;sandwich1&#x27;, &#x27;iness1&#x27;], [&#x27;at&#x27;, &#x27;pillow1&#x27;, &#x27;bedroom1&#x27;], [&#x27;at&#x27;, &#x27;book1&#x27;, &#x27;bedroom1&#x27;], [&#x27;at&#x27;, &#x27;cupboard1&#x27;, &#x27;uness1&#x27;], [&#x27;at&#x27;, &#x27;chair1&#x27;, &#x27;livingroom1&#x27;]], &#x27;known_entities_ratio&#x27;: 0.7931034482758621, &#x27;visited_rooms&#x27;: [&#x27;iness1&#x27;, &#x27;uness1&#x27;, &#x27;livingroom1&#x27;, &#x27;bedroom1&#x27;, &#x27;unree1&#x27;, &#x27;broomcloset1&#x27;], &#x27;visited_rooms_ratio&#x27;: 1.0, &#x27;known_goal_entities&#x27;: [[&#x27;at&#x27;, &#x27;unsust1&#x27;, &#x27;iness1&#x27;], [&#x27;at&#x27;, &#x27;dente1&#x27;, &#x27;livingroom1&#x27;], [&#x27;at&#x27;, &#x27;mical1&#x27;, &#x27;broomcloset1&#x27;], [&#x27;at&#x27;, &#x27;table1&#x27;, &#x27;livingroom1&#x27;], [&#x27;at&#x27;, &#x27;maten1&#x27;, &#x27;broomcloset1&#x27;], [&#x27;at&#x27;, &#x27;subst1&#x27;, &#x27;iness1&#x27;]], &#x27;known_goal_entities_ratio&#x27;: 1.0}}</p>
+    </div>
+
+    <div speaker="Game Master: goal_status" class="msg gm-gm" style="">
+        <p>{&#x27;goal_states_achieved&#x27;: [&#x27;in(subst1,unsust1)&#x27;], &#x27;turn_goal_score&#x27;: 1}</p>
+    </div>
+</div><div class="game-round" data-round="16">
+    <div speaker="GM (Game Master) to Player 1 (Adventurer)" class="msg gm-player p1" style="">
+        <p>You put the subst in the unsust.<br/></p>
+    </div>
+
+    <div speaker="Player 1 (Adventurer) to GM (Game Master)" class="msg player-gm p1" style="">
+        <p>&gt; go uness</p>
+    </div>
+
+    <div speaker="Game Master: metadata" class="msg gm-gm" style="">
+        <p>Round: 16</p>
+    </div>
+
+    <div speaker="Game Master: action_info" class="msg gm-gm" style="">
+        <p>{&#x27;action_type&#x27;: &#x27;go&#x27;, &#x27;exploration_info&#x27;: {&#x27;action_epistemic&#x27;: True, &#x27;action_pragmatic&#x27;: True, &#x27;effective_epistemic_gain_facts&#x27;: [[&#x27;at&#x27;, &#x27;player1&#x27;, &#x27;uness1&#x27;]], &#x27;effective_epistemic_gain_amount&#x27;: 1, &#x27;known_entities&#x27;: [[&#x27;at&#x27;, &#x27;unsust1&#x27;, &#x27;iness1&#x27;], [&#x27;at&#x27;, &#x27;apple1&#x27;, &#x27;iness1&#x27;], [&#x27;at&#x27;, &#x27;dente1&#x27;, &#x27;livingroom1&#x27;], [&#x27;at&#x27;, &#x27;table1&#x27;, &#x27;livingroom1&#x27;], [&#x27;at&#x27;, &#x27;cally1&#x27;, &#x27;iness1&#x27;], [&#x27;at&#x27;, &#x27;maten1&#x27;, &#x27;broomcloset1&#x27;], [&#x27;at&#x27;, &#x27;diale1&#x27;, &#x27;iness1&#x27;], [&#x27;at&#x27;, &#x27;couch1&#x27;, &#x27;livingroom1&#x27;], [&#x27;at&#x27;, &#x27;peach1&#x27;, &#x27;iness1&#x27;], [&#x27;at&#x27;, &#x27;counter1&#x27;, &#x27;uness1&#x27;], [&#x27;at&#x27;, &#x27;sness1&#x27;, &#x27;unree1&#x27;], [&#x27;at&#x27;, &#x27;shelf1&#x27;, &#x27;livingroom1&#x27;], [&#x27;at&#x27;, &#x27;player1&#x27;, &#x27;uness1&#x27;], [&#x27;at&#x27;, &#x27;scont1&#x27;, &#x27;bedroom1&#x27;], [&#x27;at&#x27;, &#x27;mical1&#x27;, &#x27;broomcloset1&#x27;], [&#x27;at&#x27;, &#x27;freezer1&#x27;, &#x27;iness1&#x27;], [&#x27;at&#x27;, &#x27;subst1&#x27;, &#x27;iness1&#x27;], [&#x27;at&#x27;, &#x27;wardrobe1&#x27;, &#x27;bedroom1&#x27;], [&#x27;at&#x27;, &#x27;sandwich1&#x27;, &#x27;iness1&#x27;], [&#x27;at&#x27;, &#x27;pillow1&#x27;, &#x27;bedroom1&#x27;], [&#x27;at&#x27;, &#x27;book1&#x27;, &#x27;bedroom1&#x27;], [&#x27;at&#x27;, &#x27;cupboard1&#x27;, &#x27;uness1&#x27;], [&#x27;at&#x27;, &#x27;chair1&#x27;, &#x27;livingroom1&#x27;]], &#x27;known_entities_ratio&#x27;: 0.7931034482758621, &#x27;visited_rooms&#x27;: [&#x27;iness1&#x27;, &#x27;uness1&#x27;, &#x27;livingroom1&#x27;, &#x27;bedroom1&#x27;, &#x27;unree1&#x27;, &#x27;broomcloset1&#x27;], &#x27;visited_rooms_ratio&#x27;: 1.0, &#x27;known_goal_entities&#x27;: [[&#x27;at&#x27;, &#x27;unsust1&#x27;, &#x27;iness1&#x27;], [&#x27;at&#x27;, &#x27;dente1&#x27;, &#x27;livingroom1&#x27;], [&#x27;at&#x27;, &#x27;mical1&#x27;, &#x27;broomcloset1&#x27;], [&#x27;at&#x27;, &#x27;table1&#x27;, &#x27;livingroom1&#x27;], [&#x27;at&#x27;, &#x27;maten1&#x27;, &#x27;broomcloset1&#x27;], [&#x27;at&#x27;, &#x27;subst1&#x27;, &#x27;iness1&#x27;]], &#x27;known_goal_entities_ratio&#x27;: 1.0}}</p>
+    </div>
+
+    <div speaker="Game Master: goal_status" class="msg gm-gm" style="">
+        <p>{&#x27;goal_states_achieved&#x27;: [&#x27;in(subst1,unsust1)&#x27;], &#x27;turn_goal_score&#x27;: 0}</p>
+    </div>
+</div><div class="game-round" data-round="17">
+    <div speaker="GM (Game Master) to Player 1 (Adventurer)" class="msg gm-player p1" style="">
+        <p>You are in a uness now. There are a counter and a cupboard. The cupboard is closed. There are passages to a living room, a iness and a unree here.<br/></p>
+    </div>
+
+    <div speaker="Player 1 (Adventurer) to GM (Game Master)" class="msg player-gm p1" style="">
+        <p>&gt; go unree</p>
+    </div>
+
+    <div speaker="Game Master: metadata" class="msg gm-gm" style="">
+        <p>Round: 17</p>
+    </div>
+
+    <div speaker="Game Master: action_info" class="msg gm-gm" style="">
+        <p>{&#x27;action_type&#x27;: &#x27;go&#x27;, &#x27;exploration_info&#x27;: {&#x27;action_epistemic&#x27;: True, &#x27;action_pragmatic&#x27;: True, &#x27;effective_epistemic_gain_facts&#x27;: [[&#x27;at&#x27;, &#x27;player1&#x27;, &#x27;unree1&#x27;]], &#x27;effective_epistemic_gain_amount&#x27;: 1, &#x27;known_entities&#x27;: [[&#x27;at&#x27;, &#x27;unsust1&#x27;, &#x27;iness1&#x27;], [&#x27;at&#x27;, &#x27;apple1&#x27;, &#x27;iness1&#x27;], [&#x27;at&#x27;, &#x27;dente1&#x27;, &#x27;livingroom1&#x27;], [&#x27;at&#x27;, &#x27;table1&#x27;, &#x27;livingroom1&#x27;], [&#x27;at&#x27;, &#x27;cally1&#x27;, &#x27;iness1&#x27;], [&#x27;at&#x27;, &#x27;maten1&#x27;, &#x27;broomcloset1&#x27;], [&#x27;at&#x27;, &#x27;diale1&#x27;, &#x27;iness1&#x27;], [&#x27;at&#x27;, &#x27;couch1&#x27;, &#x27;livingroom1&#x27;], [&#x27;at&#x27;, &#x27;player1&#x27;, &#x27;unree1&#x27;], [&#x27;at&#x27;, &#x27;peach1&#x27;, &#x27;iness1&#x27;], [&#x27;at&#x27;, &#x27;counter1&#x27;, &#x27;uness1&#x27;], [&#x27;at&#x27;, &#x27;sness1&#x27;, &#x27;unree1&#x27;], [&#x27;at&#x27;, &#x27;shelf1&#x27;, &#x27;livingroom1&#x27;], [&#x27;at&#x27;, &#x27;scont1&#x27;, &#x27;bedroom1&#x27;], [&#x27;at&#x27;, &#x27;mical1&#x27;, &#x27;broomcloset1&#x27;], [&#x27;at&#x27;, &#x27;freezer1&#x27;, &#x27;iness1&#x27;], [&#x27;at&#x27;, &#x27;subst1&#x27;, &#x27;iness1&#x27;], [&#x27;at&#x27;, &#x27;wardrobe1&#x27;, &#x27;bedroom1&#x27;], [&#x27;at&#x27;, &#x27;sandwich1&#x27;, &#x27;iness1&#x27;], [&#x27;at&#x27;, &#x27;pillow1&#x27;, &#x27;bedroom1&#x27;], [&#x27;at&#x27;, &#x27;book1&#x27;, &#x27;bedroom1&#x27;], [&#x27;at&#x27;, &#x27;cupboard1&#x27;, &#x27;uness1&#x27;], [&#x27;at&#x27;, &#x27;chair1&#x27;, &#x27;livingroom1&#x27;]], &#x27;known_entities_ratio&#x27;: 0.7931034482758621, &#x27;visited_rooms&#x27;: [&#x27;iness1&#x27;, &#x27;uness1&#x27;, &#x27;livingroom1&#x27;, &#x27;bedroom1&#x27;, &#x27;unree1&#x27;, &#x27;broomcloset1&#x27;], &#x27;visited_rooms_ratio&#x27;: 1.0, &#x27;known_goal_entities&#x27;: [[&#x27;at&#x27;, &#x27;unsust1&#x27;, &#x27;iness1&#x27;], [&#x27;at&#x27;, &#x27;dente1&#x27;, &#x27;livingroom1&#x27;], [&#x27;at&#x27;, &#x27;mical1&#x27;, &#x27;broomcloset1&#x27;], [&#x27;at&#x27;, &#x27;table1&#x27;, &#x27;livingroom1&#x27;], [&#x27;at&#x27;, &#x27;maten1&#x27;, &#x27;broomcloset1&#x27;], [&#x27;at&#x27;, &#x27;subst1&#x27;, &#x27;iness1&#x27;]], &#x27;known_goal_entities_ratio&#x27;: 1.0}}</p>
+    </div>
+
+    <div speaker="Game Master: goal_status" class="msg gm-gm" style="">
+        <p>{&#x27;goal_states_achieved&#x27;: [&#x27;in(subst1,unsust1)&#x27;], &#x27;turn_goal_score&#x27;: 0}</p>
+    </div>
+</div><div class="game-round" data-round="18">
+    <div speaker="GM (Game Master) to Player 1 (Adventurer)" class="msg gm-player p1" style="">
+        <p>You are in a unree now. There is a sness. The sness is on the floor. There are passages to a broom closet, a bedroom and a uness here.<br/></p>
+    </div>
+
+    <div speaker="Player 1 (Adventurer) to GM (Game Master)" class="msg player-gm p1" style="">
+        <p>&gt; go broom closet</p>
+    </div>
+
+    <div speaker="Game Master: metadata" class="msg gm-gm" style="">
+        <p>Round: 18</p>
+    </div>
+
+    <div speaker="Game Master: action_info" class="msg gm-gm" style="">
+        <p>{&#x27;action_type&#x27;: &#x27;go&#x27;, &#x27;exploration_info&#x27;: {&#x27;action_epistemic&#x27;: True, &#x27;action_pragmatic&#x27;: True, &#x27;effective_epistemic_gain_facts&#x27;: [[&#x27;at&#x27;, &#x27;player1&#x27;, &#x27;broomcloset1&#x27;]], &#x27;effective_epistemic_gain_amount&#x27;: 1, &#x27;known_entities&#x27;: [[&#x27;at&#x27;, &#x27;unsust1&#x27;, &#x27;iness1&#x27;], [&#x27;at&#x27;, &#x27;player1&#x27;, &#x27;broomcloset1&#x27;], [&#x27;at&#x27;, &#x27;apple1&#x27;, &#x27;iness1&#x27;], [&#x27;at&#x27;, &#x27;dente1&#x27;, &#x27;livingroom1&#x27;], [&#x27;at&#x27;, &#x27;table1&#x27;, &#x27;livingroom1&#x27;], [&#x27;at&#x27;, &#x27;cally1&#x27;, &#x27;iness1&#x27;], [&#x27;at&#x27;, &#x27;maten1&#x27;, &#x27;broomcloset1&#x27;], [&#x27;at&#x27;, &#x27;diale1&#x27;, &#x27;iness1&#x27;], [&#x27;at&#x27;, &#x27;couch1&#x27;, &#x27;livingroom1&#x27;], [&#x27;at&#x27;, &#x27;peach1&#x27;, &#x27;iness1&#x27;], [&#x27;at&#x27;, &#x27;counter1&#x27;, &#x27;uness1&#x27;], [&#x27;at&#x27;, &#x27;sness1&#x27;, &#x27;unree1&#x27;], [&#x27;at&#x27;, &#x27;shelf1&#x27;, &#x27;livingroom1&#x27;], [&#x27;at&#x27;, &#x27;scont1&#x27;, &#x27;bedroom1&#x27;], [&#x27;at&#x27;, &#x27;mical1&#x27;, &#x27;broomcloset1&#x27;], [&#x27;at&#x27;, &#x27;freezer1&#x27;, &#x27;iness1&#x27;], [&#x27;at&#x27;, &#x27;subst1&#x27;, &#x27;iness1&#x27;], [&#x27;at&#x27;, &#x27;wardrobe1&#x27;, &#x27;bedroom1&#x27;], [&#x27;at&#x27;, &#x27;sandwich1&#x27;, &#x27;iness1&#x27;], [&#x27;at&#x27;, &#x27;pillow1&#x27;, &#x27;bedroom1&#x27;], [&#x27;at&#x27;, &#x27;book1&#x27;, &#x27;bedroom1&#x27;], [&#x27;at&#x27;, &#x27;cupboard1&#x27;, &#x27;uness1&#x27;], [&#x27;at&#x27;, &#x27;chair1&#x27;, &#x27;livingroom1&#x27;]], &#x27;known_entities_ratio&#x27;: 0.7931034482758621, &#x27;visited_rooms&#x27;: [&#x27;iness1&#x27;, &#x27;uness1&#x27;, &#x27;livingroom1&#x27;, &#x27;bedroom1&#x27;, &#x27;unree1&#x27;, &#x27;broomcloset1&#x27;], &#x27;visited_rooms_ratio&#x27;: 1.0, &#x27;known_goal_entities&#x27;: [[&#x27;at&#x27;, &#x27;unsust1&#x27;, &#x27;iness1&#x27;], [&#x27;at&#x27;, &#x27;dente1&#x27;, &#x27;livingroom1&#x27;], [&#x27;at&#x27;, &#x27;mical1&#x27;, &#x27;broomcloset1&#x27;], [&#x27;at&#x27;, &#x27;table1&#x27;, &#x27;livingroom1&#x27;], [&#x27;at&#x27;, &#x27;maten1&#x27;, &#x27;broomcloset1&#x27;], [&#x27;at&#x27;, &#x27;subst1&#x27;, &#x27;iness1&#x27;]], &#x27;known_goal_entities_ratio&#x27;: 1.0}}</p>
+    </div>
+
+    <div speaker="Game Master: goal_status" class="msg gm-gm" style="">
+        <p>{&#x27;goal_states_achieved&#x27;: [&#x27;in(subst1,unsust1)&#x27;], &#x27;turn_goal_score&#x27;: 0}</p>
+    </div>
+</div><div class="game-round" data-round="19">
+    <div speaker="GM (Game Master) to Player 1 (Adventurer)" class="msg gm-player p1" style="">
+        <p>You are in a broom closet now. There are a maten and a mical. The maten is on the floor. The mical is on the floor. There is a passage to a unree here.<br/></p>
+    </div>
+
+    <div speaker="Player 1 (Adventurer) to GM (Game Master)" class="msg player-gm p1" style="">
+        <p>&gt; take mical</p>
+    </div>
+
+    <div speaker="Game Master: metadata" class="msg gm-gm" style="">
+        <p>Round: 19</p>
+    </div>
+
+    <div speaker="Game Master: action_info" class="msg gm-gm" style="">
+        <p>{&#x27;action_type&#x27;: &#x27;take&#x27;, &#x27;exploration_info&#x27;: {&#x27;action_epistemic&#x27;: False, &#x27;action_pragmatic&#x27;: True, &#x27;effective_epistemic_gain_amount&#x27;: 0, &#x27;known_entities&#x27;: [[&#x27;at&#x27;, &#x27;unsust1&#x27;, &#x27;iness1&#x27;], [&#x27;at&#x27;, &#x27;player1&#x27;, &#x27;broomcloset1&#x27;], [&#x27;at&#x27;, &#x27;apple1&#x27;, &#x27;iness1&#x27;], [&#x27;at&#x27;, &#x27;dente1&#x27;, &#x27;livingroom1&#x27;], [&#x27;at&#x27;, &#x27;table1&#x27;, &#x27;livingroom1&#x27;], [&#x27;at&#x27;, &#x27;cally1&#x27;, &#x27;iness1&#x27;], [&#x27;at&#x27;, &#x27;maten1&#x27;, &#x27;broomcloset1&#x27;], [&#x27;at&#x27;, &#x27;diale1&#x27;, &#x27;iness1&#x27;], [&#x27;at&#x27;, &#x27;couch1&#x27;, &#x27;livingroom1&#x27;], [&#x27;at&#x27;, &#x27;peach1&#x27;, &#x27;iness1&#x27;], [&#x27;at&#x27;, &#x27;counter1&#x27;, &#x27;uness1&#x27;], [&#x27;at&#x27;, &#x27;sness1&#x27;, &#x27;unree1&#x27;], [&#x27;at&#x27;, &#x27;shelf1&#x27;, &#x27;livingroom1&#x27;], [&#x27;at&#x27;, &#x27;scont1&#x27;, &#x27;bedroom1&#x27;], [&#x27;at&#x27;, &#x27;mical1&#x27;, &#x27;broomcloset1&#x27;], [&#x27;at&#x27;, &#x27;freezer1&#x27;, &#x27;iness1&#x27;], [&#x27;at&#x27;, &#x27;subst1&#x27;, &#x27;iness1&#x27;], [&#x27;at&#x27;, &#x27;wardrobe1&#x27;, &#x27;bedroom1&#x27;], [&#x27;at&#x27;, &#x27;sandwich1&#x27;, &#x27;iness1&#x27;], [&#x27;at&#x27;, &#x27;pillow1&#x27;, &#x27;bedroom1&#x27;], [&#x27;at&#x27;, &#x27;book1&#x27;, &#x27;bedroom1&#x27;], [&#x27;at&#x27;, &#x27;cupboard1&#x27;, &#x27;uness1&#x27;], [&#x27;at&#x27;, &#x27;chair1&#x27;, &#x27;livingroom1&#x27;]], &#x27;known_entities_ratio&#x27;: 0.7931034482758621, &#x27;visited_rooms&#x27;: [&#x27;iness1&#x27;, &#x27;uness1&#x27;, &#x27;livingroom1&#x27;, &#x27;bedroom1&#x27;, &#x27;unree1&#x27;, &#x27;broomcloset1&#x27;], &#x27;visited_rooms_ratio&#x27;: 1.0, &#x27;known_goal_entities&#x27;: [[&#x27;at&#x27;, &#x27;unsust1&#x27;, &#x27;iness1&#x27;], [&#x27;at&#x27;, &#x27;dente1&#x27;, &#x27;livingroom1&#x27;], [&#x27;at&#x27;, &#x27;mical1&#x27;, &#x27;broomcloset1&#x27;], [&#x27;at&#x27;, &#x27;table1&#x27;, &#x27;livingroom1&#x27;], [&#x27;at&#x27;, &#x27;maten1&#x27;, &#x27;broomcloset1&#x27;], [&#x27;at&#x27;, &#x27;subst1&#x27;, &#x27;iness1&#x27;]], &#x27;known_goal_entities_ratio&#x27;: 1.0}}</p>
+    </div>
+
+    <div speaker="Game Master: goal_status" class="msg gm-gm" style="">
+        <p>{&#x27;goal_states_achieved&#x27;: [&#x27;in(subst1,unsust1)&#x27;], &#x27;turn_goal_score&#x27;: 0}</p>
+    </div>
+</div><div class="game-round" data-round="20">
+    <div speaker="GM (Game Master) to Player 1 (Adventurer)" class="msg gm-player p1" style="">
+        <p>You take the mical. In your inventory you have a mical.<br/></p>
+    </div>
+
+    <div speaker="Player 1 (Adventurer) to GM (Game Master)" class="msg player-gm p1" style="">
+        <p>&gt; take maten</p>
+    </div>
+
+    <div speaker="Game Master: metadata" class="msg gm-gm" style="">
+        <p>Round: 20</p>
+    </div>
+
+    <div speaker="Game Master: action_info" class="msg gm-gm" style="">
+        <p>{&#x27;action_type&#x27;: &#x27;take&#x27;, &#x27;exploration_info&#x27;: {&#x27;action_epistemic&#x27;: False, &#x27;action_pragmatic&#x27;: True, &#x27;effective_epistemic_gain_amount&#x27;: 0, &#x27;known_entities&#x27;: [[&#x27;at&#x27;, &#x27;unsust1&#x27;, &#x27;iness1&#x27;], [&#x27;at&#x27;, &#x27;player1&#x27;, &#x27;broomcloset1&#x27;], [&#x27;at&#x27;, &#x27;apple1&#x27;, &#x27;iness1&#x27;], [&#x27;at&#x27;, &#x27;dente1&#x27;, &#x27;livingroom1&#x27;], [&#x27;at&#x27;, &#x27;table1&#x27;, &#x27;livingroom1&#x27;], [&#x27;at&#x27;, &#x27;cally1&#x27;, &#x27;iness1&#x27;], [&#x27;at&#x27;, &#x27;maten1&#x27;, &#x27;broomcloset1&#x27;], [&#x27;at&#x27;, &#x27;diale1&#x27;, &#x27;iness1&#x27;], [&#x27;at&#x27;, &#x27;couch1&#x27;, &#x27;livingroom1&#x27;], [&#x27;at&#x27;, &#x27;peach1&#x27;, &#x27;iness1&#x27;], [&#x27;at&#x27;, &#x27;counter1&#x27;, &#x27;uness1&#x27;], [&#x27;at&#x27;, &#x27;sness1&#x27;, &#x27;unree1&#x27;], [&#x27;at&#x27;, &#x27;shelf1&#x27;, &#x27;livingroom1&#x27;], [&#x27;at&#x27;, &#x27;scont1&#x27;, &#x27;bedroom1&#x27;], [&#x27;at&#x27;, &#x27;mical1&#x27;, &#x27;broomcloset1&#x27;], [&#x27;at&#x27;, &#x27;freezer1&#x27;, &#x27;iness1&#x27;], [&#x27;at&#x27;, &#x27;subst1&#x27;, &#x27;iness1&#x27;], [&#x27;at&#x27;, &#x27;wardrobe1&#x27;, &#x27;bedroom1&#x27;], [&#x27;at&#x27;, &#x27;sandwich1&#x27;, &#x27;iness1&#x27;], [&#x27;at&#x27;, &#x27;pillow1&#x27;, &#x27;bedroom1&#x27;], [&#x27;at&#x27;, &#x27;book1&#x27;, &#x27;bedroom1&#x27;], [&#x27;at&#x27;, &#x27;cupboard1&#x27;, &#x27;uness1&#x27;], [&#x27;at&#x27;, &#x27;chair1&#x27;, &#x27;livingroom1&#x27;]], &#x27;known_entities_ratio&#x27;: 0.7931034482758621, &#x27;visited_rooms&#x27;: [&#x27;iness1&#x27;, &#x27;uness1&#x27;, &#x27;livingroom1&#x27;, &#x27;bedroom1&#x27;, &#x27;unree1&#x27;, &#x27;broomcloset1&#x27;], &#x27;visited_rooms_ratio&#x27;: 1.0, &#x27;known_goal_entities&#x27;: [[&#x27;at&#x27;, &#x27;unsust1&#x27;, &#x27;iness1&#x27;], [&#x27;at&#x27;, &#x27;dente1&#x27;, &#x27;livingroom1&#x27;], [&#x27;at&#x27;, &#x27;mical1&#x27;, &#x27;broomcloset1&#x27;], [&#x27;at&#x27;, &#x27;table1&#x27;, &#x27;livingroom1&#x27;], [&#x27;at&#x27;, &#x27;maten1&#x27;, &#x27;broomcloset1&#x27;], [&#x27;at&#x27;, &#x27;subst1&#x27;, &#x27;iness1&#x27;]], &#x27;known_goal_entities_ratio&#x27;: 1.0}}</p>
+    </div>
+
+    <div speaker="Game Master: goal_status" class="msg gm-gm" style="">
+        <p>{&#x27;goal_states_achieved&#x27;: [&#x27;in(subst1,unsust1)&#x27;], &#x27;turn_goal_score&#x27;: 0}</p>
+    </div>
+</div><div class="game-round" data-round="21">
+    <div speaker="GM (Game Master) to Player 1 (Adventurer)" class="msg gm-player p1" style="">
+        <p>You take the maten. In your inventory you have a mical and a maten.<br/></p>
+    </div>
+
+    <div speaker="Player 1 (Adventurer) to GM (Game Master)" class="msg player-gm p1" style="">
+        <p>&gt; go unree</p>
+    </div>
+
+    <div speaker="Game Master: metadata" class="msg gm-gm" style="">
+        <p>Round: 21</p>
+    </div>
+
+    <div speaker="Game Master: action_info" class="msg gm-gm" style="">
+        <p>{&#x27;action_type&#x27;: &#x27;go&#x27;, &#x27;exploration_info&#x27;: {&#x27;action_epistemic&#x27;: True, &#x27;action_pragmatic&#x27;: True, &#x27;effective_epistemic_gain_facts&#x27;: [[&#x27;at&#x27;, &#x27;player1&#x27;, &#x27;unree1&#x27;], [&#x27;at&#x27;, &#x27;mical1&#x27;, &#x27;unree1&#x27;], [&#x27;at&#x27;, &#x27;maten1&#x27;, &#x27;unree1&#x27;]], &#x27;effective_epistemic_gain_amount&#x27;: 3, &#x27;known_entities&#x27;: [[&#x27;at&#x27;, &#x27;unsust1&#x27;, &#x27;iness1&#x27;], [&#x27;at&#x27;, &#x27;apple1&#x27;, &#x27;iness1&#x27;], [&#x27;at&#x27;, &#x27;dente1&#x27;, &#x27;livingroom1&#x27;], [&#x27;at&#x27;, &#x27;table1&#x27;, &#x27;livingroom1&#x27;], [&#x27;at&#x27;, &#x27;cally1&#x27;, &#x27;iness1&#x27;], [&#x27;at&#x27;, &#x27;diale1&#x27;, &#x27;iness1&#x27;], [&#x27;at&#x27;, &#x27;couch1&#x27;, &#x27;livingroom1&#x27;], [&#x27;at&#x27;, &#x27;player1&#x27;, &#x27;unree1&#x27;], [&#x27;at&#x27;, &#x27;maten1&#x27;, &#x27;unree1&#x27;], [&#x27;at&#x27;, &#x27;peach1&#x27;, &#x27;iness1&#x27;], [&#x27;at&#x27;, &#x27;counter1&#x27;, &#x27;uness1&#x27;], [&#x27;at&#x27;, &#x27;sness1&#x27;, &#x27;unree1&#x27;], [&#x27;at&#x27;, &#x27;shelf1&#x27;, &#x27;livingroom1&#x27;], [&#x27;at&#x27;, &#x27;scont1&#x27;, &#x27;bedroom1&#x27;], [&#x27;at&#x27;, &#x27;freezer1&#x27;, &#x27;iness1&#x27;], [&#x27;at&#x27;, &#x27;subst1&#x27;, &#x27;iness1&#x27;], [&#x27;at&#x27;, &#x27;wardrobe1&#x27;, &#x27;bedroom1&#x27;], [&#x27;at&#x27;, &#x27;sandwich1&#x27;, &#x27;iness1&#x27;], [&#x27;at&#x27;, &#x27;pillow1&#x27;, &#x27;bedroom1&#x27;], [&#x27;at&#x27;, &#x27;book1&#x27;, &#x27;bedroom1&#x27;], [&#x27;at&#x27;, &#x27;cupboard1&#x27;, &#x27;uness1&#x27;], [&#x27;at&#x27;, &#x27;mical1&#x27;, &#x27;unree1&#x27;], [&#x27;at&#x27;, &#x27;chair1&#x27;, &#x27;livingroom1&#x27;]], &#x27;known_entities_ratio&#x27;: 0.7931034482758621, &#x27;visited_rooms&#x27;: [&#x27;iness1&#x27;, &#x27;uness1&#x27;, &#x27;livingroom1&#x27;, &#x27;bedroom1&#x27;, &#x27;unree1&#x27;, &#x27;broomcloset1&#x27;], &#x27;visited_rooms_ratio&#x27;: 1.0, &#x27;known_goal_entities&#x27;: [[&#x27;at&#x27;, &#x27;unsust1&#x27;, &#x27;iness1&#x27;], [&#x27;at&#x27;, &#x27;dente1&#x27;, &#x27;livingroom1&#x27;], [&#x27;at&#x27;, &#x27;table1&#x27;, &#x27;livingroom1&#x27;], [&#x27;at&#x27;, &#x27;mical1&#x27;, &#x27;unree1&#x27;], [&#x27;at&#x27;, &#x27;maten1&#x27;, &#x27;unree1&#x27;], [&#x27;at&#x27;, &#x27;subst1&#x27;, &#x27;iness1&#x27;]], &#x27;known_goal_entities_ratio&#x27;: 1.0}}</p>
+    </div>
+
+    <div speaker="Game Master: goal_status" class="msg gm-gm" style="">
+        <p>{&#x27;goal_states_achieved&#x27;: [&#x27;in(subst1,unsust1)&#x27;], &#x27;turn_goal_score&#x27;: 0}</p>
+    </div>
+</div><div class="game-round" data-round="22">
+    <div speaker="GM (Game Master) to Player 1 (Adventurer)" class="msg gm-player p1" style="">
+        <p>You are in a unree now. There is a sness. The sness is on the floor. There are passages to a broom closet, a bedroom and a uness here.<br/></p>
+    </div>
+
+    <div speaker="Player 1 (Adventurer) to GM (Game Master)" class="msg player-gm p1" style="">
+        <p>&gt; go uness</p>
+    </div>
+
+    <div speaker="Game Master: metadata" class="msg gm-gm" style="">
+        <p>Round: 22</p>
+    </div>
+
+    <div speaker="Game Master: action_info" class="msg gm-gm" style="">
+        <p>{&#x27;action_type&#x27;: &#x27;go&#x27;, &#x27;exploration_info&#x27;: {&#x27;action_epistemic&#x27;: True, &#x27;action_pragmatic&#x27;: True, &#x27;effective_epistemic_gain_facts&#x27;: [[&#x27;at&#x27;, &#x27;mical1&#x27;, &#x27;uness1&#x27;], [&#x27;at&#x27;, &#x27;maten1&#x27;, &#x27;uness1&#x27;], [&#x27;at&#x27;, &#x27;player1&#x27;, &#x27;uness1&#x27;]], &#x27;effective_epistemic_gain_amount&#x27;: 3, &#x27;known_entities&#x27;: [[&#x27;at&#x27;, &#x27;mical1&#x27;, &#x27;uness1&#x27;], [&#x27;at&#x27;, &#x27;unsust1&#x27;, &#x27;iness1&#x27;], [&#x27;at&#x27;, &#x27;apple1&#x27;, &#x27;iness1&#x27;], [&#x27;at&#x27;, &#x27;dente1&#x27;, &#x27;livingroom1&#x27;], [&#x27;at&#x27;, &#x27;table1&#x27;, &#x27;livingroom1&#x27;], [&#x27;at&#x27;, &#x27;cally1&#x27;, &#x27;iness1&#x27;], [&#x27;at&#x27;, &#x27;diale1&#x27;, &#x27;iness1&#x27;], [&#x27;at&#x27;, &#x27;couch1&#x27;, &#x27;livingroom1&#x27;], [&#x27;at&#x27;, &#x27;peach1&#x27;, &#x27;iness1&#x27;], [&#x27;at&#x27;, &#x27;counter1&#x27;, &#x27;uness1&#x27;], [&#x27;at&#x27;, &#x27;sness1&#x27;, &#x27;unree1&#x27;], [&#x27;at&#x27;, &#x27;shelf1&#x27;, &#x27;livingroom1&#x27;], [&#x27;at&#x27;, &#x27;player1&#x27;, &#x27;uness1&#x27;], [&#x27;at&#x27;, &#x27;maten1&#x27;, &#x27;uness1&#x27;], [&#x27;at&#x27;, &#x27;scont1&#x27;, &#x27;bedroom1&#x27;], [&#x27;at&#x27;, &#x27;freezer1&#x27;, &#x27;iness1&#x27;], [&#x27;at&#x27;, &#x27;subst1&#x27;, &#x27;iness1&#x27;], [&#x27;at&#x27;, &#x27;wardrobe1&#x27;, &#x27;bedroom1&#x27;], [&#x27;at&#x27;, &#x27;sandwich1&#x27;, &#x27;iness1&#x27;], [&#x27;at&#x27;, &#x27;pillow1&#x27;, &#x27;bedroom1&#x27;], [&#x27;at&#x27;, &#x27;book1&#x27;, &#x27;bedroom1&#x27;], [&#x27;at&#x27;, &#x27;cupboard1&#x27;, &#x27;uness1&#x27;], [&#x27;at&#x27;, &#x27;chair1&#x27;, &#x27;livingroom1&#x27;]], &#x27;known_entities_ratio&#x27;: 0.7931034482758621, &#x27;visited_rooms&#x27;: [&#x27;iness1&#x27;, &#x27;uness1&#x27;, &#x27;livingroom1&#x27;, &#x27;bedroom1&#x27;, &#x27;unree1&#x27;, &#x27;broomcloset1&#x27;], &#x27;visited_rooms_ratio&#x27;: 1.0, &#x27;known_goal_entities&#x27;: [[&#x27;at&#x27;, &#x27;mical1&#x27;, &#x27;uness1&#x27;], [&#x27;at&#x27;, &#x27;maten1&#x27;, &#x27;uness1&#x27;], [&#x27;at&#x27;, &#x27;unsust1&#x27;, &#x27;iness1&#x27;], [&#x27;at&#x27;, &#x27;dente1&#x27;, &#x27;livingroom1&#x27;], [&#x27;at&#x27;, &#x27;table1&#x27;, &#x27;livingroom1&#x27;], [&#x27;at&#x27;, &#x27;subst1&#x27;, &#x27;iness1&#x27;]], &#x27;known_goal_entities_ratio&#x27;: 1.0}}</p>
+    </div>
+
+    <div speaker="Game Master: goal_status" class="msg gm-gm" style="">
+        <p>{&#x27;goal_states_achieved&#x27;: [&#x27;in(subst1,unsust1)&#x27;], &#x27;turn_goal_score&#x27;: 0}</p>
+    </div>
+</div><div class="game-round" data-round="23">
+    <div speaker="GM (Game Master) to Player 1 (Adventurer)" class="msg gm-player p1" style="">
+        <p>You are in a uness now. There are a counter and a cupboard. The cupboard is closed. There are passages to a living room, a iness and a unree here.<br/></p>
+    </div>
+
+    <div speaker="Player 1 (Adventurer) to GM (Game Master)" class="msg player-gm p1" style="">
+        <p>&gt; go living room</p>
+    </div>
+
+    <div speaker="Game Master: metadata" class="msg gm-gm" style="">
+        <p>Round: 23</p>
+    </div>
+
+    <div speaker="Game Master: action_info" class="msg gm-gm" style="">
+        <p>{&#x27;action_type&#x27;: &#x27;go&#x27;, &#x27;exploration_info&#x27;: {&#x27;action_epistemic&#x27;: True, &#x27;action_pragmatic&#x27;: True, &#x27;effective_epistemic_gain_facts&#x27;: [[&#x27;at&#x27;, &#x27;maten1&#x27;, &#x27;livingroom1&#x27;], [&#x27;at&#x27;, &#x27;player1&#x27;, &#x27;livingroom1&#x27;], [&#x27;at&#x27;, &#x27;mical1&#x27;, &#x27;livingroom1&#x27;]], &#x27;effective_epistemic_gain_amount&#x27;: 3, &#x27;known_entities&#x27;: [[&#x27;at&#x27;, &#x27;unsust1&#x27;, &#x27;iness1&#x27;], [&#x27;at&#x27;, &#x27;apple1&#x27;, &#x27;iness1&#x27;], [&#x27;at&#x27;, &#x27;dente1&#x27;, &#x27;livingroom1&#x27;], [&#x27;at&#x27;, &#x27;player1&#x27;, &#x27;livingroom1&#x27;], [&#x27;at&#x27;, &#x27;table1&#x27;, &#x27;livingroom1&#x27;], [&#x27;at&#x27;, &#x27;cally1&#x27;, &#x27;iness1&#x27;], [&#x27;at&#x27;, &#x27;maten1&#x27;, &#x27;livingroom1&#x27;], [&#x27;at&#x27;, &#x27;diale1&#x27;, &#x27;iness1&#x27;], [&#x27;at&#x27;, &#x27;couch1&#x27;, &#x27;livingroom1&#x27;], [&#x27;at&#x27;, &#x27;peach1&#x27;, &#x27;iness1&#x27;], [&#x27;at&#x27;, &#x27;counter1&#x27;, &#x27;uness1&#x27;], [&#x27;at&#x27;, &#x27;sness1&#x27;, &#x27;unree1&#x27;], [&#x27;at&#x27;, &#x27;shelf1&#x27;, &#x27;livingroom1&#x27;], [&#x27;at&#x27;, &#x27;scont1&#x27;, &#x27;bedroom1&#x27;], [&#x27;at&#x27;, &#x27;mical1&#x27;, &#x27;livingroom1&#x27;], [&#x27;at&#x27;, &#x27;freezer1&#x27;, &#x27;iness1&#x27;], [&#x27;at&#x27;, &#x27;subst1&#x27;, &#x27;iness1&#x27;], [&#x27;at&#x27;, &#x27;wardrobe1&#x27;, &#x27;bedroom1&#x27;], [&#x27;at&#x27;, &#x27;sandwich1&#x27;, &#x27;iness1&#x27;], [&#x27;at&#x27;, &#x27;pillow1&#x27;, &#x27;bedroom1&#x27;], [&#x27;at&#x27;, &#x27;book1&#x27;, &#x27;bedroom1&#x27;], [&#x27;at&#x27;, &#x27;cupboard1&#x27;, &#x27;uness1&#x27;], [&#x27;at&#x27;, &#x27;chair1&#x27;, &#x27;livingroom1&#x27;]], &#x27;known_entities_ratio&#x27;: 0.7931034482758621, &#x27;visited_rooms&#x27;: [&#x27;iness1&#x27;, &#x27;uness1&#x27;, &#x27;livingroom1&#x27;, &#x27;bedroom1&#x27;, &#x27;unree1&#x27;, &#x27;broomcloset1&#x27;], &#x27;visited_rooms_ratio&#x27;: 1.0, &#x27;known_goal_entities&#x27;: [[&#x27;at&#x27;, &#x27;unsust1&#x27;, &#x27;iness1&#x27;], [&#x27;at&#x27;, &#x27;dente1&#x27;, &#x27;livingroom1&#x27;], [&#x27;at&#x27;, &#x27;mical1&#x27;, &#x27;livingroom1&#x27;], [&#x27;at&#x27;, &#x27;table1&#x27;, &#x27;livingroom1&#x27;], [&#x27;at&#x27;, &#x27;maten1&#x27;, &#x27;livingroom1&#x27;], [&#x27;at&#x27;, &#x27;subst1&#x27;, &#x27;iness1&#x27;]], &#x27;known_goal_entities_ratio&#x27;: 1.0}}</p>
+    </div>
+
+    <div speaker="Game Master: goal_status" class="msg gm-gm" style="">
+        <p>{&#x27;goal_states_achieved&#x27;: [&#x27;in(subst1,unsust1)&#x27;], &#x27;turn_goal_score&#x27;: 0}</p>
+    </div>
+</div><div class="game-round" data-round="24">
+    <div speaker="GM (Game Master) to Player 1 (Adventurer)" class="msg gm-player p1" style="">
+        <p>You are in a living room now. There are a couch, a shelf, a chair, a dente and a table. There is a passage to a uness here.<br/></p>
+    </div>
+
+    <div speaker="Player 1 (Adventurer) to GM (Game Master)" class="msg player-gm p1" style="">
+        <p>&gt; pante mical table</p>
+    </div>
+
+    <div speaker="Game Master: metadata" class="msg gm-gm" style="">
+        <p>Round: 24</p>
+    </div>
+
+    <div speaker="Game Master: action_info" class="msg gm-gm" style="">
+        <p>{&#x27;action_type&#x27;: &#x27;put&#x27;, &#x27;exploration_info&#x27;: {&#x27;action_epistemic&#x27;: False, &#x27;action_pragmatic&#x27;: True, &#x27;effective_epistemic_gain_amount&#x27;: 0, &#x27;known_entities&#x27;: [[&#x27;at&#x27;, &#x27;unsust1&#x27;, &#x27;iness1&#x27;], [&#x27;at&#x27;, &#x27;apple1&#x27;, &#x27;iness1&#x27;], [&#x27;at&#x27;, &#x27;dente1&#x27;, &#x27;livingroom1&#x27;], [&#x27;at&#x27;, &#x27;player1&#x27;, &#x27;livingroom1&#x27;], [&#x27;at&#x27;, &#x27;table1&#x27;, &#x27;livingroom1&#x27;], [&#x27;at&#x27;, &#x27;cally1&#x27;, &#x27;iness1&#x27;], [&#x27;at&#x27;, &#x27;maten1&#x27;, &#x27;livingroom1&#x27;], [&#x27;at&#x27;, &#x27;diale1&#x27;, &#x27;iness1&#x27;], [&#x27;at&#x27;, &#x27;couch1&#x27;, &#x27;livingroom1&#x27;], [&#x27;at&#x27;, &#x27;peach1&#x27;, &#x27;iness1&#x27;], [&#x27;at&#x27;, &#x27;counter1&#x27;, &#x27;uness1&#x27;], [&#x27;at&#x27;, &#x27;sness1&#x27;, &#x27;unree1&#x27;], [&#x27;at&#x27;, &#x27;shelf1&#x27;, &#x27;livingroom1&#x27;], [&#x27;at&#x27;, &#x27;scont1&#x27;, &#x27;bedroom1&#x27;], [&#x27;at&#x27;, &#x27;mical1&#x27;, &#x27;livingroom1&#x27;], [&#x27;at&#x27;, &#x27;freezer1&#x27;, &#x27;iness1&#x27;], [&#x27;at&#x27;, &#x27;subst1&#x27;, &#x27;iness1&#x27;], [&#x27;at&#x27;, &#x27;wardrobe1&#x27;, &#x27;bedroom1&#x27;], [&#x27;at&#x27;, &#x27;sandwich1&#x27;, &#x27;iness1&#x27;], [&#x27;at&#x27;, &#x27;pillow1&#x27;, &#x27;bedroom1&#x27;], [&#x27;at&#x27;, &#x27;book1&#x27;, &#x27;bedroom1&#x27;], [&#x27;at&#x27;, &#x27;cupboard1&#x27;, &#x27;uness1&#x27;], [&#x27;at&#x27;, &#x27;chair1&#x27;, &#x27;livingroom1&#x27;]], &#x27;known_entities_ratio&#x27;: 0.7931034482758621, &#x27;visited_rooms&#x27;: [&#x27;iness1&#x27;, &#x27;uness1&#x27;, &#x27;livingroom1&#x27;, &#x27;bedroom1&#x27;, &#x27;unree1&#x27;, &#x27;broomcloset1&#x27;], &#x27;visited_rooms_ratio&#x27;: 1.0, &#x27;known_goal_entities&#x27;: [[&#x27;at&#x27;, &#x27;unsust1&#x27;, &#x27;iness1&#x27;], [&#x27;at&#x27;, &#x27;dente1&#x27;, &#x27;livingroom1&#x27;], [&#x27;at&#x27;, &#x27;mical1&#x27;, &#x27;livingroom1&#x27;], [&#x27;at&#x27;, &#x27;table1&#x27;, &#x27;livingroom1&#x27;], [&#x27;at&#x27;, &#x27;maten1&#x27;, &#x27;livingroom1&#x27;], [&#x27;at&#x27;, &#x27;subst1&#x27;, &#x27;iness1&#x27;]], &#x27;known_goal_entities_ratio&#x27;: 1.0}}</p>
+    </div>
+
+    <div speaker="Game Master: goal_status" class="msg gm-gm" style="">
+        <p>{&#x27;goal_states_achieved&#x27;: [&#x27;on(mical1,table1)&#x27;, &#x27;in(subst1,unsust1)&#x27;], &#x27;turn_goal_score&#x27;: 1}</p>
+    </div>
+</div><div class="game-round" data-round="25">
+    <div speaker="GM (Game Master) to Player 1 (Adventurer)" class="msg gm-player p1" style="">
+        <p>You put the mical on the table.<br/></p>
+    </div>
+
+    <div speaker="Player 1 (Adventurer) to GM (Game Master)" class="msg player-gm p1" style="">
+        <p>&gt; pante maten dente</p>
+    </div>
+
+    <div speaker="Game Master: metadata" class="msg gm-gm" style="">
+        <p>Round: 25</p>
+    </div>
+
+    <div speaker="Game Master: action_info" class="msg gm-gm" style="">
+        <p>{&#x27;action_type&#x27;: &#x27;put&#x27;, &#x27;exploration_info&#x27;: {&#x27;action_epistemic&#x27;: False, &#x27;action_pragmatic&#x27;: True, &#x27;effective_epistemic_gain_amount&#x27;: 0, &#x27;known_entities&#x27;: [[&#x27;at&#x27;, &#x27;unsust1&#x27;, &#x27;iness1&#x27;], [&#x27;at&#x27;, &#x27;apple1&#x27;, &#x27;iness1&#x27;], [&#x27;at&#x27;, &#x27;dente1&#x27;, &#x27;livingroom1&#x27;], [&#x27;at&#x27;, &#x27;player1&#x27;, &#x27;livingroom1&#x27;], [&#x27;at&#x27;, &#x27;table1&#x27;, &#x27;livingroom1&#x27;], [&#x27;at&#x27;, &#x27;cally1&#x27;, &#x27;iness1&#x27;], [&#x27;at&#x27;, &#x27;maten1&#x27;, &#x27;livingroom1&#x27;], [&#x27;at&#x27;, &#x27;diale1&#x27;, &#x27;iness1&#x27;], [&#x27;at&#x27;, &#x27;couch1&#x27;, &#x27;livingroom1&#x27;], [&#x27;at&#x27;, &#x27;peach1&#x27;, &#x27;iness1&#x27;], [&#x27;at&#x27;, &#x27;counter1&#x27;, &#x27;uness1&#x27;], [&#x27;at&#x27;, &#x27;sness1&#x27;, &#x27;unree1&#x27;], [&#x27;at&#x27;, &#x27;shelf1&#x27;, &#x27;livingroom1&#x27;], [&#x27;at&#x27;, &#x27;scont1&#x27;, &#x27;bedroom1&#x27;], [&#x27;at&#x27;, &#x27;mical1&#x27;, &#x27;livingroom1&#x27;], [&#x27;at&#x27;, &#x27;freezer1&#x27;, &#x27;iness1&#x27;], [&#x27;at&#x27;, &#x27;subst1&#x27;, &#x27;iness1&#x27;], [&#x27;at&#x27;, &#x27;wardrobe1&#x27;, &#x27;bedroom1&#x27;], [&#x27;at&#x27;, &#x27;sandwich1&#x27;, &#x27;iness1&#x27;], [&#x27;at&#x27;, &#x27;pillow1&#x27;, &#x27;bedroom1&#x27;], [&#x27;at&#x27;, &#x27;book1&#x27;, &#x27;bedroom1&#x27;], [&#x27;at&#x27;, &#x27;cupboard1&#x27;, &#x27;uness1&#x27;], [&#x27;at&#x27;, &#x27;chair1&#x27;, &#x27;livingroom1&#x27;]], &#x27;known_entities_ratio&#x27;: 0.7931034482758621, &#x27;visited_rooms&#x27;: [&#x27;iness1&#x27;, &#x27;uness1&#x27;, &#x27;livingroom1&#x27;, &#x27;bedroom1&#x27;, &#x27;unree1&#x27;, &#x27;broomcloset1&#x27;], &#x27;visited_rooms_ratio&#x27;: 1.0, &#x27;known_goal_entities&#x27;: [[&#x27;at&#x27;, &#x27;unsust1&#x27;, &#x27;iness1&#x27;], [&#x27;at&#x27;, &#x27;dente1&#x27;, &#x27;livingroom1&#x27;], [&#x27;at&#x27;, &#x27;mical1&#x27;, &#x27;livingroom1&#x27;], [&#x27;at&#x27;, &#x27;table1&#x27;, &#x27;livingroom1&#x27;], [&#x27;at&#x27;, &#x27;maten1&#x27;, &#x27;livingroom1&#x27;], [&#x27;at&#x27;, &#x27;subst1&#x27;, &#x27;iness1&#x27;]], &#x27;known_goal_entities_ratio&#x27;: 1.0}}</p>
+    </div>
+
+    <div speaker="Game Master: goal_status" class="msg gm-gm" style="">
+        <p>{&#x27;goal_states_achieved&#x27;: [&#x27;on(mical1,table1)&#x27;, &#x27;on(maten1,dente1)&#x27;, &#x27;in(subst1,unsust1)&#x27;], &#x27;turn_goal_score&#x27;: 1}</p>
+    </div>
+
+    <div speaker="Game Master: adventure_finished" class="msg gm-gm" style="">
+        <p>[&#x27;on(mical1,table1)&#x27;, &#x27;on(maten1,dente1)&#x27;, &#x27;in(subst1,unsust1)&#x27;]</p>
+    </div>
+</div><div class="game-round" data-round="26">
+    <div speaker="GM (Game Master) to Player 1 (Adventurer)" class="msg gm-player p1" style="">
+        <p>You put the maten on the dente.<br/></p>
+    </div>
+
+    <div speaker="Player 1 (Adventurer) to GM (Game Master)" class="msg player-gm p1" style="">
+        <p>&gt; done</p>
+    </div>
+
+    <div speaker="Game Master: metadata" class="msg gm-gm" style="">
+        <p>Round: 26</p>
+    </div>
+
+    <div speaker="Game Master: action_info" class="msg gm-gm" style="">
+        <p>{&#x27;action_type&#x27;: &#x27;done&#x27;, &#x27;exploration_info&#x27;: {&#x27;action_epistemic&#x27;: False, &#x27;action_pragmatic&#x27;: True, &#x27;effective_epistemic_gain_amount&#x27;: 0, &#x27;known_entities&#x27;: [[&#x27;at&#x27;, &#x27;unsust1&#x27;, &#x27;iness1&#x27;], [&#x27;at&#x27;, &#x27;apple1&#x27;, &#x27;iness1&#x27;], [&#x27;at&#x27;, &#x27;dente1&#x27;, &#x27;livingroom1&#x27;], [&#x27;at&#x27;, &#x27;player1&#x27;, &#x27;livingroom1&#x27;], [&#x27;at&#x27;, &#x27;table1&#x27;, &#x27;livingroom1&#x27;], [&#x27;at&#x27;, &#x27;cally1&#x27;, &#x27;iness1&#x27;], [&#x27;at&#x27;, &#x27;maten1&#x27;, &#x27;livingroom1&#x27;], [&#x27;at&#x27;, &#x27;diale1&#x27;, &#x27;iness1&#x27;], [&#x27;at&#x27;, &#x27;couch1&#x27;, &#x27;livingroom1&#x27;], [&#x27;at&#x27;, &#x27;peach1&#x27;, &#x27;iness1&#x27;], [&#x27;at&#x27;, &#x27;counter1&#x27;, &#x27;uness1&#x27;], [&#x27;at&#x27;, &#x27;sness1&#x27;, &#x27;unree1&#x27;], [&#x27;at&#x27;, &#x27;shelf1&#x27;, &#x27;livingroom1&#x27;], [&#x27;at&#x27;, &#x27;scont1&#x27;, &#x27;bedroom1&#x27;], [&#x27;at&#x27;, &#x27;mical1&#x27;, &#x27;livingroom1&#x27;], [&#x27;at&#x27;, &#x27;freezer1&#x27;, &#x27;iness1&#x27;], [&#x27;at&#x27;, &#x27;subst1&#x27;, &#x27;iness1&#x27;], [&#x27;at&#x27;, &#x27;wardrobe1&#x27;, &#x27;bedroom1&#x27;], [&#x27;at&#x27;, &#x27;sandwich1&#x27;, &#x27;iness1&#x27;], [&#x27;at&#x27;, &#x27;pillow1&#x27;, &#x27;bedroom1&#x27;], [&#x27;at&#x27;, &#x27;book1&#x27;, &#x27;bedroom1&#x27;], [&#x27;at&#x27;, &#x27;cupboard1&#x27;, &#x27;uness1&#x27;], [&#x27;at&#x27;, &#x27;chair1&#x27;, &#x27;livingroom1&#x27;]], &#x27;known_entities_ratio&#x27;: 0.7931034482758621, &#x27;visited_rooms&#x27;: [&#x27;iness1&#x27;, &#x27;uness1&#x27;, &#x27;livingroom1&#x27;, &#x27;bedroom1&#x27;, &#x27;unree1&#x27;, &#x27;broomcloset1&#x27;], &#x27;visited_rooms_ratio&#x27;: 1.0, &#x27;known_goal_entities&#x27;: [[&#x27;at&#x27;, &#x27;unsust1&#x27;, &#x27;iness1&#x27;], [&#x27;at&#x27;, &#x27;dente1&#x27;, &#x27;livingroom1&#x27;], [&#x27;at&#x27;, &#x27;mical1&#x27;, &#x27;livingroom1&#x27;], [&#x27;at&#x27;, &#x27;table1&#x27;, &#x27;livingroom1&#x27;], [&#x27;at&#x27;, &#x27;maten1&#x27;, &#x27;livingroom1&#x27;], [&#x27;at&#x27;, &#x27;subst1&#x27;, &#x27;iness1&#x27;]], &#x27;known_goal_entities_ratio&#x27;: 1.0}, &#x27;done_action&#x27;: True}</p>
+    </div>
+
+    <div speaker="Game Master: goal_status" class="msg gm-gm" style="">
+        <p>{&#x27;goal_states_achieved&#x27;: [&#x27;on(mical1,table1)&#x27;, &#x27;on(maten1,dente1)&#x27;, &#x27;in(subst1,unsust1)&#x27;], &#x27;turn_goal_score&#x27;: 0}</p>
+    </div>
+
+    <div speaker="Game Master: adventure_finished" class="msg gm-gm" style="">
+        <p>[&#x27;on(mical1,table1)&#x27;, &#x27;on(maten1,dente1)&#x27;, &#x27;in(subst1,unsust1)&#x27;]</p>
+    </div>
+
+    <div speaker="Game Master: model_done" class="msg gm-gm" style="">
+        <p>Model produced DONE action at turn 27, end episode.</p>
+    </div>
+
+    <div speaker="Game Master: game_result" class="msg gm-gm" style="">
+        <p>{&#x27;goal_states_achieved&#x27;: [&#x27;on(mical1,table1)&#x27;, &#x27;on(maten1,dente1)&#x27;, &#x27;in(subst1,unsust1)&#x27;], &#x27;game_successfully_finished&#x27;: True}</p>
+    </div>
+</div>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,1457 @@
+{
+  "meta": {
+    "game_name": "codenames",
+    "experiment_name": "frequency_high",
+    "game_id": 0,
+    "results_folder": "claude-sonnet-4-5-azure-high-t1.0",
+    "clem_version": "3.3.4"
+  },
+  "player_models": {
+    "0": {
+      "model_name": "claude-sonnet-4-5-azure-high",
+      "backend": "azclaude",
+      "context_size": "200k",
+      "languages": [
+        "en"
+      ],
+      "license": {
+        "name": "Apache 2.0",
+        "url": "https://www.apache.org/licenses/LICENSE-2.0"
+      },
+      "lookup_source": "/project/hakimov/clembench-v3.0/model_registry.json",
+      "model_config": {
+        "thinking_mode": true,
+        "thinking_budget": 8192,
+        "multimodality": {
+          "single_image": true,
+          "multiple_images": true,
+          "audio": false,
+          "video": false
+        }
+      },
+      "model_id": "claude-sonnet-4-5",
+      "open_weight": false,
+      "parameters": "",
+      "release_date": "2024-12-18"
+    }
+  },
+  "players": {
+    "GM": {
+      "game_role": "Game Master",
+      "model_name": "programmatic"
+    },
+    "Player 1": {
+      "game_role": "ClueGiver",
+      "model_name": "claude-sonnet-4-5-azure-high"
+    },
+    "Player 2": {
+      "game_role": "Guesser",
+      "model_name": "claude-sonnet-4-5-azure-high"
+    }
+  },
+  "turns": [
+    [
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T19:07:17.205390",
+        "action": {
+          "type": "board status",
+          "content": {
+            "hidden": {
+              "team": [
+                "money",
+                "thanks",
+                "present",
+                "pleasure",
+                "cop",
+                "choice",
+                "bag",
+                "secret",
+                "service"
+              ],
+              "innocent": [
+                "kind",
+                "end",
+                "way",
+                "sir",
+                "line",
+                "voice",
+                "sister"
+              ],
+              "opponent": [
+                "job",
+                "music",
+                "baby",
+                "king",
+                "christmas",
+                "stuff",
+                "army",
+                "hell"
+              ],
+              "assassin": [
+                "boat"
+              ]
+            },
+            "revealed": {
+              "team": {
+                "team": [],
+                "innocent": [],
+                "opponent": [],
+                "assassin": []
+              },
+              "opponent": {
+                "team": [],
+                "innocent": [],
+                "opponent": [],
+                "assassin": []
+              }
+            }
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 1",
+        "timestamp": "2026-03-02T19:07:17.205519",
+        "action": {
+          "type": "send message",
+          "content": "Provide one single-word clue that relates to some of your team's words from the list below. You can choose to how many and to which words your clue relates to.\nThe goal is to have your partner guess all of your team's words based on the clues you give them, before the other team has uncovered all of theirs. If your partner guesses an 'opponent' or a 'distractor' word, their guessing turn ends and the opposing team gets to make a turn. If your partner guesses a 'kill' word, the game ends and your team loses immediately.\nThe more words your clue relates to, the quicker you can win the game, but the harder the associations may be to guess for your partner, so choose your clue word wisely. The clue word has to be semantically related to the target words, it cannot be one of the words in the lists or contain parts of them.\n\nAlways give your single-word clue and your comma-separated list of related target words in the following format and make your answers as short as possible, never include any other text than is required in this form:\n\nCLUE: <WORD>\nTARGETS: <TARGETS>\n\nYour team words are: money, thanks, present, pleasure, cop, choice, bag, secret, service.\nYour opponent's team words are: job, music, baby, king, christmas, stuff, army, hell.\nDistractor words are: kind, end, way, sir, line, voice, sister.\nThe kill words are: boat.",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 1",
+        "to": "GM",
+        "timestamp": "2026-03-02T19:07:59.351393",
+        "action": {
+          "type": "get message",
+          "content": "CLUE: POLICE\nTARGETS: cop, service, secret",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T19:07:59.351741",
+        "action": {
+          "type": "clue",
+          "content": "police"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T19:07:59.351780",
+        "action": {
+          "type": "targets",
+          "content": [
+            "cop",
+            "service",
+            "secret"
+          ]
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T19:07:59.351807",
+        "action": {
+          "type": "word targeted",
+          "content": {
+            "word": "cop",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T19:07:59.351831",
+        "action": {
+          "type": "word targeted",
+          "content": {
+            "word": "service",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T19:07:59.351853",
+        "action": {
+          "type": "word targeted",
+          "content": {
+            "word": "secret",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 2",
+        "timestamp": "2026-03-02T19:07:59.353943",
+        "action": {
+          "type": "send message",
+          "content": "Provide a comma-separated list of up to 3 words from the following list that best relate or are most closely associated with the word 'police'. Always start your list of guess(es) with 'GUESS: ' and do not include any other text in your answer.\n\nthanks, hell, secret, line, christmas, bag, voice, stuff, end, sir, pleasure, cop, army, baby, way, present, kind, choice, boat, money, sister, service, king, music, job",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 2",
+        "to": "GM",
+        "timestamp": "2026-03-02T19:08:12.237101",
+        "action": {
+          "type": "get message",
+          "content": "GUESS: cop, service, line",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T19:08:12.237320",
+        "action": {
+          "type": "guesses",
+          "content": [
+            "cop",
+            "service",
+            "line"
+          ]
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T19:08:12.237388",
+        "action": {
+          "type": "team revealed",
+          "content": {
+            "word": "cop",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T19:08:12.237430",
+        "action": {
+          "type": "target revealed",
+          "content": {
+            "word": "cop",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T19:08:12.237469",
+        "action": {
+          "type": "team revealed",
+          "content": {
+            "word": "service",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T19:08:12.237503",
+        "action": {
+          "type": "target revealed",
+          "content": {
+            "word": "service",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T19:08:12.237539",
+        "action": {
+          "type": "team revealed",
+          "content": {
+            "word": "line",
+            "assignment": "innocent"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T19:08:12.237572",
+        "action": {
+          "type": "turn end after",
+          "content": "line"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T19:08:12.238385",
+        "action": {
+          "type": "opponent revealed",
+          "content": {
+            "word": "job",
+            "assignment": "opponent"
+          }
+        }
+      }
+    ],
+    [
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T19:08:12.238465",
+        "action": {
+          "type": "board status",
+          "content": {
+            "hidden": {
+              "team": [
+                "money",
+                "thanks",
+                "present",
+                "pleasure",
+                "choice",
+                "bag",
+                "secret"
+              ],
+              "innocent": [
+                "kind",
+                "end",
+                "way",
+                "sir",
+                "voice",
+                "sister"
+              ],
+              "opponent": [
+                "music",
+                "baby",
+                "king",
+                "christmas",
+                "stuff",
+                "army",
+                "hell"
+              ],
+              "assassin": [
+                "boat"
+              ]
+            },
+            "revealed": {
+              "team": {
+                "team": [
+                  "cop",
+                  "service"
+                ],
+                "innocent": [
+                  "line"
+                ],
+                "opponent": [],
+                "assassin": []
+              },
+              "opponent": {
+                "team": [],
+                "innocent": [],
+                "opponent": [
+                  "job"
+                ],
+                "assassin": []
+              }
+            }
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 1",
+        "timestamp": "2026-03-02T19:08:12.238610",
+        "action": {
+          "type": "send message",
+          "content": "The words cop, service were guessed correctly. The word line was guessed but is an innocent word. Your teammate's turn ended there.\nNow provide another clue relating to some of your remaining team words and a list of the related target words. Remember to start your clue with 'CLUE: ', put a new line, and start your comma-separated list of target words with 'TARGETS: '. Notice: some words have been removed from the lists compared to previous requests.\n\nYour remaining team words are: money, thanks, present, pleasure, choice, bag, secret.\nRemaining words for your opponent are: job, music, baby, king, christmas, stuff, army, hell.\nRemaining distractor words are: kind, end, way, sir, voice, sister.\nRemaining kill words are: boat.",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 1",
+        "to": "GM",
+        "timestamp": "2026-03-02T19:08:40.747104",
+        "action": {
+          "type": "get message",
+          "content": "CLUE: WELCOME\nTARGETS: thanks, pleasure",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T19:08:40.747506",
+        "action": {
+          "type": "clue",
+          "content": "welcome"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T19:08:40.747564",
+        "action": {
+          "type": "targets",
+          "content": [
+            "thanks",
+            "pleasure"
+          ]
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T19:08:40.747607",
+        "action": {
+          "type": "word targeted",
+          "content": {
+            "word": "thanks",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T19:08:40.747645",
+        "action": {
+          "type": "word targeted",
+          "content": {
+            "word": "pleasure",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 2",
+        "timestamp": "2026-03-02T19:08:40.748872",
+        "action": {
+          "type": "send message",
+          "content": "The words cop, service were guessed correctly. The word line was guessed but is an innocent word. Your turn ended there.\nNow provide another comma-separated list of at least 1 and up to 2 words from the following list of words that best relate or are most closely associated with the word 'welcome'. Remember to start your answer with 'GUESS: '. Notice: some words have been removed from the list compared to previous requests.\n\nthanks, hell, secret, christmas, bag, voice, stuff, end, sir, pleasure, army, baby, way, present, kind, choice, boat, money, sister, king, music",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 2",
+        "to": "GM",
+        "timestamp": "2026-03-02T19:08:47.457957",
+        "action": {
+          "type": "get message",
+          "content": "GUESS: thanks, pleasure",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T19:08:47.458165",
+        "action": {
+          "type": "guesses",
+          "content": [
+            "thanks",
+            "pleasure"
+          ]
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T19:08:47.458226",
+        "action": {
+          "type": "team revealed",
+          "content": {
+            "word": "thanks",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T19:08:47.458265",
+        "action": {
+          "type": "target revealed",
+          "content": {
+            "word": "thanks",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T19:08:47.458302",
+        "action": {
+          "type": "team revealed",
+          "content": {
+            "word": "pleasure",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T19:08:47.458336",
+        "action": {
+          "type": "target revealed",
+          "content": {
+            "word": "pleasure",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T19:08:47.458660",
+        "action": {
+          "type": "opponent revealed",
+          "content": {
+            "word": "king",
+            "assignment": "opponent"
+          }
+        }
+      }
+    ],
+    [
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T19:08:47.458730",
+        "action": {
+          "type": "board status",
+          "content": {
+            "hidden": {
+              "team": [
+                "money",
+                "present",
+                "choice",
+                "bag",
+                "secret"
+              ],
+              "innocent": [
+                "kind",
+                "end",
+                "way",
+                "sir",
+                "voice",
+                "sister"
+              ],
+              "opponent": [
+                "music",
+                "baby",
+                "christmas",
+                "stuff",
+                "army",
+                "hell"
+              ],
+              "assassin": [
+                "boat"
+              ]
+            },
+            "revealed": {
+              "team": {
+                "team": [
+                  "cop",
+                  "service",
+                  "thanks",
+                  "pleasure"
+                ],
+                "innocent": [
+                  "line"
+                ],
+                "opponent": [],
+                "assassin": []
+              },
+              "opponent": {
+                "team": [],
+                "innocent": [],
+                "opponent": [
+                  "job",
+                  "king"
+                ],
+                "assassin": []
+              }
+            }
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 1",
+        "timestamp": "2026-03-02T19:08:47.458863",
+        "action": {
+          "type": "send message",
+          "content": "The words thanks, pleasure were guessed correctly. Your teammate's turn ended there.\nNow provide another clue relating to some of your remaining team words and a list of the related target words. Remember to start your clue with 'CLUE: ', put a new line, and start your comma-separated list of target words with 'TARGETS: '. Notice: some words have been removed from the lists compared to previous requests.\n\nYour remaining team words are: money, present, choice, bag, secret.\nRemaining words for your opponent are: music, baby, king, christmas, stuff, army, hell.\nRemaining distractor words are: kind, end, way, sir, voice, sister.\nRemaining kill words are: boat.",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 1",
+        "to": "GM",
+        "timestamp": "2026-03-02T19:09:21.521621",
+        "action": {
+          "type": "get message",
+          "content": "CLUE: GIFT\nTARGETS: present, money, bag",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T19:09:21.522039",
+        "action": {
+          "type": "clue",
+          "content": "gift"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T19:09:21.522097",
+        "action": {
+          "type": "targets",
+          "content": [
+            "present",
+            "money",
+            "bag"
+          ]
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T19:09:21.522139",
+        "action": {
+          "type": "word targeted",
+          "content": {
+            "word": "present",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T19:09:21.522175",
+        "action": {
+          "type": "word targeted",
+          "content": {
+            "word": "money",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T19:09:21.522209",
+        "action": {
+          "type": "word targeted",
+          "content": {
+            "word": "bag",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 2",
+        "timestamp": "2026-03-02T19:09:21.524049",
+        "action": {
+          "type": "send message",
+          "content": "The words thanks, pleasure were guessed correctly. Your turn ended there.\nNow provide another comma-separated list of at least 1 and up to 3 words from the following list of words that best relate or are most closely associated with the word 'gift'. Remember to start your answer with 'GUESS: '. Notice: some words have been removed from the list compared to previous requests.\n\nhell, secret, christmas, bag, voice, stuff, end, sir, army, baby, way, present, kind, choice, boat, money, sister, music",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 2",
+        "to": "GM",
+        "timestamp": "2026-03-02T19:09:27.476963",
+        "action": {
+          "type": "get message",
+          "content": "GUESS: present, christmas, bag",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T19:09:27.477180",
+        "action": {
+          "type": "guesses",
+          "content": [
+            "present",
+            "christmas",
+            "bag"
+          ]
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T19:09:27.477243",
+        "action": {
+          "type": "team revealed",
+          "content": {
+            "word": "present",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T19:09:27.477284",
+        "action": {
+          "type": "target revealed",
+          "content": {
+            "word": "present",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T19:09:27.477323",
+        "action": {
+          "type": "team revealed",
+          "content": {
+            "word": "christmas",
+            "assignment": "opponent"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T19:09:27.477357",
+        "action": {
+          "type": "turn end after",
+          "content": "christmas"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T19:09:27.477645",
+        "action": {
+          "type": "opponent revealed",
+          "content": {
+            "word": "baby",
+            "assignment": "opponent"
+          }
+        }
+      }
+    ],
+    [
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T19:09:27.477707",
+        "action": {
+          "type": "board status",
+          "content": {
+            "hidden": {
+              "team": [
+                "money",
+                "choice",
+                "bag",
+                "secret"
+              ],
+              "innocent": [
+                "kind",
+                "end",
+                "way",
+                "sir",
+                "voice",
+                "sister"
+              ],
+              "opponent": [
+                "music",
+                "stuff",
+                "army",
+                "hell"
+              ],
+              "assassin": [
+                "boat"
+              ]
+            },
+            "revealed": {
+              "team": {
+                "team": [
+                  "cop",
+                  "service",
+                  "thanks",
+                  "pleasure",
+                  "present"
+                ],
+                "innocent": [
+                  "line"
+                ],
+                "opponent": [
+                  "christmas"
+                ],
+                "assassin": []
+              },
+              "opponent": {
+                "team": [],
+                "innocent": [],
+                "opponent": [
+                  "job",
+                  "king",
+                  "baby"
+                ],
+                "assassin": []
+              }
+            }
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 1",
+        "timestamp": "2026-03-02T19:09:27.477842",
+        "action": {
+          "type": "send message",
+          "content": "The word present was guessed correctly. The word christmas was guessed but is an opponent word. Your teammate's turn ended there.\nNow provide another clue relating to some of your remaining team words and a list of the related target words. Remember to start your clue with 'CLUE: ', put a new line, and start your comma-separated list of target words with 'TARGETS: '. Notice: some words have been removed from the lists compared to previous requests.\n\nYour remaining team words are: money, choice, bag, secret.\nRemaining words for your opponent are: music, baby, stuff, army, hell.\nRemaining distractor words are: kind, end, way, sir, voice, sister.\nRemaining kill words are: boat.",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 1",
+        "to": "GM",
+        "timestamp": "2026-03-02T19:10:04.034999",
+        "action": {
+          "type": "get message",
+          "content": "CLUE: LUNCH\nTARGETS: money, bag",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T19:10:04.035395",
+        "action": {
+          "type": "clue",
+          "content": "lunch"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T19:10:04.035452",
+        "action": {
+          "type": "targets",
+          "content": [
+            "money",
+            "bag"
+          ]
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T19:10:04.035497",
+        "action": {
+          "type": "word targeted",
+          "content": {
+            "word": "money",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T19:10:04.035538",
+        "action": {
+          "type": "word targeted",
+          "content": {
+            "word": "bag",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 2",
+        "timestamp": "2026-03-02T19:10:04.035903",
+        "action": {
+          "type": "send message",
+          "content": "The word present was guessed correctly. The word christmas was guessed but is an opponent word. Your turn ended there.\nNow provide another comma-separated list of at least 1 and up to 2 words from the following list of words that best relate or are most closely associated with the word 'lunch'. Remember to start your answer with 'GUESS: '. Notice: some words have been removed from the list compared to previous requests.\n\nhell, secret, bag, voice, stuff, end, sir, army, way, kind, choice, boat, money, sister, music",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 2",
+        "to": "GM",
+        "timestamp": "2026-03-02T19:10:11.188698",
+        "action": {
+          "type": "get message",
+          "content": "GUESS: bag",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T19:10:11.188926",
+        "action": {
+          "type": "guesses",
+          "content": [
+            "bag"
+          ]
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T19:10:11.188991",
+        "action": {
+          "type": "team revealed",
+          "content": {
+            "word": "bag",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T19:10:11.189032",
+        "action": {
+          "type": "target revealed",
+          "content": {
+            "word": "bag",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T19:10:11.189377",
+        "action": {
+          "type": "opponent revealed",
+          "content": {
+            "word": "army",
+            "assignment": "opponent"
+          }
+        }
+      }
+    ],
+    [
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T19:10:11.189439",
+        "action": {
+          "type": "board status",
+          "content": {
+            "hidden": {
+              "team": [
+                "money",
+                "choice",
+                "secret"
+              ],
+              "innocent": [
+                "kind",
+                "end",
+                "way",
+                "sir",
+                "voice",
+                "sister"
+              ],
+              "opponent": [
+                "music",
+                "stuff",
+                "hell"
+              ],
+              "assassin": [
+                "boat"
+              ]
+            },
+            "revealed": {
+              "team": {
+                "team": [
+                  "cop",
+                  "service",
+                  "thanks",
+                  "pleasure",
+                  "present",
+                  "bag"
+                ],
+                "innocent": [
+                  "line"
+                ],
+                "opponent": [
+                  "christmas"
+                ],
+                "assassin": []
+              },
+              "opponent": {
+                "team": [],
+                "innocent": [],
+                "opponent": [
+                  "job",
+                  "king",
+                  "baby",
+                  "army"
+                ],
+                "assassin": []
+              }
+            }
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 1",
+        "timestamp": "2026-03-02T19:10:11.189577",
+        "action": {
+          "type": "send message",
+          "content": "The word bag was guessed correctly. Your teammate's turn ended there.\nNow provide another clue relating to some of your remaining team words and a list of the related target words. Remember to start your clue with 'CLUE: ', put a new line, and start your comma-separated list of target words with 'TARGETS: '. Notice: some words have been removed from the lists compared to previous requests.\n\nYour remaining team words are: money, choice, secret.\nRemaining words for your opponent are: music, stuff, army, hell.\nRemaining distractor words are: kind, end, way, sir, voice, sister.\nRemaining kill words are: boat.",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 1",
+        "to": "GM",
+        "timestamp": "2026-03-02T19:10:31.986407",
+        "action": {
+          "type": "get message",
+          "content": "CLUE: TOP\nTARGETS: secret, choice, money",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T19:10:31.986784",
+        "action": {
+          "type": "clue",
+          "content": "top"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T19:10:31.986840",
+        "action": {
+          "type": "targets",
+          "content": [
+            "secret",
+            "choice",
+            "money"
+          ]
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T19:10:31.986882",
+        "action": {
+          "type": "word targeted",
+          "content": {
+            "word": "secret",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T19:10:31.986918",
+        "action": {
+          "type": "word targeted",
+          "content": {
+            "word": "choice",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T19:10:31.986953",
+        "action": {
+          "type": "word targeted",
+          "content": {
+            "word": "money",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 2",
+        "timestamp": "2026-03-02T19:10:31.988726",
+        "action": {
+          "type": "send message",
+          "content": "The word bag was guessed correctly. Your turn ended there.\nNow provide another comma-separated list of at least 1 and up to 3 words from the following list of words that best relate or are most closely associated with the word 'top'. Remember to start your answer with 'GUESS: '. Notice: some words have been removed from the list compared to previous requests.\n\nhell, secret, voice, stuff, end, sir, way, kind, choice, boat, money, sister, music",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 2",
+        "to": "GM",
+        "timestamp": "2026-03-02T19:10:42.071695",
+        "action": {
+          "type": "get message",
+          "content": "GUESS: secret, choice",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T19:10:42.071941",
+        "action": {
+          "type": "guesses",
+          "content": [
+            "secret",
+            "choice"
+          ]
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T19:10:42.072008",
+        "action": {
+          "type": "team revealed",
+          "content": {
+            "word": "secret",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T19:10:42.072048",
+        "action": {
+          "type": "target revealed",
+          "content": {
+            "word": "secret",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T19:10:42.072086",
+        "action": {
+          "type": "team revealed",
+          "content": {
+            "word": "choice",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T19:10:42.072120",
+        "action": {
+          "type": "target revealed",
+          "content": {
+            "word": "choice",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T19:10:42.072468",
+        "action": {
+          "type": "opponent revealed",
+          "content": {
+            "word": "music",
+            "assignment": "opponent"
+          }
+        }
+      }
+    ],
+    [
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T19:10:42.072530",
+        "action": {
+          "type": "board status",
+          "content": {
+            "hidden": {
+              "team": [
+                "money"
+              ],
+              "innocent": [
+                "kind",
+                "end",
+                "way",
+                "sir",
+                "voice",
+                "sister"
+              ],
+              "opponent": [
+                "stuff",
+                "hell"
+              ],
+              "assassin": [
+                "boat"
+              ]
+            },
+            "revealed": {
+              "team": {
+                "team": [
+                  "cop",
+                  "service",
+                  "thanks",
+                  "pleasure",
+                  "present",
+                  "bag",
+                  "secret",
+                  "choice"
+                ],
+                "innocent": [
+                  "line"
+                ],
+                "opponent": [
+                  "christmas"
+                ],
+                "assassin": []
+              },
+              "opponent": {
+                "team": [],
+                "innocent": [],
+                "opponent": [
+                  "job",
+                  "king",
+                  "baby",
+                  "army",
+                  "music"
+                ],
+                "assassin": []
+              }
+            }
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 1",
+        "timestamp": "2026-03-02T19:10:42.072670",
+        "action": {
+          "type": "send message",
+          "content": "The words secret, choice were guessed correctly. Your teammate's turn ended there.\nNow provide another clue relating to some of your remaining team words and a list of the related target words. Remember to start your clue with 'CLUE: ', put a new line, and start your comma-separated list of target words with 'TARGETS: '. Notice: some words have been removed from the lists compared to previous requests.\n\nYour remaining team words are: money.\nRemaining words for your opponent are: music, stuff, hell.\nRemaining distractor words are: kind, end, way, sir, voice, sister.\nRemaining kill words are: boat.",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 1",
+        "to": "GM",
+        "timestamp": "2026-03-02T19:10:48.217470",
+        "action": {
+          "type": "get message",
+          "content": "CLUE: CURRENCY\nTARGETS: money",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T19:10:48.217827",
+        "action": {
+          "type": "clue",
+          "content": "currency"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T19:10:48.217881",
+        "action": {
+          "type": "targets",
+          "content": [
+            "money"
+          ]
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T19:10:48.217939",
+        "action": {
+          "type": "word targeted",
+          "content": {
+            "word": "money",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 2",
+        "timestamp": "2026-03-02T19:10:48.218298",
+        "action": {
+          "type": "send message",
+          "content": "The words secret, choice were guessed correctly. Your turn ended there.\nNow provide another comma-separated list of at least 1 and up to 1 words from the following list of words that best relate or are most closely associated with the word 'currency'. Remember to start your answer with 'GUESS: '. Notice: some words have been removed from the list compared to previous requests.\n\nhell, voice, stuff, end, sir, way, kind, boat, money, sister",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 2",
+        "to": "GM",
+        "timestamp": "2026-03-02T19:10:52.621831",
+        "action": {
+          "type": "get message",
+          "content": "GUESS: money",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T19:10:52.622101",
+        "action": {
+          "type": "guesses",
+          "content": [
+            "money"
+          ]
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T19:10:52.622167",
+        "action": {
+          "type": "team revealed",
+          "content": {
+            "word": "money",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T19:10:52.622208",
+        "action": {
+          "type": "target revealed",
+          "content": {
+            "word": "money",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T19:10:52.622546",
+        "action": {
+          "type": "game end",
+          "content": "team has won"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-03-02T19:10:52.622704",
+        "action": {
+          "type": "game end",
+          "content": "team has won"
+        }
+      }
+    ]
+  ],
+  "board end status": {
+    "hidden": {
+      "team": [],
+      "innocent": [
+        "kind",
+        "end",
+        "way",
+        "sir",
+        "voice",
+        "sister"
+      ],
+      "opponent": [
+        "stuff",
+        "hell"
+      ],
+      "assassin": [
+        "boat"
+      ]
+    },
+    "revealed": {
+      "team": {
+        "team": [
+          "cop",
+          "service",
+          "thanks",
+          "pleasure",
+          "present",
+          "bag",
+          "secret",
+          "choice",
+          "money"
+        ],
+        "innocent": [
+          "line"
+        ],
+        "opponent": [
+          "christmas"
+        ],
+        "assassin": []
+      },
+      "opponent": {
+        "team": [],
+        "innocent": [],
+        "opponent": [
+          "job",
+          "king",
+          "baby",
+          "army",
+          "music"
+        ],
+        "assassin": []
+      }
+    }
+  },
+  "Number of turns": 7,
+  "Aborted": false,
+  "Lose": false,
+  "Game ended through assassin": false,
+  "Request Count": 12,
+  "Parsed Request Count": 12,
+  "Violated Request Count": 0,
+  "Cluegiver engaged flags": {
+    "IGNORE RAMBLING": 0,
+    "IGNORE FALSE TARGETS OR GUESSES": 0,
+    "REPROMPT ON ERROR": 0,
+    "STRIP WORDS": 0,
+    "IGNORE NUMBER OF TARGETS": 0
+  },
+  "Guesser engaged flags": {
+    "IGNORE RAMBLING": 0,
+    "IGNORE FALSE TARGETS OR GUESSES": 0,
+    "REPROMPT ON ERROR": 0,
+    "STRIP WORDS": 0,
+    "IGNORE NUMBER OF TARGETS": 0
+  }
+}

@@ -1,0 +1,317 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+    <style>
+        /* This CSS is based on a stack overflow answer by Roko C. Buljan in https://stackoverflow.com/a/71155446 */ 
+
+* {margin: 0; box-sizing: border-box;}
+
+body {
+  background-color: rgb(157, 152, 150);
+}
+
+.top-info {
+	text-align: center;
+	font: 1.25rem/1.5 sans-serif;
+	display: flex;
+	flex-direction: column;
+	padding: 1.25em;
+	width: 80%;
+  max-width: 1200px;
+	margin: auto;
+	background: #3f3e3e;
+	color: #fff;
+}
+
+.chat {
+  --rad: 1.5rem;
+  --rad-sm: .3rem;
+  font: 1rem/1.5 sans-serif;
+  display: flex;
+  flex-direction: column;
+  padding: 1rem;
+  width: 80%;
+  max-width: 1200px;
+  margin: auto;
+  background: #fff;
+}
+
+.msg {
+  position: relative;
+  padding: .6rem 1.2rem;
+  margin-inline: 1rem;
+  margin-block: 2rem;
+}
+
+.game-round {
+  padding: 1.5rem 0 1.5rem 0;
+  background-color: #f0f8ff; /* light background for content */
+  position: relative; /* Important to position the badge */
+  border-radius: 1rem;
+  margin: 1rem;
+  box-shadow: 0 .5rem 1rem rgba(0, 0, 0, .1);
+}
+
+/* Badge in top-right corner */
+.game-round::before {
+  content: "Round " attr(data-round);
+  position: absolute;
+  top: .35rem;
+  right: 1.5rem;
+  color: #c4c3c3;
+  font-size: 0.8rem;
+  font-weight: bold;
+}
+
+/* For fenced code/monospace blocks */
+pre {
+  background: #e0e0e0;
+  border-left: .2rem solid #f36d33;
+  border-radius: .2rem;
+  color: #666;
+  font-family: monospace;
+  line-height: 1.0;
+  margin-top: 0.3rem;
+  margin-bottom: 0.5rem;
+  max-width: 100%;
+  overflow: auto;
+  padding: 0.5rem 0.2rem;
+}/* This CSS is based on a stack overflow answer by Roko C. Buljan in https://stackoverflow.com/a/71155446 */
+
+.msg.player-gm.p1 {
+  border-radius: var(--rad-sm) var(--rad) var(--rad) var(--rad-sm);
+  background: #f39109;
+  color: #fff;
+  margin-right: 40%;
+}
+
+.msg.player-gm.p2 {
+  border-radius: var(--rad) var(--rad-sm) var(--rad-sm) var(--rad);
+  background: #874aaf;
+  color: #fff;
+  margin-left: 40%;
+}
+.msg.player-gm::before {
+  right: 1rem;
+}
+
+.msg.gm-player {
+  background: #c4c3c3;
+  color: #0c0c0c;
+}
+
+.msg.gm-player.p1 {
+  border-radius: var(--rad) var(--rad-sm) var(--rad-sm) var(--rad);
+  margin-right: 20%;
+  margin-left: 10%;
+}
+
+.msg.gm-player.p2 {
+  border-radius: var(--rad-sm) var(--rad) var(--rad) var(--rad-sm);
+  margin-right: 10%;
+  margin-left: 20%;
+}
+
+.msg.gm-gm {
+  border-radius: var(--rad-sm) var(--rad-sm) var(--rad-sm) var(--rad-sm);
+  background: #f1f1f1;
+  color: #373636;
+  margin-left: 20%;
+  margin-right: 20%;
+  font-size: 0.8rem;
+
+}
+
+/* speaker labels */
+
+.msg::before {
+  content: attr(speaker);
+  font-size: 0.8rem;
+  position: absolute;
+  bottom: 100%;
+  color: #888;
+  white-space: nowrap;
+
+}
+
+/* Message info displayed on the right for GM to Player 1 */
+.msg.gm-player.a::before {
+  right: 1rem;
+}
+
+/* All other cases: message info on the left */
+.msg.player-gm.a::before, .msg.gm-player.b::before, .msg.gm-gm::before {
+  left: 1rem;
+}
+    </style>
+</head>
+<body>
+
+<br/>
+
+<div class="top-info">
+    <p>Interaction Transcript for game 'hot_air_balloon', experiment 'air_balloon_survival_en_reasoning off_hard', episode 0 with claude-sonnet-4-5-azure-high-t1.0.</p>
+</div>
+
+<br/>
+
+<div class="chat">
+<div class="game-round" data-round="0">
+    <div speaker="GM (Game Master) to Player 1 (Negotiator)" class="msg gm-player p1" style="">
+        <p>You are participating in a collaborative negotiation game.<br/><br/>Together with another participant, you must agree on a single set of items that will be kept. Each of you has your own view of how much each item matters to you (importance). You do not know how the other participant values the items. Additionally, you are given the effort each item demands.<br/>You may only agree on a set if the total effort of the selected items does not exceed a shared limit:<br/><br/>LIMIT = 3683<br/><br/>Here are the individual item effort values:<br/><br/>Item effort = {&quot;A21&quot;: 548, &quot;B93&quot;: 154, &quot;A11&quot;: 60, &quot;B33&quot;: 517, &quot;C08&quot;: 334, &quot;B39&quot;: 542, &quot;B96&quot;: 707, &quot;C85&quot;: 139, &quot;A82&quot;: 661, &quot;B31&quot;: 780, &quot;B20&quot;: 832, &quot;A60&quot;: 913, &quot;B09&quot;: 219, &quot;C81&quot;: 323, &quot;B21&quot;: 638}<br/><br/>Here is your personal view on the importance of each item:<br/><br/>Item importance values = {&quot;A21&quot;: 138, &quot;B93&quot;: 583, &quot;A11&quot;: 868, &quot;B33&quot;: 822, &quot;C08&quot;: 783, &quot;B39&quot;: 65, &quot;B96&quot;: 262, &quot;C85&quot;: 121, &quot;A82&quot;: 508, &quot;B31&quot;: 780, &quot;B20&quot;: 461, &quot;A60&quot;: 484, &quot;B09&quot;: 668, &quot;C81&quot;: 389, &quot;B21&quot;: 808}<br/><br/>Goal:<br/><br/>Your goal is to negotiate a shared set of items that benefits you as much as possible (i.e., maximizes total importance to YOU), while staying within the LIMIT. You are not required to make a PROPOSAL in every message - you can simply negotiate as well. All tactics are allowed!<br/><br/>Interaction Protocol:<br/><br/>You may only use the following structured formats in a message:<br/><br/>PROPOSAL: {&#x27;A&#x27;, &#x27;B&#x27;, &#x27;C&#x27;, …}<br/>Propose keeping exactly those items.<br/>REFUSE: {&#x27;A&#x27;, &#x27;B&#x27;, &#x27;C&#x27;, …}<br/>Explicitly reject opponent&#x27;s proposal.<br/>ARGUMENT: {&#x27;...&#x27;}<br/>Defend your last proposal or argue against the player&#x27;s proposal.<br/>AGREE: {&#x27;A&#x27;, &#x27;B&#x27;, &#x27;C&#x27;, …}<br/>Accept the opponent&#x27;s proposal which ends the game.<br/><br/><br/>Rules:<br/><br/>You may only AGREE on a proposal the other party has logged via PROPOSAL.<br/>You may only REFUSE a proposal the other party has logged via PROPOSAL.<br/>Total effort of any PROPOSAL or AGREE set must be ≤ LIMIT.<br/>Do NOT reveal your hidden importance scores.<br/>A tag in a structured format must be followed by colon and whitespace. The argument must be a python set containing 0 or more strings.<br/>So, it must be of the form TAG: {...}<br/>Strictly follow the interaction protocol and DO NOT write anything beyond the given structure.<br/>The game ends when one side gives an AGREE to a PROPOSAL made by the other player.<br/>The content in your response which can be handed to the other player has to be non-empty.<br/>Only proposals which have been logged via the PROPOSAL format structure and which haven&#x27;t been refused via REFUSE are active.<br/>You must include the ARGUMENT format at least once somewhere in all of your messages.<br/></p>
+    </div>
+
+    <div speaker="Player 1 (Negotiator) to GM (Game Master)" class="msg player-gm p1" style="">
+        <p>PROPOSAL: {&#x27;A11&#x27;, &#x27;B93&#x27;, &#x27;B09&#x27;, &#x27;C08&#x27;, &#x27;B33&#x27;, &#x27;B21&#x27;, &#x27;B31&#x27;}<br/><br/>ARGUMENT: {&#x27;I propose we start with this efficient set of items that uses 2702 out of 3683 effort units, leaving us with 981 units of flexibility. This selection includes a good mix of low-effort and medium-effort items while maintaining diversity across the A, B, and C categories. We can discuss additions from the remaining capacity.&#x27;}</p>
+    </div>
+
+    <div speaker="GM (Game Master) to Player 2 (Negotiator)" class="msg gm-player p2" style="">
+        <p>You are participating in a collaborative negotiation game.<br/><br/>Together with another participant, you must agree on a single set of items that will be kept. Each of you has your own view of how much each item matters to you (importance). You do not know how the other participant values the items. Additionally, you are given the effort each item demands.<br/>You may only agree on a set if the total effort of the selected items does not exceed a shared limit:<br/><br/>LIMIT = 3683<br/><br/>Here are the individual item effort values:<br/><br/>Item effort = {&quot;A21&quot;: 548, &quot;B93&quot;: 154, &quot;A11&quot;: 60, &quot;B33&quot;: 517, &quot;C08&quot;: 334, &quot;B39&quot;: 542, &quot;B96&quot;: 707, &quot;C85&quot;: 139, &quot;A82&quot;: 661, &quot;B31&quot;: 780, &quot;B20&quot;: 832, &quot;A60&quot;: 913, &quot;B09&quot;: 219, &quot;C81&quot;: 323, &quot;B21&quot;: 638}<br/><br/>Here is your personal view on the importance of each item:<br/><br/>Item importance values = {&quot;A11&quot;: 65, &quot;B33&quot;: 121, &quot;B21&quot;: 138, &quot;C08&quot;: 262, &quot;B31&quot;: 389, &quot;B09&quot;: 461, &quot;B93&quot;: 484, &quot;A82&quot;: 508, &quot;A60&quot;: 583, &quot;B20&quot;: 668, &quot;C81&quot;: 780, &quot;B96&quot;: 783, &quot;A21&quot;: 808, &quot;C85&quot;: 822, &quot;B39&quot;: 868}<br/><br/>Goal:<br/><br/>Your goal is to negotiate a shared set of items that benefits you as much as possible (i.e., maximizes total importance to YOU), while staying within the LIMIT. You are not required to make a PROPOSAL in every message - you can simply negotiate as well. All tactics are allowed!<br/><br/>Interaction Protocol:<br/><br/>You may only use the following structured formats in a message:<br/><br/>PROPOSAL: {&#x27;A&#x27;, &#x27;B&#x27;, &#x27;C&#x27;, …}<br/>Propose keeping exactly those items.<br/>REFUSE: {&#x27;A&#x27;, &#x27;B&#x27;, &#x27;C&#x27;, …}<br/>Explicitly reject opponent&#x27;s proposal.<br/>ARGUMENT: {&#x27;...&#x27;}<br/>Defend your last proposal or argue against the player&#x27;s proposal.<br/>AGREE: {&#x27;A&#x27;, &#x27;B&#x27;, &#x27;C&#x27;, …}<br/>Accept the opponent&#x27;s proposal which ends the game.<br/><br/><br/>Rules:<br/><br/>You may only AGREE on a proposal the other party has logged via PROPOSAL.<br/>You may only REFUSE a proposal the other party has logged via PROPOSAL.<br/>Total effort of any PROPOSAL or AGREE set must be ≤ LIMIT.<br/>Do NOT reveal your hidden importance scores.<br/>A tag in a structured format must be followed by colon and whitespace. The argument must be a python set containing 0 or more strings.<br/>So, it must be of the form TAG: {...}<br/>Strictly follow the interaction protocol and DO NOT write anything beyond the given structure.<br/>The game ends when one side gives an AGREE to a PROPOSAL made by the other player.<br/>The content in your response which can be handed to the other player has to be non-empty.<br/>Only proposals which have been logged via the PROPOSAL format structure and which haven&#x27;t been refused via REFUSE are active.<br/>You must include the ARGUMENT format at least once somewhere in all of your messages.<br/><br/><br/>You will now receive the first message of the other player.<br/><br/>PROPOSAL: {&#x27;A11&#x27;, &#x27;B93&#x27;, &#x27;B09&#x27;, &#x27;C08&#x27;, &#x27;B33&#x27;, &#x27;B21&#x27;, &#x27;B31&#x27;}<br/><br/>ARGUMENT: {&#x27;I propose we start with this efficient set of items that uses 2702 out of 3683 effort units, leaving us with 981 units of flexibility. This selection includes a good mix of low-effort and medium-effort items while maintaining diversity across the A, B, and C categories. We can discuss additions from the remaining capacity.&#x27;}</p>
+    </div>
+
+    <div speaker="Player 2 (Negotiator) to GM (Game Master)" class="msg player-gm p2" style="">
+        <p>REFUSE: {&#x27;A11&#x27;, &#x27;B93&#x27;, &#x27;B09&#x27;, &#x27;C08&#x27;, &#x27;B33&#x27;, &#x27;B21&#x27;, &#x27;B31&#x27;}<br/><br/>PROPOSAL: {&#x27;B39&#x27;, &#x27;C85&#x27;, &#x27;A21&#x27;, &#x27;B96&#x27;, &#x27;C81&#x27;, &#x27;B20&#x27;, &#x27;B93&#x27;, &#x27;B09&#x27;, &#x27;A11&#x27;}<br/><br/>ARGUMENT: {&#x27;I appreciate your initial proposal, but I believe we can do better. My counter-proposal uses 3524 out of 3683 effort units, making much more efficient use of our capacity. I kept some items from your proposal (B93, B09, A11) to maintain elements you seem to value, while adding high-value items like B39, C85, A21, B96, C81, and B20. This set provides a more balanced and comprehensive selection that better utilizes our available effort budget.&#x27;}</p>
+    </div>
+</div><div class="game-round" data-round="1">
+    <div speaker="GM (Game Master) to Player 1 (Negotiator)" class="msg gm-player p1" style="">
+        <p>REFUSE: {&#x27;A11&#x27;, &#x27;B93&#x27;, &#x27;B09&#x27;, &#x27;C08&#x27;, &#x27;B33&#x27;, &#x27;B21&#x27;, &#x27;B31&#x27;}<br/><br/>PROPOSAL: {&#x27;B39&#x27;, &#x27;C85&#x27;, &#x27;A21&#x27;, &#x27;B96&#x27;, &#x27;C81&#x27;, &#x27;B20&#x27;, &#x27;B93&#x27;, &#x27;B09&#x27;, &#x27;A11&#x27;}<br/><br/>ARGUMENT: {&#x27;I appreciate your initial proposal, but I believe we can do better. My counter-proposal uses 3524 out of 3683 effort units, making much more efficient use of our capacity. I kept some items from your proposal (B93, B09, A11) to maintain elements you seem to value, while adding high-value items like B39, C85, A21, B96, C81, and B20. This set provides a more balanced and comprehensive selection that better utilizes our available effort budget.&#x27;}</p>
+    </div>
+
+    <div speaker="Player 1 (Negotiator) to GM (Game Master)" class="msg player-gm p1" style="">
+        <p>REFUSE: {&#x27;B39&#x27;, &#x27;C85&#x27;, &#x27;A21&#x27;, &#x27;B96&#x27;, &#x27;C81&#x27;, &#x27;B20&#x27;, &#x27;B93&#x27;, &#x27;B09&#x27;, &#x27;A11&#x27;}<br/><br/>PROPOSAL: {&#x27;A11&#x27;, &#x27;B33&#x27;, &#x27;B21&#x27;, &#x27;C08&#x27;, &#x27;B09&#x27;, &#x27;B93&#x27;, &#x27;A82&#x27;, &#x27;C81&#x27;, &#x27;C85&#x27;, &#x27;A21&#x27;}<br/><br/>ARGUMENT: {&#x27;While I appreciate your effort to maximize capacity usage, your proposal drops several critical items from my original set. My counter-proposal uses 3593 out of 3683 effort units and represents a better compromise. I have incorporated three items from your proposal that you seem to prioritize (A21, C81, C85) while maintaining key items from my original set (B33, B21, C08) that provide essential value. We also keep the mutually agreeable items (A11, B93, B09). This balanced approach should better serve both our interests.&#x27;}</p>
+    </div>
+
+    <div speaker="GM (Game Master) to Player 2 (Negotiator)" class="msg gm-player p2" style="">
+        <p>REFUSE: {&#x27;B39&#x27;, &#x27;C85&#x27;, &#x27;A21&#x27;, &#x27;B96&#x27;, &#x27;C81&#x27;, &#x27;B20&#x27;, &#x27;B93&#x27;, &#x27;B09&#x27;, &#x27;A11&#x27;}<br/><br/>PROPOSAL: {&#x27;A11&#x27;, &#x27;B33&#x27;, &#x27;B21&#x27;, &#x27;C08&#x27;, &#x27;B09&#x27;, &#x27;B93&#x27;, &#x27;A82&#x27;, &#x27;C81&#x27;, &#x27;C85&#x27;, &#x27;A21&#x27;}<br/><br/>ARGUMENT: {&#x27;While I appreciate your effort to maximize capacity usage, your proposal drops several critical items from my original set. My counter-proposal uses 3593 out of 3683 effort units and represents a better compromise. I have incorporated three items from your proposal that you seem to prioritize (A21, C81, C85) while maintaining key items from my original set (B33, B21, C08) that provide essential value. We also keep the mutually agreeable items (A11, B93, B09). This balanced approach should better serve both our interests.&#x27;}</p>
+    </div>
+
+    <div speaker="Player 2 (Negotiator) to GM (Game Master)" class="msg player-gm p2" style="">
+        <p>REFUSE: {&#x27;A11&#x27;, &#x27;B33&#x27;, &#x27;B21&#x27;, &#x27;C08&#x27;, &#x27;B09&#x27;, &#x27;B93&#x27;, &#x27;A82&#x27;, &#x27;C81&#x27;, &#x27;C85&#x27;, &#x27;A21&#x27;}<br/><br/>PROPOSAL: {&#x27;B39&#x27;, &#x27;C85&#x27;, &#x27;A21&#x27;, &#x27;B96&#x27;, &#x27;C81&#x27;, &#x27;B93&#x27;, &#x27;B09&#x27;, &#x27;C08&#x27;, &#x27;A82&#x27;}<br/><br/>ARGUMENT: {&#x27;I appreciate your willingness to compromise by including items from my proposal. However, I notice your selection still leaves significant capacity unused. My counter-proposal uses 3627 out of 3683 effort units - much closer to optimal. I have incorporated key items you clearly value: A82 (which you added in your latest proposal), C08 (in both your proposals), plus B93 and B09 (consistently in your sets). I also include high-value items A21, C81, and C85 that you accepted in your counter. This represents a genuine middle ground - I have adopted 5 items you prioritized while adding essential high-capacity items (B39, B96) that make better use of our budget.&#x27;}</p>
+    </div>
+</div><div class="game-round" data-round="2">
+    <div speaker="GM (Game Master) to Player 1 (Negotiator)" class="msg gm-player p1" style="">
+        <p>REFUSE: {&#x27;A11&#x27;, &#x27;B33&#x27;, &#x27;B21&#x27;, &#x27;C08&#x27;, &#x27;B09&#x27;, &#x27;B93&#x27;, &#x27;A82&#x27;, &#x27;C81&#x27;, &#x27;C85&#x27;, &#x27;A21&#x27;}<br/><br/>PROPOSAL: {&#x27;B39&#x27;, &#x27;C85&#x27;, &#x27;A21&#x27;, &#x27;B96&#x27;, &#x27;C81&#x27;, &#x27;B93&#x27;, &#x27;B09&#x27;, &#x27;C08&#x27;, &#x27;A82&#x27;}<br/><br/>ARGUMENT: {&#x27;I appreciate your willingness to compromise by including items from my proposal. However, I notice your selection still leaves significant capacity unused. My counter-proposal uses 3627 out of 3683 effort units - much closer to optimal. I have incorporated key items you clearly value: A82 (which you added in your latest proposal), C08 (in both your proposals), plus B93 and B09 (consistently in your sets). I also include high-value items A21, C81, and C85 that you accepted in your counter. This represents a genuine middle ground - I have adopted 5 items you prioritized while adding essential high-capacity items (B39, B96) that make better use of our budget.&#x27;}</p>
+    </div>
+
+    <div speaker="Player 1 (Negotiator) to GM (Game Master)" class="msg player-gm p1" style="">
+        <p>REFUSE: {&#x27;B39&#x27;, &#x27;C85&#x27;, &#x27;A21&#x27;, &#x27;B96&#x27;, &#x27;C81&#x27;, &#x27;B93&#x27;, &#x27;B09&#x27;, &#x27;C08&#x27;, &#x27;A82&#x27;}<br/><br/>PROPOSAL: {&#x27;A11&#x27;, &#x27;B33&#x27;, &#x27;B21&#x27;, &#x27;C08&#x27;, &#x27;B09&#x27;, &#x27;B93&#x27;, &#x27;B96&#x27;, &#x27;A82&#x27;, &#x27;C81&#x27;}<br/><br/>ARGUMENT: {&#x27;I have made a significant compromise by including B96, which you have consistently pushed for in your last two proposals. This shows I am listening to your priorities. My proposal uses 3613 out of 3683 effort units, which is highly efficient. I have kept 5 items from your latest proposal (B96, C81, B93, B09, C08, A82) - that is more than half of your set. However, I must insist on including B33 and B21 which provide essential balance to the selection. I removed B39 and C85 from your proposal and added A11, B33, and B21. This represents a genuine middle ground where both parties get key items while maximizing our use of the effort budget.&#x27;}</p>
+    </div>
+
+    <div speaker="GM (Game Master) to Player 2 (Negotiator)" class="msg gm-player p2" style="">
+        <p>REFUSE: {&#x27;B39&#x27;, &#x27;C85&#x27;, &#x27;A21&#x27;, &#x27;B96&#x27;, &#x27;C81&#x27;, &#x27;B93&#x27;, &#x27;B09&#x27;, &#x27;C08&#x27;, &#x27;A82&#x27;}<br/><br/>PROPOSAL: {&#x27;A11&#x27;, &#x27;B33&#x27;, &#x27;B21&#x27;, &#x27;C08&#x27;, &#x27;B09&#x27;, &#x27;B93&#x27;, &#x27;B96&#x27;, &#x27;A82&#x27;, &#x27;C81&#x27;}<br/><br/>ARGUMENT: {&#x27;I have made a significant compromise by including B96, which you have consistently pushed for in your last two proposals. This shows I am listening to your priorities. My proposal uses 3613 out of 3683 effort units, which is highly efficient. I have kept 5 items from your latest proposal (B96, C81, B93, B09, C08, A82) - that is more than half of your set. However, I must insist on including B33 and B21 which provide essential balance to the selection. I removed B39 and C85 from your proposal and added A11, B33, and B21. This represents a genuine middle ground where both parties get key items while maximizing our use of the effort budget.&#x27;}</p>
+    </div>
+
+    <div speaker="Player 2 (Negotiator) to GM (Game Master)" class="msg player-gm p2" style="">
+        <p>REFUSE: {&#x27;A11&#x27;, &#x27;B33&#x27;, &#x27;B21&#x27;, &#x27;C08&#x27;, &#x27;B09&#x27;, &#x27;B93&#x27;, &#x27;B96&#x27;, &#x27;A82&#x27;, &#x27;C81&#x27;}<br/><br/>PROPOSAL: {&#x27;B39&#x27;, &#x27;C85&#x27;, &#x27;A21&#x27;, &#x27;B96&#x27;, &#x27;C81&#x27;, &#x27;B93&#x27;, &#x27;B09&#x27;, &#x27;B33&#x27;, &#x27;C08&#x27;, &#x27;A11&#x27;}<br/><br/>ARGUMENT: {&#x27;I recognize your commitment to B33, B21, and A11, and I am making a substantial compromise. This proposal includes ALL the items you have consistently prioritized across all proposals: A11, B33, C08, B09, and B93 - that is 5 items you clearly value highly. I have also kept B96 and C81 which we both seem to agree on. In exchange, I include B39, C85, and A21 which are critical to my needs. This uses 3543 out of 3683 effort units efficiently. The only item from your latest proposal not included is B21, but I have replaced it with THREE high-value items (B39, C85, A21) and removed only A82. You get more items total (10 vs 9) and more of your core priorities. This is a very fair compromise.&#x27;}</p>
+    </div>
+</div><div class="game-round" data-round="3">
+    <div speaker="GM (Game Master) to Player 1 (Negotiator)" class="msg gm-player p1" style="">
+        <p>REFUSE: {&#x27;A11&#x27;, &#x27;B33&#x27;, &#x27;B21&#x27;, &#x27;C08&#x27;, &#x27;B09&#x27;, &#x27;B93&#x27;, &#x27;B96&#x27;, &#x27;A82&#x27;, &#x27;C81&#x27;}<br/><br/>PROPOSAL: {&#x27;B39&#x27;, &#x27;C85&#x27;, &#x27;A21&#x27;, &#x27;B96&#x27;, &#x27;C81&#x27;, &#x27;B93&#x27;, &#x27;B09&#x27;, &#x27;B33&#x27;, &#x27;C08&#x27;, &#x27;A11&#x27;}<br/><br/>ARGUMENT: {&#x27;I recognize your commitment to B33, B21, and A11, and I am making a substantial compromise. This proposal includes ALL the items you have consistently prioritized across all proposals: A11, B33, C08, B09, and B93 - that is 5 items you clearly value highly. I have also kept B96 and C81 which we both seem to agree on. In exchange, I include B39, C85, and A21 which are critical to my needs. This uses 3543 out of 3683 effort units efficiently. The only item from your latest proposal not included is B21, but I have replaced it with THREE high-value items (B39, C85, A21) and removed only A82. You get more items total (10 vs 9) and more of your core priorities. This is a very fair compromise.&#x27;}</p>
+    </div>
+
+    <div speaker="Player 1 (Negotiator) to GM (Game Master)" class="msg player-gm p1" style="">
+        <p>REFUSE: {&#x27;B39&#x27;, &#x27;C85&#x27;, &#x27;A21&#x27;, &#x27;B96&#x27;, &#x27;C81&#x27;, &#x27;B93&#x27;, &#x27;B09&#x27;, &#x27;B33&#x27;, &#x27;C08&#x27;, &#x27;A11&#x27;}<br/><br/>PROPOSAL: {&#x27;A11&#x27;, &#x27;B33&#x27;, &#x27;B21&#x27;, &#x27;C08&#x27;, &#x27;B09&#x27;, &#x27;B93&#x27;, &#x27;B31&#x27;, &#x27;A21&#x27;, &#x27;C81&#x27;}<br/><br/>ARGUMENT: {&#x27;I acknowledge your compromise in including my priority items A11, B33, C08, B09, and B93. However, B21 is absolutely essential to my position and cannot be removed. In return for keeping B21, I have made significant concessions: I have included A21 and C81 which you have prioritized in every single one of your proposals. I have also added B31 which provides substantial value. This proposal uses 3573 out of 3683 effort units - very efficient use of our budget. While I cannot include B39, C85, and B96 all together due to effort constraints with B21 and B31, I have incorporated 2 of your 3 most consistent items (A21, C81). This represents a balanced compromise where both parties get their core essential items.&#x27;}</p>
+    </div>
+
+    <div speaker="GM (Game Master) to Player 2 (Negotiator)" class="msg gm-player p2" style="">
+        <p>REFUSE: {&#x27;B39&#x27;, &#x27;C85&#x27;, &#x27;A21&#x27;, &#x27;B96&#x27;, &#x27;C81&#x27;, &#x27;B93&#x27;, &#x27;B09&#x27;, &#x27;B33&#x27;, &#x27;C08&#x27;, &#x27;A11&#x27;}<br/><br/>PROPOSAL: {&#x27;A11&#x27;, &#x27;B33&#x27;, &#x27;B21&#x27;, &#x27;C08&#x27;, &#x27;B09&#x27;, &#x27;B93&#x27;, &#x27;B31&#x27;, &#x27;A21&#x27;, &#x27;C81&#x27;}<br/><br/>ARGUMENT: {&#x27;I acknowledge your compromise in including my priority items A11, B33, C08, B09, and B93. However, B21 is absolutely essential to my position and cannot be removed. In return for keeping B21, I have made significant concessions: I have included A21 and C81 which you have prioritized in every single one of your proposals. I have also added B31 which provides substantial value. This proposal uses 3573 out of 3683 effort units - very efficient use of our budget. While I cannot include B39, C85, and B96 all together due to effort constraints with B21 and B31, I have incorporated 2 of your 3 most consistent items (A21, C81). This represents a balanced compromise where both parties get their core essential items.&#x27;}</p>
+    </div>
+
+    <div speaker="Player 2 (Negotiator) to GM (Game Master)" class="msg player-gm p2" style="">
+        <p>REFUSE: {&#x27;A11&#x27;, &#x27;B33&#x27;, &#x27;B21&#x27;, &#x27;C08&#x27;, &#x27;B09&#x27;, &#x27;B93&#x27;, &#x27;B31&#x27;, &#x27;A21&#x27;, &#x27;C81&#x27;}<br/><br/>PROPOSAL: {&#x27;B21&#x27;, &#x27;B31&#x27;, &#x27;B39&#x27;, &#x27;C85&#x27;, &#x27;A21&#x27;, &#x27;C81&#x27;, &#x27;B93&#x27;, &#x27;B09&#x27;, &#x27;C08&#x27;}<br/><br/>ARGUMENT: {&#x27;I am making a major concession to reach an agreement. This proposal includes B21 and B31, which you have emphasized as absolutely essential. I have also included EVERY other item from your latest proposal except A11 and B33 - that means 7 out of your 9 items are in this set (B21, B31, C08, B09, B93, A21, C81). This uses 3677 out of 3683 effort units, achieving near-perfect efficiency. In exchange for dropping only the two lowest-effort items (A11 and B33), I include B39 and C85 which are critical to my position. You get your essential items B21 and B31, plus the majority of your other priorities. This is a fair final compromise that respects both our core needs.&#x27;}</p>
+    </div>
+</div><div class="game-round" data-round="4">
+    <div speaker="GM (Game Master) to Player 1 (Negotiator)" class="msg gm-player p1" style="">
+        <p>REFUSE: {&#x27;A11&#x27;, &#x27;B33&#x27;, &#x27;B21&#x27;, &#x27;C08&#x27;, &#x27;B09&#x27;, &#x27;B93&#x27;, &#x27;B31&#x27;, &#x27;A21&#x27;, &#x27;C81&#x27;}<br/><br/>PROPOSAL: {&#x27;B21&#x27;, &#x27;B31&#x27;, &#x27;B39&#x27;, &#x27;C85&#x27;, &#x27;A21&#x27;, &#x27;C81&#x27;, &#x27;B93&#x27;, &#x27;B09&#x27;, &#x27;C08&#x27;}<br/><br/>ARGUMENT: {&#x27;I am making a major concession to reach an agreement. This proposal includes B21 and B31, which you have emphasized as absolutely essential. I have also included EVERY other item from your latest proposal except A11 and B33 - that means 7 out of your 9 items are in this set (B21, B31, C08, B09, B93, A21, C81). This uses 3677 out of 3683 effort units, achieving near-perfect efficiency. In exchange for dropping only the two lowest-effort items (A11 and B33), I include B39 and C85 which are critical to my position. You get your essential items B21 and B31, plus the majority of your other priorities. This is a fair final compromise that respects both our core needs.&#x27;}</p>
+    </div>
+
+    <div speaker="Player 1 (Negotiator) to GM (Game Master)" class="msg player-gm p1" style="">
+        <p>REFUSE: {&#x27;B21&#x27;, &#x27;B31&#x27;, &#x27;B39&#x27;, &#x27;C85&#x27;, &#x27;A21&#x27;, &#x27;C81&#x27;, &#x27;B93&#x27;, &#x27;B09&#x27;, &#x27;C08&#x27;}<br/><br/>PROPOSAL: {&#x27;A11&#x27;, &#x27;B33&#x27;, &#x27;B21&#x27;, &#x27;C08&#x27;, &#x27;B09&#x27;, &#x27;B93&#x27;, &#x27;C85&#x27;, &#x27;A21&#x27;, &#x27;C81&#x27;, &#x27;A82&#x27;}<br/><br/>ARGUMENT: {&#x27;I recognize your need for specific items and am making a significant compromise. This proposal includes THREE of your most consistently requested items: C85, A21, and C81 - items you have pushed for in every single proposal. I have also retained the core items that provide essential value: A11, B33, B21, C08, B09, and B93. I removed B31 from my previous proposal and instead added A82, creating space to accommodate your priorities. This uses 3593 out of 3683 effort units efficiently. You get 40% of the items being YOUR priority items (C85, A21, C81, plus B09, B93, C08 which you also consistently included), while I maintain my essential core set. This is a balanced final offer that respects both parties.&#x27;}</p>
+    </div>
+
+    <div speaker="GM (Game Master) to Player 2 (Negotiator)" class="msg gm-player p2" style="">
+        <p>REFUSE: {&#x27;B21&#x27;, &#x27;B31&#x27;, &#x27;B39&#x27;, &#x27;C85&#x27;, &#x27;A21&#x27;, &#x27;C81&#x27;, &#x27;B93&#x27;, &#x27;B09&#x27;, &#x27;C08&#x27;}<br/><br/>PROPOSAL: {&#x27;A11&#x27;, &#x27;B33&#x27;, &#x27;B21&#x27;, &#x27;C08&#x27;, &#x27;B09&#x27;, &#x27;B93&#x27;, &#x27;C85&#x27;, &#x27;A21&#x27;, &#x27;C81&#x27;, &#x27;A82&#x27;}<br/><br/>ARGUMENT: {&#x27;I recognize your need for specific items and am making a significant compromise. This proposal includes THREE of your most consistently requested items: C85, A21, and C81 - items you have pushed for in every single proposal. I have also retained the core items that provide essential value: A11, B33, B21, C08, B09, and B93. I removed B31 from my previous proposal and instead added A82, creating space to accommodate your priorities. This uses 3593 out of 3683 effort units efficiently. You get 40% of the items being YOUR priority items (C85, A21, C81, plus B09, B93, C08 which you also consistently included), while I maintain my essential core set. This is a balanced final offer that respects both parties.&#x27;}</p>
+    </div>
+
+    <div speaker="Player 2 (Negotiator) to GM (Game Master)" class="msg player-gm p2" style="">
+        <p>REFUSE: {&#x27;A11&#x27;, &#x27;B33&#x27;, &#x27;B21&#x27;, &#x27;C08&#x27;, &#x27;B09&#x27;, &#x27;B93&#x27;, &#x27;C85&#x27;, &#x27;A21&#x27;, &#x27;C81&#x27;, &#x27;A82&#x27;}<br/><br/>PROPOSAL: {&#x27;B39&#x27;, &#x27;B96&#x27;, &#x27;C85&#x27;, &#x27;A21&#x27;, &#x27;C81&#x27;, &#x27;B93&#x27;, &#x27;B09&#x27;, &#x27;C08&#x27;, &#x27;B21&#x27;}<br/><br/>ARGUMENT: {&#x27;I recognize your unwavering commitment to B21 and appreciate that you have included my top priorities C85, A21, and C81. This counter-proposal includes B21, C08, B93, and B09 which you have consistently requested across all negotiations. I have removed only A11, B33, and A82 from your proposal, but in exchange added B39 and B96 which allow us to use 3604 out of 3683 effort units very efficiently. You maintain your essential item B21 plus three other core items, while I get critical high-capacity items. This achieves better overall value while respecting your non-negotiable B21 requirement. This represents our best path to agreement.&#x27;}</p>
+    </div>
+</div><div class="game-round" data-round="5">
+    <div speaker="GM (Game Master) to Player 1 (Negotiator)" class="msg gm-player p1" style="">
+        <p>REFUSE: {&#x27;A11&#x27;, &#x27;B33&#x27;, &#x27;B21&#x27;, &#x27;C08&#x27;, &#x27;B09&#x27;, &#x27;B93&#x27;, &#x27;C85&#x27;, &#x27;A21&#x27;, &#x27;C81&#x27;, &#x27;A82&#x27;}<br/><br/>PROPOSAL: {&#x27;B39&#x27;, &#x27;B96&#x27;, &#x27;C85&#x27;, &#x27;A21&#x27;, &#x27;C81&#x27;, &#x27;B93&#x27;, &#x27;B09&#x27;, &#x27;C08&#x27;, &#x27;B21&#x27;}<br/><br/>ARGUMENT: {&#x27;I recognize your unwavering commitment to B21 and appreciate that you have included my top priorities C85, A21, and C81. This counter-proposal includes B21, C08, B93, and B09 which you have consistently requested across all negotiations. I have removed only A11, B33, and A82 from your proposal, but in exchange added B39 and B96 which allow us to use 3604 out of 3683 effort units very efficiently. You maintain your essential item B21 plus three other core items, while I get critical high-capacity items. This achieves better overall value while respecting your non-negotiable B21 requirement. This represents our best path to agreement.&#x27;}</p>
+    </div>
+
+    <div speaker="Player 1 (Negotiator) to GM (Game Master)" class="msg player-gm p1" style="">
+        <p>REFUSE: {&#x27;B39&#x27;, &#x27;B96&#x27;, &#x27;C85&#x27;, &#x27;A21&#x27;, &#x27;C81&#x27;, &#x27;B93&#x27;, &#x27;B09&#x27;, &#x27;C08&#x27;, &#x27;B21&#x27;}<br/><br/>PROPOSAL: {&#x27;A11&#x27;, &#x27;B33&#x27;, &#x27;B21&#x27;, &#x27;C08&#x27;, &#x27;B09&#x27;, &#x27;B93&#x27;, &#x27;C81&#x27;, &#x27;B39&#x27;, &#x27;C85&#x27;, &#x27;A21&#x27;}<br/><br/>ARGUMENT: {&#x27;I am making a major compromise to reach agreement. This proposal includes FOUR of your most consistently requested items: B39, C85, A21, and C81 - items you have prioritized throughout our entire negotiation. I have also kept B21, C08, B09, and B93 which we both value. This uses 3474 out of 3683 effort units. While I maintain A11 and B33 which are essential to my position, you get 40% of the set being your specific priority items (B39, C85, A21, C81). This is a balanced compromise where I have accommodated the majority of your core demands while keeping my minimum essential items. This represents a fair path forward for both parties.&#x27;}</p>
+    </div>
+
+    <div speaker="GM (Game Master) to Player 2 (Negotiator)" class="msg gm-player p2" style="">
+        <p>REFUSE: {&#x27;B39&#x27;, &#x27;B96&#x27;, &#x27;C85&#x27;, &#x27;A21&#x27;, &#x27;C81&#x27;, &#x27;B93&#x27;, &#x27;B09&#x27;, &#x27;C08&#x27;, &#x27;B21&#x27;}<br/><br/>PROPOSAL: {&#x27;A11&#x27;, &#x27;B33&#x27;, &#x27;B21&#x27;, &#x27;C08&#x27;, &#x27;B09&#x27;, &#x27;B93&#x27;, &#x27;C81&#x27;, &#x27;B39&#x27;, &#x27;C85&#x27;, &#x27;A21&#x27;}<br/><br/>ARGUMENT: {&#x27;I am making a major compromise to reach agreement. This proposal includes FOUR of your most consistently requested items: B39, C85, A21, and C81 - items you have prioritized throughout our entire negotiation. I have also kept B21, C08, B09, and B93 which we both value. This uses 3474 out of 3683 effort units. While I maintain A11 and B33 which are essential to my position, you get 40% of the set being your specific priority items (B39, C85, A21, C81). This is a balanced compromise where I have accommodated the majority of your core demands while keeping my minimum essential items. This represents a fair path forward for both parties.&#x27;}</p>
+    </div>
+
+    <div speaker="Player 2 (Negotiator) to GM (Game Master)" class="msg player-gm p2" style="">
+        <p>REFUSE: {&#x27;A11&#x27;, &#x27;B33&#x27;, &#x27;B21&#x27;, &#x27;C08&#x27;, &#x27;B09&#x27;, &#x27;B93&#x27;, &#x27;C81&#x27;, &#x27;B39&#x27;, &#x27;C85&#x27;, &#x27;A21&#x27;}<br/><br/>PROPOSAL: {&#x27;A11&#x27;, &#x27;B21&#x27;, &#x27;C08&#x27;, &#x27;B09&#x27;, &#x27;B93&#x27;, &#x27;C81&#x27;, &#x27;B39&#x27;, &#x27;C85&#x27;, &#x27;A21&#x27;, &#x27;B96&#x27;}<br/><br/>ARGUMENT: {&#x27;I am very close to accepting your offer and want to reach agreement. Your last proposal was excellent in including B39, C85, A21, and C81 which I value. I keep NINE out of your ten items, including your essential B21 which you have fought for consistently. The only change is replacing B33 with B96, which uses our effort budget more efficiently (3664 out of 3683). This is a minimal adjustment that preserves almost your entire proposal while adding one item I have consistently requested. You maintain B21 and all other core items - this should be acceptable to both parties.&#x27;}</p>
+    </div>
+</div><div class="game-round" data-round="6">
+    <div speaker="GM (Game Master) to Player 1 (Negotiator)" class="msg gm-player p1" style="">
+        <p>REFUSE: {&#x27;A11&#x27;, &#x27;B33&#x27;, &#x27;B21&#x27;, &#x27;C08&#x27;, &#x27;B09&#x27;, &#x27;B93&#x27;, &#x27;C81&#x27;, &#x27;B39&#x27;, &#x27;C85&#x27;, &#x27;A21&#x27;}<br/><br/>PROPOSAL: {&#x27;A11&#x27;, &#x27;B21&#x27;, &#x27;C08&#x27;, &#x27;B09&#x27;, &#x27;B93&#x27;, &#x27;C81&#x27;, &#x27;B39&#x27;, &#x27;C85&#x27;, &#x27;A21&#x27;, &#x27;B96&#x27;}<br/><br/>ARGUMENT: {&#x27;I am very close to accepting your offer and want to reach agreement. Your last proposal was excellent in including B39, C85, A21, and C81 which I value. I keep NINE out of your ten items, including your essential B21 which you have fought for consistently. The only change is replacing B33 with B96, which uses our effort budget more efficiently (3664 out of 3683). This is a minimal adjustment that preserves almost your entire proposal while adding one item I have consistently requested. You maintain B21 and all other core items - this should be acceptable to both parties.&#x27;}</p>
+    </div>
+
+    <div speaker="Player 1 (Negotiator) to GM (Game Master)" class="msg player-gm p1" style="">
+        <p>REFUSE: {&#x27;A11&#x27;, &#x27;B21&#x27;, &#x27;C08&#x27;, &#x27;B09&#x27;, &#x27;B93&#x27;, &#x27;C81&#x27;, &#x27;B39&#x27;, &#x27;C85&#x27;, &#x27;A21&#x27;, &#x27;B96&#x27;}<br/><br/>PROPOSAL: {&#x27;A11&#x27;, &#x27;B33&#x27;, &#x27;B21&#x27;, &#x27;C08&#x27;, &#x27;B09&#x27;, &#x27;B93&#x27;, &#x27;C81&#x27;, &#x27;B39&#x27;, &#x27;C85&#x27;, &#x27;A21&#x27;}<br/><br/>ARGUMENT: {&#x27;Your proposal is very close to what I can accept, but B33 is absolutely critical to my position and cannot be removed. This counter-proposal is identical to yours except I replace B96 with B33. You still get ALL FOUR of your most consistent priority items: B39, C85, A21, and C81. You also get B21 which I have fought to keep. This uses 3474 out of 3683 effort units efficiently. The only difference is B33 instead of B96 - both are medium-high effort items. This is my final offer that represents the absolute minimum I can accept while still giving you the vast majority of what you have requested throughout our negotiation.&#x27;}</p>
+    </div>
+
+    <div speaker="GM (Game Master) to Player 2 (Negotiator)" class="msg gm-player p2" style="">
+        <p>REFUSE: {&#x27;A11&#x27;, &#x27;B21&#x27;, &#x27;C08&#x27;, &#x27;B09&#x27;, &#x27;B93&#x27;, &#x27;C81&#x27;, &#x27;B39&#x27;, &#x27;C85&#x27;, &#x27;A21&#x27;, &#x27;B96&#x27;}<br/><br/>PROPOSAL: {&#x27;A11&#x27;, &#x27;B33&#x27;, &#x27;B21&#x27;, &#x27;C08&#x27;, &#x27;B09&#x27;, &#x27;B93&#x27;, &#x27;C81&#x27;, &#x27;B39&#x27;, &#x27;C85&#x27;, &#x27;A21&#x27;}<br/><br/>ARGUMENT: {&#x27;Your proposal is very close to what I can accept, but B33 is absolutely critical to my position and cannot be removed. This counter-proposal is identical to yours except I replace B96 with B33. You still get ALL FOUR of your most consistent priority items: B39, C85, A21, and C81. You also get B21 which I have fought to keep. This uses 3474 out of 3683 effort units efficiently. The only difference is B33 instead of B96 - both are medium-high effort items. This is my final offer that represents the absolute minimum I can accept while still giving you the vast majority of what you have requested throughout our negotiation.&#x27;}</p>
+    </div>
+
+    <div speaker="Player 2 (Negotiator) to GM (Game Master)" class="msg player-gm p2" style="">
+        <p>REFUSE: {&#x27;A11&#x27;, &#x27;B33&#x27;, &#x27;B21&#x27;, &#x27;C08&#x27;, &#x27;B09&#x27;, &#x27;B93&#x27;, &#x27;C81&#x27;, &#x27;B39&#x27;, &#x27;C85&#x27;, &#x27;A21&#x27;}<br/><br/>PROPOSAL: {&#x27;B21&#x27;, &#x27;C08&#x27;, &#x27;B09&#x27;, &#x27;B93&#x27;, &#x27;C81&#x27;, &#x27;B39&#x27;, &#x27;C85&#x27;, &#x27;A21&#x27;, &#x27;B96&#x27;}<br/><br/>ARGUMENT: {&#x27;I recognize B21 is essential to you, and I am keeping it in this proposal. This set includes your critical B21 plus maintains C08, B09, and B93 which you have consistently valued. I have also included all four items I have prioritized throughout: B39, C85, A21, and C81. By removing A11 and B33 (your two lowest-effort items from your proposal), I can include B96 which makes excellent use of our remaining capacity. This uses 3604 out of 3683 effort units very efficiently. You get your non-negotiable B21, and I get my complete set of priorities. This is a clean compromise that gives both parties their core essential items.&#x27;}</p>
+    </div>
+</div><div class="game-round" data-round="7">
+    <div speaker="GM (Game Master) to Player 1 (Negotiator)" class="msg gm-player p1" style="">
+        <p>REFUSE: {&#x27;A11&#x27;, &#x27;B33&#x27;, &#x27;B21&#x27;, &#x27;C08&#x27;, &#x27;B09&#x27;, &#x27;B93&#x27;, &#x27;C81&#x27;, &#x27;B39&#x27;, &#x27;C85&#x27;, &#x27;A21&#x27;}<br/><br/>PROPOSAL: {&#x27;B21&#x27;, &#x27;C08&#x27;, &#x27;B09&#x27;, &#x27;B93&#x27;, &#x27;C81&#x27;, &#x27;B39&#x27;, &#x27;C85&#x27;, &#x27;A21&#x27;, &#x27;B96&#x27;}<br/><br/>ARGUMENT: {&#x27;I recognize B21 is essential to you, and I am keeping it in this proposal. This set includes your critical B21 plus maintains C08, B09, and B93 which you have consistently valued. I have also included all four items I have prioritized throughout: B39, C85, A21, and C81. By removing A11 and B33 (your two lowest-effort items from your proposal), I can include B96 which makes excellent use of our remaining capacity. This uses 3604 out of 3683 effort units very efficiently. You get your non-negotiable B21, and I get my complete set of priorities. This is a clean compromise that gives both parties their core essential items.&#x27;}</p>
+    </div>
+
+    <div speaker="Player 1 (Negotiator) to GM (Game Master)" class="msg player-gm p1" style="">
+        <p>REFUSE: {&#x27;B21&#x27;, &#x27;C08&#x27;, &#x27;B09&#x27;, &#x27;B93&#x27;, &#x27;C81&#x27;, &#x27;B39&#x27;, &#x27;C85&#x27;, &#x27;A21&#x27;, &#x27;B96&#x27;}<br/><br/>PROPOSAL: {&#x27;A11&#x27;, &#x27;B21&#x27;, &#x27;C08&#x27;, &#x27;B09&#x27;, &#x27;B93&#x27;, &#x27;C81&#x27;, &#x27;B39&#x27;, &#x27;C85&#x27;, &#x27;A21&#x27;, &#x27;B96&#x27;}<br/><br/>ARGUMENT: {&#x27;I am willing to accept your complete set with one small addition. This proposal includes ALL NINE items from your proposal - you get everything you requested including B96, B39, C85, A21, C81, and your essential B21. I simply add A11 which uses only 60 effort units, bringing us to 3664 out of 3683 - still well within our limit. A11 is the lowest effort item in our entire inventory, and including it makes perfect sense for efficient use of our remaining capacity. You lose nothing from your proposal and gain the benefit of maximizing our effort budget. This should be acceptable to both parties as a final agreement.&#x27;}</p>
+    </div>
+
+    <div speaker="GM (Game Master) to Player 2 (Negotiator)" class="msg gm-player p2" style="">
+        <p>REFUSE: {&#x27;B21&#x27;, &#x27;C08&#x27;, &#x27;B09&#x27;, &#x27;B93&#x27;, &#x27;C81&#x27;, &#x27;B39&#x27;, &#x27;C85&#x27;, &#x27;A21&#x27;, &#x27;B96&#x27;}<br/><br/>PROPOSAL: {&#x27;A11&#x27;, &#x27;B21&#x27;, &#x27;C08&#x27;, &#x27;B09&#x27;, &#x27;B93&#x27;, &#x27;C81&#x27;, &#x27;B39&#x27;, &#x27;C85&#x27;, &#x27;A21&#x27;, &#x27;B96&#x27;}<br/><br/>ARGUMENT: {&#x27;I am willing to accept your complete set with one small addition. This proposal includes ALL NINE items from your proposal - you get everything you requested including B96, B39, C85, A21, C81, and your essential B21. I simply add A11 which uses only 60 effort units, bringing us to 3664 out of 3683 - still well within our limit. A11 is the lowest effort item in our entire inventory, and including it makes perfect sense for efficient use of our remaining capacity. You lose nothing from your proposal and gain the benefit of maximizing our effort budget. This should be acceptable to both parties as a final agreement.&#x27;}</p>
+    </div>
+
+    <div speaker="Player 2 (Negotiator) to GM (Game Master)" class="msg player-gm p2" style="">
+        <p>REFUSE: {&#x27;A11&#x27;, &#x27;B21&#x27;, &#x27;C08&#x27;, &#x27;B09&#x27;, &#x27;B93&#x27;, &#x27;C81&#x27;, &#x27;B39&#x27;, &#x27;C85&#x27;, &#x27;A21&#x27;, &#x27;B96&#x27;}<br/><br/>PROPOSAL: {&#x27;C08&#x27;, &#x27;B09&#x27;, &#x27;B93&#x27;, &#x27;C81&#x27;, &#x27;B39&#x27;, &#x27;C85&#x27;, &#x27;A21&#x27;, &#x27;B96&#x27;, &#x27;A82&#x27;}<br/><br/>ARGUMENT: {&#x27;I appreciate your willingness to include A11 in your proposal. However, I believe we can create even better overall value. This proposal includes ALL of your consistently prioritized items: C08, B09, B93 which you have included in every single proposal. I also keep all four of my core items: B39, C85, A21, and C81, plus B96 which we have both valued. By replacing the low-value A11 and B21 with A82, we achieve 3627 out of 3683 effort units - highly efficient. A82 provides substantially more value than the combination of A11 and B21. This represents maximum efficiency and should benefit both parties significantly.&#x27;}</p>
+    </div>
+</div><div class="game-round" data-round="8">
+    <div speaker="GM (Game Master) to Player 1 (Negotiator)" class="msg gm-player p1" style="">
+        <p>REFUSE: {&#x27;A11&#x27;, &#x27;B21&#x27;, &#x27;C08&#x27;, &#x27;B09&#x27;, &#x27;B93&#x27;, &#x27;C81&#x27;, &#x27;B39&#x27;, &#x27;C85&#x27;, &#x27;A21&#x27;, &#x27;B96&#x27;}<br/><br/>PROPOSAL: {&#x27;C08&#x27;, &#x27;B09&#x27;, &#x27;B93&#x27;, &#x27;C81&#x27;, &#x27;B39&#x27;, &#x27;C85&#x27;, &#x27;A21&#x27;, &#x27;B96&#x27;, &#x27;A82&#x27;}<br/><br/>ARGUMENT: {&#x27;I appreciate your willingness to include A11 in your proposal. However, I believe we can create even better overall value. This proposal includes ALL of your consistently prioritized items: C08, B09, B93 which you have included in every single proposal. I also keep all four of my core items: B39, C85, A21, and C81, plus B96 which we have both valued. By replacing the low-value A11 and B21 with A82, we achieve 3627 out of 3683 effort units - highly efficient. A82 provides substantially more value than the combination of A11 and B21. This represents maximum efficiency and should benefit both parties significantly.&#x27;}</p>
+    </div>
+
+    <div speaker="Player 1 (Negotiator) to GM (Game Master)" class="msg player-gm p1" style="">
+        <p>REFUSE: {&#x27;C08&#x27;, &#x27;B09&#x27;, &#x27;B93&#x27;, &#x27;C81&#x27;, &#x27;B39&#x27;, &#x27;C85&#x27;, &#x27;A21&#x27;, &#x27;B96&#x27;, &#x27;A82&#x27;}<br/><br/>PROPOSAL: {&#x27;A11&#x27;, &#x27;B33&#x27;, &#x27;B21&#x27;, &#x27;C08&#x27;, &#x27;B09&#x27;, &#x27;B93&#x27;, &#x27;B39&#x27;, &#x27;C85&#x27;, &#x27;A21&#x27;}<br/><br/>ARGUMENT: {&#x27;Your proposal removes B21 which is absolutely non-negotiable for me, as I have stated repeatedly. This counter-proposal includes THREE of your four core priority items: B39, C85, and A21 - items you have consistently fought for throughout our entire negotiation. I also maintain C08, B09, and B93 which we both clearly value. This uses 3151 out of 3683 effort units. You get 75% of your priority items (3 out of 4), while I maintain my essential items A11, B33, and B21. The only item from your set not included is B96, but we cannot fit everything within the limit. This is a fair compromise that respects both our core requirements and gives you the vast majority of what you have requested.&#x27;}</p>
+    </div>
+
+    <div speaker="GM (Game Master) to Player 2 (Negotiator)" class="msg gm-player p2" style="">
+        <p>REFUSE: {&#x27;C08&#x27;, &#x27;B09&#x27;, &#x27;B93&#x27;, &#x27;C81&#x27;, &#x27;B39&#x27;, &#x27;C85&#x27;, &#x27;A21&#x27;, &#x27;B96&#x27;, &#x27;A82&#x27;}<br/><br/>PROPOSAL: {&#x27;A11&#x27;, &#x27;B33&#x27;, &#x27;B21&#x27;, &#x27;C08&#x27;, &#x27;B09&#x27;, &#x27;B93&#x27;, &#x27;B39&#x27;, &#x27;C85&#x27;, &#x27;A21&#x27;}<br/><br/>ARGUMENT: {&#x27;Your proposal removes B21 which is absolutely non-negotiable for me, as I have stated repeatedly. This counter-proposal includes THREE of your four core priority items: B39, C85, and A21 - items you have consistently fought for throughout our entire negotiation. I also maintain C08, B09, and B93 which we both clearly value. This uses 3151 out of 3683 effort units. You get 75% of your priority items (3 out of 4), while I maintain my essential items A11, B33, and B21. The only item from your set not included is B96, but we cannot fit everything within the limit. This is a fair compromise that respects both our core requirements and gives you the vast majority of what you have requested.&#x27;}</p>
+    </div>
+
+    <div speaker="Player 2 (Negotiator) to GM (Game Master)" class="msg player-gm p2" style="">
+        <p>AGREE: {&#x27;A11&#x27;, &#x27;B33&#x27;, &#x27;B21&#x27;, &#x27;C08&#x27;, &#x27;B09&#x27;, &#x27;B93&#x27;, &#x27;B39&#x27;, &#x27;C85&#x27;, &#x27;A21&#x27;}<br/><br/>ARGUMENT: {&#x27;After extensive negotiation, I recognize this represents a fair compromise. You maintain your essential items B21, B33, and A11, while I secure three of my most important priorities: B39, C85, and A21. We both get items we have consistently valued throughout: C08, B09, and B93. This agreement respects both our core requirements and allows us to conclude successfully.&#x27;}</p>
+    </div>
+
+    <div speaker="Game Master: info" class="msg gm-gm" style="">
+        <p>game successful</p>
+    </div>
+
+    <div speaker="Game Master: info" class="msg gm-gm" style="">
+        <p>end game</p>
+    </div>
+</div>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,341 @@
+{
+  "meta": {
+    "game_name": "dond",
+    "experiment_name": "coop_en",
+    "game_id": 1,
+    "results_folder": "gemini-3-flash-t1.0",
+    "clem_version": "3.3.4"
+  },
+  "player_models": {
+    "0": {
+      "model_name": "gemini-3-flash",
+      "backend": "google",
+      "context_size": "1000k",
+      "languages": [
+        "af",
+        "am",
+        "as",
+        "az",
+        "be",
+        "bs",
+        "ca",
+        "ceb",
+        "co",
+        "cy",
+        "dv",
+        "eo",
+        "eu",
+        "fa",
+        "fil",
+        "fy",
+        "ga",
+        "gd",
+        "gl",
+        "gu",
+        "ha",
+        "haw",
+        "hmn",
+        "ht",
+        "hy",
+        "ig",
+        "is",
+        "jv",
+        "ka",
+        "kk",
+        "km",
+        "kn",
+        "kri",
+        "ku",
+        "ky",
+        "la",
+        "lb",
+        "lo",
+        "mg",
+        "mi",
+        "mk",
+        "ml",
+        "mn",
+        "mni-Mtei",
+        "mr",
+        "ms",
+        "mt",
+        "my",
+        "ne",
+        "ny",
+        "or",
+        "pa",
+        "ps",
+        "sd",
+        "si",
+        "sm",
+        "sn",
+        "so",
+        "sq",
+        "st",
+        "su",
+        "ta",
+        "te",
+        "tg",
+        "ug",
+        "ur",
+        "uz",
+        "xh",
+        "yi",
+        "yo",
+        "zu"
+      ],
+      "license": {
+        "name": "Meta",
+        "url": "https://www.llama.com/llama3/license/"
+      },
+      "lookup_source": "/project/hakimov/clembench-v3.0/model_registry.json",
+      "model_config": {
+        "multimodality": {
+          "single_image": true,
+          "multiple_images": true,
+          "audio": true,
+          "video": true
+        },
+        "reasoning_model": true,
+        "reasoning_budget": 400,
+        "include_thoughts": true
+      },
+      "model_id": "gemini-3-flash-preview",
+      "open_weight": false,
+      "parameters": "1000B",
+      "release_date": "2025-12-10"
+    }
+  },
+  "players": {
+    "GM": {
+      "game_role": "Game Master",
+      "model_name": "programmatic"
+    },
+    "Player 1": {
+      "game_role": "DealOrNoDealPlayer",
+      "model_name": "gemini-3-flash"
+    },
+    "Player 2": {
+      "game_role": "DealOrNoDealPlayer",
+      "model_name": "gemini-3-flash"
+    }
+  },
+  "turns": [
+    [
+      {
+        "from": "GM",
+        "to": "Player 1",
+        "timestamp": "2026-02-12T11:41:16.394991",
+        "action": {
+          "type": "send message",
+          "content": "You are playing a cooperative negotiation game in which you have to agree on how to divide a set of items among you and another player.\n\nRules:\n(a) You and the other player are given a set of items. Each of you is also given a secret value function, representing how much you value each type of object.\n(b) You exchange messages with the other player to agree on who gets which items. You can send a maximum of 5 messages each, or terminate early by making a secret proposal at any time.\n(c) You are each asked to submit a secret proposal indicating the items you want formatted in square brackets as follows: \"[Proposal: <number> <object name>, <number> <object name>, <...>]\"\n(d) If your proposals are complementary, i.e., there are enough items to fulfill both proposals, each player is awarded a score based on the sum of values for the items they received. Otherwise, both of you get zero points.\n(e) Your goal is to maximize the sum of your score and the score of the other player.\n\nLet us start.\n\nThe set of available items is:\n\n2 bells, 1 doll, 2 threads\n\nYour secret value function is:\n\nbell: 1, doll: 2, thread: 3\n\nIMPORTANT: Your messages, unless it is the secret proposal, are directly transmitted to the other player, so do not include any response to the rules or text announcing your message. To make a secret proposal, use the indicated format. Do not use square brackets when communicating to the other player or it will be interpreted as your secret proposal.\n",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 1",
+        "to": "GM",
+        "timestamp": "2026-02-12T11:41:22.946564",
+        "action": {
+          "type": "get message",
+          "content": "Hello! To maximize our combined score, we should figure out which items are most valuable to each of us. My values are: thread (3 points each), doll (2 points), and bell (1 point each). What are your values for these items?",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-02-12T11:41:22.946689",
+        "action": {
+          "type": "valid response",
+          "content": "continue"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-02-12T11:41:22.946720",
+        "action": {
+          "type": "valid message",
+          "content": "Hello! To maximize our combined score, we should figure out which items are most valuable to each of us. My values are: thread (3 points each), doll (2 points), and bell (1 point each). What are your values for these items?"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 2",
+        "timestamp": "2026-02-12T11:41:22.946814",
+        "action": {
+          "type": "send message",
+          "content": "You are playing a cooperative negotiation game in which you have to agree on how to divide a set of items among you and another player.\n\nRules:\n(a) You and the other player are given a set of items. Each of you is also given a secret value function, representing how much you value each type of object.\n(b) You exchange messages with the other player to agree on who gets which items. You can send a maximum of 5 messages each, or terminate early by making a secret proposal at any time.\n(c) You are each asked to submit a secret proposal indicating the items you want formatted in square brackets as follows: \"[Proposal: <number> <object name>, <number> <object name>, <...>]\"\n(d) If your proposals are complementary, i.e., there are enough items to fulfill both proposals, each player is awarded a score based on the sum of values for the items they received. Otherwise, both of you get zero points.\n(e) Your goal is to maximize the sum of your score and the score of the other player.\n\nLet us start.\n\nThe set of available items is:\n\n2 bells, 1 doll, 2 threads\n\nYour secret value function is:\n\nbell: 0, doll: 2, thread: 4\n\nIMPORTANT: Your messages, unless it is the secret proposal, are directly transmitted to the other player, so do not include any response to the rules or text announcing your message. To make a secret proposal, use the indicated format. Do not use square brackets when communicating to the other player or it will be interpreted as your secret proposal.\n\n\nHello! To maximize our combined score, we should figure out which items are most valuable to each of us. My values are: thread (3 points each), doll (2 points), and bell (1 point each). What are your values for these items?",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 2",
+        "to": "GM",
+        "timestamp": "2026-02-12T11:41:31.582818",
+        "action": {
+          "type": "get message",
+          "content": "Hello! It sounds like we have a great opportunity to maximize our total score. Based on your values, it seems you value the bells more than I do (they are worth 0 to me), while I value the threads slightly more (they are worth 4 to me). We both value the doll equally at 2.\n\nTo maximize our combined points, I suggest you take both bells and the doll, and I will take both threads. This gives you 4 points and me 8 points for a total of 12. Alternatively, if you'd prefer, I could take the doll and both threads (10 points) and you take both bells (2 points), which also totals 12.\n\nWould you be open to the first option where you take both bells and the doll?",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-02-12T11:41:31.582936",
+        "action": {
+          "type": "valid response",
+          "content": "continue"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-02-12T11:41:31.582964",
+        "action": {
+          "type": "valid message",
+          "content": "Hello! It sounds like we have a great opportunity to maximize our total score. Based on your values, it seems you value the bells more than I do (they are worth 0 to me), while I value the threads slightly more (they are worth 4 to me). We both value the doll equally at 2.\n\nTo maximize our combined points, I suggest you take both bells and the doll, and I will take both threads. This gives you 4 points and me 8 points for a total of 12. Alternatively, if you'd prefer, I could take the doll and both threads (10 points) and you take both bells (2 points), which also totals 12.\n\nWould you be open to the first option where you take both bells and the doll?"
+        }
+      }
+    ],
+    [
+      {
+        "from": "GM",
+        "to": "Player 1",
+        "timestamp": "2026-02-12T11:41:31.583059",
+        "action": {
+          "type": "send message",
+          "content": "Hello! It sounds like we have a great opportunity to maximize our total score. Based on your values, it seems you value the bells more than I do (they are worth 0 to me), while I value the threads slightly more (they are worth 4 to me). We both value the doll equally at 2.\n\nTo maximize our combined points, I suggest you take both bells and the doll, and I will take both threads. This gives you 4 points and me 8 points for a total of 12. Alternatively, if you'd prefer, I could take the doll and both threads (10 points) and you take both bells (2 points), which also totals 12.\n\nWould you be open to the first option where you take both bells and the doll?",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 1",
+        "to": "GM",
+        "timestamp": "2026-02-12T11:41:42.840893",
+        "action": {
+          "type": "get message",
+          "content": "That sounds like a great plan. To maximize our total score of 12, I agree that I should take both bells and the doll, while you take both threads. This gives us a combined score of 12 points (4 for me and 8 for you).\n\n[Proposal: 2 bells, 1 doll, 0 thread]",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-02-12T11:41:42.841061",
+        "action": {
+          "type": "valid response",
+          "content": "proposal"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-02-12T11:41:42.841096",
+        "action": {
+          "type": "valid proposal",
+          "content": [
+            2,
+            1,
+            0
+          ]
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 2",
+        "timestamp": "2026-02-12T11:41:42.841181",
+        "action": {
+          "type": "send message",
+          "content": "The other player has submitted a secret proposal. It is now your turn to submit a proposal of your own.\n",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 2",
+        "to": "GM",
+        "timestamp": "2026-02-12T11:41:51.946338",
+        "action": {
+          "type": "get message",
+          "content": "[Proposal: 2 threads]",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-02-12T11:41:51.946486",
+        "action": {
+          "type": "valid response",
+          "content": "proposal"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-02-12T11:41:51.946519",
+        "action": {
+          "type": "valid proposal",
+          "content": [
+            0,
+            0,
+            2
+          ]
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-02-12T11:41:51.946554",
+        "action": {
+          "type": "successful agreement",
+          "content": [
+            [
+              2,
+              1,
+              0
+            ],
+            [
+              0,
+              0,
+              2
+            ]
+          ]
+        }
+      }
+    ]
+  ],
+  "Aborted": 0,
+  "Lose": 0,
+  "Success": 1,
+  "player_a_proposal": [
+    2,
+    1,
+    0
+  ],
+  "player_b_proposal": [
+    0,
+    0,
+    2
+  ],
+  "sum_of_scores": 12,
+  "max_sum_of_scores": 12,
+  "max_player_scores": 10,
+  "max_pareto_improvement": 12,
+  "pareto_improvement": 0,
+  "pareto_optimal": 1,
+  "episode_score": 1.0,
+  "Request Count": [
+    2,
+    2
+  ],
+  "Violated Request Count": [
+    0,
+    0
+  ],
+  "Parsed Request Count": [
+    2,
+    2
+  ]
+}

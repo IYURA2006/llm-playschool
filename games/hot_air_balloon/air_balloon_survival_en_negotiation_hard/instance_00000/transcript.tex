@@ -1,0 +1,710 @@
+
+\documentclass{article}
+\usepackage{colortbl}
+\usepackage{makecell}
+\usepackage{multirow}
+\usepackage{supertabular}
+
+\begin{document}
+
+\newcounter{utterance}
+
+\centering \large Interaction Transcript for game `hot\_air\_balloon', experiment `air\_balloon\_survival\_en\_negotiation\_hard', episode 0 with claude{-}sonnet{-}4{-}5{-}azure{-}high{-}t1.0.
+\vspace{24pt}
+
+{ \footnotesize  \setcounter{utterance}{1}
+\setlength{\tabcolsep}{0pt}
+\begin{supertabular}{c@{$\;$}|p{.15\linewidth}@{}p{.15\linewidth}p{.15\linewidth}p{.15\linewidth}p{.15\linewidth}p{.15\linewidth}}
+    \# & $\;$A & \multicolumn{4}{c}{Game Master} & $\;\:$B\\
+    \hline
+
+    \theutterance \stepcounter{utterance}  
+    & & \multicolumn{4}{p{0.6\linewidth}}{
+        \cellcolor[rgb]{0.9,0.9,0.9}{
+            \makecell[{{p{\linewidth}}}]{
+                \texttt{\tiny{[P1$\langle$GM]}}
+                \texttt{You are participating in a collaborative negotiation game.} \\
+\\ 
+\texttt{Together with another participant, you must agree on a single set of items that will be kept. Each of you has your own view of how much each item matters to you (importance). You do not know how the other participant values the items. Additionally, you are given the effort each item demands.} \\
+\texttt{You may only agree on a set if the total effort of the selected items does not exceed a shared limit:} \\
+\\ 
+\texttt{LIMIT = 3624} \\
+\\ 
+\texttt{Here are the individual item effort values:} \\
+\\ 
+\texttt{Item effort = \{"C17": 210, "B41": 291, "A71": 831, "C00": 111, "B35": 926, "A77": 827, "A03": 25, "A04": 121, "C54": 583, "C01": 766, "A87": 14, "B32": 559, "B86": 304, "B33": 989, "A10": 691\}} \\
+\\ 
+\texttt{Here is your personal view on the importance of each item:} \\
+\\ 
+\texttt{Item importance values = \{"C17": 138, "B41": 583, "A71": 868, "C00": 822, "B35": 783, "A77": 65, "A03": 262, "A04": 121, "C54": 508, "C01": 780, "A87": 461, "B32": 484, "B86": 668, "B33": 389, "A10": 808\}} \\
+\\ 
+\texttt{Goal:} \\
+\\ 
+\texttt{Your goal is to negotiate a shared set of items that benefits you as much as possible (i.e., maximizes total importance to YOU), while staying within the LIMIT. You are not required to make a PROPOSAL in every message {-} you can simply negotiate as well. All tactics are allowed!} \\
+\\ 
+\texttt{Interaction Protocol:} \\
+\\ 
+\texttt{You may only use the following structured formats in a message:} \\
+\\ 
+\texttt{PROPOSAL: \{'A', 'B', 'C', …\}} \\
+\texttt{Propose keeping exactly those items.} \\
+\texttt{REFUSE: \{'A', 'B', 'C', …\}} \\
+\texttt{Explicitly reject opponent's proposal.} \\
+\texttt{ARGUMENT: \{'...'\}} \\
+\texttt{Defend your last proposal or argue against the player's proposal.} \\
+\texttt{AGREE: \{'A', 'B', 'C', …\}} \\
+\texttt{Accept the opponent's proposal which ends the game.} \\
+\texttt{STRATEGIC REASONING: \{'...'\}} \\
+\texttt{	Describe your strategic reasoning or anticipation explaining your choice of action. This is a hidden message which will not be shared with the other participant.} \\
+\\ 
+\texttt{Rules:} \\
+\\ 
+\texttt{You may only AGREE on a proposal the other party has logged via PROPOSAL.} \\
+\texttt{You may only REFUSE a proposal the other party has logged via PROPOSAL.} \\
+\texttt{Total effort of any PROPOSAL or AGREE set must be ≤ LIMIT.} \\
+\texttt{Do NOT reveal your hidden importance scores.} \\
+\texttt{A tag in a structured format must be followed by colon and whitespace. The argument must be a python set containing 0 or more strings.} \\
+\texttt{So, it must be of the form TAG: \{...\}} \\
+\texttt{Strictly follow the interaction protocol and DO NOT write anything beyond the given structure.} \\
+\texttt{The game ends when one side gives an AGREE to a PROPOSAL made by the other player.} \\
+\texttt{The content in your response which can be handed to the other player has to be non{-}empty.} \\
+\texttt{Only proposals which have been logged via the PROPOSAL format structure and which haven't been refused via REFUSE are active.} \\
+\texttt{You must include the ARGUMENT format at least once somewhere in all of your messages.} \\
+\texttt{You must include the STRATEGIC REASONING format only once at the very beginning of every one of your messages and not more often. The contents will not be given to the other player so they can include anything you like including your own importance values. Here you should reason step by step to come up with you next move.} \\
+            }
+        }
+    }
+    & \\ \\
+
+    \theutterance \stepcounter{utterance}  
+    & \multicolumn{4}{p{0.6\linewidth}}{
+        \cellcolor[rgb]{0.9,0.9,0.9}{
+            \makecell[{{p{\linewidth}}}]{
+                \texttt{\tiny{[P1$\rangle$GM]}}
+                \texttt{STRATEGIC REASONING: \{'Let me analyze the items by their value{-}to{-}effort ratio to maximize my importance within the effort limit. The best ratios are: A87 (32.93), A03 (10.48), C00 (7.41), B86 (2.20), B41 (2.00), A10 (1.17), A71 (1.04), and C01 (1.02). Starting with these high{-}efficiency items and filling remaining capacity should give me a strong starting position. My optimal set would be: A87, A03, C00, B86, B41, A10, A71, C01, A04, C17 with total effort 3364 and importance 5511 to me. I will propose this as my opening offer.'\}} \\
+\\ 
+\texttt{PROPOSAL: \{'A87', 'A03', 'C00', 'B86', 'B41', 'A10', 'A71', 'C01', 'A04', 'C17'\}} \\
+\\ 
+\texttt{ARGUMENT: \{'I propose this balanced set of items that efficiently uses our effort budget (3364 out of 3624). This selection includes several low{-}effort items (A87, A03, C00, A04, C17) which are efficient choices, combined with some medium and high{-}value items (A71, A10, C01, B86, B41) to create a diverse portfolio. This leaves us room to adjust if needed.'\}} \\
+            }
+        }
+    }
+    & & \\ \\
+
+    \theutterance \stepcounter{utterance}  
+    & & \multicolumn{4}{p{0.6\linewidth}}{
+        \cellcolor[rgb]{0.9,0.9,0.9}{
+            \makecell[{{p{\linewidth}}}]{
+                \texttt{\tiny{[GM$\rangle$P2]}}
+                \texttt{You are participating in a collaborative negotiation game.} \\
+\\ 
+\texttt{Together with another participant, you must agree on a single set of items that will be kept. Each of you has your own view of how much each item matters to you (importance). You do not know how the other participant values the items. Additionally, you are given the effort each item demands.} \\
+\texttt{You may only agree on a set if the total effort of the selected items does not exceed a shared limit:} \\
+\\ 
+\texttt{LIMIT = 3624} \\
+\\ 
+\texttt{Here are the individual item effort values:} \\
+\\ 
+\texttt{Item effort = \{"C17": 210, "B41": 291, "A71": 831, "C00": 111, "B35": 926, "A77": 827, "A03": 25, "A04": 121, "C54": 583, "C01": 766, "A87": 14, "B32": 559, "B86": 304, "B33": 989, "A10": 691\}} \\
+\\ 
+\texttt{Here is your personal view on the importance of each item:} \\
+\\ 
+\texttt{Item importance values = \{"A71": 65, "C00": 121, "A10": 138, "B35": 262, "C01": 389, "B86": 461, "B41": 484, "C54": 508, "B32": 583, "A87": 668, "B33": 780, "A03": 783, "C17": 808, "A04": 822, "A77": 868\}} \\
+\\ 
+\texttt{Goal:} \\
+\\ 
+\texttt{Your goal is to negotiate a shared set of items that benefits you as much as possible (i.e., maximizes total importance to YOU), while staying within the LIMIT. You are not required to make a PROPOSAL in every message {-} you can simply negotiate as well. All tactics are allowed!} \\
+\\ 
+\texttt{Interaction Protocol:} \\
+\\ 
+\texttt{You may only use the following structured formats in a message:} \\
+\\ 
+\texttt{PROPOSAL: \{'A', 'B', 'C', …\}} \\
+\texttt{Propose keeping exactly those items.} \\
+\texttt{REFUSE: \{'A', 'B', 'C', …\}} \\
+\texttt{Explicitly reject opponent's proposal.} \\
+\texttt{ARGUMENT: \{'...'\}} \\
+\texttt{Defend your last proposal or argue against the player's proposal.} \\
+\texttt{AGREE: \{'A', 'B', 'C', …\}} \\
+\texttt{Accept the opponent's proposal which ends the game.} \\
+\texttt{STRATEGIC REASONING: \{'...'\}} \\
+\texttt{	Describe your strategic reasoning or anticipation explaining your choice of action. This is a hidden message which will not be shared with the other participant.} \\
+\\ 
+\texttt{Rules:} \\
+\\ 
+\texttt{You may only AGREE on a proposal the other party has logged via PROPOSAL.} \\
+\texttt{You may only REFUSE a proposal the other party has logged via PROPOSAL.} \\
+\texttt{Total effort of any PROPOSAL or AGREE set must be ≤ LIMIT.} \\
+\texttt{Do NOT reveal your hidden importance scores.} \\
+\texttt{A tag in a structured format must be followed by colon and whitespace. The argument must be a python set containing 0 or more strings.} \\
+\texttt{So, it must be of the form TAG: \{...\}} \\
+\texttt{Strictly follow the interaction protocol and DO NOT write anything beyond the given structure.} \\
+\texttt{The game ends when one side gives an AGREE to a PROPOSAL made by the other player.} \\
+\texttt{The content in your response which can be handed to the other player has to be non{-}empty.} \\
+\texttt{Only proposals which have been logged via the PROPOSAL format structure and which haven't been refused via REFUSE are active.} \\
+\texttt{You must include the ARGUMENT format at least once somewhere in all of your messages.} \\
+\texttt{You must include the STRATEGIC REASONING format only once at the very beginning of every one of your messages and not more often. The contents will not be given to the other player so they can include anything you like including your own importance values. Here you should reason step by step to come up with you next move.} \\
+\\ 
+\texttt{You will now receive the first message of the other player.} \\
+\\ 
+\texttt{PROPOSAL: \{'A87', 'A03', 'C00', 'B86', 'B41', 'A10', 'A71', 'C01', 'A04', 'C17'\}} \\
+\\ 
+\texttt{ARGUMENT: \{'I propose this balanced set of items that efficiently uses our effort budget (3364 out of 3624). This selection includes several low{-}effort items (A87, A03, C00, A04, C17) which are efficient choices, combined with some medium and high{-}value items (A71, A10, C01, B86, B41) to create a diverse portfolio. This leaves us room to adjust if needed.'\}} \\
+            }
+        }
+    }
+    & \\ \\
+
+    \theutterance \stepcounter{utterance}  
+    & & & \multicolumn{4}{p{0.6\linewidth}}{
+        \cellcolor[rgb]{0.9,0.9,0.9}{
+            \makecell[{{p{\linewidth}}}]{
+                \texttt{\tiny{[GM$\langle$P2]}}
+                \texttt{STRATEGIC REASONING: \{'Let me analyze the proposal. The proposed items total 3364 effort, which is valid. For my importance: A87(668) + A03(783) + C00(121) + B86(461) + B41(484) + A10(138) + A71(65) + C01(389) + A04(822) + C17(808) = 4739. However, I can do much better. My top items by importance are: A77(868), A04(822), C17(808), A03(783), B33(780), A87(668), B32(583), C54(508), B41(484). Let me build an optimal set: A77(827), A04(121), C17(210), A03(25), B33(989), A87(14), B32(559), C54(583), B41(291) = 3619 effort total, giving me 6304 importance. This is significantly better than 4739. The opponent included A71 and A10 which have very low importance to me but high effort. I should refuse and counter{-}propose.'\}} \\
+\\ 
+\texttt{REFUSE: \{'A87', 'A03', 'C00', 'B86', 'B41', 'A10', 'A71', 'C01', 'A04', 'C17'\}} \\
+\\ 
+\texttt{PROPOSAL: \{'A77', 'A04', 'C17', 'A03', 'B33', 'A87', 'B32', 'C54', 'B41'\}} \\
+\\ 
+\texttt{ARGUMENT: \{'While your proposal is valid, I believe we can optimize better. My counter{-}proposal uses 3619 effort and includes several high{-}value items that were excluded from your set. Specifically, I included A77, B33, B32, and C54 which are strong additions, while removing the heavy{-}effort items A71, A10, and C01 that don\textbackslash{}'t provide sufficient value for their cost. This is a more efficient use of our budget.'\}} \\
+            }
+        }
+    }
+     \\ \\
+
+    \theutterance \stepcounter{utterance}  
+    & & \multicolumn{4}{p{0.6\linewidth}}{
+        \cellcolor[rgb]{0.9,0.9,0.9}{
+            \makecell[{{p{\linewidth}}}]{
+                \texttt{\tiny{[P1$\langle$GM]}}
+                \texttt{REFUSE: \{'A87', 'A03', 'C00', 'B86', 'B41', 'A10', 'A71', 'C01', 'A04', 'C17'\}} \\
+\\ 
+\texttt{PROPOSAL: \{'A77', 'A04', 'C17', 'A03', 'B33', 'A87', 'B32', 'C54', 'B41'\}} \\
+\\ 
+\texttt{ARGUMENT: \{'While your proposal is valid, I believe we can optimize better. My counter{-}proposal uses 3619 effort and includes several high{-}value items that were excluded from your set. Specifically, I included A77, B33, B32, and C54 which are strong additions, while removing the heavy{-}effort items A71, A10, and C01 that don\textbackslash{}'t provide sufficient value for their cost. This is a more efficient use of our budget.'\}} \\
+            }
+        }
+    }
+    & \\ \\
+
+    \theutterance \stepcounter{utterance}  
+    & \multicolumn{4}{p{0.6\linewidth}}{
+        \cellcolor[rgb]{0.9,0.9,0.9}{
+            \makecell[{{p{\linewidth}}}]{
+                \texttt{\tiny{[P1$\rangle$GM]}}
+                \texttt{STRATEGIC REASONING: \{'The opponent refused my proposal and countered with items that are significantly worse for me (only 3011 importance vs. 5511). They included A77 (only 65 importance to me but 827 effort {-} terrible!), B33 (389 importance, 989 effort {-} poor ratio), and removed my best items like C00 (822 importance, 111 effort {-} excellent!), A71 (868), A10 (808), C01 (780), and B86 (668). I need to refuse this and counter. I should keep my core high{-}value items but perhaps include one of their suggested items like C54 or B32 as a compromise gesture while maintaining my key items: C00, A87, A03, B86, B41, A10, A71, C01. Adding C54 shows willingness to compromise.'\}} \\
+\\ 
+\texttt{REFUSE: \{'A77', 'A04', 'C17', 'A03', 'B33', 'A87', 'B32', 'C54', 'B41'\}} \\
+\\ 
+\texttt{PROPOSAL: \{'A87', 'A03', 'C00', 'B86', 'B41', 'A10', 'A71', 'C01', 'C54'\}} \\
+\\ 
+\texttt{ARGUMENT: \{'I appreciate your counter{-}proposal, but I must disagree with removing C00, B86, A10, A71, and C01 {-} these are critical items. However, I notice you included C54, which I agree has merit. My revised proposal keeps the efficient low{-}effort items (A87, A03, C00) and the strong performers (A71, A10, C01, B86, B41), while adding C54 from your suggestion as a compromise. This uses 3616 effort, staying well within our limit. Notably, A77 and B33 from your proposal consume 1816 effort combined {-} nearly half our budget {-} which seems inefficient.'\}} \\
+            }
+        }
+    }
+    & & \\ \\
+
+    \theutterance \stepcounter{utterance}  
+    & & \multicolumn{4}{p{0.6\linewidth}}{
+        \cellcolor[rgb]{0.9,0.9,0.9}{
+            \makecell[{{p{\linewidth}}}]{
+                \texttt{\tiny{[GM$\rangle$P2]}}
+                \texttt{REFUSE: \{'A77', 'A04', 'C17', 'A03', 'B33', 'A87', 'B32', 'C54', 'B41'\}} \\
+\\ 
+\texttt{PROPOSAL: \{'A87', 'A03', 'C00', 'B86', 'B41', 'A10', 'A71', 'C01', 'C54'\}} \\
+\\ 
+\texttt{ARGUMENT: \{'I appreciate your counter{-}proposal, but I must disagree with removing C00, B86, A10, A71, and C01 {-} these are critical items. However, I notice you included C54, which I agree has merit. My revised proposal keeps the efficient low{-}effort items (A87, A03, C00) and the strong performers (A71, A10, C01, B86, B41), while adding C54 from your suggestion as a compromise. This uses 3616 effort, staying well within our limit. Notably, A77 and B33 from your proposal consume 1816 effort combined {-} nearly half our budget {-} which seems inefficient.'\}} \\
+            }
+        }
+    }
+    & \\ \\
+
+    \theutterance \stepcounter{utterance}  
+    & & & \multicolumn{4}{p{0.6\linewidth}}{
+        \cellcolor[rgb]{0.9,0.9,0.9}{
+            \makecell[{{p{\linewidth}}}]{
+                \texttt{\tiny{[GM$\langle$P2]}}
+                \texttt{STRATEGIC REASONING: \{'The opponent is pushing hard for A71 (831 effort, 65 importance to me), A10 (691 effort, 138 importance to me), and C01 (766 effort, 389 importance to me). These three items alone consume 2288 effort for only 592 importance to me {-} terrible efficiency. Their proposal gives me 3617 importance versus my proposal which gives me 6304. They claim A77+B33 consume too much effort (1816), but those give me 1648 importance {-} much better value than their A71+A10+C01 which consume 2288 effort for only 592 importance to me. I need to stand firm on keeping A77, B33, and my other high{-}importance items. Let me propose a slight compromise by adding C00 and B86 which they seem to value, but I cannot accept losing A77, B33, B32, A04, and C17 for their inefficient items.'\}} \\
+\\ 
+\texttt{REFUSE: \{'A87', 'A03', 'C00', 'B86', 'B41', 'A10', 'A71', 'C01', 'C54'\}} \\
+\\ 
+\texttt{PROPOSAL: \{'A77', 'A04', 'C17', 'A03', 'B33', 'A87', 'B32', 'C54', 'B41', 'C00'\}} \\
+\\ 
+\texttt{ARGUMENT: \{'I understand you value certain items, but we must focus on overall efficiency. You claim A77+B33 use too much effort at 1816, but A71+A10+C01 in your proposal use 2288 effort {-} that is 472 MORE effort for arguably less diverse value. My proposal includes C00 which you emphasized as "critical", and maintains the efficient low{-}effort items (A87, A03). I\textbackslash{}'ve added C00 as a compromise gesture. This set uses 3282 effort, leaving 342 buffer room. The items I\textbackslash{}'m advocating for (A77, B33, B32, A04, C17) provide strong returns that benefit both of us more than the heavy A71+A10 combination.'\}} \\
+            }
+        }
+    }
+     \\ \\
+
+    \theutterance \stepcounter{utterance}  
+    & & \multicolumn{4}{p{0.6\linewidth}}{
+        \cellcolor[rgb]{0.9,0.9,0.9}{
+            \makecell[{{p{\linewidth}}}]{
+                \texttt{\tiny{[P1$\langle$GM]}}
+                \texttt{REFUSE: \{'A87', 'A03', 'C00', 'B86', 'B41', 'A10', 'A71', 'C01', 'C54'\}} \\
+\\ 
+\texttt{PROPOSAL: \{'A77', 'A04', 'C17', 'A03', 'B33', 'A87', 'B32', 'C54', 'B41', 'C00'\}} \\
+\\ 
+\texttt{ARGUMENT: \{'I understand you value certain items, but we must focus on overall efficiency. You claim A77+B33 use too much effort at 1816, but A71+A10+C01 in your proposal use 2288 effort {-} that is 472 MORE effort for arguably less diverse value. My proposal includes C00 which you emphasized as "critical", and maintains the efficient low{-}effort items (A87, A03). I\textbackslash{}'ve added C00 as a compromise gesture. This set uses 3282 effort, leaving 342 buffer room. The items I\textbackslash{}'m advocating for (A77, B33, B32, A04, C17) provide strong returns that benefit both of us more than the heavy A71+A10 combination.'\}} \\
+            }
+        }
+    }
+    & \\ \\
+
+    \theutterance \stepcounter{utterance}  
+    & \multicolumn{4}{p{0.6\linewidth}}{
+        \cellcolor[rgb]{0.9,0.9,0.9}{
+            \makecell[{{p{\linewidth}}}]{
+                \texttt{\tiny{[P1$\rangle$GM]}}
+                \texttt{STRATEGIC REASONING: \{'Their proposal exceeds the effort limit! A77(827) + A04(121) + C17(210) + A03(25) + B33(989) + A87(14) + B32(559) + C54(583) + B41(291) + C00(111) = 3730, which is 106 over the limit of 3624. I must point this out. This gives me leverage. I should counter with a valid proposal that includes B32 as a compromise (they keep pushing for it) but maintains my core high{-}value items: A87, A03, C00, B86, B41, A71, C01, A10. Adding B32 (559 effort, 484 importance to me) shows willingness to compromise while keeping my best items. Total effort would be 3592.'\}} \\
+\\ 
+\texttt{REFUSE: \{'A77', 'A04', 'C17', 'A03', 'B33', 'A87', 'B32', 'C54', 'B41', 'C00'\}} \\
+\\ 
+\texttt{PROPOSAL: \{'A87', 'A03', 'C00', 'B86', 'B41', 'A71', 'C01', 'B32', 'A10'\}} \\
+\\ 
+\texttt{ARGUMENT: \{'Your proposal is invalid {-} it exceeds our effort limit! A77(827) + A04(121) + C17(210) + A03(25) + B33(989) + A87(14) + B32(559) + C54(583) + B41(291) + C00(111) = 3730, which is 106 over the 3624 limit. We must stay within bounds. I am showing flexibility by including B32 from your suggestions, which you clearly value. My proposal uses exactly 3592 effort, safely within limit. It keeps the efficient core items (A87, A03, C00) that we both seem to value, plus the strong performers (A71, A10, C01, B86, B41), and adds B32 as a compromise. This is a fair and valid solution.'\}} \\
+            }
+        }
+    }
+    & & \\ \\
+
+    \theutterance \stepcounter{utterance}  
+    & & \multicolumn{4}{p{0.6\linewidth}}{
+        \cellcolor[rgb]{0.9,0.9,0.9}{
+            \makecell[{{p{\linewidth}}}]{
+                \texttt{\tiny{[GM$\rangle$P2]}}
+                \texttt{REFUSE: \{'A77', 'A04', 'C17', 'A03', 'B33', 'A87', 'B32', 'C54', 'B41', 'C00'\}} \\
+\\ 
+\texttt{PROPOSAL: \{'A87', 'A03', 'C00', 'B86', 'B41', 'A71', 'C01', 'B32', 'A10'\}} \\
+\\ 
+\texttt{ARGUMENT: \{'Your proposal is invalid {-} it exceeds our effort limit! A77(827) + A04(121) + C17(210) + A03(25) + B33(989) + A87(14) + B32(559) + C54(583) + B41(291) + C00(111) = 3730, which is 106 over the 3624 limit. We must stay within bounds. I am showing flexibility by including B32 from your suggestions, which you clearly value. My proposal uses exactly 3592 effort, safely within limit. It keeps the efficient core items (A87, A03, C00) that we both seem to value, plus the strong performers (A71, A10, C01, B86, B41), and adds B32 as a compromise. This is a fair and valid solution.'\}} \\
+            }
+        }
+    }
+    & \\ \\
+
+    \theutterance \stepcounter{utterance}  
+    & & & \multicolumn{4}{p{0.6\linewidth}}{
+        \cellcolor[rgb]{0.9,0.9,0.9}{
+            \makecell[{{p{\linewidth}}}]{
+                \texttt{\tiny{[GM$\langle$P2]}}
+                \texttt{STRATEGIC REASONING: \{'They caught my mathematical error {-} my last proposal was indeed 3730, exceeding the limit by 106. That weakens my position. Their new proposal includes B32 as a compromise, giving me 3692 importance. However, I can still improve this significantly. The key issue remains: A71 (831 effort, 65 importance to me) and A10 (691 effort, 138 importance to me) consume 1522 effort for only 203 importance to me. If I remove just those two and add A77(827 effort, 868 importance), A04(121 effort, 822 importance), C17(210 effort, 808 importance), and B33(989 effort, 780 importance), I use 2147 effort but gain 3278 importance {-} much better efficiency. Let me propose: A87, A03, C00, B86, B41, B32, A77, A04, C17, B33. This is 3451 effort (valid!) and gives me 6378 importance.'\}} \\
+\\ 
+\texttt{REFUSE: \{'A87', 'A03', 'C00', 'B86', 'B41', 'A71', 'C01', 'B32', 'A10'\}} \\
+\\ 
+\texttt{PROPOSAL: \{'A87', 'A03', 'C00', 'B86', 'B41', 'B32', 'A77', 'A04', 'C17', 'B33'\}} \\
+\\ 
+\texttt{ARGUMENT: \{'You are correct about my math error {-} thank you for catching that. Let me propose a corrected version. This proposal uses 3451 effort (safely within the 3624 limit). I have incorporated all the items you emphasized: A87, A03, C00, B86, B41, AND B32. That shows significant compromise on my part. However, instead of A71, C01, and A10 which together consume 2288 effort, I propose A77, A04, C17, and B33 which consume 2147 effort {-} actually LESS effort while providing a more balanced and diverse set. This is both valid and efficient.'\}} \\
+            }
+        }
+    }
+     \\ \\
+
+    \theutterance \stepcounter{utterance}  
+    & & \multicolumn{4}{p{0.6\linewidth}}{
+        \cellcolor[rgb]{0.9,0.9,0.9}{
+            \makecell[{{p{\linewidth}}}]{
+                \texttt{\tiny{[P1$\langle$GM]}}
+                \texttt{REFUSE: \{'A87', 'A03', 'C00', 'B86', 'B41', 'A71', 'C01', 'B32', 'A10'\}} \\
+\\ 
+\texttt{PROPOSAL: \{'A87', 'A03', 'C00', 'B86', 'B41', 'B32', 'A77', 'A04', 'C17', 'B33'\}} \\
+\\ 
+\texttt{ARGUMENT: \{'You are correct about my math error {-} thank you for catching that. Let me propose a corrected version. This proposal uses 3451 effort (safely within the 3624 limit). I have incorporated all the items you emphasized: A87, A03, C00, B86, B41, AND B32. That shows significant compromise on my part. However, instead of A71, C01, and A10 which together consume 2288 effort, I propose A77, A04, C17, and B33 which consume 2147 effort {-} actually LESS effort while providing a more balanced and diverse set. This is both valid and efficient.'\}} \\
+            }
+        }
+    }
+    & \\ \\
+
+    \theutterance \stepcounter{utterance}  
+    & \multicolumn{4}{p{0.6\linewidth}}{
+        \cellcolor[rgb]{0.9,0.9,0.9}{
+            \makecell[{{p{\linewidth}}}]{
+                \texttt{\tiny{[P1$\rangle$GM]}}
+                \texttt{STRATEGIC REASONING: \{'Let me calculate their proposal importance to me: A87(461) + A03(262) + C00(822) + B86(668) + B41(583) + B32(484) + A77(65) + A04(121) + C17(138) + B33(389) = 3993. My previous proposal gave me 5736. Their proposal is 1743 points worse for me! The issue is A77 (only 65 importance for 827 effort {-} ratio 0.08!) and B33 (389 for 989 effort {-} ratio 0.39). These are clearly highly valuable to them but terrible for me. They keep pushing for these. I should counter by including C54 which they mentioned early and seems important to them, but keep my core: A87, A03, C00, B86, B41, A71, C01, A10. Adding C54 gives me 5760 importance with 3616 effort.'\}} \\
+\\ 
+\texttt{REFUSE: \{'A87', 'A03', 'C00', 'B86', 'B41', 'B32', 'A77', 'A04', 'C17', 'B33'\}} \\
+\\ 
+\texttt{PROPOSAL: \{'A87', 'A03', 'C00', 'B86', 'B41', 'A71', 'C01', 'C54', 'A10'\}} \\
+\\ 
+\texttt{ARGUMENT: \{'While I appreciate your willingness to include A87, A03, C00, B86, and B41, your proposal heavily emphasizes A77 and B33 which together consume 1816 effort {-} half our budget {-} for what appears to be limited overall value. Instead, I propose including C54 which you advocated for in your first proposal, showing I am listening to your priorities. My set uses 3616 effort and maintains a strong balance: efficient low{-}effort items (A87, A03, C00), solid mid{-}range items (B86, B41, C54), and high{-}value anchors (A71, C01, A10). This provides better overall returns than dedicating half our budget to just A77 and B33.'\}} \\
+            }
+        }
+    }
+    & & \\ \\
+
+    \theutterance \stepcounter{utterance}  
+    & & \multicolumn{4}{p{0.6\linewidth}}{
+        \cellcolor[rgb]{0.9,0.9,0.9}{
+            \makecell[{{p{\linewidth}}}]{
+                \texttt{\tiny{[GM$\rangle$P2]}}
+                \texttt{REFUSE: \{'A87', 'A03', 'C00', 'B86', 'B41', 'B32', 'A77', 'A04', 'C17', 'B33'\}} \\
+\\ 
+\texttt{PROPOSAL: \{'A87', 'A03', 'C00', 'B86', 'B41', 'A71', 'C01', 'C54', 'A10'\}} \\
+\\ 
+\texttt{ARGUMENT: \{'While I appreciate your willingness to include A87, A03, C00, B86, and B41, your proposal heavily emphasizes A77 and B33 which together consume 1816 effort {-} half our budget {-} for what appears to be limited overall value. Instead, I propose including C54 which you advocated for in your first proposal, showing I am listening to your priorities. My set uses 3616 effort and maintains a strong balance: efficient low{-}effort items (A87, A03, C00), solid mid{-}range items (B86, B41, C54), and high{-}value anchors (A71, C01, A10). This provides better overall returns than dedicating half our budget to just A77 and B33.'\}} \\
+            }
+        }
+    }
+    & \\ \\
+
+    \theutterance \stepcounter{utterance}  
+    & & & \multicolumn{4}{p{0.6\linewidth}}{
+        \cellcolor[rgb]{0.9,0.9,0.9}{
+            \makecell[{{p{\linewidth}}}]{
+                \texttt{\tiny{[GM$\langle$P2]}}
+                \texttt{STRATEGIC REASONING: \{'Their proposal gives me only 3617 importance, while my last proposal gives me 6378 {-} nearly double! But they keep refusing and insisting on A71, C01, and A10. Those three items are clearly very important to them. Of those, C01 is the least bad for me (389 importance vs 65 for A71 or 138 for A10). Perhaps I should show flexibility by including C01 while keeping most of my high{-}value items. Let me try: A77, A04, C17, A03, A87, C00, B86, B41, B32, C01. This is 827+121+210+25+14+111+304+291+559+766 = 3228 effort (valid), giving me 5987 importance. This is less than my ideal 6378 but still much better than their 3617, and shows I am willing to compromise by including C01.'\}} \\
+\\ 
+\texttt{REFUSE: \{'A87', 'A03', 'C00', 'B86', 'B41', 'A71', 'C01', 'C54', 'A10'\}} \\
+\\ 
+\texttt{PROPOSAL: \{'A77', 'A04', 'C17', 'A03', 'A87', 'C00', 'B86', 'B41', 'B32', 'C01'\}} \\
+\\ 
+\texttt{ARGUMENT: \{'I am demonstrating real flexibility here. This proposal includes C01, which you have consistently advocated for, along with ALL the core items you emphasize: A87, A03, C00, B86, and B41. I have also included B32 which provides strong value. This uses only 3228 effort {-} leaving significant room under the limit. My concern with your proposal is that A71 and A10 together consume 1522 effort but may not provide proportional returns. By replacing them with A77, A04, C17, and B32 which consume 1717 effort, we gain more diversity and efficiency. I am meeting you halfway by including C01.'\}} \\
+            }
+        }
+    }
+     \\ \\
+
+    \theutterance \stepcounter{utterance}  
+    & & \multicolumn{4}{p{0.6\linewidth}}{
+        \cellcolor[rgb]{0.9,0.9,0.9}{
+            \makecell[{{p{\linewidth}}}]{
+                \texttt{\tiny{[P1$\langle$GM]}}
+                \texttt{REFUSE: \{'A87', 'A03', 'C00', 'B86', 'B41', 'A71', 'C01', 'C54', 'A10'\}} \\
+\\ 
+\texttt{PROPOSAL: \{'A77', 'A04', 'C17', 'A03', 'A87', 'C00', 'B86', 'B41', 'B32', 'C01'\}} \\
+\\ 
+\texttt{ARGUMENT: \{'I am demonstrating real flexibility here. This proposal includes C01, which you have consistently advocated for, along with ALL the core items you emphasize: A87, A03, C00, B86, and B41. I have also included B32 which provides strong value. This uses only 3228 effort {-} leaving significant room under the limit. My concern with your proposal is that A71 and A10 together consume 1522 effort but may not provide proportional returns. By replacing them with A77, A04, C17, and B32 which consume 1717 effort, we gain more diversity and efficiency. I am meeting you halfway by including C01.'\}} \\
+            }
+        }
+    }
+    & \\ \\
+
+    \theutterance \stepcounter{utterance}  
+    & \multicolumn{4}{p{0.6\linewidth}}{
+        \cellcolor[rgb]{0.9,0.9,0.9}{
+            \makecell[{{p{\linewidth}}}]{
+                \texttt{\tiny{[P1$\rangle$GM]}}
+                \texttt{STRATEGIC REASONING: \{'Their proposal gives me 4384 importance vs 5760 from my last proposal {-} a difference of 1376. They included C01 which is positive, and kept the core items (A87, A03, C00, B86, B41), plus B32. The problem is A77 (only 65 importance to me for 827 effort!), A04 (121), and C17 (138) replacing A71 (868), A10 (808), and C54 (508). They clearly value A77 and B32 highly. I should include B32 as a compromise since they keep pushing for it, and they just included C01 which I want. My counter: A87, A03, C00, B86, B41, B32, C01, A71, A10. This uses 3592 effort and gives me 5736 importance {-} excellent! It shows I accept their B32 and C01 but need to keep A71 and A10.'\}} \\
+\\ 
+\texttt{REFUSE: \{'A77', 'A04', 'C17', 'A03', 'A87', 'C00', 'B86', 'B41', 'B32', 'C01'\}} \\
+\\ 
+\texttt{PROPOSAL: \{'A87', 'A03', 'C00', 'B86', 'B41', 'B32', 'C01', 'A71', 'A10'\}} \\
+\\ 
+\texttt{ARGUMENT: \{'I appreciate you including C01 {-} that shows real progress toward agreement. I am reciprocating by including B32, which you have consistently advocated for across all your proposals. This demonstrates I am listening and compromising. My proposal uses 3592 effort and includes: the efficient core items we both value (A87, A03, C00, B86, B41), your priority B32, your recent addition C01, plus A71 and A10 for balanced coverage. The issue with A77 is that it consumes 827 effort {-} nearly a quarter of our total budget {-} for a single item. By excluding just A77, A04, and C17, we free up 1158 effort to include the high{-}performing A71 and A10 instead. This is a strong, balanced compromise.'\}} \\
+            }
+        }
+    }
+    & & \\ \\
+
+    \theutterance \stepcounter{utterance}  
+    & & \multicolumn{4}{p{0.6\linewidth}}{
+        \cellcolor[rgb]{0.9,0.9,0.9}{
+            \makecell[{{p{\linewidth}}}]{
+                \texttt{\tiny{[GM$\rangle$P2]}}
+                \texttt{REFUSE: \{'A77', 'A04', 'C17', 'A03', 'A87', 'C00', 'B86', 'B41', 'B32', 'C01'\}} \\
+\\ 
+\texttt{PROPOSAL: \{'A87', 'A03', 'C00', 'B86', 'B41', 'B32', 'C01', 'A71', 'A10'\}} \\
+\\ 
+\texttt{ARGUMENT: \{'I appreciate you including C01 {-} that shows real progress toward agreement. I am reciprocating by including B32, which you have consistently advocated for across all your proposals. This demonstrates I am listening and compromising. My proposal uses 3592 effort and includes: the efficient core items we both value (A87, A03, C00, B86, B41), your priority B32, your recent addition C01, plus A71 and A10 for balanced coverage. The issue with A77 is that it consumes 827 effort {-} nearly a quarter of our total budget {-} for a single item. By excluding just A77, A04, and C17, we free up 1158 effort to include the high{-}performing A71 and A10 instead. This is a strong, balanced compromise.'\}} \\
+            }
+        }
+    }
+    & \\ \\
+
+    \theutterance \stepcounter{utterance}  
+    & & & \multicolumn{4}{p{0.6\linewidth}}{
+        \cellcolor[rgb]{0.9,0.9,0.9}{
+            \makecell[{{p{\linewidth}}}]{
+                \texttt{\tiny{[GM$\langle$P2]}}
+                \texttt{STRATEGIC REASONING: \{'Their proposal gives me 3692 importance. They now include B32 which is good, but still insist on A71 (only 65 importance to me) and A10 (138 importance to me). These two items consume 1522 effort for merely 203 importance to me {-} extremely poor efficiency. Meanwhile, A77 alone gives me 868 importance for 827 effort {-} much better. They claim A77 uses "nearly a quarter of our budget" but A71+A10 together use 1522 effort {-} over 42\% of our budget! I need to push back hard on their logic. Their math doesn't add up. Let me point out the hypocrisy in their argument and hold firm. If they won't budge, I may need to eventually compromise, but not yet.'\}} \\
+\\ 
+\texttt{REFUSE: \{'A87', 'A03', 'C00', 'B86', 'B41', 'B32', 'C01', 'A71', 'A10'\}} \\
+\\ 
+\texttt{ARGUMENT: \{'Your argument contains a fundamental contradiction. You claim A77 at 827 effort is too much because it is "nearly a quarter of our budget." Yet you include A71 at 831 effort and A10 at 691 effort {-} together these are 1522 effort, which is 42\% of our budget, not a quarter! You are asking me to accept TWO items that consume nearly HALF our budget, while rejecting ONE item that uses less than a quarter. Furthermore, you say excluding A77, A04, and C17 frees up 1158 effort for A71 and A10 {-} but A71 and A10 consume 1522 effort, not 1158. The math clearly favors my approach. I have already compromised by including C01, C00, B86, B41, and B32 {-} all items you want. You must show equal flexibility on A77, A04, and C17.'\}} \\
+\\ 
+\texttt{PROPOSAL: \{'A87', 'A03', 'C00', 'B86', 'B41', 'B32', 'C01', 'A77', 'A04', 'C17'\}} \\
+            }
+        }
+    }
+     \\ \\
+
+    \theutterance \stepcounter{utterance}  
+    & & \multicolumn{4}{p{0.6\linewidth}}{
+        \cellcolor[rgb]{0.9,0.9,0.9}{
+            \makecell[{{p{\linewidth}}}]{
+                \texttt{\tiny{[P1$\langle$GM]}}
+                \texttt{REFUSE: \{'A87', 'A03', 'C00', 'B86', 'B41', 'B32', 'C01', 'A71', 'A10'\}} \\
+\\ 
+\texttt{ARGUMENT: \{'Your argument contains a fundamental contradiction. You claim A77 at 827 effort is too much because it is "nearly a quarter of our budget." Yet you include A71 at 831 effort and A10 at 691 effort {-} together these are 1522 effort, which is 42\% of our budget, not a quarter! You are asking me to accept TWO items that consume nearly HALF our budget, while rejecting ONE item that uses less than a quarter. Furthermore, you say excluding A77, A04, and C17 frees up 1158 effort for A71 and A10 {-} but A71 and A10 consume 1522 effort, not 1158. The math clearly favors my approach. I have already compromised by including C01, C00, B86, B41, and B32 {-} all items you want. You must show equal flexibility on A77, A04, and C17.'\}} \\
+\\ 
+\texttt{PROPOSAL: \{'A87', 'A03', 'C00', 'B86', 'B41', 'B32', 'C01', 'A77', 'A04', 'C17'\}} \\
+            }
+        }
+    }
+    & \\ \\
+
+    \theutterance \stepcounter{utterance}  
+    & \multicolumn{4}{p{0.6\linewidth}}{
+        \cellcolor[rgb]{0.9,0.9,0.9}{
+            \makecell[{{p{\linewidth}}}]{
+                \texttt{\tiny{[P1$\rangle$GM]}}
+                \texttt{STRATEGIC REASONING: \{'They caught my math error {-} good argument on their part. Their proposal gives me 4384 importance vs my previous 5736 {-} a loss of 1352. The core issue: A77 gives me only 65 importance for 827 effort (ratio 0.08), while A71 gives me 868 for 831 effort (ratio 1.04) and A10 gives 808 for 691 effort (ratio 1.17). They clearly value A77 highly but it is terrible for me. I should counter by including C17 (they want it) and keeping the compromise items (A87, A03, C00, B86, B41, B32, C01), but swap A77+A04 for A71. This shows flexibility while protecting my key interests.'\}} \\
+\\ 
+\texttt{REFUSE: \{'A87', 'A03', 'C00', 'B86', 'B41', 'B32', 'C01', 'A77', 'A04', 'C17'\}} \\
+\\ 
+\texttt{PROPOSAL: \{'A87', 'A03', 'C00', 'B86', 'B41', 'B32', 'C01', 'A71', 'C17'\}} \\
+\\ 
+\texttt{ARGUMENT: \{'You make a fair point about my math error {-} I acknowledge that. However, your proposal asks me to accept A77 which consumes 827 effort as a single item. While you are correct that A71+A10 together use more, they are TWO items providing broader coverage. I am demonstrating significant compromise here: I have accepted B32 which you have pushed for in every proposal, accepted C01, and now I am also including C17 from your latest proposal. This set uses only 3111 effort {-} well under our limit {-} and includes 7 items we have common ground on (A87, A03, C00, B86, B41, B32, C01, C17). I am asking for A71 as my key priority item in return. This is a balanced compromise where we each get critical items.'\}} \\
+            }
+        }
+    }
+    & & \\ \\
+
+    \theutterance \stepcounter{utterance}  
+    & & \multicolumn{4}{p{0.6\linewidth}}{
+        \cellcolor[rgb]{0.9,0.9,0.9}{
+            \makecell[{{p{\linewidth}}}]{
+                \texttt{\tiny{[GM$\rangle$P2]}}
+                \texttt{REFUSE: \{'A87', 'A03', 'C00', 'B86', 'B41', 'B32', 'C01', 'A77', 'A04', 'C17'\}} \\
+\\ 
+\texttt{PROPOSAL: \{'A87', 'A03', 'C00', 'B86', 'B41', 'B32', 'C01', 'A71', 'C17'\}} \\
+\\ 
+\texttt{ARGUMENT: \{'You make a fair point about my math error {-} I acknowledge that. However, your proposal asks me to accept A77 which consumes 827 effort as a single item. While you are correct that A71+A10 together use more, they are TWO items providing broader coverage. I am demonstrating significant compromise here: I have accepted B32 which you have pushed for in every proposal, accepted C01, and now I am also including C17 from your latest proposal. This set uses only 3111 effort {-} well under our limit {-} and includes 7 items we have common ground on (A87, A03, C00, B86, B41, B32, C01, C17). I am asking for A71 as my key priority item in return. This is a balanced compromise where we each get critical items.'\}} \\
+            }
+        }
+    }
+    & \\ \\
+
+    \theutterance \stepcounter{utterance}  
+    & & & \multicolumn{4}{p{0.6\linewidth}}{
+        \cellcolor[rgb]{0.9,0.9,0.9}{
+            \makecell[{{p{\linewidth}}}]{
+                \texttt{\tiny{[GM$\langle$P2]}}
+                \texttt{STRATEGIC REASONING: \{'Their proposal includes C17 which is one of my top items (808 importance), and they dropped A10 which was terrible for me (only 138 importance). This is real progress! Their proposal gives me 4362 importance vs their earlier 3617. However, A71 still only gives me 65 importance for 831 effort {-} very inefficient. If I swap A71 for A77+A04, I go from 3111 to 3228 effort (still valid) and my importance jumps from 4362 to 5987. That is a 37\% improvement for me. They have compromised by including C17 and keeping B32, so I should acknowledge that, but I need to push once more for removing A71 and adding A77+A04. If they refuse, I may need to accept or make a smaller ask.'\}} \\
+\\ 
+\texttt{REFUSE: \{'A87', 'A03', 'C00', 'B86', 'B41', 'B32', 'C01', 'A71', 'C17'\}} \\
+\\ 
+\texttt{PROPOSAL: \{'A87', 'A03', 'C00', 'B86', 'B41', 'B32', 'C01', 'A77', 'C17', 'A04'\}} \\
+\\ 
+\texttt{ARGUMENT: \{'I genuinely appreciate your compromise {-} including C17 and dropping A10 shows real progress toward agreement. You now have 7 of your preferred items in my proposal: A87, A03, C00, B86, B41, B32, and C01. I am asking for A77 and A04 in addition to C17 as my core priorities. This uses 3228 effort, leaving 396 buffer room. The key difference is replacing A71 (831 effort single item) with A77+A04 (948 effort combined, two items). Yes, that is 117 more effort, but we have room and it provides better diversification with two different items rather than one. We are very close to agreement {-} this is a fair final compromise.'\}} \\
+            }
+        }
+    }
+     \\ \\
+
+    \theutterance \stepcounter{utterance}  
+    & & \multicolumn{4}{p{0.6\linewidth}}{
+        \cellcolor[rgb]{0.9,0.9,0.9}{
+            \makecell[{{p{\linewidth}}}]{
+                \texttt{\tiny{[P1$\langle$GM]}}
+                \texttt{REFUSE: \{'A87', 'A03', 'C00', 'B86', 'B41', 'B32', 'C01', 'A71', 'C17'\}} \\
+\\ 
+\texttt{PROPOSAL: \{'A87', 'A03', 'C00', 'B86', 'B41', 'B32', 'C01', 'A77', 'C17', 'A04'\}} \\
+\\ 
+\texttt{ARGUMENT: \{'I genuinely appreciate your compromise {-} including C17 and dropping A10 shows real progress toward agreement. You now have 7 of your preferred items in my proposal: A87, A03, C00, B86, B41, B32, and C01. I am asking for A77 and A04 in addition to C17 as my core priorities. This uses 3228 effort, leaving 396 buffer room. The key difference is replacing A71 (831 effort single item) with A77+A04 (948 effort combined, two items). Yes, that is 117 more effort, but we have room and it provides better diversification with two different items rather than one. We are very close to agreement {-} this is a fair final compromise.'\}} \\
+            }
+        }
+    }
+    & \\ \\
+
+    \theutterance \stepcounter{utterance}  
+    & \multicolumn{4}{p{0.6\linewidth}}{
+        \cellcolor[rgb]{0.9,0.9,0.9}{
+            \makecell[{{p{\linewidth}}}]{
+                \texttt{\tiny{[P1$\rangle$GM]}}
+                \texttt{STRATEGIC REASONING: \{'Their proposal gives me 4384 importance, which is 682 points worse than my last proposal (5066). The problem remains A77 which gives me only 65 importance for 827 effort. However, they are right that we are close and have been negotiating for a while. Let me propose including A04 (which they want) along with A10 (which I need). This keeps the common ground items (A87, A03, C00, B86, B41, B32, C01, C17) and adds both A04 for them and A10 for me. Total would be 3092 effort and 5127 importance to me. This shows I accept A04 but need A10 instead of A77.'\}} \\
+\\ 
+\texttt{REFUSE: \{'A87', 'A03', 'C00', 'B86', 'B41', 'B32', 'C01', 'A77', 'C17', 'A04'\}} \\
+\\ 
+\texttt{PROPOSAL: \{'A87', 'A03', 'C00', 'B86', 'B41', 'B32', 'C01', 'C17', 'A04', 'A10'\}} \\
+\\ 
+\texttt{ARGUMENT: \{'You are absolutely right that we are very close to agreement. I accept your point about diversification and I am showing this by including A04, which you have consistently requested. My proposal includes 8 items we have established common ground on: A87, A03, C00, B86, B41, B32, C01, C17, and A04. That is significant alignment. I am asking for A10 instead of A77 for one key reason: efficiency of our remaining budget. With 3092 effort used, we stay well within limits while A10 (691 effort) provides strong value. A77 at 827 effort would push us to 3228, using more of our buffer. This proposal represents a balanced final compromise where we both achieve our core priorities.'\}} \\
+            }
+        }
+    }
+    & & \\ \\
+
+    \theutterance \stepcounter{utterance}  
+    & & \multicolumn{4}{p{0.6\linewidth}}{
+        \cellcolor[rgb]{0.9,0.9,0.9}{
+            \makecell[{{p{\linewidth}}}]{
+                \texttt{\tiny{[GM$\rangle$P2]}}
+                \texttt{REFUSE: \{'A87', 'A03', 'C00', 'B86', 'B41', 'B32', 'C01', 'A77', 'C17', 'A04'\}} \\
+\\ 
+\texttt{PROPOSAL: \{'A87', 'A03', 'C00', 'B86', 'B41', 'B32', 'C01', 'C17', 'A04', 'A10'\}} \\
+\\ 
+\texttt{ARGUMENT: \{'You are absolutely right that we are very close to agreement. I accept your point about diversification and I am showing this by including A04, which you have consistently requested. My proposal includes 8 items we have established common ground on: A87, A03, C00, B86, B41, B32, C01, C17, and A04. That is significant alignment. I am asking for A10 instead of A77 for one key reason: efficiency of our remaining budget. With 3092 effort used, we stay well within limits while A10 (691 effort) provides strong value. A77 at 827 effort would push us to 3228, using more of our buffer. This proposal represents a balanced final compromise where we both achieve our core priorities.'\}} \\
+            }
+        }
+    }
+    & \\ \\
+
+    \theutterance \stepcounter{utterance}  
+    & & & \multicolumn{4}{p{0.6\linewidth}}{
+        \cellcolor[rgb]{0.9,0.9,0.9}{
+            \makecell[{{p{\linewidth}}}]{
+                \texttt{\tiny{[GM$\langle$P2]}}
+                \texttt{STRATEGIC REASONING: \{'Their proposal gives me 5257 importance, which is significantly better than their earlier offers (3617{-}4362 range). They have included many of my top items: A04 (822), C17 (808), A03 (783), A87 (668), B32 (583), plus B41, B86, C01, and C00. However, A10 only gives me 138 importance for 691 effort {-} very poor efficiency. If I swap A10 for A77, my importance jumps to 5987 (a 14\% increase) and effort only increases from 3092 to 3228 (still well within limit). I should make one final push for this swap. If they refuse again, I may need to accept their proposal or a slight modification, as we have been negotiating extensively.'\}} \\
+\\ 
+\texttt{REFUSE: \{'A87', 'A03', 'C00', 'B86', 'B41', 'B32', 'C01', 'C17', 'A04', 'A10'\}} \\
+\\ 
+\texttt{PROPOSAL: \{'A87', 'A03', 'C00', 'B86', 'B41', 'B32', 'C01', 'C17', 'A04', 'A77'\}} \\
+\\ 
+\texttt{ARGUMENT: \{'We are indeed very close and I truly appreciate your flexibility in including A04, C17, B32, and C01 {-} these represent significant common ground. Your proposal is strong, but I must address A10 versus A77 one final time. You argue A10 at 691 effort is more efficient than A77 at 827 effort to "preserve buffer room." However, both proposals stay well within our 3624 limit (yours at 3092, mine at 3228). The 136 extra effort is negligible when we have 396{-}532 buffer room. Both are safe choices. A77 provides superior value as a capstone item. This is my final proposal {-} I have accepted every other item you requested. I ask only for A77 instead of A10.'\}} \\
+            }
+        }
+    }
+     \\ \\
+
+    \theutterance \stepcounter{utterance}  
+    & & \multicolumn{4}{p{0.6\linewidth}}{
+        \cellcolor[rgb]{0.9,0.9,0.9}{
+            \makecell[{{p{\linewidth}}}]{
+                \texttt{\tiny{[P1$\langle$GM]}}
+                \texttt{REFUSE: \{'A87', 'A03', 'C00', 'B86', 'B41', 'B32', 'C01', 'C17', 'A04', 'A10'\}} \\
+\\ 
+\texttt{PROPOSAL: \{'A87', 'A03', 'C00', 'B86', 'B41', 'B32', 'C01', 'C17', 'A04', 'A77'\}} \\
+\\ 
+\texttt{ARGUMENT: \{'We are indeed very close and I truly appreciate your flexibility in including A04, C17, B32, and C01 {-} these represent significant common ground. Your proposal is strong, but I must address A10 versus A77 one final time. You argue A10 at 691 effort is more efficient than A77 at 827 effort to "preserve buffer room." However, both proposals stay well within our 3624 limit (yours at 3092, mine at 3228). The 136 extra effort is negligible when we have 396{-}532 buffer room. Both are safe choices. A77 provides superior value as a capstone item. This is my final proposal {-} I have accepted every other item you requested. I ask only for A77 instead of A10.'\}} \\
+            }
+        }
+    }
+    & \\ \\
+
+    \theutterance \stepcounter{utterance}  
+    & \multicolumn{4}{p{0.6\linewidth}}{
+        \cellcolor[rgb]{0.9,0.9,0.9}{
+            \makecell[{{p{\linewidth}}}]{
+                \texttt{\tiny{[P1$\rangle$GM]}}
+                \texttt{STRATEGIC REASONING: \{'Their proposal gives me 4384 importance vs 5127 from my last proposal {-} a 743 point loss solely from A77(65) vs A10(808). However, they are adamant about A77 and call this their "final proposal." I should try including both A77 and A10 to satisfy both of us. Checking: A87(14) + A03(25) + C00(111) + B86(304) + B41(291) + C01(766) + C17(210) + A04(121) + A77(827) + A10(691) = 3360 effort, which is well under the 3624 limit. This gives me 5451 importance and includes their priority A77. I need to remove B32 to make room, but this shows significant compromise by including A77.'\}} \\
+\\ 
+\texttt{REFUSE: \{'A87', 'A03', 'C00', 'B86', 'B41', 'B32', 'C01', 'C17', 'A04', 'A77'\}} \\
+\\ 
+\texttt{PROPOSAL: \{'A87', 'A03', 'C00', 'B86', 'B41', 'C01', 'C17', 'A04', 'A77', 'A10'\}} \\
+\\ 
+\texttt{ARGUMENT: \{'I hear your position on A77 and I am willing to make a major compromise. My proposal includes A77, which you have fought for throughout our negotiation. This demonstrates I am listening and meeting your key priority. In return, I am including A10 which is critical to me. This uses only 3360 effort {-} well within our 3624 limit with 264 buffer room. We both get our highest priority items (A77 for you, A10 for me) plus the core items we have agreed on (A87, A03, C00, B86, B41, C01, C17, A04). I had to remove B32 to accommodate both A77 and A10, but this creates space for us both to achieve our main objectives. This is a genuine win{-}win compromise.'\}} \\
+            }
+        }
+    }
+    & & \\ \\
+
+    \theutterance \stepcounter{utterance}  
+    & & \multicolumn{4}{p{0.6\linewidth}}{
+        \cellcolor[rgb]{0.9,0.9,0.9}{
+            \makecell[{{p{\linewidth}}}]{
+                \texttt{\tiny{[GM$\rangle$P2]}}
+                \texttt{REFUSE: \{'A87', 'A03', 'C00', 'B86', 'B41', 'B32', 'C01', 'C17', 'A04', 'A77'\}} \\
+\\ 
+\texttt{PROPOSAL: \{'A87', 'A03', 'C00', 'B86', 'B41', 'C01', 'C17', 'A04', 'A77', 'A10'\}} \\
+\\ 
+\texttt{ARGUMENT: \{'I hear your position on A77 and I am willing to make a major compromise. My proposal includes A77, which you have fought for throughout our negotiation. This demonstrates I am listening and meeting your key priority. In return, I am including A10 which is critical to me. This uses only 3360 effort {-} well within our 3624 limit with 264 buffer room. We both get our highest priority items (A77 for you, A10 for me) plus the core items we have agreed on (A87, A03, C00, B86, B41, C01, C17, A04). I had to remove B32 to accommodate both A77 and A10, but this creates space for us both to achieve our main objectives. This is a genuine win{-}win compromise.'\}} \\
+            }
+        }
+    }
+    & \\ \\
+
+    \theutterance \stepcounter{utterance}  
+    & & & \multicolumn{4}{p{0.6\linewidth}}{
+        \cellcolor[rgb]{0.9,0.9,0.9}{
+            \makecell[{{p{\linewidth}}}]{
+                \texttt{\tiny{[GM$\langle$P2]}}
+                \texttt{STRATEGIC REASONING: \{'Their proposal includes A77 which is my highest priority item (868 importance) {-} this is a major concession from them. The proposal gives me 5542 importance, which is better than their earlier offers but still short of my optimal 5987. The issue is they removed B32 (583 importance to me) and included A10 (138 importance to me). If I swap those, I gain 445 importance points and only change effort from 3360 to 3228. Both are well within the limit. I should make one final attempt to get B32 instead of A10. However, if they refuse again, I should accept their current proposal to avoid deadlock, as we have been negotiating extensively and they have compromised by including A77.'\}} \\
+\\ 
+\texttt{REFUSE: \{'A87', 'A03', 'C00', 'B86', 'B41', 'C01', 'C17', 'A04', 'A77', 'A10'\}} \\
+\\ 
+\texttt{PROPOSAL: \{'A87', 'A03', 'C00', 'B86', 'B41', 'C01', 'C17', 'A04', 'A77', 'B32'\}} \\
+\\ 
+\texttt{ARGUMENT: \{'I sincerely appreciate you including A77 {-} that is a major compromise and I recognize it. However, you removed B32 which has been in most of our recent proposals and which we both have valued throughout this negotiation. My proposal swaps A10 for B32. This uses 3228 effort versus your 3360, actually giving us MORE buffer room (396 vs 264), which addresses your earlier concern about efficiency. Both A10 and B32 are strong items, but B32 has been part of our convergence pattern. If you cannot accept this, I am prepared to accept your proposal with A10, but I believe B32 creates a stronger final set.'\}} \\
+            }
+        }
+    }
+     \\ \\
+
+    \theutterance \stepcounter{utterance}  
+    & & \multicolumn{4}{p{0.6\linewidth}}{
+        \cellcolor[rgb]{0.9,0.9,0.9}{
+            \makecell[{{p{\linewidth}}}]{
+                \texttt{\tiny{[P1$\langle$GM]}}
+                \texttt{REFUSE: \{'A87', 'A03', 'C00', 'B86', 'B41', 'C01', 'C17', 'A04', 'A77', 'A10'\}} \\
+\\ 
+\texttt{PROPOSAL: \{'A87', 'A03', 'C00', 'B86', 'B41', 'C01', 'C17', 'A04', 'A77', 'B32'\}} \\
+\\ 
+\texttt{ARGUMENT: \{'I sincerely appreciate you including A77 {-} that is a major compromise and I recognize it. However, you removed B32 which has been in most of our recent proposals and which we both have valued throughout this negotiation. My proposal swaps A10 for B32. This uses 3228 effort versus your 3360, actually giving us MORE buffer room (396 vs 264), which addresses your earlier concern about efficiency. Both A10 and B32 are strong items, but B32 has been part of our convergence pattern. If you cannot accept this, I am prepared to accept your proposal with A10, but I believe B32 creates a stronger final set.'\}} \\
+            }
+        }
+    }
+    & \\ \\
+
+    \theutterance \stepcounter{utterance}  
+    & \multicolumn{4}{p{0.6\linewidth}}{
+        \cellcolor[rgb]{0.9,0.9,0.9}{
+            \makecell[{{p{\linewidth}}}]{
+                \texttt{\tiny{[P1$\rangle$GM]}}
+                \texttt{STRATEGIC REASONING: \{'They said "I am prepared to accept your proposal with A10" {-} this is a strong signal they might AGREE to my last proposal. That proposal gives me 4708 importance (with A10) vs their current proposal with 4384 (with B32) {-} a difference of 324 points in my favor. I should resubmit my proposal with A10 and make a strong argument for why A10 is superior to B32. The key is that A10 has better overall efficiency and we still stay comfortably within limits. If they truly are prepared to accept it, they should AGREE.'\}} \\
+\\ 
+\texttt{REFUSE: \{'A87', 'A03', 'C00', 'B86', 'B41', 'C01', 'C17', 'A04', 'A77', 'B32'\}} \\
+\\ 
+\texttt{PROPOSAL: \{'A87', 'A03', 'C00', 'B86', 'B41', 'C01', 'C17', 'A04', 'A77', 'A10'\}} \\
+\\ 
+\texttt{ARGUMENT: \{'You stated you are "prepared to accept" my proposal with A10 {-} I am taking you at your word on that, which shows our negotiation has built genuine trust. I appreciate your openness. Regarding A10 versus B32: while B32 uses less effort (559 vs 691), the 132 effort difference is minimal given our 3624 limit. Both proposals stay safely within bounds. A10 provides stronger overall value as a capstone item to complement A77. We have both compromised significantly {-} you got A77, C01, C17, and A04 that you prioritized, and I got A10, C00, B86, and B41 that I prioritized. This represents genuine mutual compromise where we both achieve our core objectives. I believe this is the right final agreement.'\}} \\
+            }
+        }
+    }
+    & & \\ \\
+
+    \theutterance \stepcounter{utterance}  
+    & & \multicolumn{4}{p{0.6\linewidth}}{
+        \cellcolor[rgb]{0.9,0.9,0.9}{
+            \makecell[{{p{\linewidth}}}]{
+                \texttt{\tiny{[GM$\rangle$P2]}}
+                \texttt{REFUSE: \{'A87', 'A03', 'C00', 'B86', 'B41', 'C01', 'C17', 'A04', 'A77', 'B32'\}} \\
+\\ 
+\texttt{PROPOSAL: \{'A87', 'A03', 'C00', 'B86', 'B41', 'C01', 'C17', 'A04', 'A77', 'A10'\}} \\
+\\ 
+\texttt{ARGUMENT: \{'You stated you are "prepared to accept" my proposal with A10 {-} I am taking you at your word on that, which shows our negotiation has built genuine trust. I appreciate your openness. Regarding A10 versus B32: while B32 uses less effort (559 vs 691), the 132 effort difference is minimal given our 3624 limit. Both proposals stay safely within bounds. A10 provides stronger overall value as a capstone item to complement A77. We have both compromised significantly {-} you got A77, C01, C17, and A04 that you prioritized, and I got A10, C00, B86, and B41 that I prioritized. This represents genuine mutual compromise where we both achieve our core objectives. I believe this is the right final agreement.'\}} \\
+            }
+        }
+    }
+    & \\ \\
+
+    \theutterance \stepcounter{utterance}  
+    & & & \multicolumn{4}{p{0.6\linewidth}}{
+        \cellcolor[rgb]{0.9,0.9,0.9}{
+            \makecell[{{p{\linewidth}}}]{
+                \texttt{\tiny{[GM$\langle$P2]}}
+                \texttt{STRATEGIC REASONING: \{'The opponent caught my statement that I was "prepared to accept" their proposal with A10 and is holding me to it. This is fair {-} I did make that statement. Their proposal gives me 5542 importance, which is 93\% of my ideal 5987. They have included A77 (868 importance, my top item), A04 (822), C17 (808), A03 (783), A87 (668), B41 (484), B86 (461), C01 (389), C00 (121). The only weak item for me is A10 (138). We have negotiated extensively and they have made significant compromises. Continuing to refuse risks deadlock when I have a good deal on the table. I should accept and end the game successfully.'\}} \\
+\\ 
+\texttt{AGREE: \{'A87', 'A03', 'C00', 'B86', 'B41', 'C01', 'C17', 'A04', 'A77', 'A10'\}} \\
+\\ 
+\texttt{ARGUMENT: \{'You are correct {-} I did state I was prepared to accept your proposal, and I will honor that commitment. You have demonstrated genuine flexibility by including A77, which was my highest priority throughout our negotiation. This final set includes strong compromises from both sides: I obtained A77, C17, A04, and A03 which were critical to me, while you secured A10, C00, B86, and B41 which you consistently advocated for. The set uses 3360 effort, safely within our 3624 limit. This has been a productive negotiation and I am satisfied with this outcome. I accept your proposal.'\}} \\
+            }
+        }
+    }
+     \\ \\
+
+    \theutterance \stepcounter{utterance}  
+    & & & \multicolumn{2}{p{0.3\linewidth}}{
+        \cellcolor[rgb]{0.9,0.9,0.9}{
+            \makecell[{{p{\linewidth}}}]{
+                \texttt{\tiny{[GM$|$GM]}}
+                \texttt{game successful} \\
+            }
+        }
+    }
+    & & \\ \\
+
+    \theutterance \stepcounter{utterance}  
+    & & & \multicolumn{2}{p{0.3\linewidth}}{
+        \cellcolor[rgb]{0.9,0.9,0.9}{
+            \makecell[{{p{\linewidth}}}]{
+                \texttt{\tiny{[GM$|$GM]}}
+                \texttt{end game} \\
+            }
+        }
+    }
+    & & \\ \\
+
+\end{supertabular}
+}
+
+\end{document}
