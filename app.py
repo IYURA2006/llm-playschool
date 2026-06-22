@@ -507,14 +507,38 @@ div:focus, div:focus-visible {
     background: transparent !important; border: none !important;
 }
 
-/* ── Overall Game Quality — vertical list rows ────────────────── */
+/* ── Overall Game Quality — 1–7 slider with labelled endpoints ─── */
+.ovr-slider-ends {
+    display: flex !important; justify-content: space-between !important;
+    gap: 24px !important; margin-bottom: 6px !important;
+}
+.ovr-end {
+    display: flex !important; flex-direction: column !important;
+    flex: 1 1 0 !important; min-width: 0 !important;
+}
+.ovr-end-hi { text-align: right !important; align-items: flex-end !important; }
+.ovr-end-num {
+    font-size: 22px !important; font-weight: 800 !important;
+    color: #e2e8f0 !important; line-height: 1.1 !important;
+}
+.ovr-end-lbl {
+    font-size: 13px !important; font-weight: 700 !important;
+    color: #93c5fd !important; margin-top: 2px !important;
+}
+.ovr-end-desc {
+    font-size: 12px !important; color: #64748b !important;
+    line-height: 1.45 !important; margin-top: 3px !important;
+}
+
+/* ── Rating-scale legend rows (welcome page) ──────────────────── */
 .ovr-row {
     align-items: center !important;
     gap: 14px !important;
-    padding: 10px 6px !important;
+    padding: 8px 6px !important;
     border-bottom: 1px solid #1e293b !important;
     flex-wrap: nowrap !important;
 }
+.ovr-row:last-child { border-bottom: none !important; }
 /* Number badge column */
 .ovr-num {
     flex: 0 0 46px !important; min-width: 46px !important;
@@ -537,36 +561,6 @@ div:focus, div:focus-visible {
     font-size: 13px !important; color: #64748b !important;
     line-height: 1.5 !important; margin: 0 !important;
 }
-/* Select button column */
-.ovr-sel-btn {
-    flex: 0 0 76px !important; min-width: 76px !important;
-    display: flex !important; align-items: center !important;
-    justify-content: center !important; padding: 0 !important;
-}
-.ovr-sel-btn .block, .ovr-sel-btn .wrap {
-    display: flex !important; align-items: center !important;
-    justify-content: center !important; padding: 0 !important;
-}
-.ovr-sel-btn button {
-    width: 100% !important; min-width: unset !important;
-    font-size: 11px !important; font-weight: 600 !important;
-    padding: 5px 10px !important; border-radius: 6px !important;
-    box-shadow: none !important; letter-spacing: 0.02em !important;
-}
-.ovr-btn-err button {
-    border-color: #ef4444 !important;
-    box-shadow: 0 0 0 3px rgba(239,68,68,.15) !important;
-}
-/* Selected row highlight */
-.ovr-row-sel {
-    background: rgba(29, 78, 216, 0.12) !important;
-    border-bottom-color: #1e40af !important;
-    border-left: 3px solid #3b82f6 !important;
-    border-radius: 0 4px 4px 0 !important;
-    padding-left: 3px !important;
-}
-.ovr-row-sel .ovr-label p,
-.ovr-row-sel .ovr-label strong { color: #93c5fd !important; }
 /* Strip block backgrounds inside rows */
 .ovr-row .block, .ovr-row > div > .block {
     background: transparent !important; border: none !important; padding: 0 !important;
@@ -640,12 +634,16 @@ force_dark = """
 </script>
 <script>
 (function () {
-    // Each turn is one annotation card. gr.Group doubles the class onto a
-    // wrapper+inner pair, so the "real" cards are the outer wrappers.
+    // Each turn is one annotation card. Some Gradio versions double the class
+    // onto a wrapper+inner pair; others don't. Either way the "real" cards are
+    // the TOP-LEVEL .turn-anno-card nodes (those with no .turn-anno-card
+    // ancestor), so this works whether or not the class is doubled.
     function panes() {
         return Array.prototype.filter.call(
             document.querySelectorAll('.turn-anno-card'),
-            function (c) { return c.querySelector('.turn-anno-card'); }
+            function (c) {
+                return !(c.parentElement && c.parentElement.closest('.turn-anno-card'));
+            }
         );
     }
     function chips() {
@@ -809,17 +807,27 @@ force_dark = """
 </script>
 """
 
+def _capture_pid(request: gr.Request):
+    # Prolific appends ?PROLIFIC_PID=... to the study URL; stored with each annotation.
+    qp = dict(request.query_params or {})
+    return qp.get("PROLIFIC_PID") or qp.get("prolific_pid") or ""
+
+
 with gr.Blocks() as app:
     # Shared selected-game path; the annotation selector writes it and both the
     # annotation and verdict screens render off it.
     game_state = gr.State(annotation.DEFAULT_GAME)
+    # Annotator identity (Prolific PID), captured from the URL on page load.
+    annotator_state = gr.State("")
 
     welcome_page = gr.Column(visible=True)
     annotation_page = gr.Column(visible=False, elem_id="annot-page")
     verdict_page = gr.Column(visible=False, elem_id="verdict-page")
 
     welcome.build(welcome_page, annotation_page)
-    annotation.build(welcome_page, annotation_page, verdict_page, game_state)
-    annotation_verdict.build(welcome_page, annotation_page, verdict_page, game_state)
+    annotation.build(welcome_page, annotation_page, verdict_page, game_state, annotator_state)
+    annotation_verdict.build(welcome_page, annotation_page, verdict_page, game_state, annotator_state)
+
+    app.load(_capture_pid, inputs=None, outputs=annotator_state)
 
 app.launch(css=css, theme=gr.themes.Soft(), head=force_dark, share=True)

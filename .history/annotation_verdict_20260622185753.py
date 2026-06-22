@@ -1,7 +1,10 @@
 import gradio as gr
+import json
+import os
 
-import db
-from annotation import DEFAULT_GAME, load_game, game_slug
+from annotation import DEFAULT_GAME, load_game, output_path_for
+
+_dir = os.path.dirname(os.path.abspath(__file__))
 
 _COHERENCE = [
     ("1", "No plan",   "Each move seems disconnected from the last — no consistent logic across turns."),
@@ -39,7 +42,7 @@ def _coh_select(chosen):
     return (*_col_updates(_COHERENCE, chosen), *_btn_updates(_COHERENCE, chosen), chosen)
 
 
-def _save_verdict(game_path, annotator_id, coherence, overall, comment):
+def _save_verdict(game_path, coherence, overall, comment):
     c_err = not coherence
 
     if c_err:
@@ -48,21 +51,31 @@ def _save_verdict(game_path, annotator_id, coherence, overall, comment):
             *_col_updates(_COHERENCE, coherence, err=c_err),
         )
 
-    slug = game_slug(game_path or DEFAULT_GAME)
-    ok = db.save_verdict(slug, annotator_id, coherence, int(overall), comment or "")
-    if not ok:
+    output_path = output_path_for(game_path or DEFAULT_GAME)
+    try:
+        with open(output_path) as f:
+            saved = json.load(f)
+    except FileNotFoundError:
         return (
             "⚠️ Turn annotations not found. Please complete Step 1 first.",
             *_col_updates(_COHERENCE, coherence),
         )
 
+    saved["overall_verdict"] = {
+        "strategic_coherence": coherence,
+        "overall_rating": str(int(overall)),
+        "comment": comment or "",
+    }
+    with open(output_path, "w") as f:
+        json.dump(saved, f, indent=2)
+
     return (
-        "✅ Verdict saved.",
+        f"✅ Verdict saved to {os.path.relpath(output_path, _dir)}",
         *_col_updates(_COHERENCE, coherence),
     )
 
 
-def build(welcome_page, annotation_page, verdict_page, game_state, annotator_state):
+def build(welcome_page, annotation_page, verdict_page, game_state):
     with verdict_page:
 
         # ── TOP NAV ───────────────────────────────────────────────────
@@ -154,7 +167,7 @@ def build(welcome_page, annotation_page, verdict_page, game_state, annotator_sta
 
         submit_btn.click(
             fn=_save_verdict,
-            inputs=[game_state, annotator_state, coherence, overall, comment],
+            inputs=[game_state, coherence, overall, comment],
             outputs=[status, *coh_cols],
         )
 
