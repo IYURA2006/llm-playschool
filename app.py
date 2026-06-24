@@ -97,15 +97,18 @@ div:focus, div:focus-visible {
     color: #3b82f6; letter-spacing: .08em;
     margin-bottom: 6px;
 }
-.goal-text { font-size: 13px; color: #374151; line-height: 1.5; margin: 0; white-space: pre-line; }
+/* These three sit on the permanently-light .tx-col panel, so their dark text
+   colours need !important to survive the forced dark theme on HF Spaces —
+   otherwise Gradio's --body-text-color turns them near-white (invisible). */
+.goal-text { font-size: 13px; color: #374151 !important; line-height: 1.5; margin: 0; white-space: pre-line; }
 .gm-msg {
-    font-size: 12px; color: #6b7280;
+    font-size: 12px; color: #6b7280 !important;
     padding: 5px 10px; margin: 6px 0;
     border-left: 2px solid #cbd5e1;
     line-height: 1.5;
     white-space: pre-line;
 }
-.gm-tag { font-weight: 700; color: #94a3b8; font-size: 10px; letter-spacing: .06em; margin-right: 4px; }
+.gm-tag { font-weight: 700; color: #94a3b8 !important; font-size: 10px; letter-spacing: .06em; margin-right: 4px; }
 .turn-card {
     background: #1e3a5f;
     border: 2px solid transparent;
@@ -143,11 +146,11 @@ div:focus, div:focus-visible {
 }
 .card-body { font-size: 13px; line-height: 1.65; color: #e2e8f0; white-space: pre-wrap; }
 .correct-msg {
-    background: #ecfdf5; color: #065f46;
+    background: #ecfdf5; color: #065f46 !important;
     padding: 8px 12px; border-radius: 6px;
     font-size: 13px; margin: 8px 0;
 }
-.game-end-msg { text-align: center; color: #9ca3af; font-size: 13px; padding: 10px 0; }
+.game-end-msg { text-align: center; color: #9ca3af !important; font-size: 13px; padding: 10px 0; }
 .game-win-msg {
     text-align: center;
     background: #052e16; border: 1px solid #166534; border-radius: 8px;
