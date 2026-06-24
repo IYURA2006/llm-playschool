@@ -79,6 +79,10 @@ def init_db():
 def backup_db_to_hf():
     """Best-effort push of annotations.db to the HF dataset repo. Never raises."""
     if not _HF_TOKEN:
+        # Loud, because a missing token silently drops every annotation: the
+        # annotator sees "saved" while nothing reaches the HF dataset backup.
+        print("⚠️ HF backup SKIPPED: HF_TOKEN is not set — annotation NOT persisted "
+              "to the HF dataset. Set HF_TOKEN in the Space's Repository secrets.")
         return
     try:
         # Flush WAL into the main file so the upload is complete (WAL mode).
@@ -98,7 +102,12 @@ def backup_db_to_hf():
 
 def _restore_db_from_hf():
     """If no local DB exists, pull the last backup from the HF dataset repo."""
-    if os.path.exists(DB_PATH) or not _HF_TOKEN:
+    if os.path.exists(DB_PATH):
+        return
+    if not _HF_TOKEN:
+        print("⚠️ HF restore SKIPPED: HF_TOKEN is not set — starting with an empty DB "
+              "and annotations will NOT be backed up. Set HF_TOKEN in the Space's "
+              "Repository secrets.")
         return
     try:
         from huggingface_hub import hf_hub_download
@@ -207,5 +216,7 @@ def save_verdict(game_slug, annotator_id, coherence, overall, comment):
     return ok
 
 
+print(f"🗄️  DB config: HF_TOKEN={'set' if _HF_TOKEN else 'MISSING'}, "
+      f"HF_DATASET_REPO={HF_DATASET_REPO}")
 _restore_db_from_hf()   # pull backup first (no-op if local DB present)
 init_db()               # then ensure schema exists (CREATE TABLE IF NOT EXISTS)
