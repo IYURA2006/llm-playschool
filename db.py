@@ -8,11 +8,26 @@ SQLite's same-thread restriction. WAL mode allows concurrent writers.
 
 import json
 import os
+import shutil
 import sqlite3
 from datetime import datetime
 
+from dotenv import load_dotenv
+
+# Load secrets from a local .env (gitignored) for local dev. On an HF Space the
+# vars come from the Space's Settings -> Repository secrets, and load_dotenv is a
+# harmless no-op there since no .env file is present.
+load_dotenv()
+
 _dir = os.path.dirname(os.path.abspath(__file__))
 DB_PATH = os.path.join(_dir, "annotations.db")
+
+# HF Dataset backup target. An HF Space has an ephemeral filesystem, so the local
+# annotations.db is wiped on every restart. We mirror it to a private HF dataset
+# repo after each verdict submit and restore it on startup. Set HF_DATASET_REPO
+# and HF_TOKEN (write access) in .env locally / the Space's Repository secrets.
+HF_DATASET_REPO = os.environ.get("HF_DATASET_REPO", "yuriiilnytskyi/playschool-annotations")
+_HF_TOKEN = os.environ.get("HF_TOKEN")
 
 _SCHEMA = """
 CREATE TABLE IF NOT EXISTS annotations (
@@ -59,6 +74,44 @@ def _connect():
 def init_db():
     with _connect() as conn:
         conn.executescript(_SCHEMA)
+
+
+def backup_db_to_hf():
+    """Best-effort push of annotations.db to the HF dataset repo. Never raises."""
+    if not _HF_TOKEN:
+        return
+    try:
+        # Flush WAL into the main file so the upload is complete (WAL mode).
+        with _connect() as conn:
+            conn.execute("PRAGMA wal_checkpoint(TRUNCATE)")
+        from huggingface_hub import HfApi
+        HfApi(token=_HF_TOKEN).upload_file(
+            path_or_fileobj=DB_PATH,
+            path_in_repo="annotations.db",
+            repo_id=HF_DATASET_REPO,
+            repo_type="dataset",
+        )
+    except Exception as e:
+        # Never let a backup failure break the annotator's submit flow.
+        print(f"⚠️ HF backup failed: {e}")
+
+
+def _restore_db_from_hf():
+    """If no local DB exists, pull the last backup from the HF dataset repo."""
+    if os.path.exists(DB_PATH) or not _HF_TOKEN:
+        return
+    try:
+        from huggingface_hub import hf_hub_download
+        downloaded = hf_hub_download(
+            repo_id=HF_DATASET_REPO,
+            filename="annotations.db",
+            repo_type="dataset",
+            token=_HF_TOKEN,
+        )
+        shutil.copy(downloaded, DB_PATH)
+        print("✅ Restored annotations.db from HF dataset backup")
+    except Exception as e:
+        print(f"No existing HF backup found, starting fresh: {e}")
 
 
 def save_turns(game_slug, meta, source_path, has_reasoning, annotator_id, turns_out):
@@ -146,7 +199,13 @@ def save_verdict(game_slug, annotator_id, coherence, overall, comment):
             """,
             (coherence, overall, comment, now, now, game_slug, annotator_id),
         )
-        return cur.rowcount > 0
+        ok = cur.rowcount > 0
+    # save_turns wrote the turn rows before this verdict step, so backing up now
+    # captures both turns and verdict in a single push.
+    if ok:
+        backup_db_to_hf()
+    return ok
 
 
-init_db()
+_restore_db_from_hf()   # pull backup first (no-op if local DB present)
+init_db()               # then ensure schema exists (CREATE TABLE IF NOT EXISTS)

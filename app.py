@@ -744,7 +744,21 @@ force_dark = """
         var host = document.getElementById('annot-page');
         if (!host || !window.MutationObserver) return;
         var debounceTimer, retryIv;
-        new MutationObserver(function () {
+        // Only react to a genuine re-render (cards/chips added or removed).
+        // refresh() itself rewrites the .prog-rated text node, which is a
+        // childList mutation too — reacting to that would loop forever (blinking).
+        function isStructural(muts) {
+            function has(nodes) {
+                return Array.prototype.some.call(nodes, function (n) {
+                    return n.nodeType === 1 && n.matches &&
+                        (n.matches('.turn-anno-card, .tn-chip') ||
+                         (n.querySelector && n.querySelector('.turn-anno-card, .tn-chip')));
+                });
+            }
+            return muts.some(function (m) { return has(m.addedNodes) || has(m.removedNodes); });
+        }
+        new MutationObserver(function (muts) {
+            if (!isStructural(muts)) return;
             // Debounce rapid mutations (Gradio fires many during render)
             clearTimeout(debounceTimer);
             clearInterval(retryIv);
@@ -830,4 +844,11 @@ with gr.Blocks() as app:
 
     app.load(_capture_pid, inputs=None, outputs=annotator_state)
 
-app.launch(css=css, theme=gr.themes.Soft(), head=force_dark, share=True)
+# System fonts so first paint needs no remote Google Fonts fetch (slow over the
+# gradio.live share tunnel). Must be gr.themes.Font objects, not plain strings —
+# Gradio compares theme fonts via .name and a bare str crashes that check.
+theme = gr.themes.Soft(
+    font=[gr.themes.Font(f) for f in ("system-ui", "-apple-system", "Segoe UI", "sans-serif")],
+    font_mono=[gr.themes.Font(f) for f in ("ui-monospace", "SFMono-Regular", "monospace")],
+)
+app.launch(css=css, theme=theme, head=force_dark, share=True)
