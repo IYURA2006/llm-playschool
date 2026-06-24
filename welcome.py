@@ -100,6 +100,6 @@ def build(welcome_page, annotation_page):
 
             gr.Markdown(
                 "By continuing you confirm you are a registered Prolific participant "
-                "and have read these instructions.",
+                "and have read these instructions",
                 elem_classes=["welcome-foot"],
             )
