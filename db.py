@@ -27,6 +27,11 @@ DB_PATH = os.path.join(_dir, "annotations.db")
 # repo after each verdict submit and restore it on startup. Set HF_DATASET_REPO
 # and HF_TOKEN (write access) in .env locally / the Space's Repository secrets.
 HF_DATASET_REPO = os.environ.get("HF_DATASET_REPO", "yuriiilnytskyi/playschool-annotations")
+# Pilot Space secrets set HF_PILOT_DATASET_REPO to a separate, throwaway dataset
+# repo so 2 days of pilot test data never lands in the production dataset above.
+# Unset (main branch / no pilot Space) => falls back to HF_DATASET_REPO, so this
+# is a no-op change in behavior anywhere but the pilot Space.
+HF_DATASET_REPO = os.environ.get("HF_PILOT_DATASET_REPO", HF_DATASET_REPO)
 _HF_TOKEN = os.environ.get("HF_TOKEN")
 
 _SCHEMA = """
@@ -38,13 +43,21 @@ CREATE TABLE IF NOT EXISTS annotations (
     source_path TEXT,
     has_reasoning INTEGER,
     annotator_id TEXT NOT NULL DEFAULT '',
+    condition TEXT,
+    session_day TEXT,
+    session_started_at TEXT,
+    started_at TEXT,
     annotated_at TEXT,
     strategic_coherence TEXT,
     overall_rating INTEGER,
     verdict_comment TEXT,
     verdict_at TEXT,
+    survey_fit TEXT,
+    survey_fatigue TEXT,
+    survey_confidence TEXT,
+    survey_comment TEXT,
     updated_at TEXT,
-    UNIQUE(game_slug, annotator_id)
+    UNIQUE(game_slug, annotator_id, condition)
 );
 
 CREATE TABLE IF NOT EXISTS turn_ratings (
@@ -59,6 +72,7 @@ CREATE TABLE IF NOT EXISTS turn_ratings (
     reasoning_clarity TEXT,
     flags TEXT,
     comment TEXT,
+    extra_responses TEXT,
     UNIQUE(annotation_id, turn_index)
 );
 """
@@ -71,9 +85,70 @@ def _connect():
     return conn
 
 
+def _migrate_pilot_schema(conn):
+    """One-time upgrade for pre-pilot annotations.db files: add `condition` /
+    `extra_responses` and widen the annotations UNIQUE key to include
+    `condition` (so the same annotator+game under a different pilot block
+    doesn't silently overwrite prior data). No-op once already migrated;
+    SQLite can't ALTER a UNIQUE constraint in place, hence the table rebuild.
+    """
+    cols = {row[1] for row in conn.execute("PRAGMA table_info(annotations)")}
+    if "condition" in cols:
+        return  # already migrated (or a fresh pilot DB, created with the schema above)
+
+    conn.execute("ALTER TABLE annotations ADD COLUMN condition TEXT")
+    turn_cols = {row[1] for row in conn.execute("PRAGMA table_info(turn_ratings)")}
+    if "extra_responses" not in turn_cols:
+        conn.execute("ALTER TABLE turn_ratings ADD COLUMN extra_responses TEXT")
+
+    conn.execute("""
+        CREATE TABLE annotations_new (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            game_slug TEXT NOT NULL,
+            game_id INTEGER,
+            game_name TEXT,
+            source_path TEXT,
+            has_reasoning INTEGER,
+            annotator_id TEXT NOT NULL DEFAULT '',
+            condition TEXT,
+            annotated_at TEXT,
+            strategic_coherence TEXT,
+            overall_rating INTEGER,
+            verdict_comment TEXT,
+            verdict_at TEXT,
+            updated_at TEXT,
+            UNIQUE(game_slug, annotator_id, condition)
+        )
+    """)
+    conn.execute("""
+        INSERT INTO annotations_new
+            (id, game_slug, game_id, game_name, source_path, has_reasoning,
+             annotator_id, condition, annotated_at, strategic_coherence,
+             overall_rating, verdict_comment, verdict_at, updated_at)
+        SELECT id, game_slug, game_id, game_name, source_path, has_reasoning,
+               annotator_id, condition, annotated_at, strategic_coherence,
+               overall_rating, verdict_comment, verdict_at, updated_at
+        FROM annotations
+    """)
+    conn.execute("DROP TABLE annotations")
+    conn.execute("ALTER TABLE annotations_new RENAME TO annotations")
+
+
+def _migrate_ab_columns(conn):
+    """Additive columns for the internal A/B pilot: session timing and the
+    per-game questions-fit micro-survey. Safe to run repeatedly."""
+    cols = {row[1] for row in conn.execute("PRAGMA table_info(annotations)")}
+    for col in ("session_day", "session_started_at", "started_at", "survey_fit",
+                "survey_fatigue", "survey_confidence", "survey_comment"):
+        if col not in cols:
+            conn.execute(f"ALTER TABLE annotations ADD COLUMN {col} TEXT")
+
+
 def init_db():
     with _connect() as conn:
         conn.executescript(_SCHEMA)
+        _migrate_pilot_schema(conn)
+        _migrate_ab_columns(conn)
 
 
 def backup_db_to_hf():
@@ -123,23 +198,30 @@ def _restore_db_from_hf():
         print(f"No existing HF backup found, starting fresh: {e}")
 
 
-def save_turns(game_slug, meta, source_path, has_reasoning, annotator_id, turns_out):
+def save_turns(game_slug, meta, source_path, has_reasoning, annotator_id, condition,
+               turns_out, started_at=None, session_day=None, session_started_at=None):
     """Upsert the annotation row and replace its turn ratings. Returns annotation id."""
     now = datetime.now().isoformat()
     annotator_id = annotator_id or ""
+    condition = condition or ""
     with _connect() as conn:
         cur = conn.cursor()
         cur.execute(
             """
             INSERT INTO annotations
                 (game_slug, game_id, game_name, source_path, has_reasoning,
-                 annotator_id, annotated_at, updated_at)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-            ON CONFLICT(game_slug, annotator_id) DO UPDATE SET
+                 annotator_id, condition, session_day, session_started_at,
+                 started_at, annotated_at, updated_at)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            ON CONFLICT(game_slug, annotator_id, condition) DO UPDATE SET
                 game_id=excluded.game_id,
                 game_name=excluded.game_name,
                 source_path=excluded.source_path,
                 has_reasoning=excluded.has_reasoning,
+                session_day=excluded.session_day,
+                session_started_at=COALESCE(annotations.session_started_at,
+                                            excluded.session_started_at),
+                started_at=COALESCE(annotations.started_at, excluded.started_at),
                 annotated_at=excluded.annotated_at,
                 updated_at=excluded.updated_at
             """,
@@ -150,13 +232,17 @@ def save_turns(game_slug, meta, source_path, has_reasoning, annotator_id, turns_
                 source_path,
                 1 if has_reasoning else 0,
                 annotator_id,
+                condition,
+                session_day,
+                session_started_at,
+                started_at,
                 now,
                 now,
             ),
         )
         cur.execute(
-            "SELECT id FROM annotations WHERE game_slug=? AND annotator_id=?",
-            (game_slug, annotator_id),
+            "SELECT id FROM annotations WHERE game_slug=? AND annotator_id=? AND condition=?",
+            (game_slug, annotator_id, condition),
         )
         annotation_id = cur.fetchone()[0]
 
@@ -166,8 +252,8 @@ def save_turns(game_slug, meta, source_path, has_reasoning, annotator_id, turns_
             INSERT INTO turn_ratings
                 (annotation_id, turn_index, from_player, role, content,
                  prior_information_use, strategic_logic, reasoning_clarity,
-                 flags, comment)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                 flags, comment, extra_responses)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             """,
             [
                 (
@@ -181,20 +267,40 @@ def save_turns(game_slug, meta, source_path, has_reasoning, annotator_id, turns_
                     t["reasoning_clarity"],
                     json.dumps(t["flags"]),
                     t["comment"],
+                    json.dumps(t["extra_responses"]) if t.get("extra_responses") else None,
                 )
                 for t in turns_out
             ],
         )
+    # Pilot: back up on every turn submission (not just the final verdict), so
+    # a session abandoned mid-way is still captured within the shortened window.
+    backup_db_to_hf()
     return annotation_id
 
 
-def save_verdict(game_slug, annotator_id, coherence, overall, comment):
+def completed_pairs(annotator_id):
+    """{(game_slug, condition)} this annotator has fully finished (verdict
+    submitted). Drives the welcome form's resume logic — a game with turns
+    saved but no verdict counts as not done and will be redone."""
+    with _connect() as conn:
+        rows = conn.execute(
+            "SELECT game_slug, condition FROM annotations "
+            "WHERE annotator_id=? AND verdict_at IS NOT NULL",
+            (annotator_id or "",),
+        ).fetchall()
+    return {(r[0], r[1]) for r in rows}
+
+
+def save_verdict(game_slug, annotator_id, condition, coherence, overall, comment,
+                 survey_fit=None, survey_fatigue=None, survey_confidence=None,
+                 survey_comment=None):
     """Update the verdict columns of an existing annotation row.
 
     Returns True if a matching row existed (turns submitted first), else False.
     """
     now = datetime.now().isoformat()
     annotator_id = annotator_id or ""
+    condition = condition or ""
     with _connect() as conn:
         cur = conn.execute(
             """
@@ -203,14 +309,20 @@ def save_verdict(game_slug, annotator_id, coherence, overall, comment):
                 overall_rating=?,
                 verdict_comment=?,
                 verdict_at=?,
+                survey_fit=?,
+                survey_fatigue=?,
+                survey_confidence=?,
+                survey_comment=?,
                 updated_at=?
-            WHERE game_slug=? AND annotator_id=?
+            WHERE game_slug=? AND annotator_id=? AND condition=?
             """,
-            (coherence, overall, comment, now, now, game_slug, annotator_id),
+            (coherence, overall, comment, now, survey_fit, survey_fatigue,
+             survey_confidence, survey_comment, now, game_slug, annotator_id,
+             condition),
         )
         ok = cur.rowcount > 0
-    # save_turns wrote the turn rows before this verdict step, so backing up now
-    # captures both turns and verdict in a single push.
+    # save_turns already backs up; back up again here so the verdict fields
+    # (submitted after turns, in a separate step) are captured too.
     if ok:
         backup_db_to_hf()
     return ok
