@@ -116,6 +116,10 @@ more games to fix.
    - `HF_PILOT_DATASET_REPO` — a **separate throwaway dataset repo** (e.g.
      `yuriiilnytskyi/playschool-pilot-annotations`; create it first) so test
      data never lands in the production dataset.
+   The pilot branch reads **only** `HF_PILOT_DATASET_REPO` — it never falls
+   back to the production dataset. If the secret is unset, cloud backup and
+   restore are disabled outright and annotations live only in the Space's
+   ephemeral local DB (they vanish on restart), so set it before Day 1.
 3. Push the `pilot` branch to GitHub — `.github/workflows/sync_to_hub.yml`
    auto-deploys `pilot` → the pilot Space (and `main` → production, as before).
    No GitHub? Push directly:

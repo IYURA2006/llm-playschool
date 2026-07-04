@@ -806,8 +806,18 @@ force_dark = """
         else if (e.key === 'End') { goTo(n - 1, true); e.preventDefault(); }
     }
 
+    // Ready only once every chip AND every card has actually mounted. Chips
+    // render as one atomic gr.HTML block of exactly n_turns chips, so their
+    // count never partially updates — comparing counts is a reliable "fully
+    // painted" signal, unlike "at least one of each" (see the retry loop
+    // below for why that weaker check is unsafe).
+    function ready() {
+        var p = panes(), c = chips();
+        return p.length > 0 && p.length === c.length;
+    }
+
     function init() {
-        if (!panes().length || !chips().length) return false;
+        if (!ready()) return false;
         wireAria();
         document.addEventListener('click', onClick);
         document.addEventListener('keydown', onKey);
@@ -830,8 +840,17 @@ force_dark = """
     // observer callback rather than a single fixed timeout — this guarantees
     // refresh() is only called once BOTH cards AND chips are in the DOM.
     (function () {
-        var host = document.getElementById('annot-page');
-        if (!host || !window.MutationObserver) return;
+        if (!window.MutationObserver) return;
+        // Observe document.documentElement (<html>), NOT #annot-page: this
+        // whole head script runs while <head> is still parsing, before
+        // Gradio has mounted ANYTHING — annotation_page starts life as a
+        // hidden gr.Column, which Gradio 6 lazily mounts, so
+        // getElementById('annot-page') reliably returns null at this point.
+        // An observer built on that null host was silently never attached,
+        // so every later @gr.render swap (e.g. "Next game") went unwatched
+        // and its cards were stranded at whatever raw display Svelte left
+        // them at. <html> always exists, even mid-parse, so observing it
+        // from the start needs no existence check or retry of its own.
         var debounceTimer, retryIv;
         // Only react to a genuine re-render (cards/chips added or removed).
         // refresh() itself rewrites the .prog-rated text node, which is a
@@ -852,10 +871,15 @@ force_dark = """
             clearTimeout(debounceTimer);
             clearInterval(retryIv);
             debounceTimer = setTimeout(function () {
-                // Poll until both annotation panes and nav chips exist
+                // Poll until every card AND every chip has mounted — NOT just
+                // "at least one of each". @gr.render streams a long game's
+                // turn cards into the DOM one at a time; firing as soon as
+                // the first couple exist would refresh() against a half-built
+                // page, permanently stranding every later card at its default
+                // (visible) display since nothing revisits them afterward.
                 var attempts = 0;
                 retryIv = setInterval(function () {
-                    if (panes().length && chips().length) {
+                    if (ready()) {
                         clearInterval(retryIv);
                         wireAria();
                         current = 0;
@@ -865,7 +889,7 @@ force_dark = """
                     }
                 }, 50);
             }, 80);
-        }).observe(host, { childList: true, subtree: true });
+        }).observe(document.documentElement, { childList: true, subtree: true });
     })();
 })();
 </script>

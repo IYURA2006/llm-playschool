@@ -10,6 +10,7 @@ import json
 import os
 import shutil
 import sqlite3
+import threading
 from datetime import datetime
 
 from dotenv import load_dotenv
@@ -24,14 +25,15 @@ DB_PATH = os.path.join(_dir, "annotations.db")
 
 # HF Dataset backup target. An HF Space has an ephemeral filesystem, so the local
 # annotations.db is wiped on every restart. We mirror it to a private HF dataset
-# repo after each verdict submit and restore it on startup. Set HF_DATASET_REPO
-# and HF_TOKEN (write access) in .env locally / the Space's Repository secrets.
-HF_DATASET_REPO = os.environ.get("HF_DATASET_REPO", "yuriiilnytskyi/playschool-annotations")
-# Pilot Space secrets set HF_PILOT_DATASET_REPO to a separate, throwaway dataset
-# repo so 2 days of pilot test data never lands in the production dataset above.
-# Unset (main branch / no pilot Space) => falls back to HF_DATASET_REPO, so this
-# is a no-op change in behavior anywhere but the pilot Space.
-HF_DATASET_REPO = os.environ.get("HF_PILOT_DATASET_REPO", HF_DATASET_REPO)
+# repo after each submit and restore it on startup.
+#
+# THIS BRANCH ONLY READS HF_PILOT_DATASET_REPO — never HF_DATASET_REPO. The old
+# fallback to the production dataset meant any local run with the developer's
+# .env (which holds a live write token and no pilot var) silently overwrote the
+# production backup with local test data — this actually happened once and had
+# to be restored from the HF dataset's commit history. Unset => backup/restore
+# are disabled outright; the pilot branch must never be able to touch production.
+HF_DATASET_REPO = os.environ.get("HF_PILOT_DATASET_REPO")
 _HF_TOKEN = os.environ.get("HF_TOKEN")
 
 _SCHEMA = """
@@ -82,6 +84,10 @@ def _connect():
     conn = sqlite3.connect(DB_PATH)
     conn.execute("PRAGMA journal_mode=WAL")
     conn.execute("PRAGMA foreign_keys=ON")
+    # WAL allows only one writer; without a busy_timeout a second concurrent
+    # writer (two annotators submitting at once) gets SQLITE_BUSY immediately,
+    # which propagates as an uncaught OperationalError and the save is lost.
+    conn.execute("PRAGMA busy_timeout=10000")
     return conn
 
 
@@ -151,33 +157,66 @@ def init_db():
         _migrate_ab_columns(conn)
 
 
+# Serializes snapshot+upload: concurrent submits must not interleave uploads
+# (stale-over-fresh races) or snapshot while another backup is mid-flight.
+_backup_lock = threading.Lock()
+
+
 def backup_db_to_hf():
     """Best-effort push of annotations.db to the HF dataset repo. Never raises."""
+    if not HF_DATASET_REPO:
+        print("⚠️ HF backup DISABLED: HF_PILOT_DATASET_REPO is not set — the pilot "
+              "branch never writes the production dataset. Annotations live only "
+              "in the local annotations.db until the secret is configured.")
+        return
     if not _HF_TOKEN:
         # Loud, because a missing token silently drops every annotation: the
         # annotator sees "saved" while nothing reaches the HF dataset backup.
         print("⚠️ HF backup SKIPPED: HF_TOKEN is not set — annotation NOT persisted "
               "to the HF dataset. Set HF_TOKEN in the Space's Repository secrets.")
         return
-    try:
-        # Flush WAL into the main file so the upload is complete (WAL mode).
-        with _connect() as conn:
-            conn.execute("PRAGMA wal_checkpoint(TRUNCATE)")
-        from huggingface_hub import HfApi
-        HfApi(token=_HF_TOKEN).upload_file(
-            path_or_fileobj=DB_PATH,
-            path_in_repo="annotations.db",
-            repo_id=HF_DATASET_REPO,
-            repo_type="dataset",
-        )
-    except Exception as e:
-        # Never let a backup failure break the annotator's submit flow.
-        print(f"⚠️ HF backup failed: {e}")
+    snapshot = DB_PATH + ".hfsnapshot"
+    with _backup_lock:
+        try:
+            # Point-in-time copy via the sqlite3 backup API. Uploading the live
+            # file (the old approach) races SQLite's automatic checkpoints —
+            # a concurrent commit can rewrite the main file mid-upload, giving
+            # the HF copy torn pages or missing the newest WAL-only commits.
+            src = _connect()
+            try:
+                dst = sqlite3.connect(snapshot)
+                try:
+                    src.backup(dst)
+                finally:
+                    dst.close()
+            finally:
+                src.close()
+            from huggingface_hub import HfApi
+            HfApi(token=_HF_TOKEN).upload_file(
+                path_or_fileobj=snapshot,
+                path_in_repo="annotations.db",
+                repo_id=HF_DATASET_REPO,
+                repo_type="dataset",
+            )
+        except Exception as e:
+            # Never let a backup failure break the annotator's submit flow.
+            print(f"⚠️ HF backup failed: {e}")
+        finally:
+            for suffix in ("", "-wal", "-shm"):
+                try:
+                    os.remove(snapshot + suffix)
+                except OSError:
+                    pass
 
 
 def _restore_db_from_hf():
     """If no local DB exists, pull the last backup from the HF dataset repo."""
     if os.path.exists(DB_PATH):
+        return
+    if not HF_DATASET_REPO:
+        print("⚠️ HF restore DISABLED: HF_PILOT_DATASET_REPO is not set — starting "
+              "with an empty local DB; the pilot branch never reads the "
+              "production dataset.")
         return
     if not _HF_TOKEN:
         print("⚠️ HF restore SKIPPED: HF_TOKEN is not set — starting with an empty DB "
@@ -219,9 +258,9 @@ def save_turns(game_slug, meta, source_path, has_reasoning, annotator_id, condit
                 source_path=excluded.source_path,
                 has_reasoning=excluded.has_reasoning,
                 session_day=excluded.session_day,
-                session_started_at=COALESCE(annotations.session_started_at,
-                                            excluded.session_started_at),
-                started_at=COALESCE(annotations.started_at, excluded.started_at),
+                session_started_at=COALESCE(excluded.session_started_at,
+                                            annotations.session_started_at),
+                started_at=COALESCE(excluded.started_at, annotations.started_at),
                 annotated_at=excluded.annotated_at,
                 updated_at=excluded.updated_at
             """,
@@ -329,6 +368,6 @@ def save_verdict(game_slug, annotator_id, condition, coherence, overall, comment
 
 
 print(f"🗄️  DB config: HF_TOKEN={'set' if _HF_TOKEN else 'MISSING'}, "
-      f"HF_DATASET_REPO={HF_DATASET_REPO}")
+      f"HF_PILOT_DATASET_REPO={HF_DATASET_REPO or 'UNSET — cloud backup/restore disabled'}")
 _restore_db_from_hf()   # pull backup first (no-op if local DB present)
 init_db()               # then ensure schema exists (CREATE TABLE IF NOT EXISTS)

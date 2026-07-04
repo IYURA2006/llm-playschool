@@ -585,7 +585,7 @@ def build(welcome_page, annotation_page, verdict_page, game_state, annotator_sta
                     gr.HTML(_build_transcript_html(g, 0, pretty_map=pretty_map))
 
                 # RIGHT: per-turn annotation cards
-                with gr.Column(scale=2, elem_id="annot-col"):
+                with gr.Column(scale=2, elem_id="annot-col", key=f"annot-col-{g.slug}"):
                     gr.HTML(_turn_nav_html(g))
 
                     # Flat, ordered list of every input component created below,
@@ -599,7 +599,21 @@ def build(welcome_page, annotation_page, verdict_page, game_state, annotator_sta
                         role = g.role(sender)
                         role_cfg = (bespoke or {}).get("roles", {}).get(role, {})
 
-                        with gr.Group(elem_classes=["turn-anno-card"]):
+                        # Every stateful widget below gets an explicit `key=`
+                        # scoped to THIS game's slug. Gradio 6 otherwise matches
+                        # components across @gr.render re-renders by tree
+                        # position — this key makes each (game, turn, slot) a
+                        # distinct component per Gradio's documented `key=`
+                        # contract. NOTE: confirmed by isolated repro that this
+                        # alone does NOT fully stop a known Gradio 6.15.2 issue
+                        # where a same-position Radio can retain a stale
+                        # cross-game value internally (invisible in the UI,
+                        # still submitted) when switching games mid-playlist —
+                        # see the flagged follow-up: a real fix needs an
+                        # intermediate empty re-render to force a full
+                        # unmount/remount, which hasn't been implemented yet.
+                        kbase = f"{g.slug}-t{i}"
+                        with gr.Group(elem_classes=["turn-anno-card"], key=kbase):
                             gr.HTML(_card_header_html(g, i))
 
                             # Q1 slot: "generic" (default) = universal widget,
@@ -610,12 +624,14 @@ def build(welcome_page, annotation_page, verdict_page, game_state, annotator_sta
                                 q1 = gr.Radio(
                                     choices=[("1\nNone", "1"), ("2\nPartial", "2"), ("3\nGood", "3"), ("4\nExcellent", "4")],
                                     show_label=False, elem_classes=["scale-radio", "q1-scale"],
+                                    key=f"{kbase}-q1",
                                 )
                                 components.append(q1); field_specs.append((i, "q1"))
                             elif q1_cfg is not None:
                                 label_md, choices = q1_cfg
                                 gr.Markdown(label_md)
-                                q1 = gr.Radio(choices=choices, show_label=False, elem_classes=["scale-radio", "q1-scale"])
+                                q1 = gr.Radio(choices=choices, show_label=False,
+                                              elem_classes=["scale-radio", "q1-scale"], key=f"{kbase}-q1")
                                 components.append(q1); field_specs.append((i, "q1"))
 
                             # Q2 slot — same generic/None/bespoke pattern.
@@ -625,18 +641,21 @@ def build(welcome_page, annotation_page, verdict_page, game_state, annotator_sta
                                 q2 = gr.Radio(
                                     choices=[("1\nNonsensical", "1"), ("2\nPoor", "2"), ("3\nReasonable", "3"), ("4\nStrong", "4")],
                                     show_label=False, elem_classes=["scale-radio", "q2-scale"],
+                                    key=f"{kbase}-q2",
                                 )
                                 components.append(q2); field_specs.append((i, "q2"))
                             elif q2_cfg is not None:
                                 label_md, choices = q2_cfg
                                 gr.Markdown(label_md)
-                                q2 = gr.Radio(choices=choices, show_label=False, elem_classes=["scale-radio", "q2-scale"])
+                                q2 = gr.Radio(choices=choices, show_label=False,
+                                              elem_classes=["scale-radio", "q2-scale"], key=f"{kbase}-q2")
                                 components.append(q2); field_specs.append((i, "q2"))
 
                             # Bespoke bolt-on(s) — additive, beyond the Q1/Q2 slots.
                             for key, label_md, choices in role_cfg.get("bolt_ons", []):
                                 gr.Markdown(label_md)
-                                bolt = gr.Radio(choices=choices, show_label=False, elem_classes=["scale-radio"])
+                                bolt = gr.Radio(choices=choices, show_label=False,
+                                                elem_classes=["scale-radio"], key=f"{kbase}-bolt-{key}")
                                 components.append(bolt); field_specs.append((i, "extra", key))
 
                             # Q3 — unchanged, existing conditional pattern (reused,
@@ -646,23 +665,25 @@ def build(welcome_page, annotation_page, verdict_page, game_state, annotator_sta
                                 q3 = gr.Radio(
                                     choices=[("1\nUnclear", "1"), ("2\nConfused", "2"), ("3\nClear", "3"), ("4\nTransparent", "4"), ("N/A", "NA")],
                                     show_label=False, elem_classes=["scale-radio", "q3-scale"],
+                                    key=f"{kbase}-q3",
                                 )
                             else:
-                                q3 = gr.Radio(choices=[("N/A", "NA")], value="NA", visible=False, show_label=False)
+                                q3 = gr.Radio(choices=[("N/A", "NA")], value="NA", visible=False,
+                                              show_label=False, key=f"{kbase}-q3")
                             components.append(q3); field_specs.append((i, "q3"))
 
                             flag_choices = (bespoke.get("flags") if bespoke and bespoke.get("flags") else g.flag_choices)
                             gr.HTML('<div class="flags-lbl">Flags <span class="flags-sub">— tick all that apply</span></div>')
                             fl = gr.CheckboxGroup(
                                 choices=flag_choices, show_label=False,
-                                elem_classes=["flags-check"],
+                                elem_classes=["flags-check"], key=f"{kbase}-flags",
                             )
                             components.append(fl); field_specs.append((i, "flags"))
 
                             cm = gr.Textbox(
                                 placeholder="Optional turn comment…",
                                 show_label=False, lines=2,
-                                elem_classes=["turn-comment"],
+                                elem_classes=["turn-comment"], key=f"{kbase}-comment",
                             )
                             components.append(cm); field_specs.append((i, "comment"))
 
