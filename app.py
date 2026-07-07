@@ -104,12 +104,17 @@ div:focus, div:focus-visible {
 }
 .txscroll {
     padding: 16px 18px;
-    /* !important so the fixed viewport-height cap can't be relaxed by a
-       later Gradio/theme rule on HF (same cascade-order hazard as the chips
-       above); without the cap the transcript column grows with its content
-       instead of scrolling. Mirrors #annot-col, which already forces these. */
+    /* The px cap in min() is load-bearing on HF Spaces. HF embeds the app in an
+       iframe sized to the app's OWN content (Gradio auto-resize, scrolling=no),
+       so inside it `100vh` == the iframe height == our content height, not the
+       browser window. A bare `calc(100vh - 150px)` then feeds back: the taller
+       the transcript, the taller 100vh, the taller this box — it grows to fit
+       instead of scrolling ("infinitely going down"). min(…, 680px) clamps it
+       to a fixed 680px, which breaks the loop (the app then reports a stable
+       height and the iframe settles), while `calc(100vh - 150px)` still wins on
+       a real, smaller viewport (direct *.hf.space URL / short laptop). */
     overflow-y: auto !important;
-    height: calc(100vh - 150px) !important;
+    height: min(calc(100vh - 150px), 680px) !important;
 }
 .goal-box {
     background: #e8f0fe;
@@ -198,7 +203,9 @@ div:focus, div:focus-visible {
     background: #0a0e1a !important;
     border-radius: 10px !important;
     padding: 10px 12px !important;
-    height: calc(100vh - 150px) !important;
+    /* min(…,680px): same HF auto-resize-iframe trap as .txscroll — a bare 100vh
+       grows with content and the two columns must stay the same fixed height. */
+    height: min(calc(100vh - 150px), 680px) !important;
     overflow-y: auto !important;
     /* Gradio's .column is flex-wrap:wrap — with a fixed height, children
        taller than the box WRAP INTO A SECOND COLUMN off to the right
@@ -500,16 +507,6 @@ div:focus, div:focus-visible {
 }
 .flags-check label:hover { border-color: #3b82f6 !important; }
 
-/* ── Pilot feedback: "how many questions didn't fit" reveal ───── */
-/* Shown only when fit-flag-radio is answered "Yes" — toggled client-side
-   (see the head script below), not via a Gradio .change() event: a live
-   .change() here reliably hung the UI in a permanent "processing" spinner
-   on Gradio 6.15.2 (no server error, the update never resolved on the
-   frontend) — every other purely-cosmetic show/hide in this app already
-   goes through JS instead of a round-trip, for the same reason. */
-.fit-count-radio { display: none !important; }
-.fit-count-radio.fc-visible { display: block !important; }
-
 /* ── Comment textbox ──────────────────────────────────────────── */
 /* Strip the Gradio outer wrapper so only the textarea colour shows */
 .turn-comment,
@@ -754,13 +751,19 @@ div:focus, div:focus-visible {
 }
 
 /* ── Training (practice round) page ───────────────────────────── */
-#train-col { background: #0a0e1a !important; border-radius: 10px !important; padding: 10px 12px !important; }
+#train-col { background: #0a0e1a !important; border-radius: 10px !important; padding: 10px 12px !important;
+    /* Match the annotation page: fixed, self-scrolling column (see .txscroll for
+       why the min() px cap is required inside HF's content-sized iframe). */
+    height: min(calc(100vh - 150px), 680px) !important; overflow-y: auto !important; }
 #train-col label { color: #cbd5e1 !important; }
 #train-col .prose strong, #train-col p strong { color: #e2e8f0 !important; }
 #train-col .prose p, #train-col p { color: #64748b !important; font-size: 12px !important; margin: 2px 0 6px !important; }
-/* Training transcript scrolls in its own class so the annotation page's
-   height-sync JS (which targets .txscroll) never touches it. */
-.train-txscroll { padding: 16px 18px; overflow-y: auto; max-height: 78vh; }
+/* Training transcript: its own class so it can be styled independently of the
+   annotation page's .txscroll. Same fixed height + min() px cap as .txscroll so
+   practice matches the real page and stays bounded inside HF's iframe (a bare
+   78vh grew to fill content there, so practice was "limitless" too). */
+.train-txscroll { padding: 16px 18px; overflow-y: auto !important;
+    height: min(calc(100vh - 150px), 680px) !important; }
 /* Practice card — same wrapper+inner doubling handling as .turn-anno-card */
 .train-card:has(.train-card) {
     background: #0e1a30 !important;
@@ -1034,29 +1037,6 @@ force_dark = """
             }, 80);
         }).observe(document.documentElement, { childList: true, subtree: true });
     })();
-})();
-</script>
-<script>
-(function () {
-    // Pilot-feedback "how many questions didn't fit" follow-up: reveal
-    // .fit-count-radio only while .fit-flag-radio is answered "Yes". Pure
-    // client-side toggle (see app.py's CSS comment for why this isn't a
-    // Gradio .change() event) — a MutationObserver (not just a 'change'
-    // listener) is used because a programmatic reset (gr.update(value=None)
-    // on "Next game") may not dispatch a real DOM 'change' event.
-    function syncFitCount() {
-        var checked = document.querySelector('.fit-flag-radio input[type=radio]:checked');
-        var countEl = document.querySelector('.fit-count-radio');
-        if (countEl) countEl.classList.toggle('fc-visible', !!(checked && checked.value === 'yes'));
-    }
-    document.addEventListener('change', syncFitCount);
-    if (window.MutationObserver) {
-        new MutationObserver(syncFitCount).observe(document.documentElement, {
-            attributes: true, attributeFilter: ['aria-checked', 'checked'],
-            childList: true, subtree: true,
-        });
-    }
-    syncFitCount();
 })();
 </script>
 """

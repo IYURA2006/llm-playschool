@@ -241,11 +241,40 @@ def load_game(path):
                 break
     rules = rules or "(no rules text found)"
 
+    # ── Drop parse-error retry duplicates (clean_up) ──────────────────────
+    # When a player's response is rejected for a format error (clean_up's
+    # "message must not contain anything before the command" penalty), clembench
+    # re-prompts and the model answers again — and logs BOTH the rejected attempt
+    # and the accepted retry as label=="response". That surfaced as two adjacent
+    # near-duplicate turn cards: the fuller reasoning attempt, then the bare
+    # corrected resend of the same SAY. We keep the FULLER original (team call —
+    # it strictly contains the retry's text, since the only thing stripped is the
+    # reasoning "head") and drop the accepted retry. Detected structurally (a GM
+    # parse_error between a response and the SAME player's very next response), so
+    # it only ever fires where such a retry actually happened (today: clean_up).
+    def _retry_dupe_ids():
+        flat = [m for turn in turns for m in turn]
+        resp = [i for i, m in enumerate(flat)
+                if m["from"] in ai_ids and m["action"].get("label") == "response"]
+        drop = set()
+        for k in range(1, len(resp)):
+            prev, cur = flat[resp[k - 1]], flat[resp[k]]
+            if prev["from"] != cur["from"]:
+                continue
+            window = flat[resp[k - 1] + 1:resp[k]]
+            if any(w["from"] == "GM" and w["action"].get("type") == "parse_error"
+                   for w in window):
+                drop.add(id(cur))
+        return drop
+
+    skip_ids = _retry_dupe_ids()
+
     # ── Collect AI turns (only genuine AI players, in transcript order) ──
     ai_turns = []
     for turn in turns:
         for msg in turn:
-            if msg["from"] in ai_ids and msg["action"].get("label") == "response":
+            if (msg["from"] in ai_ids and msg["action"].get("label") == "response"
+                    and id(msg) not in skip_ids):
                 ai_turns.append(msg)
 
     # ── Detect whether this game has explicit reasoning/explanation text ──
@@ -271,6 +300,9 @@ def load_game(path):
     g.rules = rules
     g.ai_turns = ai_turns
     g.n_turns = len(ai_turns)
+    # Response messages to NOT render as turn cards — kept in sync with the
+    # ai_turns filter above so transcript turn_counter matches ai_turns indices.
+    g.skip_msg_ids = skip_ids
     # question_set.md fixes Q3's trigger by GAME ("Shown when: Game requires
     # an explanation (Wordle family, Dond)") — the marker heuristic alone
     # misses Dond, whose negotiation prose explains itself without the exact
@@ -733,6 +765,11 @@ def _build_transcript_html(g, current_idx, pretty_map=False,
 
             # Genuine AI player response → render as a turn card
             if label == "response":
+                # Skip parse-error retry duplicates (see load_game). Must skip
+                # WITHOUT bumping turn_counter so the tc-N card ids stay aligned
+                # with ai_turns indices (the annotation cards / nav depend on it).
+                if id(msg) in getattr(g, "skip_msg_ids", set()):
+                    continue
                 active = turn_counter == current_idx
                 slot = _player_slots.get(sender, "p1")
                 card_cls = f"turn-card {slot}" + (" active-turn" if active else "")

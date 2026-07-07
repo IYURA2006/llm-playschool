@@ -22,9 +22,6 @@ _OVERALL_RATINGS = [
     ("7", "Flawless",  "The AI played as well as a skilled human would. Every move was sharp and purposeful."),
 ]
 
-_FIT_COUNT_CHOICES = [("1", "1"), ("2", "2"), ("3+", "3+")]
-
-
 def _col_updates(options, chosen, err=False):
     return [
         gr.update(elem_classes=["coh-col", "coh-col-sel"] if v == chosen
@@ -60,15 +57,15 @@ def _action_label(playlist, playlist_idx):
     """The merged save/advance button's label depends on where we are in the
     playlist — known at render time (no need to wait for a click)."""
     if not playlist:
-        return "💾 Save Verdict"
+        return "Save Verdict"
     if playlist_idx + 1 >= len(playlist):
-        return "🏁 Save & Finish Study"
-    return "💾 Save & Next Game →"
+        return "Save & Finish Study"
+    return "Save & Next Game →"
 
 
 def _verdict_save_and_clear(game_path, annotator_id, condition, playlist, playlist_idx,
                             coherence, overall, overall_touched, comment,
-                            confidence, fit_flag, fit_count, fb_comment):
+                            confidence, fit_flag, fb_comment):
     """Step 1 of the merged action button: validate + persist, AND (only if
     that succeeds and another playlist game remains) blank/reset every
     verdict widget in the SAME event — mirroring the old _next_game_clear,
@@ -100,7 +97,7 @@ def _verdict_save_and_clear(game_path, annotator_id, condition, playlist, playli
             _overall_update(err=True),
             gr.skip(), gr.skip(),                     # overall_touched, comment
             _survey_update(confidence, err=True),
-            gr.skip(), gr.skip(), gr.skip(),          # fit_flag, fit_count, survey_comment
+            gr.skip(), gr.skip(),                     # fit_flag, survey_comment
             False,                                    # verdict_ok_state
         )
 
@@ -109,7 +106,6 @@ def _verdict_save_and_clear(game_path, annotator_id, condition, playlist, playli
         slug, annotator_id, condition, coherence, int(overall), comment or "",
         survey_confidence=confidence, survey_comment=fb_comment or "",
         survey_fit_missing=fit_flag or "",
-        survey_fit_missing_count=(fit_count if fit_flag == "yes" else ""),
     )
     if not ok:
         return (
@@ -120,7 +116,7 @@ def _verdict_save_and_clear(game_path, annotator_id, condition, playlist, playli
             _overall_update(err=False),
             gr.skip(), gr.skip(),
             _survey_update(confidence, err=False),
-            gr.skip(), gr.skip(), gr.skip(),
+            gr.skip(), gr.skip(),
             False,
         )
 
@@ -142,7 +138,6 @@ def _verdict_save_and_clear(game_path, annotator_id, condition, playlist, playli
             "",                            # verdict comment
             gr.update(value=None, elem_classes=["scale-radio"]),  # confidence
             gr.update(value=None),                         # fit_flag
-            gr.update(value=None),                         # fit_count
             "",                            # survey comment
             True,                          # verdict_ok_state
         )
@@ -157,7 +152,7 @@ def _verdict_save_and_clear(game_path, annotator_id, condition, playlist, playli
         _overall_update(err=False),
         gr.skip(), gr.skip(),
         _survey_update(confidence, err=False),
-        gr.skip(), gr.skip(), gr.skip(),
+        gr.skip(), gr.skip(),
         True,
     )
 
@@ -305,20 +300,9 @@ def build(welcome_page, annotation_page, verdict_page, session_survey_page,
                 show_label=False, elem_classes=["scale-radio"],
             )
             gr.Markdown("Was there a question that didn't really fit this game? *(optional)*")
-            # fit_count's reveal-on-"Yes" is done client-side (app.py's head
-            # script toggles the .fc-visible class) rather than via a Gradio
-            # .change() event — a live .change() here reliably hung the UI in
-            # a permanent "processing" spinner on Gradio 6.15.2 (no server
-            # error, the update never resolved on the frontend). Every other
-            # conditional-show/hide in this app already goes through JS, not
-            # a round-trip, for exactly this kind of pure-cosmetic toggle.
             fit_flag = gr.Radio(
-                choices=[("No", "no"), ("Yes", "yes")],
-                show_label=False, elem_classes=["scale-radio", "fit-flag-radio"],
-            )
-            fit_count = gr.Radio(
-                choices=_FIT_COUNT_CHOICES, show_label=False,
-                elem_classes=["scale-radio", "fit-count-radio"],
+                choices=[("1", "1"), ("2", "2"), ("3", "3"), ("4", "4"), ("5", "5")],
+                show_label=False, elem_classes=["scale-radio"],
             )
             survey_comment = gr.Textbox(
                 placeholder="Anything confusing or missing in the questions or the app? (optional)",
@@ -345,11 +329,6 @@ def build(welcome_page, annotation_page, verdict_page, session_survey_page,
 
         overall.release(fn=lambda: True, outputs=[overall_touched])
 
-        fit_flag.change(
-            fn=lambda v: gr.update(visible=(v == "yes")),
-            inputs=[fit_flag], outputs=[fit_count],
-        )
-
         # ONE button now does what used to take two clicks: validate+save
         # (and, if continuing, blank every verdict widget) in ONE event, then
         # (chained via .then) advance to the next game / route to the new
@@ -362,10 +341,10 @@ def build(welcome_page, annotation_page, verdict_page, session_survey_page,
             fn=_verdict_save_and_clear,
             inputs=[game_state, annotator_state, block_state, playlist_state,
                     playlist_idx_state, coherence, overall, overall_touched,
-                    comment, survey_confidence, fit_flag, fit_count, survey_comment],
+                    comment, survey_confidence, fit_flag, survey_comment],
             outputs=[status, clearing_state, coherence, *coh_cols, *coh_btns,
                      overall, overall_touched, comment, survey_confidence,
-                     fit_flag, fit_count, survey_comment, verdict_ok_state],
+                     fit_flag, survey_comment, verdict_ok_state],
         ).then(
             fn=_verdict_finish,
             inputs=[verdict_ok_state, playlist_state, playlist_idx_state],
