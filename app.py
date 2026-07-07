@@ -1145,7 +1145,25 @@ def _capture_session_params(request: gr.Request):
             "", playlist, idx, day)
 
 
-with gr.Blocks() as app:
+# System fonts so first paint needs no remote Google Fonts fetch (slow over the
+# gradio.live share tunnel). Must be gr.themes.Font objects, not plain strings —
+# Gradio compares theme fonts via .name and a bare str crashes that check.
+theme = gr.themes.Soft(
+    font=[gr.themes.Font(f) for f in ("system-ui", "-apple-system", "Segoe UI", "sans-serif")],
+    font_mono=[gr.themes.Font(f) for f in ("ui-monospace", "SFMono-Regular", "monospace")],
+)
+
+# css / theme / head go on the Blocks CONSTRUCTOR, not launch(). Gradio 6 moved
+# these to launch(), but launch()-time values are only baked into the page by
+# the exact launch() call that receives them. Running `python app.py` locally
+# runs our launch() verbatim, so it worked there — but Hugging Face Spaces (and
+# `gradio app.py` reload mode) start the discovered `app` Blocks with their own
+# launch() call, dropping our kwargs. That left the page with no CSS (transcript
+# column grew unbounded) and no head <script> (turn-nav JS never ran, so every
+# turn's card stacked and you were stuck on turn 1). Set on the constructor,
+# Gradio stores them as self._deprecated_{css,theme,head}, and whatever launch()
+# runs falls back to those — so they survive HF's launch path.
+with gr.Blocks(css=css, theme=theme, head=force_dark) as app:
     # Shared selected-game path; the URL params write it and both the
     # annotation and verdict screens render off it.
     game_state = gr.State(annotation.DEFAULT_GAME)
@@ -1211,11 +1229,4 @@ with gr.Blocks() as app:
               outputs=[annotator_state, block_state, game_state, error_state,
                        playlist_state, playlist_idx_state, session_day_state])
 
-# System fonts so first paint needs no remote Google Fonts fetch (slow over the
-# gradio.live share tunnel). Must be gr.themes.Font objects, not plain strings —
-# Gradio compares theme fonts via .name and a bare str crashes that check.
-theme = gr.themes.Soft(
-    font=[gr.themes.Font(f) for f in ("system-ui", "-apple-system", "Segoe UI", "sans-serif")],
-    font_mono=[gr.themes.Font(f) for f in ("ui-monospace", "SFMono-Regular", "monospace")],
-)
-app.launch(css=css, theme=theme, head=force_dark, share=True)
+app.launch(share=True)
