@@ -14,7 +14,7 @@ from datetime import datetime
 
 import gradio as gr
 
-from annotation import load_game, _build_transcript_html, _card_header_html
+from annotation import load_game, _build_transcript_html, _card_header_html, _turn_nav_html
 
 _dir = os.path.dirname(os.path.abspath(__file__))
 
@@ -165,11 +165,15 @@ def build(welcome_page, training_page, annotation_page, started_at_state):
                                                scroll_cls="train-txscroll",
                                                id_prefix="ttc-"))
 
-            # RIGHT: all practice turns stacked (short game — no pagination)
+            # RIGHT: one practice turn at a time, same chip navigator as the
+            # real annotation page — "turn-anno-card" is what app.py's JS
+            # (panes()/chips()) targets, "train-card" only adds practice-only
+            # styling on top of it.
             with gr.Column(scale=2, elem_id="train-col"):
+                gr.HTML(_turn_nav_html(g))
                 radios, feedbacks = [], []
                 for i in range(g.n_turns):
-                    with gr.Group(elem_classes=["train-card"]):
+                    with gr.Group(elem_classes=["train-card", "turn-anno-card"]):
                         gr.HTML(_card_header_html(g, i))
                         gr.Markdown(_Q1_MD)
                         q1 = gr.Radio(choices=_SCALE_Q1, show_label=False,

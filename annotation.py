@@ -1,9 +1,11 @@
 import gradio as gr
+import ast
 import functools
 import glob
 import html
 import json
 import os
+import re
 
 import db
 
@@ -269,7 +271,14 @@ def load_game(path):
     g.rules = rules
     g.ai_turns = ai_turns
     g.n_turns = len(ai_turns)
-    g.has_reasoning = _detect_reasoning(ai_turns)
+    # question_set.md fixes Q3's trigger by GAME ("Shown when: Game requires
+    # an explanation (Wordle family, Dond)") — the marker heuristic alone
+    # misses Dond, whose negotiation prose explains itself without the exact
+    # marker words (1 of 4 turns hit; threshold needs half). Game list first,
+    # heuristic as the catch-all for anything else that visibly reasons.
+    game_key = os.path.relpath(path, _games_dir).split(os.sep)[0]
+    _REASONING_GAMES = {"wordle", "wordle_withclue", "wordle_withcritic", "dond"}
+    g.has_reasoning = game_key in _REASONING_GAMES or _detect_reasoning(ai_turns)
     g.multi_role = len(ai_ids) > 1
     g.flag_choices = [
         "Repeated a previous failed move",
@@ -284,8 +293,278 @@ def load_game(path):
 
 
 # ──────────────────────────────────────────────────────────────────────────
+# TEXTMAPWORLD (GRAPH REASONING) MAP RENDERER
+# Per question_set.md's "updated, detailed version": each turn card shows the
+# map the model has CLAIMED so far, validated against what its walk actually
+# revealed — green ring = claimed correctly, red = claimed wrongly (and stays
+# red until the claim is fixed), dashed blue ring = current position.
+# ──────────────────────────────────────────────────────────────────────────
+
+_DIR_VEC = {"north": (0, -1), "south": (0, 1), "east": (1, 0), "west": (-1, 0)}
+_DIR_OPP = {"north": "south", "south": "north", "east": "west", "west": "east"}
+
+
+def _parse_map_response(content):
+    """Parse the model's `{"action": …, "graph": …}` reply, or None.
+
+    The models write edge lists as Python tuples — `[("A", "B")]` — which is
+    NOT valid JSON, so json.loads alone rejects almost every real turn (this
+    is why the old pretty-print path silently fell back to raw text). Try
+    JSON first, then a Python-literal parse.
+    """
+    if not isinstance(content, str) or "graph" not in content:
+        return None
+    for parse in (json.loads, ast.literal_eval):
+        try:
+            d = parse(content.strip())
+        except (ValueError, SyntaxError, MemoryError, RecursionError):
+            continue
+        if isinstance(d, dict) and isinstance(d.get("graph"), dict):
+            return d
+    return None
+
+
+def _map_truth_and_layout(g):
+    """Walk the full transcript once; return (snapshots, positions).
+
+    snapshots[i] = ground truth OBSERVED BY THE MODEL up to (not including)
+    its i-th response: visited rooms, directed true edges (both directions),
+    and the room it stood in when it answered. Built from the GM's `move`
+    records paired with the model's own `GO: <dir>` actions — the env only
+    reveals the map by walking, so this is exactly what the model could know.
+
+    positions = one stable full-game grid layout {room: (x, y)} derived from
+    the true walk's compass directions, so rooms don't jump around between
+    turn cards. Hallucinated (never-visited) rooms are placed later, per
+    claim, in _map_svg.
+    """
+    snapshots = []
+    visited, edges = set(), set()
+    current = None
+    moves = []          # (old, dir_or_None, new) in walk order
+    resp_dir = None     # direction of the response in the current round
+
+    for round_msgs in g.data["turns"]:
+        for msg in round_msgs:
+            a = msg["action"]
+            if msg["from"] in g.ai_ids and a.get("label") == "response":
+                d = _parse_map_response(a.get("content"))
+                m = re.search(r"GO:\s*(north|south|east|west)",
+                              str((d or {}).get("action", "")), re.I)
+                resp_dir = m.group(1).lower() if m else None
+                if current is None and d:
+                    nodes = d["graph"].get("nodes") or []
+                    if nodes:  # the env told the model its start room
+                        current = str(nodes[0])
+                        visited.add(current)
+                snapshots.append({"visited": set(visited),
+                                  "edges": set(edges),
+                                  "current": current})
+            elif msg["from"] == "GM" and a.get("type") == "move":
+                try:
+                    mv = json.loads(a.get("content", ""))
+                except (ValueError, TypeError):
+                    continue
+                old, new = str(mv.get("old")), str(mv.get("new"))
+                visited.update((old, new))
+                if resp_dir:
+                    edges.add((old, resp_dir, new))
+                    edges.add((new, _DIR_OPP[resp_dir], old))
+                moves.append((old, resp_dir, new))
+                current = new
+
+    pos = {}
+
+    def _place(room, cand):
+        while cand in pos.values():          # two rooms claim the same cell
+            cand = (cand[0] + 0.45, cand[1] + 0.35)
+        pos[room] = cand
+
+    if moves:
+        _place(moves[0][0], (0, 0))
+    elif current:
+        _place(current, (0, 0))
+    for old, d, new in moves:
+        if old not in pos:
+            _place(old, (0, 0))
+        if new not in pos:
+            vec = _DIR_VEC.get(d, (1, 1))
+            _place(new, (pos[old][0] + vec[0], pos[old][1] + vec[1]))
+    return snapshots, pos
+
+
+def _map_svg(claim, snap, pos_global):
+    """Inline SVG of one turn's claimed map, or None if there is nothing to draw."""
+    graph = claim.get("graph", {})
+    nodes = [str(n) for n in (graph.get("nodes") or []) if str(n).strip()]
+    if not nodes:
+        return None
+
+    claimed = []        # (a, dir, b) as the model asserted them
+    for d, pairs in (graph.get("edges") or {}).items():
+        d = str(d).lower()
+        for pr in (pairs or []):
+            if isinstance(pr, (list, tuple)) and len(pr) == 2:
+                claimed.append((str(pr[0]), d, str(pr[1])))
+
+    # ── Place nodes: true-walk grid first, then hallucinated rooms next to
+    # whichever claimed neighbour is already placed, else parked below. ──
+    pos = {n: pos_global[n] for n in nodes if n in pos_global}
+
+    def _free(cand):
+        while cand in pos.values():
+            cand = (cand[0] + 0.45, cand[1] + 0.35)
+        return cand
+
+    for n in nodes:
+        if n in pos:
+            continue
+        for a, d, b in claimed:
+            if d not in _DIR_VEC:
+                continue
+            if a == n and b in pos:
+                vx, vy = _DIR_VEC[_DIR_OPP[d]]
+                pos[n] = _free((pos[b][0] + vx, pos[b][1] + vy))
+                break
+            if b == n and a in pos:
+                vx, vy = _DIR_VEC[d]
+                pos[n] = _free((pos[a][0] + vx, pos[a][1] + vy))
+                break
+        else:
+            bottom = max((y for _, y in pos.values()), default=0)
+            pos[n] = _free((0, bottom + 1.4))
+
+    # ── Scale grid → pixels ──
+    SX, SY, R = 92, 84, 13
+    xs = [p[0] for p in pos.values()]
+    ys = [p[1] for p in pos.values()]
+    minx, miny = min(xs), min(ys)
+    px = {n: ((x - minx) * SX + 46, (y - miny) * SY + 34) for n, (x, y) in pos.items()}
+    w = int(max(x for x, _ in px.values()) + 46)
+    h = int(max(y for _, y in px.values()) + 44)
+
+    parts = []
+    # Edges (drawn first, deduped to one line per room pair): solid grey when
+    # the walk verified the claim, dashed red when the model asserts a
+    # connection its own experience never showed it.
+    seen_pairs = {}
+    for a, d, b in claimed:
+        if a not in px or b not in px:
+            continue
+        key = frozenset((a, b))
+        ok = (a, d, b) in snap["edges"]
+        seen_pairs[key] = seen_pairs.get(key, True) and ok
+    for key, ok in seen_pairs.items():
+        a, b = tuple(key) if len(key) == 2 else (next(iter(key)),) * 2
+        (x1, y1), (x2, y2) = px[a], px[b]
+        style = ('stroke="#8b98ab" stroke-width="1.6"' if ok else
+                 'stroke="#ef4444" stroke-width="1.6" stroke-dasharray="5 4"')
+        parts.append(f'<line x1="{x1:.0f}" y1="{y1:.0f}" x2="{x2:.0f}" y2="{y2:.0f}" {style} opacity="0.85"/>')
+
+    # Nodes: ring colour = claim correctness; dashed outer ring = current room.
+    for n, (x, y) in px.items():
+        colour = "#22c55e" if n in snap["visited"] else "#ef4444"
+        if n == snap["current"]:
+            parts.append(f'<circle cx="{x:.0f}" cy="{y:.0f}" r="{R + 6}" fill="none" '
+                         f'stroke="#3b82f6" stroke-width="2" stroke-dasharray="4 4"/>')
+        parts.append(f'<circle cx="{x:.0f}" cy="{y:.0f}" r="{R}" fill="#0e1a30" '
+                     f'stroke="{colour}" stroke-width="2.5"/>')
+        parts.append(f'<text x="{x:.0f}" y="{y + R + 15:.0f}" text-anchor="middle" '
+                     f'font-size="10.5" font-weight="600" fill="#dbe4f0">{html.escape(n)}</text>')
+
+    return (f'<svg class="map-svg" viewBox="0 0 {w} {h}" width="{w}" height="{h}" '
+            f'xmlns="http://www.w3.org/2000/svg" role="img" '
+            f'aria-label="Map claimed by the AI this turn">{"".join(parts)}</svg>')
+
+
+_MAP_LEGEND_HTML = (
+    '<div class="map-legend">'
+    '<span><svg width="14" height="14" viewBox="0 0 14 14"><circle cx="7" cy="7" r="5" '
+    'fill="none" stroke="#22c55e" stroke-width="2.5"/></svg> claimed correctly</span>'
+    '<span><svg width="14" height="14" viewBox="0 0 14 14"><circle cx="7" cy="7" r="5" '
+    'fill="none" stroke="#ef4444" stroke-width="2.5"/></svg> claimed wrongly</span>'
+    '<span><svg width="14" height="14" viewBox="0 0 14 14"><circle cx="7" cy="7" r="5.5" '
+    'fill="none" stroke="#3b82f6" stroke-width="1.8" stroke-dasharray="3 2.4"/></svg> current position</span>'
+    '<span><svg width="20" height="14" viewBox="0 0 20 14"><line x1="1" y1="7" x2="19" y2="7" '
+    'stroke="#ef4444" stroke-width="1.8" stroke-dasharray="4 3"/></svg> unverified connection</span>'
+    '</div>'
+)
+
+
+# ──────────────────────────────────────────────────────────────────────────
 # HTML BUILDERS  (pure functions of a loaded game `g`)
 # ──────────────────────────────────────────────────────────────────────────
+
+# Characters that make up ASCII board art (clean_up's box-drawing grids,
+# imagegame/referencegame's ▢ grids).
+_GRID_CHARS = set("╔╗╚╝║═╟╢╤╧┼┤├┬┴┌┐└┘─│◌▢")
+_GRID_OBJ_RE = re.compile(r"(?<![A-Za-z])([A-Z])(?![A-Za-z])")
+
+
+def _is_grid_line(ln):
+    """A real board ROW is mostly grid characters — prose that merely
+    mentions one (e.g. "…must only contain the symbol '◌'.") is not. The
+    density test is what keeps such sentences flowing inline instead of
+    getting frozen into a no-wrap monospace block."""
+    n = sum(1 for ch in ln if ch in _GRID_CHARS)
+    if n < 4:
+        return False
+    non_space = sum(1 for ch in ln if not ch.isspace())
+    return n / non_space >= 0.5
+
+
+def _grid_block(lines):
+    """One aligned, monospace board block; single capital letters (the game
+    objects annotators must track — C/L/P, X/R…) get a highlight span."""
+    body = _GRID_OBJ_RE.sub(r'<span class="grid-obj">\1</span>',
+                            html.escape("\n".join(lines)))
+    return f'<pre class="ascii-grid">{body}</pre>'
+
+
+def _rich_content_html(text):
+    """html.escape + proper rendering for board art.
+
+    The transcript containers use white-space:pre-line/pre-wrap with a
+    proportional font, which (a) collapses runs of spaces and (b) gives every
+    glyph a different width — both destroy grid alignment (clean_up's board
+    was unreadable, see the pilot feedback). Fenced (```) blocks that contain
+    board rows, and unfenced runs of board rows, are re-emitted as an
+    .ascii-grid <pre>; fence markers are dropped either way. Fenced PROSE
+    stays ordinary wrapping text — freezing it into a no-wrap block forced
+    horizontal scrolling. Everything is escaped in all paths.
+    """
+    parts, plain, block = [], [], []
+    in_fence = False
+
+    def flush_plain():
+        if plain:
+            parts.append(html.escape("\n".join(plain)))
+            plain.clear()
+
+    def flush_block():
+        if block:
+            if any(_is_grid_line(ln) for ln in block):
+                parts.append(_grid_block(block))
+            else:
+                parts.append(html.escape("\n".join(block)))
+            block.clear()
+
+    for ln in str(text).split("\n"):
+        if ln.strip().startswith("```"):
+            flush_block() if in_fence else flush_plain()
+            in_fence = not in_fence
+            continue
+        if in_fence or _is_grid_line(ln):
+            if not in_fence and plain:
+                flush_plain()
+            block.append(ln)
+        else:
+            flush_block()
+            plain.append(ln)
+    flush_plain()
+    flush_block()
+    return "".join(parts)
+
 
 def _progress_html(g, rated):
     return (
@@ -340,13 +619,21 @@ def _build_transcript_html(g, current_idx, pretty_map=False,
     parts = []
     turn_counter = 0  # index over AI-player response turns only
 
-    goal_text = html.escape(g.rules.strip())
+    goal_text = _rich_content_html(g.rules.strip())
     parts.append(
         f'<div class="goal-box">'
         f'<div class="goal-label">GAME GOAL</div>'
         f'<div class="goal-text">{goal_text}</div>'
         f'</div>'
     )
+
+    # TextMapWorld (Graph Reasoning) map renderer state: ground truth as the
+    # walker revealed it, per turn, plus one stable room layout — see
+    # _map_truth_and_layout. Only computed in hybrid mode (pretty_map).
+    map_snapshots, map_grid = ([], {})
+    if pretty_map:
+        map_snapshots, map_grid = _map_truth_and_layout(g)
+        parts.append(_MAP_LEGEND_HTML)
 
     # messages from turn 0 that are pure setup (the long rules prompt) — skip in body
     _turn0_setup = set()
@@ -365,7 +652,7 @@ def _build_transcript_html(g, current_idx, pretty_map=False,
             if pid in g.ai_ids and pid not in _player_slots:
                 _player_slots[pid] = _slot_names[min(len(_player_slots), len(_slot_names) - 1)]
 
-    for round_msgs in g.data["turns"]:
+    for round_idx, round_msgs in enumerate(g.data["turns"]):
         for msg in round_msgs:
             sender = msg["from"]
             action = msg["action"]
@@ -418,15 +705,28 @@ def _build_transcript_html(g, current_idx, pretty_map=False,
                 # ── Skip non-string content and setup messages ──
                 if not isinstance(content, str):
                     continue
-                if content in _turn0_setup:
+                # Scoped to round 0 only: this content-equality check exists to
+                # hide turn-0's setup lines (the rules prompt), but games like
+                # TextMapWorld re-send an earlier round's exact text as later
+                # context (e.g. a room description first appears as the
+                # programmatic describer's round-0 response, then again as GM
+                # context at the start of round 1) — matching it everywhere,
+                # not just within round 0, silently dropped that legitimate
+                # later context.
+                if round_idx == 0 and content in _turn0_setup:
                     continue
 
                 # ── Contextual GM messages shown to players ──
                 if label == "context":
+                    # With the map rendered on every turn card, the GM's echo
+                    # of the model's own {"action", "graph"} JSON is pure
+                    # noise — drop it (hybrid/pretty_map mode only).
+                    if pretty_map and _parse_map_response(content):
+                        continue
                     tag = "GM" if sender == "GM" else html.escape(g.role(sender))
                     parts.append(
                         f'<div class="gm-msg">'
-                        f'<span class="gm-tag">{tag}</span> {html.escape(content)}'
+                        f'<span class="gm-tag">{tag}</span> {_rich_content_html(content)}'
                         f'</div>'
                     )
                 continue
@@ -437,24 +737,30 @@ def _build_transcript_html(g, current_idx, pretty_map=False,
                 slot = _player_slots.get(sender, "p1")
                 card_cls = f"turn-card {slot}" + (" active-turn" if active else "")
 
-                # Hybrid-mode TextMapWorld (Graph Reasoning): the AI's raw content
-                # is already `{"action": ..., "graph": {...}}` — pretty-print the
-                # claimed map instead of showing the compact JSON blob verbatim.
-                # Universal mode deliberately skips this (see BESPOKE_QUESTIONS
-                # docstring) so the mismatch with generic questions is visible.
-                body_html = html.escape(str(content))
+                # TextMapWorld (Graph Reasoning): draw the model's claimed map
+                # as an SVG graph, validated against its own walk (green/red
+                # rings, dashed ring = current position — see the renderer
+                # block above). Shown in BOTH conditions — only the questions
+                # differ between universal and hybrid, not the visualization.
+                body_html = _rich_content_html(str(content))
                 if pretty_map and isinstance(content, str):
-                    try:
-                        parsed = json.loads(content)
-                    except ValueError:
-                        parsed = None
-                    if isinstance(parsed, dict) and "graph" in parsed:
+                    parsed = _parse_map_response(content)
+                    if parsed:
                         action_txt = html.escape(str(parsed.get("action", "")))
-                        graph_txt = html.escape(json.dumps(parsed["graph"], indent=2))
-                        body_html = (
-                            f'<div><strong>Action:</strong> {action_txt}</div>'
-                            f'<pre style="white-space:pre-wrap;margin-top:6px;">{graph_txt}</pre>'
-                        )
+                        snap = (map_snapshots[turn_counter]
+                                if turn_counter < len(map_snapshots) else None)
+                        svg = _map_svg(parsed, snap, map_grid) if snap else None
+                        if svg:
+                            body_html = (
+                                f'<div class="map-action"><strong>Action:</strong> {action_txt}</div>'
+                                f'<div class="map-wrap">{svg}</div>'
+                            )
+                        else:
+                            graph_txt = html.escape(json.dumps(parsed["graph"], indent=2, default=list))
+                            body_html = (
+                                f'<div class="map-action"><strong>Action:</strong> {action_txt}</div>'
+                                f'<pre style="white-space:pre-wrap;margin-top:6px;">{graph_txt}</pre>'
+                            )
 
                 # Show just the sender ID in the card header — clean and unambiguous.
                 parts.append(
@@ -536,7 +842,7 @@ def _submit(g, field_specs, condition, annotator_id, started_at, session_day,
 
 def build(welcome_page, annotation_page, verdict_page, game_state, annotator_state,
           block_state, playlist_state, playlist_idx_state, started_at_state,
-          session_day_state, session_started_at_state):
+          session_day_state, session_started_at_state, clearing_state):
     with annotation_page:
 
         # The whole page body re-renders whenever `game` or `block` change
@@ -544,13 +850,25 @@ def build(welcome_page, annotation_page, verdict_page, game_state, annotator_sta
         # makes game loading URL-driven instead of the old static DEFAULT_GAME
         # build. app.py's MutationObserver already re-initialises the JS turn
         # navigator/progress counter whenever this swaps the cards.
-        @gr.render(inputs=[game_state, block_state, playlist_state, playlist_idx_state])
-        def _render_annotation(path, block, playlist, playlist_idx):
+        @gr.render(inputs=[game_state, block_state, playlist_state,
+                           playlist_idx_state, clearing_state])
+        def _render_annotation(path, block, playlist, playlist_idx, clearing):
+            # Blank intermediate render: while clearing_state is True (the
+            # first half of a game switch — see app.py where the state is
+            # defined) render NOTHING so every widget fully unmounts before
+            # the next game's widgets mount. This is what prevents Gradio
+            # from carrying user-entered values across games.
+            if clearing or not path:
+                return
             g = load_game(path)
             block_type = BLOCK_TO_TYPE.get(block, "universal")
             game_key = g.slug.split("__", 1)[0]
             bespoke = BESPOKE_QUESTIONS.get(game_key) if block_type == "hybrid" else None
-            pretty_map = bool(bespoke and bespoke.get("render_graph"))
+            # The claimed-map renderer shows in BOTH conditions (team call,
+            # 2026-07-06): raw graph JSON is unreadable no matter which
+            # question set you're answering, so only the QUESTIONS differ
+            # between universal and hybrid — not the visualization.
+            pretty_map = bool(BESPOKE_QUESTIONS.get(game_key, {}).get("render_graph"))
 
             # Playlist sessions show where the annotator is in today's queue.
             seq_chip = ""
@@ -575,6 +893,12 @@ def build(welcome_page, annotation_page, verdict_page, game_state, annotator_sta
                     '<div class="goal-text">This transcript has no annotatable AI '
                     'player turns.</div></div>'
                 )
+                # Without this the page is a dead end — no Submit is rendered
+                # (nothing to submit) and no other way back exists.
+                gr.Button("Quit", variant="stop", elem_classes=["quit-btn"]).click(
+                    fn=lambda: (gr.update(visible=True), gr.update(visible=False)),
+                    outputs=[welcome_page, annotation_page],
+                )
                 return
 
             # MAIN LAYOUT
@@ -584,8 +908,18 @@ def build(welcome_page, annotation_page, verdict_page, game_state, annotator_sta
                 with gr.Column(scale=3, elem_classes=["tx-col"]):
                     gr.HTML(_build_transcript_html(g, 0, pretty_map=pretty_map))
 
-                # RIGHT: per-turn annotation cards
-                with gr.Column(scale=2, elem_id="annot-col", key=f"annot-col-{g.slug}"):
+                # RIGHT: per-turn annotation cards.
+                # NO key= on anything created inside this @gr.render: keyed
+                # blocks go through Gradio 6's key_to_id_map, which reuses
+                # block ids across render passes and intermittently raises
+                # DuplicateBlockError ("A block with id N has already been
+                # rendered") when the same game re-renders — seen twice in
+                # real sessions, always at a keyed component. The keys also
+                # buy nothing: they provably do NOT stop the cross-game value
+                # leak (that fix is the clearing_state blank render, see the
+                # top of _render_annotation), so unkeyed fresh-id components
+                # are strictly safer.
+                with gr.Column(scale=2, elem_id="annot-col"):
                     gr.HTML(_turn_nav_html(g))
 
                     # Flat, ordered list of every input component created below,
@@ -599,21 +933,7 @@ def build(welcome_page, annotation_page, verdict_page, game_state, annotator_sta
                         role = g.role(sender)
                         role_cfg = (bespoke or {}).get("roles", {}).get(role, {})
 
-                        # Every stateful widget below gets an explicit `key=`
-                        # scoped to THIS game's slug. Gradio 6 otherwise matches
-                        # components across @gr.render re-renders by tree
-                        # position — this key makes each (game, turn, slot) a
-                        # distinct component per Gradio's documented `key=`
-                        # contract. NOTE: confirmed by isolated repro that this
-                        # alone does NOT fully stop a known Gradio 6.15.2 issue
-                        # where a same-position Radio can retain a stale
-                        # cross-game value internally (invisible in the UI,
-                        # still submitted) when switching games mid-playlist —
-                        # see the flagged follow-up: a real fix needs an
-                        # intermediate empty re-render to force a full
-                        # unmount/remount, which hasn't been implemented yet.
-                        kbase = f"{g.slug}-t{i}"
-                        with gr.Group(elem_classes=["turn-anno-card"], key=kbase):
+                        with gr.Group(elem_classes=["turn-anno-card"]):
                             gr.HTML(_card_header_html(g, i))
 
                             # Q1 slot: "generic" (default) = universal widget,
@@ -624,14 +944,13 @@ def build(welcome_page, annotation_page, verdict_page, game_state, annotator_sta
                                 q1 = gr.Radio(
                                     choices=[("1\nNone", "1"), ("2\nPartial", "2"), ("3\nGood", "3"), ("4\nExcellent", "4")],
                                     show_label=False, elem_classes=["scale-radio", "q1-scale"],
-                                    key=f"{kbase}-q1",
                                 )
                                 components.append(q1); field_specs.append((i, "q1"))
                             elif q1_cfg is not None:
                                 label_md, choices = q1_cfg
                                 gr.Markdown(label_md)
                                 q1 = gr.Radio(choices=choices, show_label=False,
-                                              elem_classes=["scale-radio", "q1-scale"], key=f"{kbase}-q1")
+                                              elem_classes=["scale-radio", "q1-scale"])
                                 components.append(q1); field_specs.append((i, "q1"))
 
                             # Q2 slot — same generic/None/bespoke pattern.
@@ -641,21 +960,20 @@ def build(welcome_page, annotation_page, verdict_page, game_state, annotator_sta
                                 q2 = gr.Radio(
                                     choices=[("1\nNonsensical", "1"), ("2\nPoor", "2"), ("3\nReasonable", "3"), ("4\nStrong", "4")],
                                     show_label=False, elem_classes=["scale-radio", "q2-scale"],
-                                    key=f"{kbase}-q2",
                                 )
                                 components.append(q2); field_specs.append((i, "q2"))
                             elif q2_cfg is not None:
                                 label_md, choices = q2_cfg
                                 gr.Markdown(label_md)
                                 q2 = gr.Radio(choices=choices, show_label=False,
-                                              elem_classes=["scale-radio", "q2-scale"], key=f"{kbase}-q2")
+                                              elem_classes=["scale-radio", "q2-scale"])
                                 components.append(q2); field_specs.append((i, "q2"))
 
                             # Bespoke bolt-on(s) — additive, beyond the Q1/Q2 slots.
                             for key, label_md, choices in role_cfg.get("bolt_ons", []):
                                 gr.Markdown(label_md)
                                 bolt = gr.Radio(choices=choices, show_label=False,
-                                                elem_classes=["scale-radio"], key=f"{kbase}-bolt-{key}")
+                                                elem_classes=["scale-radio"])
                                 components.append(bolt); field_specs.append((i, "extra", key))
 
                             # Q3 — unchanged, existing conditional pattern (reused,
@@ -665,31 +983,30 @@ def build(welcome_page, annotation_page, verdict_page, game_state, annotator_sta
                                 q3 = gr.Radio(
                                     choices=[("1\nUnclear", "1"), ("2\nConfused", "2"), ("3\nClear", "3"), ("4\nTransparent", "4"), ("N/A", "NA")],
                                     show_label=False, elem_classes=["scale-radio", "q3-scale"],
-                                    key=f"{kbase}-q3",
                                 )
                             else:
                                 q3 = gr.Radio(choices=[("N/A", "NA")], value="NA", visible=False,
-                                              show_label=False, key=f"{kbase}-q3")
+                                              show_label=False)
                             components.append(q3); field_specs.append((i, "q3"))
 
                             flag_choices = (bespoke.get("flags") if bespoke and bespoke.get("flags") else g.flag_choices)
                             gr.HTML('<div class="flags-lbl">Flags <span class="flags-sub">— tick all that apply</span></div>')
                             fl = gr.CheckboxGroup(
                                 choices=flag_choices, show_label=False,
-                                elem_classes=["flags-check"], key=f"{kbase}-flags",
+                                elem_classes=["flags-check"],
                             )
                             components.append(fl); field_specs.append((i, "flags"))
 
                             cm = gr.Textbox(
                                 placeholder="Optional turn comment…",
-                                show_label=False, lines=2,
-                                elem_classes=["turn-comment"], key=f"{kbase}-comment",
+                                show_label=False, lines=1,
+                                elem_classes=["turn-comment"],
                             )
                             components.append(cm); field_specs.append((i, "comment"))
 
                     status = gr.Markdown("")
                     with gr.Row():
-                        back_btn = gr.Button("← Back", variant="secondary")
+                        back_btn = gr.Button("Quit", variant="stop", elem_classes=["quit-btn"])
                         submit_btn = gr.Button("Submit All", variant="primary")
 
             # EVENTS — wired inside @gr.render since `components` is rebuilt

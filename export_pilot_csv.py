@@ -1,6 +1,6 @@
 """Throwaway debrief export for the annotation pilot.
 
-Reads annotations.db and writes two files:
+Reads annotations.db and writes three files:
 
 - pilot_export.csv — one row per (annotation, turn), with the verdict/survey/
   timing fields repeated on every row for that annotation so the whole thing
@@ -11,6 +11,9 @@ Reads annotations.db and writes two files:
   (so it includes the practice round) to the last submitted verdict;
   `active_seconds` is the sum of the per-game durations (excludes practice
   and any break between games).
+- pilot_session_surveys.csv — one row per (annotator, session_day): the
+  once-per-sitting end-of-session survey (capacity, disruption,
+  guessing_preference, would_change_answers, comment).
 
 Usage: python export_pilot_csv.py [output.csv]
 """
@@ -29,7 +32,8 @@ COLUMNS = [
     "prior_information_use", "strategic_logic", "reasoning_clarity",
     "extra_responses", "flags", "comment",
     "strategic_coherence", "overall_rating", "verdict_comment",
-    "survey_fit", "survey_fatigue", "survey_confidence", "survey_comment",
+    "survey_confidence", "survey_fit_missing", "survey_fit_missing_count",
+    "survey_comment",
     "session_started_at", "started_at", "annotated_at", "verdict_at",
     "duration_seconds",
 ]
@@ -40,7 +44,8 @@ SELECT
     t.prior_information_use, t.strategic_logic, t.reasoning_clarity,
     t.extra_responses, t.flags, t.comment,
     a.strategic_coherence, a.overall_rating, a.verdict_comment,
-    a.survey_fit, a.survey_fatigue, a.survey_confidence, a.survey_comment,
+    a.survey_confidence, a.survey_fit_missing, a.survey_fit_missing_count,
+    a.survey_comment,
     a.session_started_at, a.started_at, a.annotated_at, a.verdict_at
 FROM turn_ratings t
 JOIN annotations a ON a.id = t.annotation_id
@@ -57,6 +62,18 @@ SESSION_QUERY = """
 SELECT annotator_id, session_day, session_started_at, started_at, verdict_at
 FROM annotations
 WHERE session_day IS NOT NULL AND session_day != ''
+ORDER BY annotator_id, session_day
+"""
+
+SESSION_SURVEY_COLUMNS = [
+    "annotator", "session_day", "capacity", "disruption",
+    "guessing_preference", "would_change_answers", "comment", "submitted_at",
+]
+
+SESSION_SURVEY_QUERY = """
+SELECT annotator_id, session_day, capacity, disruption, guessing_preference,
+       would_change_answers, comment, submitted_at
+FROM session_surveys
 ORDER BY annotator_id, session_day
 """
 
@@ -104,11 +121,14 @@ def _session_rows(rows):
 
 def main():
     out_path = sys.argv[1] if len(sys.argv) > 1 else os.path.join(_dir, "pilot_export.csv")
-    sessions_path = os.path.join(os.path.dirname(out_path) or _dir, "pilot_sessions.csv")
+    out_dir = os.path.dirname(out_path) or _dir
+    sessions_path = os.path.join(out_dir, "pilot_sessions.csv")
+    session_surveys_path = os.path.join(out_dir, "pilot_session_surveys.csv")
 
     conn = sqlite3.connect(DB_PATH)
     rows = conn.execute(QUERY).fetchall()
     session_rows = conn.execute(SESSION_QUERY).fetchall()
+    session_survey_rows = conn.execute(SESSION_SURVEY_QUERY).fetchall()
     conn.close()
 
     with open(out_path, "w", newline="") as f:
@@ -125,6 +145,12 @@ def main():
         writer.writerow(SESSION_COLUMNS)
         writer.writerows(summaries)
     print(f"Wrote {len(summaries)} session summaries to {sessions_path}")
+
+    with open(session_surveys_path, "w", newline="") as f:
+        writer = csv.writer(f)
+        writer.writerow(SESSION_SURVEY_COLUMNS)
+        writer.writerows(session_survey_rows)
+    print(f"Wrote {len(session_survey_rows)} session surveys to {session_surveys_path}")
 
 
 if __name__ == "__main__":

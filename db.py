@@ -62,6 +62,19 @@ CREATE TABLE IF NOT EXISTS annotations (
     UNIQUE(game_slug, annotator_id, condition)
 );
 
+CREATE TABLE IF NOT EXISTS session_surveys (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    annotator_id TEXT NOT NULL DEFAULT '',
+    session_day TEXT,
+    capacity TEXT,
+    disruption TEXT,
+    guessing_preference TEXT,
+    would_change_answers TEXT,
+    comment TEXT,
+    submitted_at TEXT,
+    UNIQUE(annotator_id, session_day)
+);
+
 CREATE TABLE IF NOT EXISTS turn_ratings (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     annotation_id INTEGER NOT NULL REFERENCES annotations(id) ON DELETE CASCADE,
@@ -142,10 +155,17 @@ def _migrate_pilot_schema(conn):
 
 def _migrate_ab_columns(conn):
     """Additive columns for the internal A/B pilot: session timing and the
-    per-game questions-fit micro-survey. Safe to run repeatedly."""
+    per-game questions-fit micro-survey. Safe to run repeatedly.
+
+    survey_fit/survey_fatigue are no longer written by the app (replaced by
+    survey_fit_missing/survey_fit_missing_count) but are kept here and in the
+    schema as harmless historical columns — an active pilot DB may already
+    hold real Day-1 answers in them, and this migration path is additive-only
+    by design (no DROP COLUMN)."""
     cols = {row[1] for row in conn.execute("PRAGMA table_info(annotations)")}
     for col in ("session_day", "session_started_at", "started_at", "survey_fit",
-                "survey_fatigue", "survey_confidence", "survey_comment"):
+                "survey_fatigue", "survey_confidence", "survey_comment",
+                "survey_fit_missing", "survey_fit_missing_count"):
         if col not in cols:
             conn.execute(f"ALTER TABLE annotations ADD COLUMN {col} TEXT")
 
@@ -331,8 +351,8 @@ def completed_pairs(annotator_id):
 
 
 def save_verdict(game_slug, annotator_id, condition, coherence, overall, comment,
-                 survey_fit=None, survey_fatigue=None, survey_confidence=None,
-                 survey_comment=None):
+                 survey_confidence=None, survey_comment=None,
+                 survey_fit_missing=None, survey_fit_missing_count=None):
     """Update the verdict columns of an existing annotation row.
 
     Returns True if a matching row existed (turns submitted first), else False.
@@ -348,16 +368,16 @@ def save_verdict(game_slug, annotator_id, condition, coherence, overall, comment
                 overall_rating=?,
                 verdict_comment=?,
                 verdict_at=?,
-                survey_fit=?,
-                survey_fatigue=?,
                 survey_confidence=?,
                 survey_comment=?,
+                survey_fit_missing=?,
+                survey_fit_missing_count=?,
                 updated_at=?
             WHERE game_slug=? AND annotator_id=? AND condition=?
             """,
-            (coherence, overall, comment, now, survey_fit, survey_fatigue,
-             survey_confidence, survey_comment, now, game_slug, annotator_id,
-             condition),
+            (coherence, overall, comment, now, survey_confidence, survey_comment,
+             survey_fit_missing, survey_fit_missing_count, now, game_slug,
+             annotator_id, condition),
         )
         ok = cur.rowcount > 0
     # save_turns already backs up; back up again here so the verdict fields
@@ -365,6 +385,35 @@ def save_verdict(game_slug, annotator_id, condition, coherence, overall, comment
     if ok:
         backup_db_to_hf()
     return ok
+
+
+def save_session_survey(annotator_id, session_day, capacity, disruption,
+                        guessing_preference, would_change_answers, comment=""):
+    """Upsert the once-per-sitting end-of-session survey (asked after the
+    last game of a playlist, not tied to any single annotation row)."""
+    now = datetime.now().isoformat()
+    annotator_id = annotator_id or ""
+    session_day = session_day or ""
+    with _connect() as conn:
+        conn.execute(
+            """
+            INSERT INTO session_surveys
+                (annotator_id, session_day, capacity, disruption,
+                 guessing_preference, would_change_answers, comment, submitted_at)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+            ON CONFLICT(annotator_id, session_day) DO UPDATE SET
+                capacity=excluded.capacity,
+                disruption=excluded.disruption,
+                guessing_preference=excluded.guessing_preference,
+                would_change_answers=excluded.would_change_answers,
+                comment=excluded.comment,
+                submitted_at=excluded.submitted_at
+            """,
+            (annotator_id, session_day, capacity, disruption, guessing_preference,
+             would_change_answers, comment, now),
+        )
+    backup_db_to_hf()
+    return True
 
 
 print(f"🗄️  DB config: HF_TOKEN={'set' if _HF_TOKEN else 'MISSING'}, "

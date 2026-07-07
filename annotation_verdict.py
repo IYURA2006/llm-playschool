@@ -22,6 +22,8 @@ _OVERALL_RATINGS = [
     ("7", "Flawless",  "The AI played as well as a skilled human would. Every move was sharp and purposeful."),
 ]
 
+_FIT_COUNT_CHOICES = [("1", "1"), ("2", "2"), ("3+", "3+")]
+
 
 def _col_updates(options, chosen, err=False):
     return [
@@ -47,92 +49,166 @@ def _survey_update(value, err):
     return gr.update(elem_classes=classes)
 
 
-def _save_verdict(game_path, annotator_id, condition, playlist, playlist_idx,
-                  coherence, overall, comment, fit, fatigue, confidence,
-                  fb_comment):
-    err = not coherence or not fit or not fatigue or not confidence
+def _overall_update(err):
+    # Slider counterpart of _survey_update — .ovr-slider-err is a dedicated
+    # rule since a Slider's DOM shape differs from a Radio's.
+    classes = ["ovr-slider", "ovr-slider-err"] if err else ["ovr-slider"]
+    return gr.update(elem_classes=classes)
 
-    # Error paths return a NO-OP update for next_btn, not visible=False: the
-    # button starts hidden/unmounted, and Gradio 6 never shows a component
-    # again once visible=False reached it before its first mount.
+
+def _action_label(playlist, playlist_idx):
+    """The merged save/advance button's label depends on where we are in the
+    playlist — known at render time (no need to wait for a click)."""
+    if not playlist:
+        return "💾 Save Verdict"
+    if playlist_idx + 1 >= len(playlist):
+        return "🏁 Save & Finish Study"
+    return "💾 Save & Next Game →"
+
+
+def _verdict_save_and_clear(game_path, annotator_id, condition, playlist, playlist_idx,
+                            coherence, overall, overall_touched, comment,
+                            confidence, fit_flag, fit_count, fb_comment):
+    """Step 1 of the merged action button: validate + persist, AND (only if
+    that succeeds and another playlist game remains) blank/reset every
+    verdict widget in the SAME event — mirroring the old _next_game_clear,
+    which likewise set clearing_state=True together with every widget reset
+    in one event. Keeping validate+save+clear as ONE event (not two chained
+    ones) matters: an earlier version split "clear" into its own .then()
+    step, and that separate event — despite being a no-op on error and
+    otherwise identical in shape to the old code — reliably threw ~200
+    frontend "Cannot read properties of null" errors on every game switch
+    that the old 2-event (this event + _verdict_finish) shape never did.
+    Root cause not fully pinned down (likely a Gradio 6 quirk with 3-deep
+    .then() chains feeding into annotation.py's own @gr.render), but the
+    old 2-event shape is proven not to trigger it, so this collapses back
+    to that shape rather than chasing the internals further.
+
+    A slider never reports a falsy value (minimum=1), so "not overall" can
+    no longer detect an untouched G2 — overall_touched (set only by the
+    slider's .release() event, never by a programmatic reset) is the sole
+    authority on that."""
+    err = not coherence or not overall_touched or not confidence
+
     if err:
         return (
             "⚠️ Please fill in the highlighted fields before submitting.",
+            gr.skip(),                              # clearing_state
+            gr.skip(),                               # coherence value
             *_col_updates(_COHERENCE, coherence, err=True),
-            _survey_update(fit, err=True),
-            _survey_update(fatigue, err=True),
+            *([gr.skip()] * 4),                      # coh_btns unchanged
+            _overall_update(err=True),
+            gr.skip(), gr.skip(),                     # overall_touched, comment
             _survey_update(confidence, err=True),
-            gr.update(),
+            gr.skip(), gr.skip(), gr.skip(),          # fit_flag, fit_count, survey_comment
+            False,                                    # verdict_ok_state
         )
 
     slug = game_slug(game_path or DEFAULT_GAME)
-    ok = db.save_verdict(slug, annotator_id, condition, coherence, int(overall),
-                         comment or "", survey_fit=fit, survey_fatigue=fatigue,
-                         survey_confidence=confidence,
-                         survey_comment=fb_comment or "")
+    ok = db.save_verdict(
+        slug, annotator_id, condition, coherence, int(overall), comment or "",
+        survey_confidence=confidence, survey_comment=fb_comment or "",
+        survey_fit_missing=fit_flag or "",
+        survey_fit_missing_count=(fit_count if fit_flag == "yes" else ""),
+    )
     if not ok:
         return (
             "⚠️ Turn annotations not found. Please complete Step 1 first.",
+            gr.skip(), gr.skip(),
             *_col_updates(_COHERENCE, coherence),
-            _survey_update(fit, err=False),
-            _survey_update(fatigue, err=False),
+            *([gr.skip()] * 4),
+            _overall_update(err=False),
+            gr.skip(), gr.skip(),
             _survey_update(confidence, err=False),
-            gr.update(),
+            gr.skip(), gr.skip(), gr.skip(),
+            False,
         )
 
-    if playlist:
-        if playlist_idx + 1 < len(playlist):
-            status = "✅ Saved — click **Next game →** to continue."
-            next_visible = True
-        else:
-            status = (f"🎉 **All done!** All {len(playlist)} games for today are "
-                      f"submitted. Thank you — you can close this tab.")
-            next_visible = False
-    else:
-        status = "✅ Verdict saved."
-        next_visible = False
+    # Saved OK. Real status text is set by _verdict_finish (it knows which
+    # branch — advance / finish study / legacy — actually fires); only clear
+    # the widgets here if we're about to advance to another playlist game.
+    if playlist and playlist_idx + 1 < len(playlist):
+        return (
+            "",
+            True,                          # clearing_state — blank annotation page
+            "",                            # coherence value
+            *_col_updates(_COHERENCE, ""),
+            *_btn_updates(_COHERENCE, ""),
+            # Reset value is cosmetic only — overall_touched (reset right
+            # after) is what actually gates validation, so this number is
+            # never mistaken for a recorded judgment even if briefly shown.
+            gr.update(value=4, elem_classes=["ovr-slider"]),  # overall
+            False,                         # overall_touched
+            "",                            # verdict comment
+            gr.update(value=None, elem_classes=["scale-radio"]),  # confidence
+            gr.update(value=None),                         # fit_flag
+            gr.update(value=None),                         # fit_count
+            "",                            # survey comment
+            True,                          # verdict_ok_state
+        )
 
+    # Last game or legacy mode — nothing to clear, leave every widget as-is.
     return (
-        status,
+        "",
+        gr.skip(),
+        gr.skip(),
         *_col_updates(_COHERENCE, coherence),
-        _survey_update(fit, err=False),
-        _survey_update(fatigue, err=False),
+        *([gr.skip()] * 4),
+        _overall_update(err=False),
+        gr.skip(), gr.skip(),
         _survey_update(confidence, err=False),
-        gr.update(visible=next_visible),
+        gr.skip(), gr.skip(), gr.skip(),
+        True,
     )
 
 
-def _next_game(playlist, playlist_idx):
-    """Advance to the next playlist item: swap game+condition (the annotation
-    page's @gr.render rebuilds off these), restart the timer, reset every
-    verdict/survey widget, and flip back to the annotation page."""
-    new_idx = min(playlist_idx + 1, len(playlist) - 1)
+def _verdict_finish(ok, playlist, playlist_idx):
+    """Step 3 (chained via .then): route to the next game, the new
+    end-of-session survey, or a static "saved" status — whichever applies.
+    Deliberately does NOT touch clearing_state on the last-game branch: that
+    mechanism only protects annotation.py's @gr.render from stale widgets,
+    which stops mattering once the annotator is leaving the annotation flow
+    for good."""
+    if not ok:
+        return (gr.skip(),) * 10
+    if not playlist:
+        return (
+            gr.skip(), "✅ Verdict saved.", gr.skip(), gr.skip(), gr.skip(),
+            gr.skip(), gr.skip(), gr.skip(), gr.skip(), gr.skip(),
+        )
+    if playlist_idx + 1 >= len(playlist):
+        return (
+            gr.skip(),                   # clearing_state — irrelevant from here on
+            "",
+            gr.skip(), gr.skip(), gr.skip(), gr.skip(),
+            gr.skip(),                   # annotation_page — never shown again
+            gr.update(visible=False),    # verdict_page
+            gr.update(visible=True),     # session_survey_page
+            gr.skip(),                   # action_btn — page is left behind
+        )
+    new_idx = playlist_idx + 1
     item = playlist[new_idx]
     path = slug_to_path(item["game"]) or DEFAULT_GAME
     return (
-        new_idx,
-        path,
-        item["condition"],
-        datetime.now().isoformat(),
-        gr.update(visible=True),    # annotation_page
-        gr.update(visible=False),   # verdict_page
-        "",                          # status
-        gr.update(visible=False),   # next_btn
-        "",                          # coherence value
-        *_col_updates(_COHERENCE, ""),
-        *_btn_updates(_COHERENCE, ""),
-        gr.update(value=4),          # overall slider
-        "",                          # verdict comment
-        gr.update(value=None, elem_classes=["scale-radio"]),  # fit
-        gr.update(value=None, elem_classes=["scale-radio"]),  # fatigue
-        gr.update(value=None, elem_classes=["scale-radio"]),  # confidence
-        "",                          # survey comment
+        False,                        # clearing_state — mount the new game
+        "",
+        new_idx, path, item["condition"],
+        datetime.now().isoformat(),   # started_at
+        gr.update(visible=True),      # annotation_page
+        gr.update(visible=False),     # verdict_page
+        gr.skip(),                    # session_survey_page
+        # Relabel in the SAME atomic event that advances playlist_idx_state,
+        # rather than a separate .change() listener on that state — a
+        # standalone listener reacting to the same mutation raced with
+        # annotation.py's own @gr.render (also keyed on playlist_idx_state),
+        # throwing frontend "Cannot read properties of null" errors.
+        gr.update(value=_action_label(playlist, new_idx)),
     )
 
 
-def build(welcome_page, annotation_page, verdict_page, game_state, annotator_state,
-          block_state, playlist_state, playlist_idx_state, started_at_state,
-          session_day_state):
+def build(welcome_page, annotation_page, verdict_page, session_survey_page,
+          game_state, annotator_state, block_state, playlist_state,
+          playlist_idx_state, started_at_state, session_day_state, clearing_state):
     with verdict_page:
 
         # ── TOP NAV ───────────────────────────────────────────────────
@@ -196,11 +272,18 @@ def build(welcome_page, annotation_page, verdict_page, game_state, annotator_sta
                 f'<span class="ovr-end-desc">{_hi_desc}</span></div>'
                 '</div>'
             )
+            # A slider, with explicit "touched" tracking: unlike a Radio, a
+            # Slider always reports a numeric value (never falsy), so "chose
+            # 4" and "never touched it" are indistinguishable from the value
+            # alone. overall_touched is flipped True only by .release() — the
+            # user-gesture-only event that (unlike .change()) never fires on a
+            # programmatic gr.update(value=...) reset — and is what
+            # _verdict_save_and_clear actually checks instead of the slider's value.
             overall = gr.Slider(
                 minimum=1, maximum=7, step=1, value=4,
-                label="Overall rating", show_label=False,
-                elem_classes=["ovr-slider"],
+                show_label=False, elem_classes=["ovr-slider"],
             )
+            overall_touched = gr.State(False)
 
         # ── Comment
         comment = gr.Textbox(
@@ -210,28 +293,32 @@ def build(welcome_page, annotation_page, verdict_page, game_state, annotator_sta
         )
 
         # ── Pilot micro-survey — feedback about the STUDY DESIGN, not the AI.
-        # This is the actual outcome measure of the internal A/B test: which
-        # question set fits which game, and how draining a session is.
+        # Kept deliberately short (confidence + one optional tap) to avoid
+        # survey fatigue across repeated games in a sitting.
         with gr.Group(elem_classes=["question-card"]):
             gr.Markdown("### 📋 Pilot feedback — about the questions, not the AI")
-            gr.Markdown("How well did the questions you just answered fit this game?")
-            survey_fit = gr.Radio(
-                choices=[("1\nDidn't fit", "1"), ("2\nAwkward", "2"),
-                         ("3\nMostly fit", "3"), ("4\nPerfect fit", "4")],
-                show_label=False, elem_classes=["scale-radio"],
-            )
-            gr.Markdown("How mentally drained do you feel right now?")
-            survey_fatigue = gr.Radio(
-                choices=[("1\nFresh", "1"), ("2\nFine", "2"),
-                         ("3\nTiring", "3"), ("4\nDrained", "4")],
-                show_label=False, elem_classes=["scale-radio"],
-            )
             gr.Markdown("How confident are you in the ratings you just gave for this game?")
             survey_confidence = gr.Radio(
                 choices=[("1\nGuessing", "1"), ("2\nUnsure", "2"),
                          ("3\nMixed", "3"), ("4\nConfident", "4"),
                          ("5\nCertain", "5")],
                 show_label=False, elem_classes=["scale-radio"],
+            )
+            gr.Markdown("Was there a question that didn't really fit this game? *(optional)*")
+            # fit_count's reveal-on-"Yes" is done client-side (app.py's head
+            # script toggles the .fc-visible class) rather than via a Gradio
+            # .change() event — a live .change() here reliably hung the UI in
+            # a permanent "processing" spinner on Gradio 6.15.2 (no server
+            # error, the update never resolved on the frontend). Every other
+            # conditional-show/hide in this app already goes through JS, not
+            # a round-trip, for exactly this kind of pure-cosmetic toggle.
+            fit_flag = gr.Radio(
+                choices=[("No", "no"), ("Yes", "yes")],
+                show_label=False, elem_classes=["scale-radio", "fit-flag-radio"],
+            )
+            fit_count = gr.Radio(
+                choices=_FIT_COUNT_CHOICES, show_label=False,
+                elem_classes=["scale-radio", "fit-count-radio"],
             )
             survey_comment = gr.Textbox(
                 placeholder="Anything confusing or missing in the questions or the app? (optional)",
@@ -243,8 +330,11 @@ def build(welcome_page, annotation_page, verdict_page, game_state, annotator_sta
 
         with gr.Row():
             back_btn = gr.Button("← Back to Annotation", variant="secondary")
-            submit_btn = gr.Button("Submit Verdict", variant="primary")
-            next_btn = gr.Button("Next game →", variant="primary", visible=False)
+            action_btn = gr.Button(_action_label([], 0), variant="primary")
+
+        # Local-only pass-through signal for the 3-step click chain below —
+        # never threaded to app.py.
+        verdict_ok_state = gr.State(False)
 
         # ── EVENT WIRING
         for i, (val, *_) in enumerate(_COHERENCE):
@@ -253,23 +343,54 @@ def build(welcome_page, annotation_page, verdict_page, game_state, annotator_sta
                 outputs=[*coh_cols, *coh_btns, coherence],
             )
 
-        submit_btn.click(
-            fn=_save_verdict,
-            inputs=[game_state, annotator_state, block_state, playlist_state,
-                    playlist_idx_state, coherence, overall, comment,
-                    survey_fit, survey_fatigue, survey_confidence, survey_comment],
-            outputs=[status, *coh_cols, survey_fit, survey_fatigue,
-                     survey_confidence, next_btn],
+        overall.release(fn=lambda: True, outputs=[overall_touched])
+
+        fit_flag.change(
+            fn=lambda v: gr.update(visible=(v == "yes")),
+            inputs=[fit_flag], outputs=[fit_count],
         )
 
-        next_btn.click(
-            fn=_next_game,
-            inputs=[playlist_state, playlist_idx_state],
-            outputs=[playlist_idx_state, game_state, block_state, started_at_state,
-                     annotation_page, verdict_page, status, next_btn,
-                     coherence, *coh_cols, *coh_btns, overall, comment,
-                     survey_fit, survey_fatigue, survey_confidence, survey_comment],
+        # ONE button now does what used to take two clicks: validate+save
+        # (and, if continuing, blank every verdict widget) in ONE event, then
+        # (chained via .then) advance to the next game / route to the new
+        # end-of-session survey — the exact same TWO-event clearing_state
+        # shape the old "Next game →" flow used (_next_game_clear that also
+        # did the reset, then _next_game_advance), just with the leading
+        # event now also doing validate+save. See _verdict_save_and_clear's
+        # docstring for why this stayed two events rather than three.
+        action_btn.click(
+            fn=_verdict_save_and_clear,
+            inputs=[game_state, annotator_state, block_state, playlist_state,
+                    playlist_idx_state, coherence, overall, overall_touched,
+                    comment, survey_confidence, fit_flag, fit_count, survey_comment],
+            outputs=[status, clearing_state, coherence, *coh_cols, *coh_btns,
+                     overall, overall_touched, comment, survey_confidence,
+                     fit_flag, fit_count, survey_comment, verdict_ok_state],
+        ).then(
+            fn=_verdict_finish,
+            inputs=[verdict_ok_state, playlist_state, playlist_idx_state],
+            outputs=[clearing_state, status, playlist_idx_state, game_state,
+                     block_state, started_at_state, annotation_page, verdict_page,
+                     session_survey_page, action_btn],
         )
+
+        # Syncs the button label for the very FIRST view of this page in a
+        # sitting (playlist_state is assigned once, on page load / Start,
+        # before verdict_page is ever shown — this fires reliably then,
+        # mirroring the top-nav game-name @gr.render's proven reliance on the
+        # same mechanism). Deliberately NOT also listening on
+        # playlist_idx_state: that state is mutated by _verdict_finish above,
+        # and a second independent listener reacting to the same mutation
+        # raced with annotation.py's own @gr.render (also keyed on
+        # playlist_idx_state), corrupting the frontend — _verdict_finish's
+        # own action_btn output (this same atomic event) handles resyncing
+        # the label for every game after the first instead.
+        def _sync_action_label(playlist, playlist_idx):
+            return gr.update(value=_action_label(playlist, playlist_idx))
+
+        playlist_state.change(fn=_sync_action_label,
+                              inputs=[playlist_state, playlist_idx_state],
+                              outputs=[action_btn])
 
         back_btn.click(
             fn=lambda: (gr.update(visible=True), gr.update(visible=False)),

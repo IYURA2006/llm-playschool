@@ -57,67 +57,102 @@ def _progress_note(name, day):
             f"Start will resume where you left off (practice round is skipped).")
 
 
-def _start(err, playlist, block, name, day):
+def _start(err, playlist, block, name, day, annotator):
     """Route the Start click.
 
-    Priority: malformed-URL error → URL playlist link → legacy single-game
-    link → the name/day form (the normal public path). The form path loads the
-    playlist itself and resumes at the first game without a submitted verdict.
+    Priority: filled name/day form → URL playlist link → legacy single-game
+    link. The form outranks a playlist loaded earlier in the session (via URL
+    or a previous Start): once the loaded day is finished, picking the other
+    day in the form must actually switch to it — with playlist-first routing
+    the stale playlist shadowed the form forever. BOTH playlist paths resume
+    at the first game without a submitted verdict — they used to diverge, and
+    reopening a ?annotator=x&day=n link silently restarted at game 1 and
+    overwrote completed work via the DB upsert.
 
     Pages that stay hidden get a no-op gr.update(), NOT visible=False: Gradio 6
     lazily mounts hidden columns, and sending visible=False to a never-mounted
     column breaks every later visible=True on it (the page would stay blank).
     States that shouldn't change get gr.skip().
+
+    The final element of every return is clearing_state=False — the Start
+    click's first chained event set it True (blanking the annotation page so
+    no widget values survive from a previous game, see app.py); leaving it
+    True on any branch would strand a permanently blank page.
     """
     noop = gr.update()
 
     def stay(note):
         return (noop, noop, noop, gr.skip(), gr.skip(), gr.skip(), gr.skip(),
-                gr.skip(), gr.skip(), gr.skip(), gr.skip(), note)
+                gr.skip(), gr.skip(), gr.skip(), gr.skip(), note, False)
 
-    if err:
+    # A URL error only blocks Start while the form is unfilled — the welcome
+    # form must stay usable under an error banner (e.g. the "all done for this
+    # day's link" case, where the fix is simply picking the other day below).
+    if err and (not name or not day):
         return stay("")
     # `now` doubles as the session clock (stamped once per Start click — the
     # practice round counts toward the session) and the first game's clock
     # (training re-stamps started_at when real annotation begins).
     now = datetime.now().isoformat()
-    if playlist:  # URL pilot link (?annotator=x&day=n) — states set on page load
-        return (gr.update(visible=False), noop, gr.update(visible=True), now, now,
-                gr.skip(), gr.skip(), gr.skip(), gr.skip(), gr.skip(), gr.skip(), "")
+
+    # ── Name/day form path — the user's explicit choice, checked first ──
+    if name and day:
+        items = _load_assignments().get(name, {}).get(day) or []
+        if not items:
+            return stay(f"⚠️ No games assigned for **{name}** on Day {day} — "
+                        f"tell the study coordinator.")
+        done = db.completed_pairs(name)
+        idx = next((i for i, it in enumerate(items)
+                    if (it["game"], it["condition"]) not in done), None)
+        if idx is None:
+            return stay(f"🎉 You've already completed all {len(items)} games for "
+                        f"Day {day}. Nothing left to do — thank you!")
+        item = items[idx]
+        path = annotation.slug_to_path(item["game"])
+        if not path:
+            return stay(f"⚠️ Your assignment references an unknown game "
+                        f"({item['game']!r}) — tell the study coordinator.")
+
+        if idx == 0:   # fresh session → practice round first
+            pages = (gr.update(visible=False), noop, gr.update(visible=True))
+        else:          # resuming → skip training, land on the next unfinished game
+            pages = (gr.update(visible=False), gr.update(visible=True), noop)
+        return (*pages, now, now, name, item["condition"], path, items, idx, day,
+                "", False)
+
+    if playlist:  # URL pilot link (?annotator=x&day=n), form untouched
+        # Recompute resume position at click time: the completed set may have
+        # grown since page load (or since a Back → Start round-trip).
+        done = db.completed_pairs(annotator)
+        idx = next((i for i, it in enumerate(playlist)
+                    if (it["game"], it["condition"]) not in done), None)
+        if idx is None:
+            return stay(f"🎉 You've already completed all {len(playlist)} games "
+                        f"for this session. Nothing left to do — thank you!")
+        item = playlist[idx]
+        path = annotation.slug_to_path(item["game"])
+        if not path:
+            return stay(f"⚠️ Your assignment references an unknown game "
+                        f"({item['game']!r}) — tell the study coordinator.")
+        if idx == 0:   # nothing finished yet → practice round first
+            pages = (gr.update(visible=False), noop, gr.update(visible=True))
+        else:          # resuming → skip training, land on the next unfinished game
+            pages = (gr.update(visible=False), gr.update(visible=True), noop)
+        return (*pages, now, now, gr.skip(), item["condition"], path,
+                gr.skip(), idx, gr.skip(), "", False)
+
     if block:     # legacy single-game link — straight to annotation
         return (gr.update(visible=False), gr.update(visible=True), noop, now, now,
-                gr.skip(), gr.skip(), gr.skip(), gr.skip(), gr.skip(), gr.skip(), "")
+                gr.skip(), gr.skip(), gr.skip(), gr.skip(), gr.skip(), gr.skip(),
+                "", False)
 
-    # ── Name/day form path ──
-    if not name or not day:
-        return stay("⚠️ Pick your **name** and **session day** above, then press Start.")
-    items = _load_assignments().get(name, {}).get(day) or []
-    if not items:
-        return stay(f"⚠️ No games assigned for **{name}** on Day {day} — "
-                    f"tell the study coordinator.")
-    done = db.completed_pairs(name)
-    idx = next((i for i, it in enumerate(items)
-                if (it["game"], it["condition"]) not in done), None)
-    if idx is None:
-        return stay(f"🎉 You've already completed all {len(items)} games for "
-                    f"Day {day}. Nothing left to do — thank you!")
-    item = items[idx]
-    path = annotation.slug_to_path(item["game"])
-    if not path:
-        return stay(f"⚠️ Your assignment references an unknown game "
-                    f"({item['game']!r}) — tell the study coordinator.")
-
-    if idx == 0:   # fresh session → practice round first
-        pages = (gr.update(visible=False), noop, gr.update(visible=True))
-    else:          # resuming → skip training, land on the next unfinished game
-        pages = (gr.update(visible=False), gr.update(visible=True), noop)
-    return (*pages, now, now, name, item["condition"], path, items, idx, day, "")
+    return stay("⚠️ Pick your **name** and **session day** above, then press Start.")
 
 
 def build(welcome_page, annotation_page, training_page, error_state,
           playlist_state, started_at_state, session_started_at_state,
           annotator_state, block_state, game_state, playlist_idx_state,
-          session_day_state):
+          session_day_state, clearing_state):
 
     #everything below goes into screen Welcome
     with welcome_page:
@@ -209,18 +244,27 @@ def build(welcome_page, annotation_page, training_page, error_state,
                 widget.change(_progress_note, inputs=[name_dd, day_radio],
                               outputs=[form_note])
 
-            # NEXT PAGE
+            # NEXT PAGE — two chained events: the first blanks the annotation
+            # page (clearing_state=True → empty @gr.render) so no widget
+            # values can survive from a previously annotated game (e.g.
+            # finish day 1 → Back → pick day 2 → Start); _start then sets the
+            # game states AND clearing_state=False in one event, mounting the
+            # page fresh exactly once. See app.py's clearing_state comment.
             gr.Button(
                 "Start Annotation →", variant="primary", size="lg",
                 elem_classes=["start-btn"],
             ).click(
+                lambda: True,
+                outputs=[clearing_state],
+            ).then(
                 _start,
-                inputs=[error_state, playlist_state, block_state, name_dd, day_radio],
+                inputs=[error_state, playlist_state, block_state, name_dd,
+                        day_radio, annotator_state],
                 outputs=[welcome_page, annotation_page, training_page,
                          started_at_state, session_started_at_state,
                          annotator_state, block_state,
                          game_state, playlist_state, playlist_idx_state,
-                         session_day_state, form_note],
+                         session_day_state, form_note, clearing_state],
             )
 
 

@@ -145,6 +145,76 @@ This is the core of the pilot.
   (Guessing → Certain). Stored in `survey_confidence`, exported per row —
   this is the "Avg confidence" column of the debrief table.
 
+## Task 11 — Severe-bug fixes from the 2026-07-04 evaluation
+
+All six confirmed severe bugs fixed and verified end-to-end with scripted
+Playwright probes (32 assertions):
+
+- [x] **Cross-game widget value leak** (Gradio 6.15.2 `@gr.render` carried
+  Radio/Textbox values from game N into game N+1; `key=` doesn't prevent it):
+  fixed via a blank intermediate render driven by a new `clearing_state` —
+  "Next game →" and Start are now two chained events (blank unmount, then
+  mount fresh). See `app.py`'s `clearing_state` comment.
+- [x] **URL playlist links never resumed** (reopening `?annotator=x&day=n`
+  restarted at game 1 and overwrote completed work): both the page-load path
+  and the Start click now resume at the first game without a verdict, with a
+  friendly all-done banner; the name/day form outranks a stale playlist so
+  switching days always works.
+- [x] **Timing anchors kept the FIRST attempt** (`COALESCE` order): redone
+  games now re-anchor `started_at`/`session_started_at` to the new attempt, so
+  durations no longer span abandonment gaps.
+- [x] **Production-dataset fallback removed**: `db.py` reads only
+  `HF_PILOT_DATASET_REPO`; unset ⇒ backup/restore disabled loudly. The pilot
+  branch can no longer touch the production dataset.
+- [x] **Concurrency**: `busy_timeout=10000` (no more lost saves on
+  simultaneous submits) + serialized, snapshot-based HF backup (no torn
+  uploads).
+- [x] **G2 Overall Quality** is now a mandatory 7-point radio (the slider's
+  silent default of 4 used to be recorded as a real judgment).
+- [x] 0-turn transcripts get a Back button instead of a dead end.
+- [x] (found in the 2026-07-05 QA pass) Q3/Reasoning Clarity now triggers by
+  GAME for the Wordle family + Deal or No Deal, per question_set.md's
+  conditional table — the marker heuristic alone missed Dond (1 of 4 turns
+  hit the markers; threshold needs half), so Dond annotators were never
+  asked Q3 or shown the Reasoning-Action Mismatch flag. Heuristic kept as
+  catch-all for other games.
+
+## Task 13 — DuplicateBlockError fix: no keyed components in @gr.render (2026-07-05)
+
+- [x] Removed every `key=` from the components built inside
+  `_render_annotation` (the annot-col Column, per-turn Groups, radios,
+  flags, comments). Keyed blocks route through Gradio 6's `key_to_id_map`,
+  which reuses block ids across render passes and intermittently raised
+  `DuplicateBlockError: A block with id N has already been rendered` in real
+  sessions — always at a keyed component. The keys provided no protection
+  anyway (they provably do not stop the cross-game value leak; the
+  `clearing_state` blank render in Task 11 is that fix), so unkeyed
+  fresh-id components are strictly safer.
+- [x] A clembench-transcript left-column view was prototyped the same day
+  and reverted at the team's call — the custom rebuild is the keeper (it's
+  condensed; the official render duplicates full GM prompts to both players
+  and bookkeeping messages). The episode dirs under `games/` still ship
+  clembench's `transcript.html` untouched if this is ever revisited.
+
+Known content gap (not a code fix): Imagegame/Clean Up have no bespoke
+question sets, so `condition="hybrid"` renders universal questions there —
+Day 2's contrast needs an Imagegame bespoke set (see RUNBOOK limitations).
+
+## Task 12 — TextMapWorld (Graph Reasoning) map renderer (2026-07-04)
+
+- [x] The renderer question_set.md calls "required, not optional" is built:
+  in hybrid mode each turn card draws the model's CLAIMED map as an SVG
+  graph — green ring = room claimed correctly, red ring = claimed wrongly
+  (stays red until fixed), red dashed line = asserted connection the walk
+  never verified, blue dashed ring = current position. Compass-true stable
+  layout from the GM's `move` records; each turn is validated only against
+  what the walker had revealed *by that turn*. A legend row sits above the
+  transcript. Universal mode still deliberately shows the raw JSON.
+- [x] Fixed en passant: the models' graph JSON uses Python tuples (invalid
+  JSON), so the old pretty-print path never actually fired — parsing now
+  falls back to a Python-literal parse. The GM's per-turn echo of the
+  model's own JSON is hidden in hybrid mode (the map replaces it).
+
 ---
 
 ## Non-Goals (explicitly do not build these in this branch)
