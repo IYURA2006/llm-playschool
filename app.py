@@ -104,8 +104,12 @@ div:focus, div:focus-visible {
 }
 .txscroll {
     padding: 16px 18px;
-    overflow-y: auto;
-    height: calc(100vh - 150px);
+    /* !important so the fixed viewport-height cap can't be relaxed by a
+       later Gradio/theme rule on HF (same cascade-order hazard as the chips
+       above); without the cap the transcript column grows with its content
+       instead of scrolling. Mirrors #annot-col, which already forces these. */
+    overflow-y: auto !important;
+    height: calc(100vh - 150px) !important;
 }
 .goal-box {
     background: #e8f0fe;
@@ -344,26 +348,39 @@ div:focus, div:focus-visible {
     border-radius: 10px; padding: 5px 10px; margin-bottom: 8px;
 }
 .tn-chips { display: flex; flex-wrap: wrap; gap: 6px; flex: 1; justify-content: center; }
+/* !important on every colour here is load-bearing on HF Spaces: Gradio's theme
+   ships `.gradio-container-… .gradio-style button { background/border/color }`
+   (specificity 0,2,1, no !important). These chips ARE <button>s, so that rule
+   outranks a bare `.tn-chip.is-rated` (0,2,0) and repaints rated chips theme-
+   grey — the exact "I answered it but the number goes back to grey" bug. Only
+   `.is-current.is-rated` (0,3,0) happened to win, which is why a rated chip
+   looked green *while selected* and grey once you moved off it. Locally the
+   cascade order let our rules win without !important; on HF it doesn't. Since
+   the Gradio rule isn't !important, !important here wins in BOTH places. */
 .tn-chip {
     min-width: 30px; height: 30px; padding: 0 8px;
-    border: 1px solid #2d3748; border-radius: 8px;
-    background: #161e2e; color: #94a3b8;
+    border: 1px solid #2d3748 !important; border-radius: 8px;
+    background: #161e2e !important; color: #94a3b8 !important;
     font-size: 13px; font-weight: 600; cursor: pointer;
     display: inline-flex; align-items: center; justify-content: center;
     transition: background .12s, border-color .12s, color .12s;
 }
-.tn-chip:hover { border-color: #3b82f6; color: #cbd5e1; }
-.tn-chip.is-rated { border-color: #22c55e; color: #4ade80; }
-.tn-chip.is-current { background: #1d4ed8; border-color: #3b82f6; color: #fff; }
-.tn-chip.is-current.is-rated { background: #16a34a; border-color: #22c55e; }
+.tn-chip:hover { border-color: #3b82f6 !important; color: #cbd5e1 !important; }
+/* Rated-but-not-current: a solid green fill (not just a green outline) so a
+   completed turn stays unmistakably "done" after you navigate away from it. */
+.tn-chip.is-rated {
+    background: #166534 !important; border-color: #22c55e !important; color: #dcfce7 !important;
+}
+.tn-chip.is-current { background: #1d4ed8 !important; border-color: #60a5fa !important; color: #fff !important; }
+.tn-chip.is-current.is-rated { background: #16a34a !important; border-color: #4ade80 !important; color: #fff !important; }
 .tn-arrow {
     width: 32px; height: 32px; flex-shrink: 0;
-    border: 1px solid #2d3748; border-radius: 8px;
-    background: #161e2e; color: #cbd5e1;
+    border: 1px solid #2d3748 !important; border-radius: 8px;
+    background: #161e2e !important; color: #cbd5e1 !important;
     font-size: 18px; line-height: 1; cursor: pointer;
     display: inline-flex; align-items: center; justify-content: center;
 }
-.tn-arrow:hover { border-color: #3b82f6; }
+.tn-arrow:hover { border-color: #3b82f6 !important; }
 /* Restore visible focus rings (the global reset removes them) — accessibility */
 .tn-chip:focus-visible, .tn-arrow:focus-visible {
     outline: 2px solid #93c5fd !important; outline-offset: 2px;
@@ -1145,25 +1162,7 @@ def _capture_session_params(request: gr.Request):
             "", playlist, idx, day)
 
 
-# System fonts so first paint needs no remote Google Fonts fetch (slow over the
-# gradio.live share tunnel). Must be gr.themes.Font objects, not plain strings —
-# Gradio compares theme fonts via .name and a bare str crashes that check.
-theme = gr.themes.Soft(
-    font=[gr.themes.Font(f) for f in ("system-ui", "-apple-system", "Segoe UI", "sans-serif")],
-    font_mono=[gr.themes.Font(f) for f in ("ui-monospace", "SFMono-Regular", "monospace")],
-)
-
-# css / theme / head go on the Blocks CONSTRUCTOR, not launch(). Gradio 6 moved
-# these to launch(), but launch()-time values are only baked into the page by
-# the exact launch() call that receives them. Running `python app.py` locally
-# runs our launch() verbatim, so it worked there — but Hugging Face Spaces (and
-# `gradio app.py` reload mode) start the discovered `app` Blocks with their own
-# launch() call, dropping our kwargs. That left the page with no CSS (transcript
-# column grew unbounded) and no head <script> (turn-nav JS never ran, so every
-# turn's card stacked and you were stuck on turn 1). Set on the constructor,
-# Gradio stores them as self._deprecated_{css,theme,head}, and whatever launch()
-# runs falls back to those — so they survive HF's launch path.
-with gr.Blocks(css=css, theme=theme, head=force_dark) as app:
+with gr.Blocks() as app:
     # Shared selected-game path; the URL params write it and both the
     # annotation and verdict screens render off it.
     game_state = gr.State(annotation.DEFAULT_GAME)
@@ -1229,4 +1228,11 @@ with gr.Blocks(css=css, theme=theme, head=force_dark) as app:
               outputs=[annotator_state, block_state, game_state, error_state,
                        playlist_state, playlist_idx_state, session_day_state])
 
-app.launch(share=True)
+# System fonts so first paint needs no remote Google Fonts fetch (slow over the
+# gradio.live share tunnel). Must be gr.themes.Font objects, not plain strings —
+# Gradio compares theme fonts via .name and a bare str crashes that check.
+theme = gr.themes.Soft(
+    font=[gr.themes.Font(f) for f in ("system-ui", "-apple-system", "Segoe UI", "sans-serif")],
+    font_mono=[gr.themes.Font(f) for f in ("ui-monospace", "SFMono-Regular", "monospace")],
+)
+app.launch(css=css, theme=theme, head=force_dark, share=True)
