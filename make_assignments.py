@@ -26,8 +26,8 @@ _dir = os.path.dirname(os.path.abspath(__file__))
 # ── EDIT ME ────────────────────────────────────────────────────────────────
 # Group A: Day 1 general (universal) → Day 2 specific (hybrid).
 # Group B: Day 1 specific (hybrid)  → Day 2 general (universal).
-ANNOTATORS_GROUP_A = ["alessandro", "yurii", "sabrina"]
-ANNOTATORS_GROUP_B = ["annotator4", "annotator5", "annotator6"]
+ANNOTATORS_GROUP_A = ["Alessandro", "Sherzod", "Filippo"]
+ANNOTATORS_GROUP_B = ["Sabrina", "Davi", "Dimitrije"]
 
 # The pilot Space URL (or http://localhost:7860/ for a local dry run).
 BASE_URL = "http://localhost:7860/"
