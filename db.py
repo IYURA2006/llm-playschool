@@ -165,7 +165,11 @@ def _migrate_ab_columns(conn):
     cols = {row[1] for row in conn.execute("PRAGMA table_info(annotations)")}
     for col in ("session_day", "session_started_at", "started_at", "survey_fit",
                 "survey_fatigue", "survey_confidence", "survey_comment",
-                "survey_fit_missing", "survey_fit_missing_count"):
+                "survey_fit_missing", "survey_fit_missing_count",
+                # Hybrid-only per-game whole-game ("specific overall") answers,
+                # stored as a JSON object {question_index: value}. Additive/
+                # nullable so it is safe on the live production dataset.
+                "verdict_specific"):
         if col not in cols:
             conn.execute(f"ALTER TABLE annotations ADD COLUMN {col} TEXT")
 
@@ -352,8 +356,12 @@ def completed_pairs(annotator_id):
 
 def save_verdict(game_slug, annotator_id, condition, coherence, overall, comment,
                  survey_confidence=None, survey_comment=None,
-                 survey_fit_missing=None, survey_fit_missing_count=None):
+                 survey_fit_missing=None, survey_fit_missing_count=None,
+                 verdict_specific=None):
     """Update the verdict columns of an existing annotation row.
+
+    `verdict_specific` is the hybrid-only per-game whole-game answer(s), passed
+    as a JSON string (or None); universal-condition saves leave it NULL.
 
     Returns True if a matching row existed (turns submitted first), else False.
     """
@@ -372,12 +380,13 @@ def save_verdict(game_slug, annotator_id, condition, coherence, overall, comment
                 survey_comment=?,
                 survey_fit_missing=?,
                 survey_fit_missing_count=?,
+                verdict_specific=?,
                 updated_at=?
             WHERE game_slug=? AND annotator_id=? AND condition=?
             """,
             (coherence, overall, comment, now, survey_confidence, survey_comment,
-             survey_fit_missing, survey_fit_missing_count, now, game_slug,
-             annotator_id, condition),
+             survey_fit_missing, survey_fit_missing_count, verdict_specific, now,
+             game_slug, annotator_id, condition),
         )
         ok = cur.rowcount > 0
     # save_turns already backs up; back up again here so the verdict fields

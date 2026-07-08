@@ -15,8 +15,8 @@ _STEPS = [
      "A full AI game session is shown on the left. Take your time to read "
      "through each turn before rating."),
     ("⭐", "2", "Rate each AI turn",
-     "For every AI move, score Prior Information Use and Strategic Logic on a "
-     "1–4 scale. Flag any obvious errors you spot."),
+     "For every AI move, score how it uses prior information and whether it's a "
+     "sensible next step on a 1–4 scale. Flag any obvious errors you spot."),
     ("✅", "3", "Give an overall verdict",
      "After rating all turns, score the game as a whole on Strategic Coherence "
      "and Overall Quality, then submit."),

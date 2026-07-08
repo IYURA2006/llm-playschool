@@ -1,9 +1,11 @@
+import json
 from datetime import datetime
 
 import gradio as gr
 
 import db
-from annotation import DEFAULT_GAME, load_game, game_slug, slug_to_path
+from annotation import (DEFAULT_GAME, load_game, game_slug, slug_to_path,
+                        whole_game_questions)
 
 _COHERENCE = [
     ("1", "No plan",   "Each move seems disconnected from the last — no consistent logic across turns."),
@@ -65,7 +67,7 @@ def _action_label(playlist, playlist_idx):
 
 def _verdict_save_and_clear(game_path, annotator_id, condition, playlist, playlist_idx,
                             coherence, overall, overall_touched, comment,
-                            confidence, fit_flag, fb_comment):
+                            confidence, fit_flag, fb_comment, specific):
     """Step 1 of the merged action button: validate + persist, AND (only if
     that succeeds and another playlist game remains) blank/reset every
     verdict widget in the SAME event — mirroring the old _next_game_clear,
@@ -85,7 +87,13 @@ def _verdict_save_and_clear(game_path, annotator_id, condition, playlist, playli
     no longer detect an untouched G2 — overall_touched (set only by the
     slider's .release() event, never by a programmatic reset) is the sole
     authority on that."""
-    err = not coherence or not overall_touched or not confidence
+    # Hybrid-only game-specific whole-game question(s): mandatory when shown.
+    # `specific` is the accumulated {str(index): value} dict from specific_state.
+    wg = whole_game_questions(game_path or DEFAULT_GAME, condition)
+    specific = specific or {}
+    specific_incomplete = bool(wg) and any(
+        not specific.get(str(i)) for i in range(len(wg)))
+    err = not coherence or not overall_touched or not confidence or specific_incomplete
 
     if err:
         return (
@@ -98,6 +106,7 @@ def _verdict_save_and_clear(game_path, annotator_id, condition, playlist, playli
             gr.skip(), gr.skip(),                     # overall_touched, comment
             _survey_update(confidence, err=True),
             gr.skip(), gr.skip(),                     # fit_flag, survey_comment
+            gr.skip(),                                # specific_state unchanged
             False,                                    # verdict_ok_state
         )
 
@@ -106,6 +115,7 @@ def _verdict_save_and_clear(game_path, annotator_id, condition, playlist, playli
         slug, annotator_id, condition, coherence, int(overall), comment or "",
         survey_confidence=confidence, survey_comment=fb_comment or "",
         survey_fit_missing=fit_flag or "",
+        verdict_specific=json.dumps(specific) if (wg and specific) else None,
     )
     if not ok:
         return (
@@ -117,6 +127,7 @@ def _verdict_save_and_clear(game_path, annotator_id, condition, playlist, playli
             gr.skip(), gr.skip(),
             _survey_update(confidence, err=False),
             gr.skip(), gr.skip(),
+            gr.skip(),                                # specific_state unchanged
             False,
         )
 
@@ -139,6 +150,7 @@ def _verdict_save_and_clear(game_path, annotator_id, condition, playlist, playli
             gr.update(value=None, elem_classes=["scale-radio"]),  # confidence
             gr.update(value=None),                         # fit_flag
             "",                            # survey comment
+            {},                            # specific_state — reset for next game
             True,                          # verdict_ok_state
         )
 
@@ -153,6 +165,7 @@ def _verdict_save_and_clear(game_path, annotator_id, condition, playlist, playli
         gr.skip(), gr.skip(),
         _survey_update(confidence, err=False),
         gr.skip(), gr.skip(),
+        gr.skip(),                                # specific_state unchanged
         True,
     )
 
@@ -280,6 +293,31 @@ def build(welcome_page, annotation_page, verdict_page, session_survey_page,
             )
             overall_touched = gr.State(False)
 
+        # ── Game-specific whole-game question(s) — HYBRID condition only.
+        # Rendered on top of the generic G1/G2 above (not a replacement), per the
+        # pilot decision to keep Overall for everyone and add a game-specific
+        # "specific overall" only for the hybrid group. The radios are rebuilt per
+        # game/condition by @gr.render; each writes its value into specific_state
+        # ({index: value}) so the fixed-shape save chain needs only ONE extra
+        # input, never dynamic per-game inputs.
+        specific_state = gr.State({})
+
+        @gr.render(inputs=[game_state, block_state])
+        def _specific_overall(path, block):
+            questions = whole_game_questions(path or DEFAULT_GAME, block)
+            if not questions:
+                return
+            with gr.Group(elem_classes=["question-card"]):
+                gr.Markdown("### G3 — This game specifically")
+                for idx, (q_md, choices) in enumerate(questions):
+                    gr.Markdown(q_md)
+                    r = gr.Radio(choices=choices, show_label=False,
+                                 elem_classes=["scale-radio"])
+                    r.change(
+                        fn=lambda val, cur, i=idx: {**(cur or {}), str(i): val},
+                        inputs=[r, specific_state], outputs=[specific_state],
+                    )
+
         # ── Comment
         comment = gr.Textbox(
             placeholder="Any overall observations about this game? (optional)",
@@ -299,7 +337,7 @@ def build(welcome_page, annotation_page, verdict_page, session_survey_page,
                          ("5\nCertain", "5")],
                 show_label=False, elem_classes=["scale-radio"],
             )
-            gr.Markdown("Was there a question that didn't really fit this game? *(optional)*")
+            gr.Markdown("How well do you feel the questions aligned to this game? *(optional)*")
             fit_flag = gr.Radio(
                 choices=[("1", "1"), ("2", "2"), ("3", "3"), ("4", "4"), ("5", "5")],
                 show_label=False, elem_classes=["scale-radio"],
@@ -341,10 +379,11 @@ def build(welcome_page, annotation_page, verdict_page, session_survey_page,
             fn=_verdict_save_and_clear,
             inputs=[game_state, annotator_state, block_state, playlist_state,
                     playlist_idx_state, coherence, overall, overall_touched,
-                    comment, survey_confidence, fit_flag, survey_comment],
+                    comment, survey_confidence, fit_flag, survey_comment,
+                    specific_state],
             outputs=[status, clearing_state, coherence, *coh_cols, *coh_btns,
                      overall, overall_touched, comment, survey_confidence,
-                     fit_flag, survey_comment, verdict_ok_state],
+                     fit_flag, survey_comment, specific_state, verdict_ok_state],
         ).then(
             fn=_verdict_finish,
             inputs=[verdict_ok_state, playlist_state, playlist_idx_state],

@@ -104,17 +104,14 @@ div:focus, div:focus-visible {
 }
 .txscroll {
     padding: 16px 18px;
-    /* The px cap in min() is load-bearing on HF Spaces. HF embeds the app in an
-       iframe sized to the app's OWN content (Gradio auto-resize, scrolling=no),
-       so inside it `100vh` == the iframe height == our content height, not the
-       browser window. A bare `calc(100vh - 150px)` then feeds back: the taller
-       the transcript, the taller 100vh, the taller this box — it grows to fit
-       instead of scrolling ("infinitely going down"). min(…, 680px) clamps it
-       to a fixed 680px, which breaks the loop (the app then reports a stable
-       height and the iframe settles), while `calc(100vh - 150px)` still wins on
-       a real, smaller viewport (direct *.hf.space URL / short laptop). */
+    /* Height is set by JS (syncTxHeight): the transcript matches the right
+       column (#annot-col) when the questions are tall, and floors at a
+       comfortable reading height when they're short. The value below is only a
+       fallback for before JS runs — it must NOT be viewport-based, because HF
+       embeds the app in a content-sized iframe where `100vh` feeds back and
+       grows unbounded. Non-!important so the JS inline height wins. */
     overflow-y: auto !important;
-    height: min(calc(100vh - 150px), 680px) !important;
+    height: 600px;
 }
 .goal-box {
     background: #e8f0fe;
@@ -203,16 +200,15 @@ div:focus, div:focus-visible {
     background: #0a0e1a !important;
     border-radius: 10px !important;
     padding: 10px 12px !important;
-    /* min(…,680px): same HF auto-resize-iframe trap as .txscroll — a bare 100vh
-       grows with content and the two columns must stay the same fixed height. */
-    height: min(calc(100vh - 150px), 680px) !important;
-    overflow-y: auto !important;
-    /* Gradio's .column is flex-wrap:wrap — with a fixed height, children
-       taller than the box WRAP INTO A SECOND COLUMN off to the right
-       (invisible page). Force single-column flow so it scrolls instead. */
+    /* Right column shows the whole current card at once — no internal scroll,
+       height follows its content. It must NOT stretch to the flex row height, or
+       its offsetHeight would stop being the true content height that
+       syncTxHeight measures to size the transcript. */
+    height: auto !important;
+    align-self: flex-start !important;
     flex-wrap: nowrap !important;
 }
-/* Don't let the fixed-height flex column squash its children to fit */
+/* Keep children at natural height inside the auto-height flex column */
 #annot-col > * { flex-shrink: 0 !important; }
 #annot-col > .wrap, #annot-col > .wrap > div { background: transparent !important; border: none !important; }
 #annot-col label { color: #cbd5e1 !important; }
@@ -752,18 +748,17 @@ div:focus, div:focus-visible {
 
 /* ── Training (practice round) page ───────────────────────────── */
 #train-col { background: #0a0e1a !important; border-radius: 10px !important; padding: 10px 12px !important;
-    /* Match the annotation page: fixed, self-scrolling column (see .txscroll for
-       why the min() px cap is required inside HF's content-sized iframe). */
-    height: min(calc(100vh - 150px), 680px) !important; overflow-y: auto !important; }
+    /* Match the annotation page: content-height, no internal scroll, no stretch
+       (see #annot-col). syncTxHeight sizes .train-txscroll to this column. */
+    height: auto !important; align-self: flex-start !important; }
 #train-col label { color: #cbd5e1 !important; }
 #train-col .prose strong, #train-col p strong { color: #e2e8f0 !important; }
 #train-col .prose p, #train-col p { color: #64748b !important; font-size: 12px !important; margin: 2px 0 6px !important; }
 /* Training transcript: its own class so it can be styled independently of the
-   annotation page's .txscroll. Same fixed height + min() px cap as .txscroll so
-   practice matches the real page and stays bounded inside HF's iframe (a bare
-   78vh grew to fill content there, so practice was "limitless" too). */
-.train-txscroll { padding: 16px 18px; overflow-y: auto !important;
-    height: min(calc(100vh - 150px), 680px) !important; }
+   annotation page's .txscroll. Height set by syncTxHeight (matches #train-col,
+   floored at a comfortable minimum); the fixed px below is a pre-JS fallback,
+   NOT viewport-based (see .txscroll for the HF content-sized-iframe reason). */
+.train-txscroll { padding: 16px 18px; overflow-y: auto !important; height: 600px; }
 /* Practice card — same wrapper+inner doubling handling as .turn-anno-card */
 .train-card:has(.train-card) {
     background: #0e1a30 !important;
@@ -887,6 +882,34 @@ force_dark = """
         return null;
     }
 
+    // Match the transcript (left) height to the questions column (right): when
+    // the questions are tall the two line up; when the questions are short the
+    // transcript keeps a comfortable reading height (TX_MIN_H). The right column
+    // is content-height with no internal scroll, so its offsetHeight is the real
+    // target. No viewport units anywhere — safe inside HF's content-sized iframe.
+    var TX_MIN_H = 500;
+    function syncCol(colSel, txSel) {
+        var col = document.querySelector(colSel);
+        var tx = document.querySelector(txSel);
+        if (!col || !tx || onHiddenPage(col)) return;
+        tx.style.height = Math.max(col.offsetHeight, TX_MIN_H) + 'px';
+    }
+    function syncHeights() {
+        syncCol('#annot-col', '.txscroll');
+        syncCol('#train-col', '.train-txscroll');
+    }
+    // Re-sync when the questions column reflows (radio picked, comment box grows,
+    // window resize) — not just on turn switch. Setting .txscroll height never
+    // resizes #annot-col (separate column, flex-start), so this can't loop.
+    var _txRO = window.ResizeObserver ? new ResizeObserver(function () { syncHeights(); }) : null;
+    function observeCols() {
+        if (!_txRO) return;
+        ['#annot-col', '#train-col'].forEach(function (s) {
+            var el = document.querySelector(s);
+            if (el) { try { _txRO.observe(el); } catch (e) {} }
+        });
+    }
+
     // Show only the current card; sync chips, transcript highlight, and counter.
     function refresh() {
         var cards = panes();
@@ -916,6 +939,7 @@ force_dark = """
         if (active) active.classList.add('active-turn');
         var el = document.querySelector('#annot-page .prog-rated');
         if (el) el.textContent = rated + ' of ' + cards.length + ' turns rated';
+        syncHeights();
     }
 
     function goTo(i, focusChip) {
@@ -965,9 +989,11 @@ force_dark = """
     function init() {
         if (!ready()) return false;
         wireAria();
+        observeCols();
         document.addEventListener('click', onClick);
         document.addEventListener('keydown', onKey);
         document.addEventListener('change', refresh);
+        window.addEventListener('resize', syncHeights);
         refresh();
         return true;
     }
@@ -1028,6 +1054,7 @@ force_dark = """
                     if (ready()) {
                         clearInterval(retryIv);
                         wireAria();
+                        observeCols();   // re-observe the freshly-rendered column
                         current = 0;
                         refresh();
                     } else if (++attempts > 80) {

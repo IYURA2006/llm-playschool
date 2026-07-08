@@ -23,9 +23,9 @@ _dir = os.path.dirname(os.path.abspath(__file__))
 TRAINING_GAME = os.path.join(_dir, "interactions", "interactions-20.json")
 
 _Q1_MD = ("**Q1 — Prior Information Use**\n\nDid the AI correctly use "
-          "information established in earlier turns?")
-_Q2_MD = ("**Q2 — Strategic Logic**\n\nRegardless of constraints, did this "
-          "move make strategic sense?")
+          "information from earlier in the game?")
+_Q2_MD = ("**Q2 — Sensible Next Step**\n\nDid this move make sense "
+          "as a next step?")
 _SCALE_Q1 = [("1\nNone", "1"), ("2\nPartial", "2"), ("3\nGood", "3"), ("4\nExcellent", "4")]
 _SCALE_Q2 = [("1\nNonsensical", "1"), ("2\nPoor", "2"), ("3\nReasonable", "3"), ("4\nStrong", "4")]
 
@@ -105,7 +105,7 @@ def _check(*vals):
         html = (
             '<div class="train-fb">'
             + _feedback_row("Q1 — Prior Information Use", ref["q1"], q1, ref["why_q1"])
-            + _feedback_row("Q2 — Strategic Logic", ref["q2"], q2, ref["why_q2"])
+            + _feedback_row("Q2 — Sensible Next Step", ref["q2"], q2, ref["why_q2"])
             + f'<div class="fb-note">💡 {ref["lower"]}</div>'
             + '</div>'
         )

@@ -77,6 +77,14 @@ def _scale4(labels):
     return [(f"{i + 1}\n{lbl}", str(i + 1)) for i, lbl in enumerate(labels)]
 
 
+def _scaleN(n, ends=None):
+    """Plain-number 1..n scale radio; `ends={1: 'lo', n: 'hi'}` adds end anchors.
+    Used for the bespoke whole-game "specific overall" questions (1-7 / 1-4)."""
+    ends = ends or {}
+    return [((f"{i}\n{ends[i]}" if i in ends else str(i)), str(i))
+            for i in range(1, n + 1)]
+
+
 # Hybrid-mode bespoke per-turn question sets, wired up only when block_type ==
 # "hybrid" (see BLOCK_TO_TYPE). Wording/scales sourced from question_set.md
 # (the pilot's design doc) — each entry replaces the universal Q1/Q2 for the
@@ -115,15 +123,21 @@ BESPOKE_QUESTIONS = {
     },
     "taboo": {
         "flags": [
-            "Guesser ignored its own previous wrong guess",
-            "Describer repeated the same clue",
+            "Guesser repeated a guess it already made",
+            "Describer gave the same (or same-meaning) clue as an earlier turn",
         ],
         "roles": {
             "WordDescriber": {
+                # Clarity only — forbidden-word use is checked automatically by the
+                # game engine, so a human should not judge it on this scale.
                 "q1": (
-                    "**Q1 — Clue Clarity**\n\nWas this clue clear enough to "
-                    "guess from, without a forbidden word?",
-                    _scale4(["Unclear", "Vague", "Mostly clear", "Fully clear"]),
+                    "**Q1 — Clue Clarity**\n\nWas this clue clear enough for the "
+                    "Guesser to work out the word? *(forbidden-word use is checked "
+                    "automatically — ignore that here)*",
+                    _scale4([
+                        "Not clear at all", "Barely clear, very vague",
+                        "Mostly clear, minor ambiguity", "Fully clear, easy to guess from",
+                    ]),
                 ),
                 "q2": None,
             },
@@ -132,10 +146,21 @@ BESPOKE_QUESTIONS = {
                 "q2": (
                     "**Q2 — Guess Match**\n\nDid the guess match what the clue "
                     "was pointing to?",
-                    _scale4(["No match", "Weak match", "Good match", "Strong match"]),
+                    _scale4([
+                        "No connection", "Weak, a stretch",
+                        "Reasonable, not exact", "Directly matches",
+                    ]),
                 ),
             },
         },
+        "whole_game": [
+            (
+                "**Whole game — Did the Describer adjust its clues based on what "
+                "the Guesser got wrong?**",
+                _scaleN(7, {1: "kept repeating the same approach",
+                            7: "clearly adjusted each time"}),
+            ),
+        ],
     },
     "hot_air_balloon": {
         "flags": [
@@ -157,32 +182,131 @@ BESPOKE_QUESTIONS = {
         },
     },
     "textmapworld_graphreasoning": {
+        # Colours match the map renderer/legend (_map_svg + _MAP_LEGEND_HTML):
+        # green ring = claimed correctly, red ring = claimed wrongly.
         "flags": [
-            "Spatial Hallucination / Invalid Move",
-            "Successful Self-Correction",
-            "Final Map Matches Own Movement History",
+            "Spatial hallucination — tried to go somewhere that doesn't exist, or invented a room",
+            "Self-correction — a room it drew wrong earlier (red) is later corrected (green) and matches its updated map",
+            "Final map doesn't match its own moves — a move it made is missing from, or contradicts, its final map",
         ],
         "render_graph": True,
         "roles": {
             "PathGuesser": {
                 "q1": (
                     "**Q1 — Map Self-Consistency**\n\nLooking only at the map "
-                    "the AI has drawn so far — does its move make sense, even "
-                    "if the map itself turns out to be wrong? *You are not "
+                    "the AI has drawn so far — does this move make sense, even "
+                    "if the map turns out to be wrong? *You are not "
                     "checking if the AI is right, only if it is consistent "
                     "with what it believes.*",
                     [
-                        ("1\nMakes no sense", "1"),
-                        ("2\nDoesn't quite fit", "2"),
-                        ("3\nMostly makes sense", "3"),
-                        ("4\nMakes perfect sense", "4"),
+                        ("1\nMakes no sense — contradicts its own map", "1"),
+                        ("2\nDoesn't quite fit — hard to explain from its own map", "2"),
+                        ("3\nMostly makes sense — reasonable, small issues", "3"),
+                        ("4\nMakes perfect sense — smart, logical given its own map", "4"),
                     ],
                 ),
                 "q2": None,
             },
         },
+        "whole_game": [
+            (
+                "**Whole game — Did it build an accurate, consistent map, and "
+                "recognize when it was done?**",
+                _scaleN(7),
+            ),
+        ],
+    },
+    "dond": {
+        "flags": [
+            "Player revealed its own secret values in the open chat",
+            "This player's secret proposal doesn't match what was just agreed",
+        ],
+        "roles": {
+            # Both seats share the "DealOrNoDealPlayer" role.
+            "DealOrNoDealPlayer": {
+                "q1": (
+                    "**Q1 — Value Consistency**\n\nDoes this offer make sense "
+                    "given what this player says they value?",
+                    _scale4([
+                        "Contradicts it", "Barely consistent",
+                        "Mostly consistent", "Fully consistent",
+                    ]),
+                ),
+                "q2": (
+                    "**Q2 — Builds on the Agreement**\n\nDoes this message build "
+                    "on what was agreed earlier?",
+                    _scale4([
+                        "Ignores/contradicts it", "Barely connected",
+                        "Mostly follows on", "Clearly builds on it",
+                    ]),
+                ),
+            },
+        },
+        "whole_game": [
+            (
+                "**Whole game — Did they reach an agreement that was genuinely "
+                "collaborative and close to the best value for both?**",
+                _scaleN(7),
+            ),
+        ],
+    },
+    "clean_up": {
+        "flags": [
+            "Repeated a proposal already rejected",
+            "Misstated its own object's position",
+            "Declared success without re-checking actual positions",
+        ],
+        "roles": {
+            # Both seats share the "GridCleaner" role.
+            "GridCleaner": {
+                "q1": (
+                    "**Q1 — Uses Stated Positions**\n\nDid this turn correctly use "
+                    "positions either player already stated?",
+                    _scale4([
+                        "Ignored/contradicted one", "Used some, missed one",
+                        "Mostly consistent", "Fully correct",
+                    ]),
+                ),
+                "q2": (
+                    "**Q2 — Sensible Next Step**\n\nDid this proposal make sense "
+                    "as a next step?",
+                    _scale4([
+                        "Nonsensical", "Wastes a turn",
+                        "Reasonable", "Efficient, well-targeted",
+                    ]),
+                ),
+            },
+        },
+        # Two separate whole-game scores on purpose: clarity and efficiency are
+        # different (a game can be clear-but-slow or confusing-but-fast).
+        "whole_game": [
+            (
+                "**Whole game (1 of 2) — Did they communicate clearly, without "
+                "confusion?**",
+                _scaleN(4),
+            ),
+            (
+                "**Whole game (2 of 2) — Did they reach agreement without "
+                "unnecessary repetition?**",
+                _scaleN(4),
+            ),
+        ],
     },
 }
+
+
+def whole_game_questions(game_path, block):
+    """Bespoke whole-game "specific overall" questions for a game as a list of
+    (question_markdown, choices), or [] when there are none.
+
+    Returned ONLY in the hybrid condition — mirrors the per-turn bespoke gating
+    (BLOCK_TO_TYPE): the universal condition keeps just the generic Coherence +
+    Overall verdict questions, so the whole-game A/B addition is hybrid-only.
+    """
+    if BLOCK_TO_TYPE.get(block, "universal") != "hybrid":
+        return []
+    game_key = game_slug(game_path).split("__", 1)[0]
+    return BESPOKE_QUESTIONS.get(game_key, {}).get("whole_game") or []
 
 
 def output_path_for(game_path):
@@ -313,12 +437,12 @@ def load_game(path):
     g.has_reasoning = game_key in _REASONING_GAMES or _detect_reasoning(ai_turns)
     g.multi_role = len(ai_ids) > 1
     g.flag_choices = [
-        "Repeated a previous failed move",
-        "Invented or misquoted a game fact",
-        "Self-corrected after error",
+        "Repeated a move that already failed",
+        "Invented or got a game fact wrong",
+        "Noticed and fixed an earlier mistake",
     ]
     if g.has_reasoning:
-        g.flag_choices.append("Reasoning-Action Mismatch")
+        g.flag_choices.append("Explanation does not match the move")
     g.slug = game_slug(path)
     g.source_path = os.path.relpath(path, _dir)
     return g
@@ -817,7 +941,7 @@ def _build_transcript_html(g, current_idx, pretty_map=False,
 # SUBMIT  (closure over the active game + the field layout that render built)
 # ──────────────────────────────────────────────────────────────────────────
 
-def _submit(g, field_specs, condition, annotator_id, started_at, session_day,
+def _submit(g, field_specs, condition, show_q3, annotator_id, started_at, session_day,
             session_started_at, *vals):
     # field_specs[i] describes what vals[i] holds: (turn_index, "q1"/"q2"/"q3"
     # /"flags"/"comment") or (turn_index, "extra", key) for a bespoke bolt-on.
@@ -860,7 +984,7 @@ def _submit(g, field_specs, condition, annotator_id, started_at, session_day,
             "content": msg["action"]["content"],
             "prior_information_use": t["q1"],
             "strategic_logic": t["q2"],
-            "reasoning_clarity": t["q3"] if g.has_reasoning else None,
+            "reasoning_clarity": t["q3"] if show_q3 else None,
             "flags": t["flags"] or [],
             "comment": t["comment"] or "",
             "extra_responses": t["extra"] or None,
@@ -901,6 +1025,14 @@ def build(welcome_page, annotation_page, verdict_page, game_state, annotator_sta
             block_type = BLOCK_TO_TYPE.get(block, "universal")
             game_key = g.slug.split("__", 1)[0]
             bespoke = BESPOKE_QUESTIONS.get(game_key) if block_type == "hybrid" else None
+            # Q3 (Reasoning Clarity) gating by condition:
+            #  - universal ("general"): only where the AI actually explains its
+            #    reasoning (g.has_reasoning) — i.e. where it can be answered.
+            #  - hybrid ("mix"): only when the game's bespoke set opts in via a
+            #    "reasoning_clarity" flag. None do today, so Q3 is dropped from the
+            #    hybrid condition (it was never in those bespoke question lists).
+            show_q3 = (bool(bespoke.get("reasoning_clarity"))
+                       if bespoke is not None else g.has_reasoning)
             # The claimed-map renderer shows in BOTH conditions (team call,
             # 2026-07-06): raw graph JSON is unreadable no matter which
             # question set you're answering, so only the QUESTIONS differ
@@ -977,7 +1109,7 @@ def build(welcome_page, annotation_page, verdict_page, game_state, annotator_sta
                             # None = not rendered for this role, tuple = bespoke.
                             q1_cfg = role_cfg.get("q1", "generic")
                             if q1_cfg == "generic":
-                                gr.Markdown("**Q1 — Prior Information Use**\n\nDid the AI correctly use information established in earlier turns?")
+                                gr.Markdown("**Q1 — Prior Information Use**\n\nDid the AI correctly use information from earlier in the game?")
                                 q1 = gr.Radio(
                                     choices=[("1\nNone", "1"), ("2\nPartial", "2"), ("3\nGood", "3"), ("4\nExcellent", "4")],
                                     show_label=False, elem_classes=["scale-radio", "q1-scale"],
@@ -993,7 +1125,7 @@ def build(welcome_page, annotation_page, verdict_page, game_state, annotator_sta
                             # Q2 slot — same generic/None/bespoke pattern.
                             q2_cfg = role_cfg.get("q2", "generic")
                             if q2_cfg == "generic":
-                                gr.Markdown("**Q2 — Strategic Logic**\n\nRegardless of constraints, did this move make strategic sense?")
+                                gr.Markdown("**Q2 — Sensible Next Step**\n\nDid this move make sense as a next step?")
                                 q2 = gr.Radio(
                                     choices=[("1\nNonsensical", "1"), ("2\nPoor", "2"), ("3\nReasonable", "3"), ("4\nStrong", "4")],
                                     show_label=False, elem_classes=["scale-radio", "q2-scale"],
@@ -1013,10 +1145,11 @@ def build(welcome_page, annotation_page, verdict_page, game_state, annotator_sta
                                                 elem_classes=["scale-radio"])
                                 components.append(bolt); field_specs.append((i, "extra", key))
 
-                            # Q3 — unchanged, existing conditional pattern (reused,
-                            # not duplicated, regardless of universal/hybrid).
-                            if g.has_reasoning:
-                                gr.Markdown("**Q3 — Reasoning Clarity** · conditional")
+                            # Q3 — shown per show_q3 (condition-gated above). When
+                            # hidden it's a preset-N/A invisible radio so field_specs
+                            # / submit / the JS rated-counter all stay aligned.
+                            if show_q3:
+                                gr.Markdown("**Q3 — Reasoning Clarity** · conditional\n\nHow clearly does the AI explain its move?")
                                 q3 = gr.Radio(
                                     choices=[("1\nUnclear", "1"), ("2\nConfused", "2"), ("3\nClear", "3"), ("4\nTransparent", "4"), ("N/A", "NA")],
                                     show_label=False, elem_classes=["scale-radio", "q3-scale"],
@@ -1049,7 +1182,7 @@ def build(welcome_page, annotation_page, verdict_page, game_state, annotator_sta
             # EVENTS — wired inside @gr.render since `components` is rebuilt
             # fresh on every game/block change.
             submit_btn.click(
-                fn=functools.partial(_submit, g, field_specs, block),
+                fn=functools.partial(_submit, g, field_specs, block, show_q3),
                 inputs=[annotator_state, started_at_state, session_day_state,
                         session_started_at_state, *components],
                 outputs=[status, annotation_page, verdict_page],
