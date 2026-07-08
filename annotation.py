@@ -292,6 +292,69 @@ BESPOKE_QUESTIONS = {
             ),
         ],
     },
+    "imagegame": {
+        # Two AI seats with DIFFERENT roles, so the per-turn questions change with
+        # whose turn it is: Giver turns (the "Command: …" text) get Q1/Q2, Follower
+        # turns (the ▢-grid the game renders as an ASCII block) get the grid-update
+        # question. The target grid the Giver must reproduce is shown once at the
+        # top of the transcript (its opening GM prompt), so Q1 is answerable there.
+        "flags": [],  # no per-turn flags for imagegame (Giver or Follower)
+        "whole_game_only": True,  # verdict shows ONLY the whole_game sliders (no G1/G2)
+        "roles": {
+            "Instruction Giver": {
+                "q1": (
+                    "**Q1 — Does this instruction correctly describe one cell/row/column of the real target grid? Pick N/A "
+                    "on the final \"DONE\" turn.)*",
+                    [
+                        ("1\nWrong", "1"),
+                        ("2\nPartly right", "2"),
+                        ("3\nMostly right ", "3"),
+                        ("4\nFully right", "4"),
+                        ("N/A", "NA"),
+                    ],
+                ),
+                "q2": (
+                    "**Q2 — Does this instruction still make sense given everything filled in so far, or does it suggest the Giver has lost track of the shape *(On the final turn, "
+                    "judge instead: was it right to stop here?)*",
+                    _scale4([
+                        "No — lost track of the shape",
+                        "Barely — hard to follow on from earlier instructions",
+                        "Mostly — small issues only",
+                        "Fully — clearly builds on what came before",
+                    ]),
+                ),
+            },
+            "Instruction Follower": {
+                # Was a Yes/No/N/A tick — now a 1-4 scale (team call).
+                "q1": (
+                    "**Q1 — Grid Updated Correctly**\n\nDid the grid actually change "
+                    "to match this instruction?",
+                    _scale4([
+                        "No — didn't change, or changed wrongly",
+                        "Partly — changed but doesn't match",
+                        "Mostly — close, minor mismatch",
+                        "Yes — matches the instruction exactly",
+                    ]),
+                ),
+                "q2": None,
+            },
+        },
+        "whole_game": [
+            (
+                "**Whole game — Giver's plan**\n\nEven if the Follower made mistakes "
+                "along the way, was the Giver's overall plan for the shape a good one?",
+                _scaleN(7, {1: "plan itself was confused / didn't make sense",
+                            7: "clear and correct the whole way through"}),
+            ),
+            (
+                "**Whole game — Follower's execution**\n\nEven if the Giver's "
+                "instructions weren't always correct, did the Follower update the "
+                "grid correctly based on what it was actually told?",
+                _scaleN(7, {1: "rarely followed instructions correctly",
+                            7: "followed correctly nearly every time"}),
+            ),
+        ],
+    },
 }
 
 
@@ -307,6 +370,18 @@ def whole_game_questions(game_path, block):
         return []
     game_key = game_slug(game_path).split("__", 1)[0]
     return BESPOKE_QUESTIONS.get(game_key, {}).get("whole_game") or []
+
+
+def whole_game_only(game_path, block):
+    """True when the verdict should show ONLY the game-specific whole-game
+    questions (as 1-7 sliders) and hide the generic Coherence + Overall pair.
+    Set per game via BESPOKE_QUESTIONS[...]["whole_game_only"]; hybrid-only,
+    and only meaningful when whole_game_questions() is non-empty (imagegame:
+    a two-role game where a single "overall quality" score doesn't fit)."""
+    if BLOCK_TO_TYPE.get(block, "universal") != "hybrid":
+        return False
+    game_key = game_slug(game_path).split("__", 1)[0]
+    return bool(BESPOKE_QUESTIONS.get(game_key, {}).get("whole_game_only"))
 
 
 def output_path_for(game_path):
@@ -1159,13 +1234,19 @@ def build(welcome_page, annotation_page, verdict_page, game_state, annotator_sta
                                               show_label=False)
                             components.append(q3); field_specs.append((i, "q3"))
 
-                            flag_choices = (bespoke.get("flags") if bespoke and bespoke.get("flags") else g.flag_choices)
-                            gr.HTML('<div class="flags-lbl">Flags <span class="flags-sub">— tick all that apply</span></div>')
-                            fl = gr.CheckboxGroup(
-                                choices=flag_choices, show_label=False,
-                                elem_classes=["flags-check"],
-                            )
-                            components.append(fl); field_specs.append((i, "flags"))
+                            # Flags: a bespoke "flags" LIST overrides the generic set;
+                            # an explicit [] means "no flags for this game" (imagegame),
+                            # so the CheckboxGroup is skipped entirely. None/absent
+                            # (e.g. codenames) falls back to the generic set.
+                            _bf = bespoke.get("flags") if bespoke else None
+                            flag_choices = _bf if isinstance(_bf, list) else g.flag_choices
+                            if flag_choices:
+                                gr.HTML('<div class="flags-lbl">Flags <span class="flags-sub">— tick all that apply</span></div>')
+                                fl = gr.CheckboxGroup(
+                                    choices=flag_choices, show_label=False,
+                                    elem_classes=["flags-check"],
+                                )
+                                components.append(fl); field_specs.append((i, "flags"))
 
                             cm = gr.Textbox(
                                 placeholder="Optional turn comment…",

@@ -57,7 +57,7 @@ def _progress_note(name, day):
             f"Start will resume where you left off (practice round is skipped).")
 
 
-def _start(err, playlist, block, name, day, annotator):
+def _start(err, playlist, block, name, day, annotator, session_day):
     """Route the Start click.
 
     Priority: filled name/day form → URL playlist link → legacy single-game
@@ -113,9 +113,11 @@ def _start(err, playlist, block, name, day, annotator):
             return stay(f"⚠️ Your assignment references an unknown game "
                         f"({item['game']!r}) — tell the study coordinator.")
 
-        if idx == 0:   # fresh session → practice round first
+        # Practice round only on the FIRST game of Day 1 — Day 2 skips it
+        # (annotators already did the practice on Day 1).
+        if idx == 0 and day != "2":
             pages = (gr.update(visible=False), noop, gr.update(visible=True))
-        else:          # resuming → skip training, land on the next unfinished game
+        else:          # resuming, or Day 2 → straight to annotation
             pages = (gr.update(visible=False), gr.update(visible=True), noop)
         return (*pages, now, now, name, item["condition"], path, items, idx, day,
                 "", False)
@@ -134,9 +136,11 @@ def _start(err, playlist, block, name, day, annotator):
         if not path:
             return stay(f"⚠️ Your assignment references an unknown game "
                         f"({item['game']!r}) — tell the study coordinator.")
-        if idx == 0:   # nothing finished yet → practice round first
+        # Practice only on Day 1's first game; Day 2 (session_day from the URL)
+        # skips straight to annotation.
+        if idx == 0 and session_day != "2":
             pages = (gr.update(visible=False), noop, gr.update(visible=True))
-        else:          # resuming → skip training, land on the next unfinished game
+        else:          # resuming, or Day 2 → straight to annotation
             pages = (gr.update(visible=False), gr.update(visible=True), noop)
         return (*pages, now, now, gr.skip(), item["condition"], path,
                 gr.skip(), idx, gr.skip(), "", False)
@@ -259,7 +263,7 @@ def build(welcome_page, annotation_page, training_page, error_state,
             ).then(
                 _start,
                 inputs=[error_state, playlist_state, block_state, name_dd,
-                        day_radio, annotator_state],
+                        day_radio, annotator_state, session_day_state],
                 outputs=[welcome_page, annotation_page, training_page,
                          started_at_state, session_started_at_state,
                          annotator_state, block_state,

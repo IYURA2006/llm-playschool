@@ -640,17 +640,20 @@ div:focus, div:focus-visible {
     font-size: 12px !important; color: #64748b !important;
     line-height: 1.45 !important; margin-top: 3px !important;
 }
-/* Untouched-slider error ring (parallel to .scale-radio.radio-error for
-   Radio questions) — targets a couple of DOM levels since elem_classes
-   lands on the Slider's outer block wrapper, and visual verification may
-   show the ring needs to sit on an inner level instead. */
-.ovr-slider.ovr-slider-err,
-.ovr-slider.ovr-slider-err .wrap,
-.ovr-slider.ovr-slider-err > div {
+/* Untouched-slider error ring (parallel to .scale-radio.radio-error for Radio
+   questions). Applied to the OUTER block wrapper ONLY — elem_classes lands there,
+   and bordering the inner .wrap / > div as well drew two/three nested rings
+   ("double border"). One ring around the whole slider block is what we want. */
+.ovr-slider.ovr-slider-err {
     border: 1px solid #ef4444 !important;
     border-radius: 10px !important;
     box-shadow: 0 0 0 3px rgba(239,68,68,.18) !important;
 }
+/* whole_game_only games (imagegame): the head script adds .hide-generic to
+   #verdict-page when the game-specific block renders a .wg-only marker, hiding
+   the generic Coherence/Overall cards so only the game's own sliders show. */
+#verdict-page.hide-generic .g1-card,
+#verdict-page.hide-generic .g2-card { display: none !important; }
 
 /* ── Rating-scale legend rows (welcome page) ──────────────────── */
 .ovr-row {
@@ -1064,6 +1067,25 @@ force_dark = """
             }, 80);
         }).observe(document.documentElement, { childList: true, subtree: true });
     })();
+})();
+</script>
+<script>
+(function () {
+    // whole_game_only games (imagegame) render a .wg-only marker in their
+    // game-specific verdict block. When it's present, hide the generic G1/G2
+    // cards by toggling .hide-generic on #verdict-page (CSS does the hiding).
+    // The server skips G1/G2 validation for these games, so this is purely
+    // cosmetic — safe even if it briefly lags a render.
+    function toggleGeneric() {
+        var vp = document.getElementById('verdict-page');
+        if (!vp) return;
+        vp.classList.toggle('hide-generic', !!vp.querySelector('.wg-only'));
+    }
+    if (window.MutationObserver) {
+        new MutationObserver(toggleGeneric).observe(document.documentElement,
+            { childList: true, subtree: true });
+    }
+    toggleGeneric();
 })();
 </script>
 """

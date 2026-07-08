@@ -5,7 +5,7 @@ import gradio as gr
 
 import db
 from annotation import (DEFAULT_GAME, load_game, game_slug, slug_to_path,
-                        whole_game_questions)
+                        whole_game_questions, whole_game_only)
 
 _COHERENCE = [
     ("1", "No plan",   "Each move seems disconnected from the last — no consistent logic across turns."),
@@ -90,10 +90,17 @@ def _verdict_save_and_clear(game_path, annotator_id, condition, playlist, playli
     # Hybrid-only game-specific whole-game question(s): mandatory when shown.
     # `specific` is the accumulated {str(index): value} dict from specific_state.
     wg = whole_game_questions(game_path or DEFAULT_GAME, condition)
+    wg_only = whole_game_only(game_path or DEFAULT_GAME, condition)
     specific = specific or {}
     specific_incomplete = bool(wg) and any(
         not specific.get(str(i)) for i in range(len(wg)))
-    err = not coherence or not overall_touched or not confidence or specific_incomplete
+    # whole_game_only games (imagegame) hide G1/G2 — only the specific sliders +
+    # confidence are required there; every other game still requires coherence
+    # + a touched overall slider.
+    if wg_only:
+        err = not confidence or specific_incomplete
+    else:
+        err = not coherence or not overall_touched or not confidence or specific_incomplete
 
     if err:
         return (
@@ -111,8 +118,12 @@ def _verdict_save_and_clear(game_path, annotator_id, condition, playlist, playli
         )
 
     slug = game_slug(game_path or DEFAULT_GAME)
+    # For whole_game_only games the generic G1/G2 are hidden, so don't persist
+    # their (untouched) defaults — store NULL; the answers live in verdict_specific.
+    save_coherence = None if wg_only else coherence
+    save_overall = None if wg_only else int(overall)
     ok = db.save_verdict(
-        slug, annotator_id, condition, coherence, int(overall), comment or "",
+        slug, annotator_id, condition, save_coherence, save_overall, comment or "",
         survey_confidence=confidence, survey_comment=fb_comment or "",
         survey_fit_missing=fit_flag or "",
         verdict_specific=json.dumps(specific) if (wg and specific) else None,
@@ -248,7 +259,9 @@ def build(welcome_page, annotation_page, verdict_page, session_survey_page,
         gr.Markdown("You have rated all individual turns. Now give your overall assessment of this game session.")
 
         # ── G1: Strategic Coherence
-        with gr.Group(elem_classes=["question-card"]):
+        # (.g1-card / .g2-card let the head script hide the generic pair for
+        # whole_game_only games — see #verdict-page.hide-generic in app.py.)
+        with gr.Group(elem_classes=["question-card", "g1-card"]):
             gr.Markdown("### G1 — Strategic Coherence")
             gr.Markdown("How well did the AI stick to and adapt its plan throughout the game?")
             coh_cols, coh_btns = [], []
@@ -265,7 +278,7 @@ def build(welcome_page, annotation_page, verdict_page, session_survey_page,
             coherence = gr.Textbox(value="", visible=False)
 
         # ── G2: Overall Game Quality
-        with gr.Group(elem_classes=["question-card"]):
+        with gr.Group(elem_classes=["question-card", "g2-card"]):
             gr.Markdown("### G2 — Overall Game Quality")
             gr.Markdown("Looking at the whole game, how well did the AI actually play to achieve the main goal?")
             _lo_v, _lo_lbl, _lo_desc = _OVERALL_RATINGS[0]
@@ -294,12 +307,12 @@ def build(welcome_page, annotation_page, verdict_page, session_survey_page,
             overall_touched = gr.State(False)
 
         # ── Game-specific whole-game question(s) — HYBRID condition only.
-        # Rendered on top of the generic G1/G2 above (not a replacement), per the
-        # pilot decision to keep Overall for everyone and add a game-specific
-        # "specific overall" only for the hybrid group. The radios are rebuilt per
-        # game/condition by @gr.render; each writes its value into specific_state
-        # ({index: value}) so the fixed-shape save chain needs only ONE extra
-        # input, never dynamic per-game inputs.
+        # Normally rendered ON TOP of the generic G1/G2 (kept for everyone). For a
+        # "whole_game_only" game (imagegame) these REPLACE G1/G2 — the .wg-only
+        # marker below tells the head script to hide .g1-card/.g2-card, and the
+        # server skips the coherence/overall checks (see _verdict_save_and_clear).
+        # Each widget writes its value into specific_state ({index: value}) so the
+        # fixed-shape save chain needs only ONE extra input, never dynamic ones.
         specific_state = gr.State({})
 
         @gr.render(inputs=[game_state, block_state])
@@ -307,16 +320,42 @@ def build(welcome_page, annotation_page, verdict_page, session_survey_page,
             questions = whole_game_questions(path or DEFAULT_GAME, block)
             if not questions:
                 return
-            with gr.Group(elem_classes=["question-card"]):
-                gr.Markdown("### G3 — This game specifically")
+            slider_mode = whole_game_only(path or DEFAULT_GAME, block)
+            cls = ["question-card"] + (["wg-only"] if slider_mode else [])
+            with gr.Group(elem_classes=cls):
+                gr.Markdown("### This game specifically" if slider_mode
+                            else "### G3 — This game specifically")
                 for idx, (q_md, choices) in enumerate(questions):
                     gr.Markdown(q_md)
-                    r = gr.Radio(choices=choices, show_label=False,
-                                 elem_classes=["scale-radio"])
-                    r.change(
-                        fn=lambda val, cur, i=idx: {**(cur or {}), str(i): val},
-                        inputs=[r, specific_state], outputs=[specific_state],
-                    )
+                    if slider_mode:
+                        # 1-7 slider like G2, with the end anchors from the choices.
+                        n = len(choices)
+                        lo = choices[0][0].split("\n", 1)
+                        hi = choices[-1][0].split("\n", 1)
+                        lo_lbl = lo[1] if len(lo) > 1 else ""
+                        hi_lbl = hi[1] if len(hi) > 1 else ""
+                        gr.HTML(
+                            '<div class="ovr-slider-ends">'
+                            f'<div class="ovr-end ovr-end-lo"><span class="ovr-end-num">1</span>'
+                            f'<span class="ovr-end-desc">{lo_lbl}</span></div>'
+                            f'<div class="ovr-end ovr-end-hi"><span class="ovr-end-num">{n}</span>'
+                            f'<span class="ovr-end-desc">{hi_lbl}</span></div></div>'
+                        )
+                        s = gr.Slider(minimum=1, maximum=n, step=1, value=(1 + n) // 2,
+                                      show_label=False, elem_classes=["ovr-slider"])
+                        # .release only (a user gesture) — an untouched slider stays
+                        # OUT of specific_state, so validation still catches "unanswered".
+                        s.release(
+                            fn=lambda val, cur, i=idx: {**(cur or {}), str(i): str(int(val))},
+                            inputs=[s, specific_state], outputs=[specific_state],
+                        )
+                    else:
+                        r = gr.Radio(choices=choices, show_label=False,
+                                     elem_classes=["scale-radio"])
+                        r.change(
+                            fn=lambda val, cur, i=idx: {**(cur or {}), str(i): val},
+                            inputs=[r, specific_state], outputs=[specific_state],
+                        )
 
         # ── Comment
         comment = gr.Textbox(

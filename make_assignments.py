@@ -49,15 +49,14 @@ DAY1_GAMES = [
     "taboo__medium_en__instance_00000",
 ]
 
-# Day 2 — 2–3 transcripts of ONE game that nobody saw on Day 1.
-# Default: Imagegame (vivid confirmed bug: grid silently failed to update).
-# NOTE: only 2 imagegame transcripts exist in games/ right now and
-# compact_grids has a single AI turn — pull 1–2 more episodes from
-# clembench-runs (ideally the grid-freeze one) before Day 2, or fall back to
-# taboo (medium_en + high_en are the two non-practice transcripts).
+# Day 2 — transcripts of ONE game that nobody saw on Day 1.
+# Imagegame (vivid confirmed bug: grid silently failed to update). Four episodes
+# now exist in games/ (two grid types × two instances).
 DAY2_GAMES = [
     "imagegame__random_grids__instance_00000",
+    "imagegame__random_grids__instance_00001",
     "imagegame__compact_grids__instance_00000",
+    "imagegame__compact_grids__instance_00001",
 ]
 # ───────────────────────────────────────────────────────────────────────────
 
