@@ -303,18 +303,21 @@ BESPOKE_QUESTIONS = {
         "roles": {
             "Instruction Giver": {
                 "q1": (
-                    "**Q1 — Does this instruction correctly describe one cell/row/column of the real target grid? Pick N/A "
-                    "on the final \"DONE\" turn.)*",
+                    "**Q1 — Correct Placement**\n\nDoes this instruction correctly "
+                    "describe one cell / row / column of the real target grid? "
+                    "*(Pick N/A on the final \"DONE\" turn.)*",
                     [
                         ("1\nWrong", "1"),
                         ("2\nPartly right", "2"),
-                        ("3\nMostly right ", "3"),
+                        ("3\nMostly right", "3"),
                         ("4\nFully right", "4"),
                         ("N/A", "NA"),
                     ],
                 ),
                 "q2": (
-                    "**Q2 — Does this instruction still make sense given everything filled in so far, or does it suggest the Giver has lost track of the shape *(On the final turn, "
+                    "**Q2 — Still On Track**\n\nDoes this instruction still make "
+                    "sense given everything filled in so far, or does it suggest "
+                    "the Giver has lost track of the shape? *(On the final turn, "
                     "judge instead: was it right to stop here?)*",
                     _scale4([
                         "No — lost track of the shape",
