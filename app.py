@@ -1264,4 +1264,9 @@ theme = gr.themes.Soft(
     font=[gr.themes.Font(f) for f in ("system-ui", "-apple-system", "Segoe UI", "sans-serif")],
     font_mono=[gr.themes.Font(f) for f in ("ui-monospace", "SFMono-Regular", "monospace")],
 )
-app.launch(css=css, theme=theme, head=force_dark, share=True)
+# share=False: HF Spaces force-disables share anyway (warns), and on any other
+# host share=True serves the whole frontend from Gradio's S3 CDN — when a lazily
+# loaded component chunk (Dropdown/Radio) fails to fetch it silently doesn't
+# mount, leaving e.g. an empty "Start your session" card. Participants get the
+# HF Space URL, not a gradio.live link, so the tunnel was never needed.
+app.launch(css=css, theme=theme, head=force_dark, share=False)
