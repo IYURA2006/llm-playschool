@@ -320,6 +320,10 @@ BESPOKE_QUESTIONS = {
                     _scaleN(4, {
                         1: "Doesn't fit — feels like it's starting something "
                            "new, not continuing the shape",
+                        2: "Barely fits — technically continues the shape, but "
+                           "an odd or inefficient choice right now",
+                        3: "Fits well — a sensible next step, even if not the "
+                           "most efficient one",
                         4: "Fits perfectly — a clear, smart next step for the shape",
                     }),
                 ),
