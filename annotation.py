@@ -303,7 +303,7 @@ BESPOKE_QUESTIONS = {
         "roles": {
             "Instruction Giver": {
                 "q1": (
-                    "**Q1 — Correct Placement**\n\nDoes this instruction correctly "
+                    "**Q1 — Backend Knowledge**\n\nDoes this instruction correctly "
                     "describe one cell / row / column of the real target grid? "
                     "*(Pick N/A on the final \"DONE\" turn.)*",
                     [
@@ -315,22 +315,19 @@ BESPOKE_QUESTIONS = {
                     ],
                 ),
                 "q2": (
-                    "**Q2 — Still On Track**\n\nDoes this instruction still make "
-                    "sense given everything filled in so far, or does it suggest "
-                    "the Giver has lost track of the shape? *(On the final turn, "
-                    "judge instead: was it right to stop here?)*",
-                    _scale4([
-                        "No — lost track of the shape",
-                        "Barely — hard to follow on from earlier instructions",
-                        "Mostly — small issues only",
-                        "Fully — clearly builds on what came before",
-                    ]),
+                    "**Q2 — Conversation Cohesion**\n\nIs this instruction a good "
+                    "next step for the shape, based on how much has been built so far?",
+                    _scaleN(4, {
+                        1: "Doesn't fit — feels like it's starting something "
+                           "new, not continuing the shape",
+                        4: "Fits perfectly — a clear, smart next step for the shape",
+                    }),
                 ),
             },
             "Instruction Follower": {
                 # Was a Yes/No/N/A tick — now a 1-4 scale (team call).
                 "q1": (
-                    "**Q1 — Grid Updated Correctly**\n\nDid the grid actually change "
+                    "**Q1 — Backend Knowledge**\n\nDid the grid actually change "
                     "to match this instruction?",
                     _scale4([
                         "No — didn't change, or changed wrongly",
