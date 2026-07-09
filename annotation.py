@@ -736,11 +736,17 @@ _GRID_OBJ_RE = re.compile(r"(?<![A-Za-z])([A-Z])(?![A-Za-z])")
 
 
 def _is_grid_line(ln):
-    """A real board ROW is mostly grid characters — prose that merely
-    mentions one (e.g. "…must only contain the symbol '◌'.") is not. The
-    density test is what keeps such sentences flowing inline instead of
-    getting frozen into a no-wrap monospace block."""
-    n = sum(1 for ch in ln if ch in _GRID_CHARS)
+    """A real board ROW is mostly grid cells — prose that merely mentions one
+    (e.g. "…must only contain the symbol '◌'.") is not. A cell is either a grid
+    glyph (▢, box-drawing) OR a lone capital game-object (R/X/E, C/L/P). Counting
+    the objects too is essential for imagegame: as the follower fills the board,
+    rows accumulate letters and shed ▢'s, so a row like "R R ▢ ▢ ▢" has only 3
+    glyphs — glyph-only counting dropped it below the threshold and rendered it
+    as prose, fragmenting the grid (or de-gridding a mostly-filled board
+    entirely). The density test still keeps object-mentioning sentences inline:
+    prose is dominated by lowercase word-letters, pushing the ratio well under
+    0.5."""
+    n = sum(1 for ch in ln if ch in _GRID_CHARS) + len(_GRID_OBJ_RE.findall(ln))
     if n < 4:
         return False
     non_space = sum(1 for ch in ln if not ch.isspace())
