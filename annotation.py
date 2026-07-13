@@ -876,12 +876,15 @@ def _build_transcript_html(g, current_idx, pretty_map=False,
         map_snapshots, map_grid = _map_truth_and_layout(g)
         parts.append(_MAP_LEGEND_HTML)
 
-    # messages from turn 0 that are pure setup (the long rules prompt) — skip in body
-    _turn0_setup = set()
-    for m in g.data["turns"][0]:
-        c = m["action"].get("content")
-        if isinstance(c, str):
-            _turn0_setup.add(c)
+    # Content already shown in the GAME GOAL box up top (g.rules) — skip a
+    # verbatim repeat of it in the turn-0 body. Deliberately NOT every turn-0
+    # message: some games (e.g. Deal or No Deal, Clean Up) send each player a
+    # DIFFERENT context message in turn 0 — the shared rules plus that
+    # player's own private info (DoND's secret value function, Clean Up's
+    # board position). Matching against every turn-0 message hid the second
+    # player's distinct context too, since only the first one ever gets
+    # promoted to g.rules — annotators never saw what the second player knew.
+    _turn0_setup = {g.rules}
 
     # Assign a stable colour slot (p1, p2, p3…) to each AI sender
     # in the order they first appear as a "response" message.
