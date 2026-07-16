@@ -968,6 +968,15 @@ def _build_transcript_html(g, current_idx, pretty_map=False,
                     if pretty_map and _parse_map_response(content):
                         continue
                     tag = "GM" if sender == "GM" else html.escape(g.role(sender))
+                    # In two-player games each GM message is privately addressed —
+                    # clean_up sends each player their OWN grid + move feedback —
+                    # and the interleaved P1/P2 order lands a player's feedback
+                    # under the OTHER player's turn card. Label the recipient so
+                    # e.g. "Moved 'C' successfully" reads as Player 1's feedback,
+                    # not the Player 2 card it happens to sit beneath.
+                    recipient = msg.get("to")
+                    if g.multi_role and recipient in g.ai_ids:
+                        tag = f"{tag} → {html.escape(recipient)}"
                     parts.append(
                         f'<div class="gm-msg">'
                         f'<span class="gm-tag">{tag}</span> {_rich_content_html(content)}'
