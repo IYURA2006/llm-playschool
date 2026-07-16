@@ -1236,7 +1236,7 @@ with gr.Blocks() as app:
     verdict_page = gr.Column(visible=False, elem_id="verdict-page")
     session_survey_page = gr.Column(visible=False, elem_id="session-survey-page")
 
-    welcome.build(welcome_page, annotation_page, training_page, error_state,
+    name_dd = welcome.build(welcome_page, annotation_page, training_page, error_state,
                   playlist_state, started_at_state, session_started_at_state,
                   annotator_state, block_state,
                   game_state, playlist_idx_state, session_day_state,
@@ -1256,6 +1256,11 @@ with gr.Blocks() as app:
     app.load(_capture_session_params, inputs=None,
               outputs=[annotator_state, block_state, game_state, error_state,
                        playlist_state, playlist_idx_state, session_day_state])
+    # The name dropdown's `choices=` is otherwise only evaluated once, at
+    # Blocks-graph build time — refresh it on every visit so a transient
+    # assignments.json read failure (or a later edit) doesn't freeze it empty
+    # for the process's whole lifetime.
+    app.load(welcome.refresh_names, inputs=None, outputs=[name_dd])
 
 # System fonts so first paint needs no remote Google Fonts fetch (slow over the
 # gradio.live share tunnel). Must be gr.themes.Font objects, not plain strings —
