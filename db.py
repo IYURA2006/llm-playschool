@@ -233,6 +233,21 @@ def backup_db_to_hf():
                     pass
 
 
+def backup_db_to_hf_async():
+    """Fire-and-forget wrapper: run the HF upload on a daemon thread so the
+    ~seconds-long network commit never blocks the Gradio event handler.
+
+    Called synchronously, the upload froze the UI (Gradio's 'processing | Ns'
+    spinner) on every turn/verdict/survey save. The local SQLite write has
+    already committed by the time this runs, so the annotation is durable
+    regardless — only the off-site HF mirror is deferred. _backup_lock still
+    serializes the actual uploads, so overlapping saves queue instead of
+    racing. Daemon so it never keeps the process alive at shutdown (the
+    accepted tradeoff: a mirror still in flight when the process dies is lost,
+    but the data remains in the local DB and every prior save already pushed)."""
+    threading.Thread(target=backup_db_to_hf, daemon=True).start()
+
+
 def _restore_db_from_hf():
     """If no local DB exists, pull the last backup from the HF dataset repo."""
     if os.path.exists(DB_PATH):
@@ -337,7 +352,7 @@ def save_turns(game_slug, meta, source_path, has_reasoning, annotator_id, condit
         )
     # Pilot: back up on every turn submission (not just the final verdict), so
     # a session abandoned mid-way is still captured within the shortened window.
-    backup_db_to_hf()
+    backup_db_to_hf_async()
     return annotation_id
 
 
@@ -392,7 +407,7 @@ def save_verdict(game_slug, annotator_id, condition, coherence, overall, comment
     # save_turns already backs up; back up again here so the verdict fields
     # (submitted after turns, in a separate step) are captured too.
     if ok:
-        backup_db_to_hf()
+        backup_db_to_hf_async()
     return ok
 
 
@@ -421,7 +436,7 @@ def save_session_survey(annotator_id, session_day, capacity, disruption,
             (annotator_id, session_day, capacity, disruption, guessing_preference,
              would_change_answers, comment, now),
         )
-    backup_db_to_hf()
+    backup_db_to_hf_async()
     return True
 
 
