@@ -35,8 +35,20 @@ def _load_assignments():
     try:
         with open(os.path.join(_dir, "assignments.json")) as f:
             return json.load(f)
-    except (OSError, ValueError):
+    except (OSError, ValueError) as e:
+        # Loud, like db.py's HF backup warnings: a silent {} here used to empty
+        # the name dropdown for the rest of the process's life (see refresh_names).
+        print(f"⚠️ Could not read assignments.json: {e}")
         return {}
+
+
+def refresh_names():
+    """Re-read assignments.json's names on every page load. The dropdown's
+    initial `choices=` (below) is only evaluated once, at Blocks-graph build
+    time (process startup) — any transient read failure at that moment (or an
+    assignments.json edit after the Space started) would otherwise leave the
+    dropdown empty/stale for the process's entire remaining life."""
+    return gr.update(choices=sorted(_load_assignments().keys()))
 
 
 def _progress_note(name, day):
@@ -277,3 +289,5 @@ def build(welcome_page, annotation_page, training_page, error_state,
                 "and have read these instructions",
                 elem_classes=["welcome-foot"],
             )
+
+    return name_dd
