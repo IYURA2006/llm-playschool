@@ -397,6 +397,93 @@ class _Game:
     """Lightweight container for everything a screen needs about one game."""
 
 
+def _detect_outcome(turns):
+    """One game outcome — "won"/"lost"/"aborted"/"ended" — from the structured
+    end-of-game signals each clembench game family logs. Replaces the old
+    per-event keyword banners, which misfired two ways: every _END_TYPES event
+    emitted its OWN banner (clean_up showed 🏆 twice, adventuregame three
+    banners), and substring-matching str(content) called failed games won —
+    str({'game_successfully_finished': False}) contains 'success', and
+    codenames' 'opponent has won' (a loss) contains 'won'. Checks are ordered
+    most-explicit-first; families whose transcripts carry no verdict at all
+    (imagegame — scored offline against the target grid; privateshared;
+    textmapworld's walker 'stop') fall through to the neutral "ended"."""
+    acts = [m["action"] for turn in turns for m in turn]
+
+    def first(t):
+        return next((a for a in acts if a.get("type") == t), None)
+
+    # Explicit success flag (clean_up, and any family that logs one).
+    a = first("success")
+    if a and isinstance(a.get("content"), str):
+        return "won" if a["content"].strip().lower() == "true" else "lost"
+    # clean_up's stats block: '* success: True / * lose: False / * aborted: …'.
+    a = first("game_finished")
+    if a and isinstance(a.get("content"), str):
+        c = a["content"].lower()
+        if re.search(r"aborted:\s*true", c):
+            return "aborted"
+        m = re.search(r"success:\s*(true|false)", c)
+        if m:
+            return "won" if m.group(1) == "true" else "lost"
+    # adventuregame's result dict.
+    a = first("game_result")
+    if a and isinstance(a.get("content"), dict):
+        v = a["content"].get("game_successfully_finished")
+        if isinstance(v, bool):
+            return "won" if v else "lost"
+    # dond: a logged agreement means the deal went through.
+    if first("successful agreement"):
+        return "won"
+    # wordle family: 'correct guess' carries an explicit 'game_result = WIN/LOSS'.
+    for a in acts:
+        if a.get("type") == "correct guess" and isinstance(a.get("content"), str):
+            m = re.search(r"game_result\s*=\s*(win|loss)", a["content"], re.I)
+            if m:
+                return "won" if m.group(1).lower() == "win" else "lost"
+    # codenames: 'game end' prose names the winner — 'opponent has won' is a
+    # LOSS for the evaluated team, so the opponent check must come first.
+    a = first("game end")
+    if a and isinstance(a.get("content"), str):
+        c = a["content"].lower()
+        if "abort" in c:
+            return "aborted"
+        if "opponent" in c:
+            return "lost"
+        if "won" in c or "win" in c:
+            return "won"
+    # hot_air_balloon: 'info' events ('game successful', 'end game').
+    for a in acts:
+        if a.get("type") == "info" and isinstance(a.get("content"), str):
+            c = a["content"].strip().lower()
+            if "unsuccessful" in c or "fail" in c:
+                return "lost"
+            if c == "game successful":
+                return "won"
+    # matchit: win only if BOTH players' decisions were right.
+    dec = [a.get("content") for a in acts
+           if str(a.get("type", "")).startswith("Decision Player")]
+    if dec:
+        return ("won" if all(str(d).strip().lower() == "success" for d in dec)
+                else "lost")
+    # referencegame: the guesser's answer was checked against the target.
+    if first("parse_correct"):
+        return "won"
+    if first("parse_wrong") or first("parse_incorrect"):
+        return "lost"
+    # taboo/guesswhat: a 'correct guess' event is only ever logged when the
+    # guess actually matched — a loss runs out of turns without one.
+    if first("correct guess"):
+        return "won"
+    # Aborted episodes: an explicit abort (textmapworld's 'abort game'), or the
+    # transcript cutting off on an unparseable reply (imagegame).
+    if first("aborted"):
+        return "aborted"
+    if acts and acts[-1].get("type") == "invalid format":
+        return "aborted"
+    return "ended"
+
+
 @functools.lru_cache(maxsize=None)
 def load_game(path):
     with open(path) as f:
@@ -503,6 +590,7 @@ def load_game(path):
     g.rules = rules
     g.ai_turns = ai_turns
     g.n_turns = len(ai_turns)
+    g.outcome = _detect_outcome(turns)
     # Response messages to NOT render as turn cards — kept in sync with the
     # ai_turns filter above so transcript turn_counter matches ai_turns indices.
     g.skip_msg_ids = skip_ids
@@ -731,9 +819,25 @@ _MAP_LEGEND_HTML = (
 # ──────────────────────────────────────────────────────────────────────────
 
 # Characters that make up ASCII board art (clean_up's box-drawing grids,
-# imagegame/referencegame's ▢ grids).
-_GRID_CHARS = set("╔╗╚╝║═╟╢╤╧┼┤├┬┴┌┐└┘─│◌▢")
+# imagegame/referencegame's ▢ grids). Both empty-cell squares are needed:
+# referencegame's letter/number grids use ▢ (U+25A2) but its line/random
+# grids use the near-identical □ (U+25A1) — missing it rendered those two
+# variants' boards as wrapped prose.
+_GRID_CHARS = set("╔╗╚╝║═╟╢╤╧┼┤├┬┴┌┐└┘─│◌▢□")
 _GRID_OBJ_RE = re.compile(r"(?<![A-Za-z])([A-Z])(?![A-Za-z])")
+
+# Wordle guess feedback arrives as 'm<red> o<yellow> e<green>' markup; matched
+# AFTER html.escape (hence &lt;/&gt;), so only this exact token shape can ever
+# produce markup — anything else stays escaped text.
+_WD_TILE_RE = re.compile(r"([A-Za-z])&lt;(red|green|yellow)&gt;")
+
+# The single end-of-transcript outcome banner (see _detect_outcome).
+_OUTCOME_BANNERS = {
+    "won":     '<div class="game-win-msg">🏆 Game Won!</div>',
+    "lost":    '<div class="game-loss-msg">❌ Game Lost</div>',
+    "aborted": '<div class="game-loss-msg">⚠️ Game aborted</div>',
+    "ended":   '<div class="game-end-msg">🏁 Game Ended</div>',
+}
 
 
 def _is_grid_line(ln):
@@ -777,9 +881,15 @@ def _rich_content_html(text):
     parts, plain, block = [], [], []
     in_fence = False
 
+    def esc(lines):
+        # escape first, THEN swap wordle letter<color> tokens for tiles —
+        # operating on the escaped text keeps every other '<' inert.
+        return _WD_TILE_RE.sub(r'<span class="wd-tile wd-\2">\1</span>',
+                               html.escape("\n".join(lines)))
+
     def flush_plain():
         if plain:
-            parts.append(html.escape("\n".join(plain)))
+            parts.append(esc(plain))
             plain.clear()
 
     def flush_block():
@@ -787,7 +897,7 @@ def _rich_content_html(text):
             if any(_is_grid_line(ln) for ln in block):
                 parts.append(_grid_block(block))
             else:
-                parts.append(html.escape("\n".join(block)))
+                parts.append(esc(block))
             block.clear()
 
     for ln in str(text).split("\n"):
@@ -900,50 +1010,34 @@ def _build_transcript_html(g, current_idx, pretty_map=False,
         for msg in round_msgs:
             sender = msg["from"]
             action = msg["action"]
-            atype = action["type"]
+            atype = action.get("type", "")
             label = action.get("label", "")
             content = action.get("content", "")
 
             # GM / environment messages
             if sender == "GM" or sender not in g.ai_ids:
-                # ── End-game banners (checked BEFORE _turn0_setup filter) ──────
-                # Covers every end-game action type found across all game formats.
+                # ── End-game bookkeeping events: consumed by _detect_outcome ──
+                # (one banner rendered after the loop), never shown inline.
+                # Emitting a banner per event here double-bannered clean_up /
+                # adventuregame and mis-called failed games as won — see
+                # _detect_outcome's docstring.
                 _END_TYPES = {
                     "game_finished", "game end", "game_result",
                     "adventure_finished", "end", "successful agreement", "aborted",
-                    "stop", "info",
+                    "stop", "info", "success",
                 }
                 if atype in _END_TYPES:
-                    cl = str(content).strip().lower()
-                    if "win" in cl or "success" in cl or "agreement" in atype:
-                        parts.append('<div class="game-win-msg">🏆 Game Won!</div>')
-                    elif "loss" in cl or "lose" in cl or "fail" in cl or "abort" in cl:
-                        parts.append('<div class="game-loss-msg">❌ Game Lost</div>')
-                    else:
-                        parts.append('<div class="game-end-msg">🏁 Game Ended</div>')
-                    continue
-
-                if atype == "success" and isinstance(content, str):
-                    c_val = content.strip().lower()
-                    if c_val == "true":
-                        parts.append('<div class="game-win-msg">🏆 Game Won!</div>')
-                    elif c_val == "false":
-                        parts.append('<div class="game-loss-msg">❌ Game Lost</div>')
                     continue
 
                 if atype == "correct guess" and isinstance(content, str):
-                    cl = content.strip().lower()
-                    if content == "end game":
-                        parts.append('<div class="game-end-msg">🏁 Game Ended</div>')
-                    elif "win" in cl:
-                        parts.append('<div class="game-win-msg">🏆 Game Won!</div>')
-                    elif "loss" in cl or "lose" in cl or "fail" in cl:
-                        parts.append('<div class="game-loss-msg">❌ Game Lost</div>')
-                    else:
-                        parts.append(
-                            f'<div class="correct-msg">✅ '
-                            f'<strong>{html.escape(str(content))}</strong></div>'
-                        )
+                    # 'end game' / 'game_result = WIN' markers feed the outcome
+                    # banner; an actual guessed word (guesswhat) stays inline.
+                    if content == "end game" or "game_result" in content:
+                        continue
+                    parts.append(
+                        f'<div class="correct-msg">✅ '
+                        f'<strong>{html.escape(str(content))}</strong></div>'
+                    )
                     continue
 
                 # ── Skip non-string content and setup messages ──
@@ -1030,6 +1124,10 @@ def _build_transcript_html(g, current_idx, pretty_map=False,
                     f'</div>'
                 )
                 turn_counter += 1
+
+    # Exactly ONE outcome banner, computed by _detect_outcome — never emitted
+    # inline per event (see the _END_TYPES comment above).
+    parts.append(_OUTCOME_BANNERS[getattr(g, "outcome", "ended")])
 
     return f'<div class="{scroll_cls}">' + "".join(parts) + "</div>"
 
@@ -1146,8 +1244,8 @@ def build(welcome_page, annotation_page, verdict_page, game_state, annotator_sta
             with gr.Row(elem_classes=["annot-topnav"]):
                 gr.HTML(
                     f'<div class="nav-left">'
-                    f'<span class="game-id-tag">#{g.meta["game_id"]}</span>'
-                    f'<span class="game-name-tag">{g.meta["game_name"].title()}</span>'
+                    f'<span class="game-id-tag">#{html.escape(str(g.meta["game_id"]))}</span>'
+                    f'<span class="game-name-tag">{html.escape(str(g.meta["game_name"]).title())}</span>'
                     f'{seq_chip}'
                     f'</div>'
                 )

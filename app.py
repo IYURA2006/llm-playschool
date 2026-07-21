@@ -7,6 +7,8 @@ import welcome
 import training
 import annotation
 import annotation_verdict
+import assignment
+import consent
 import session_survey
 
 _dir = os.path.dirname(os.path.abspath(__file__))
@@ -128,13 +130,14 @@ div:focus, div:focus-visible {
 /* These three sit on the permanently-light .tx-col panel, so their dark text
    colours need !important to survive the forced dark theme on HF Spaces —
    otherwise Gradio's --body-text-color turns them near-white (invisible). */
-.goal-text { font-size: 13px; color: #374151 !important; line-height: 1.5; margin: 0; white-space: pre-line; }
+.goal-text { font-size: 13px; color: #374151 !important; line-height: 1.5; margin: 0; white-space: pre-line; overflow-wrap: anywhere; }
 .gm-msg {
     font-size: 12px; color: #6b7280 !important;
     padding: 5px 10px; margin: 6px 0;
     border-left: 2px solid #cbd5e1;
     line-height: 1.5;
     white-space: pre-line;
+    overflow-wrap: anywhere;
 }
 .gm-tag { font-weight: 700; color: #94a3b8 !important; font-size: 10px; letter-spacing: .06em; margin-right: 4px; }
 .turn-card {
@@ -172,7 +175,7 @@ div:focus, div:focus-visible {
     color: #7dd3fc; letter-spacing: .1em;
     margin-bottom: 8px;
 }
-.card-body { font-size: 13px; line-height: 1.65; color: #e2e8f0; white-space: pre-wrap; }
+.card-body { font-size: 13px; line-height: 1.65; color: #e2e8f0; white-space: pre-wrap; overflow-wrap: anywhere; }
 .correct-msg {
     background: #ecfdf5; color: #065f46 !important;
     padding: 8px 12px; border-radius: 6px;
@@ -326,6 +329,18 @@ div:focus, div:focus-visible {
 }
 /* The game objects (C/L/P, X/R…) are what annotators track — make them pop */
 .ascii-grid .grid-obj { color: #fbbf24; font-weight: 700; }
+
+/* Wordle guess-feedback tiles — letter<color> markup rendered as the actual
+   colored squares (see annotation.py's _WD_TILE_RE). */
+.wd-tile {
+    display: inline-block; min-width: 20px; padding: 1px 4px; margin: 0 1px;
+    border-radius: 4px; text-align: center;
+    font-family: ui-monospace, SFMono-Regular, monospace;
+    font-weight: 700; font-size: 13px; text-transform: uppercase;
+}
+.wd-green  { background: #22c55e; color: #052e16; }
+.wd-yellow { background: #eab308; color: #3b2a03; }
+.wd-red    { background: #64748b; color: #0b1220; }
 
 /* ── TextMapWorld map renderer (hybrid mode) ──────────────────── */
 /* Legend row sits on the light transcript panel, above the turn cards */
@@ -723,6 +738,18 @@ div:focus, div:focus-visible {
 }
 .start-btn { width: 100% !important; margin-top: 6px !important; }
 
+/* ── Consent page ─────────────────────────────────────────────── */
+.consent-sheet { max-height: min(60vh, 640px); overflow-y: auto; }
+.consent-sheet h2, .consent-sheet h3 { color: #e2e8f0 !important; }
+.consent-sheet p, .consent-sheet li { color: #9fb0c9 !important; font-size: 13.5px !important; line-height: 1.6 !important; }
+.consent-sheet strong { color: #dbeafe !important; }
+.consent-sheet a { color: #7dd3fc !important; }
+.consent-todo {
+    background: #7c2d12; color: #fed7aa; border: 1px solid #c2410c;
+    padding: 1px 8px; border-radius: 5px; font-weight: 700; font-size: 12.5px;
+    white-space: nowrap;
+}
+
 /* ── Rules panel ──────────────────────────────────────────────── */
 .rules-panel {
     background: #f8fafc !important;
@@ -1096,7 +1123,13 @@ def _session_error(msg):
 
 
 def _capture_session_params(request: gr.Request):
-    # Two link forms are accepted:
+    # Three link forms are accepted:
+    #   Prolific (general study): ?PROLIFIC_PID=...&STUDY_ID=...&SESSION_ID=...
+    #     — the standard Prolific redirect. Highest priority: a genuine
+    #     Prolific link always carries PROLIFIC_PID and never the pilot's
+    #     annotator/block/day params, so this can't misfire on an internal
+    #     QA link. The playlist is built live (coverage-balanced) instead of
+    #     read from assignments.json — see assignment.py.
     #   Playlist (A/B pilot): ?annotator=alice&day=1
     #     — the ordered game+condition queue comes from assignments.json.
     #   Legacy single game:   ?annotator=alice&block=day1_hybrid&game=<slug>
@@ -1104,6 +1137,36 @@ def _capture_session_params(request: gr.Request):
     # Anything malformed routes to an in-app error instead of a crash or a
     # silent fallback to the old default game.
     qp = dict(request.query_params or {})
+
+    # Case-insensitive lookup defensively — we don't control how the link
+    # gets constructed/copy-pasted, and Prolific's own docs are inconsistent
+    # about casing in examples.
+    prolific_pid = next(
+        (v.strip() for k, v in qp.items() if k.upper() == "PROLIFIC_PID" and v.strip()),
+        "",
+    )
+    if prolific_pid:
+        if len(prolific_pid) > 100:  # sanity bound, not a strict format check
+            return _session_error("⚠️ Malformed participant link.")
+        playlist, err_msg = assignment.build_playlist_for(prolific_pid)
+        if err_msg:
+            return _session_error(err_msg)
+        done = db.completed_pairs(prolific_pid)
+        idx = next((i for i, it in enumerate(playlist)
+                    if (it["game"], it["condition"]) not in done), None)
+        if idx is None:
+            return _session_error(
+                f"🎉 You've already completed all {len(playlist)} tasks for "
+                f"this study. Thank you!"
+            )
+        item = playlist[idx]
+        # session_day="1" (never "2") reuses welcome.py's existing "practice
+        # only on idx==0 when session_day != '2'" logic to show the practice
+        # round once, on the very first game, and never again on resume —
+        # a Prolific PID is always a single sitting, no day-2 concept.
+        return (prolific_pid, item["condition"], annotation.slug_to_path(item["game"]),
+                "", playlist, idx, "1")
+
     annotator = (qp.get("annotator") or "").strip()
     block = (qp.get("block") or "").strip()
     game = (qp.get("game") or "").strip()
@@ -1230,12 +1293,18 @@ with gr.Blocks() as app:
     # the frontend submit stale values that crash server-side validation.
     clearing_state = gr.State(False)
 
-    welcome_page = gr.Column(visible=True)
+    # Consent gate: the very first thing anyone sees. welcome_page starts
+    # hidden and only becomes visible once "I agree" is clicked (consent.build)
+    # or app.load's routing (consent.route_consent) finds this identity has
+    # already consented — see the app.load chain below.
+    consent_page = gr.Column(visible=True, elem_id="consent-page")
+    welcome_page = gr.Column(visible=False)
     training_page = gr.Column(visible=False, elem_id="train-page")
     annotation_page = gr.Column(visible=False, elem_id="annot-page")
     verdict_page = gr.Column(visible=False, elem_id="verdict-page")
     session_survey_page = gr.Column(visible=False, elem_id="session-survey-page")
 
+    consent.build(consent_page, welcome_page, annotator_state)
     name_dd = welcome.build(welcome_page, annotation_page, training_page, error_state,
                   playlist_state, started_at_state, session_started_at_state,
                   annotator_state, block_state,
@@ -1255,7 +1324,15 @@ with gr.Blocks() as app:
 
     app.load(_capture_session_params, inputs=None,
               outputs=[annotator_state, block_state, game_state, error_state,
-                       playlist_state, playlist_idx_state, session_day_state])
+                       playlist_state, playlist_idx_state, session_day_state]
+    ).then(
+        # Chained (not a separate app.load) so annotator_state is already
+        # resolved from the URL before this reads it — a returning Prolific
+        # PID needs the consent-already-given check to see the real PID, not
+        # the pre-load default "".
+        consent.route_consent, inputs=[annotator_state],
+        outputs=[consent_page, welcome_page],
+    )
     # The name dropdown's `choices=` is otherwise only evaluated once, at
     # Blocks-graph build time — refresh it on every visit so a transient
     # assignments.json read failure (or a later edit) doesn't freeze it empty
