@@ -59,9 +59,11 @@ def slug_to_path(slug):
     return _SLUG_TO_PATH.get(slug)
 
 
-# Pilot condition config: which block maps to which question-set mode.
-# The day1_*/day2_* names are the original one-link-per-game blocks; the bare
-# "universal"/"hybrid" values are what playlist items (assignments.json) carry.
+# Which block/condition value maps to which question-set mode. The
+# day1_*/day2_* names are the original pilot-era one-link-per-game blocks,
+# kept working for the legacy single-game debug link; the bare
+# "universal"/"hybrid" values are what the general study's playlist items
+# (assignment.build_playlist_for, always "hybrid") carry.
 BLOCK_TO_TYPE = {
     "day1_universal": "universal",
     "day1_hybrid": "hybrid",

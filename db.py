@@ -55,25 +55,9 @@ CREATE TABLE IF NOT EXISTS annotations (
     overall_rating INTEGER,
     verdict_comment TEXT,
     verdict_at TEXT,
-    survey_fit TEXT,
-    survey_fatigue TEXT,
-    survey_confidence TEXT,
-    survey_comment TEXT,
+    verdict_specific TEXT,
     updated_at TEXT,
     UNIQUE(game_slug, annotator_id, condition)
-);
-
-CREATE TABLE IF NOT EXISTS session_surveys (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    annotator_id TEXT NOT NULL DEFAULT '',
-    session_day TEXT,
-    capacity TEXT,
-    disruption TEXT,
-    guessing_preference TEXT,
-    would_change_answers TEXT,
-    comment TEXT,
-    submitted_at TEXT,
-    UNIQUE(annotator_id, session_day)
 );
 
 CREATE TABLE IF NOT EXISTS turn_ratings (
@@ -111,81 +95,9 @@ def _connect():
     return conn
 
 
-def _migrate_pilot_schema(conn):
-    """One-time upgrade for pre-pilot annotations.db files: add `condition` /
-    `extra_responses` and widen the annotations UNIQUE key to include
-    `condition` (so the same annotator+game under a different pilot block
-    doesn't silently overwrite prior data). No-op once already migrated;
-    SQLite can't ALTER a UNIQUE constraint in place, hence the table rebuild.
-    """
-    cols = {row[1] for row in conn.execute("PRAGMA table_info(annotations)")}
-    if "condition" in cols:
-        return  # already migrated (or a fresh pilot DB, created with the schema above)
-
-    conn.execute("ALTER TABLE annotations ADD COLUMN condition TEXT")
-    turn_cols = {row[1] for row in conn.execute("PRAGMA table_info(turn_ratings)")}
-    if "extra_responses" not in turn_cols:
-        conn.execute("ALTER TABLE turn_ratings ADD COLUMN extra_responses TEXT")
-
-    conn.execute("""
-        CREATE TABLE annotations_new (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            game_slug TEXT NOT NULL,
-            game_id INTEGER,
-            game_name TEXT,
-            source_path TEXT,
-            has_reasoning INTEGER,
-            annotator_id TEXT NOT NULL DEFAULT '',
-            condition TEXT,
-            annotated_at TEXT,
-            strategic_coherence TEXT,
-            overall_rating INTEGER,
-            verdict_comment TEXT,
-            verdict_at TEXT,
-            updated_at TEXT,
-            UNIQUE(game_slug, annotator_id, condition)
-        )
-    """)
-    conn.execute("""
-        INSERT INTO annotations_new
-            (id, game_slug, game_id, game_name, source_path, has_reasoning,
-             annotator_id, condition, annotated_at, strategic_coherence,
-             overall_rating, verdict_comment, verdict_at, updated_at)
-        SELECT id, game_slug, game_id, game_name, source_path, has_reasoning,
-               annotator_id, condition, annotated_at, strategic_coherence,
-               overall_rating, verdict_comment, verdict_at, updated_at
-        FROM annotations
-    """)
-    conn.execute("DROP TABLE annotations")
-    conn.execute("ALTER TABLE annotations_new RENAME TO annotations")
-
-
-def _migrate_ab_columns(conn):
-    """Additive columns for the internal A/B pilot: session timing and the
-    per-game questions-fit micro-survey. Safe to run repeatedly.
-
-    survey_fit/survey_fatigue are no longer written by the app (replaced by
-    survey_fit_missing/survey_fit_missing_count) but are kept here and in the
-    schema as harmless historical columns — an active pilot DB may already
-    hold real Day-1 answers in them, and this migration path is additive-only
-    by design (no DROP COLUMN)."""
-    cols = {row[1] for row in conn.execute("PRAGMA table_info(annotations)")}
-    for col in ("session_day", "session_started_at", "started_at", "survey_fit",
-                "survey_fatigue", "survey_confidence", "survey_comment",
-                "survey_fit_missing", "survey_fit_missing_count",
-                # Hybrid-only per-game whole-game ("specific overall") answers,
-                # stored as a JSON object {question_index: value}. Additive/
-                # nullable so it is safe on the live production dataset.
-                "verdict_specific"):
-        if col not in cols:
-            conn.execute(f"ALTER TABLE annotations ADD COLUMN {col} TEXT")
-
-
 def init_db():
     with _connect() as conn:
         conn.executescript(_SCHEMA)
-        _migrate_pilot_schema(conn)
-        _migrate_ab_columns(conn)
 
 
 # Serializes snapshot+upload: concurrent submits must not interleave uploads
@@ -530,8 +442,6 @@ def reserve_games(annotator_id, condition, game_slugs, conn=None):
 
 
 def save_verdict(game_slug, annotator_id, condition, coherence, overall, comment,
-                 survey_confidence=None, survey_comment=None,
-                 survey_fit_missing=None, survey_fit_missing_count=None,
                  verdict_specific=None):
     """Update the verdict columns of an existing annotation row.
 
@@ -551,16 +461,11 @@ def save_verdict(game_slug, annotator_id, condition, coherence, overall, comment
                 overall_rating=?,
                 verdict_comment=?,
                 verdict_at=?,
-                survey_confidence=?,
-                survey_comment=?,
-                survey_fit_missing=?,
-                survey_fit_missing_count=?,
                 verdict_specific=?,
                 updated_at=?
             WHERE game_slug=? AND annotator_id=? AND condition=?
             """,
-            (coherence, overall, comment, now, survey_confidence, survey_comment,
-             survey_fit_missing, survey_fit_missing_count, verdict_specific, now,
+            (coherence, overall, comment, now, verdict_specific, now,
              game_slug, annotator_id, condition),
         )
         ok = cur.rowcount > 0
@@ -569,35 +474,6 @@ def save_verdict(game_slug, annotator_id, condition, coherence, overall, comment
     if ok:
         backup_db_to_hf_async()
     return ok
-
-
-def save_session_survey(annotator_id, session_day, capacity, disruption,
-                        guessing_preference, would_change_answers, comment=""):
-    """Upsert the once-per-sitting end-of-session survey (asked after the
-    last game of a playlist, not tied to any single annotation row)."""
-    now = datetime.now().isoformat()
-    annotator_id = annotator_id or ""
-    session_day = session_day or ""
-    with _connect() as conn:
-        conn.execute(
-            """
-            INSERT INTO session_surveys
-                (annotator_id, session_day, capacity, disruption,
-                 guessing_preference, would_change_answers, comment, submitted_at)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-            ON CONFLICT(annotator_id, session_day) DO UPDATE SET
-                capacity=excluded.capacity,
-                disruption=excluded.disruption,
-                guessing_preference=excluded.guessing_preference,
-                would_change_answers=excluded.would_change_answers,
-                comment=excluded.comment,
-                submitted_at=excluded.submitted_at
-            """,
-            (annotator_id, session_day, capacity, disruption, guessing_preference,
-             would_change_answers, comment, now),
-        )
-    backup_db_to_hf_async()
-    return True
 
 
 print(f"🗄️  DB config: HF_TOKEN={'set' if _HF_TOKEN else 'MISSING'}, "

@@ -43,15 +43,9 @@ def _coh_select(chosen):
     return (*_col_updates(_COHERENCE, chosen), *_btn_updates(_COHERENCE, chosen), chosen)
 
 
-def _survey_update(value, err):
-    # Red ring on an unanswered pilot-survey radio, reusing .radio-error CSS.
-    classes = ["scale-radio", "radio-error"] if (err and not value) else ["scale-radio"]
-    return gr.update(elem_classes=classes)
-
-
 def _overall_update(err):
-    # Slider counterpart of _survey_update — .ovr-slider-err is a dedicated
-    # rule since a Slider's DOM shape differs from a Radio's.
+    # .ovr-slider-err is a dedicated rule since a Slider's DOM shape differs
+    # from a Radio's (reused for the coherence radio-error styling too).
     classes = ["ovr-slider", "ovr-slider-err"] if err else ["ovr-slider"]
     return gr.update(elem_classes=classes)
 
@@ -67,8 +61,7 @@ def _action_label(playlist, playlist_idx):
 
 
 def _verdict_save_and_clear(game_path, annotator_id, condition, playlist, playlist_idx,
-                            coherence, overall, overall_touched, comment,
-                            confidence, fit_flag, fb_comment, specific):
+                            coherence, overall, overall_touched, comment, specific):
     """Step 1 of the merged action button: validate + persist, AND (only if
     that succeeds and another playlist game remains) blank/reset every
     verdict widget in the SAME event — mirroring the old _next_game_clear,
@@ -95,13 +88,13 @@ def _verdict_save_and_clear(game_path, annotator_id, condition, playlist, playli
     specific = specific or {}
     specific_incomplete = bool(wg) and any(
         not specific.get(str(i)) for i in range(len(wg)))
-    # whole_game_only games (imagegame) hide G1/G2 — only the specific sliders +
-    # confidence are required there; every other game still requires coherence
-    # + a touched overall slider.
+    # whole_game_only games (imagegame) hide G1/G2 — only the specific sliders
+    # are required there; every other game still requires coherence + a
+    # touched overall slider.
     if wg_only:
-        err = not confidence or specific_incomplete
+        err = specific_incomplete
     else:
-        err = not coherence or not overall_touched or not confidence or specific_incomplete
+        err = not coherence or not overall_touched or specific_incomplete
 
     if err:
         return (
@@ -112,8 +105,6 @@ def _verdict_save_and_clear(game_path, annotator_id, condition, playlist, playli
             *([gr.skip()] * 4),                      # coh_btns unchanged
             _overall_update(err=True),
             gr.skip(), gr.skip(),                     # overall_touched, comment
-            _survey_update(confidence, err=True),
-            gr.skip(), gr.skip(),                     # fit_flag, survey_comment
             gr.skip(),                                # specific_state unchanged
             False,                                    # verdict_ok_state
         )
@@ -125,8 +116,6 @@ def _verdict_save_and_clear(game_path, annotator_id, condition, playlist, playli
     save_overall = None if wg_only else int(overall)
     ok = db.save_verdict(
         slug, annotator_id, condition, save_coherence, save_overall, comment or "",
-        survey_confidence=confidence, survey_comment=fb_comment or "",
-        survey_fit_missing=fit_flag or "",
         verdict_specific=json.dumps(specific) if (wg and specific) else None,
     )
     if not ok:
@@ -136,8 +125,6 @@ def _verdict_save_and_clear(game_path, annotator_id, condition, playlist, playli
             *_col_updates(_COHERENCE, coherence),
             *([gr.skip()] * 4),
             _overall_update(err=False),
-            gr.skip(), gr.skip(),
-            _survey_update(confidence, err=False),
             gr.skip(), gr.skip(),
             gr.skip(),                                # specific_state unchanged
             False,
@@ -159,9 +146,6 @@ def _verdict_save_and_clear(game_path, annotator_id, condition, playlist, playli
             gr.update(value=4, elem_classes=["ovr-slider"]),  # overall
             False,                         # overall_touched
             "",                            # verdict comment
-            gr.update(value=None, elem_classes=["scale-radio"]),  # confidence
-            gr.update(value=None),                         # fit_flag
-            "",                            # survey comment
             {},                            # specific_state — reset for next game
             True,                          # verdict_ok_state
         )
@@ -175,35 +159,32 @@ def _verdict_save_and_clear(game_path, annotator_id, condition, playlist, playli
         *([gr.skip()] * 4),
         _overall_update(err=False),
         gr.skip(), gr.skip(),
-        _survey_update(confidence, err=False),
-        gr.skip(), gr.skip(),
         gr.skip(),                                # specific_state unchanged
         True,
     )
 
 
 def _verdict_finish(ok, playlist, playlist_idx):
-    """Step 3 (chained via .then): route to the next game, the new
-    end-of-session survey, or a static "saved" status — whichever applies.
-    Deliberately does NOT touch clearing_state on the last-game branch: that
-    mechanism only protects annotation.py's @gr.render from stale widgets,
-    which stops mattering once the annotator is leaving the annotation flow
-    for good."""
+    """Step 3 (chained via .then): route to the next game, or a static
+    "saved"/"all done" status — whichever applies. Deliberately does NOT
+    touch clearing_state on the last-game branch: that mechanism only
+    protects annotation.py's @gr.render from stale widgets, which stops
+    mattering once the annotator is leaving the annotation flow for good."""
     if not ok:
-        return (gr.skip(),) * 10
+        return (gr.skip(),) * 9
     if not playlist:
         return (
             gr.skip(), "✅ Verdict saved.", gr.skip(), gr.skip(), gr.skip(),
-            gr.skip(), gr.skip(), gr.skip(), gr.skip(), gr.skip(),
+            gr.skip(), gr.skip(), gr.skip(), gr.skip(),
         )
     if playlist_idx + 1 >= len(playlist):
         return (
             gr.skip(),                   # clearing_state — irrelevant from here on
-            "",
+            "🎉 Thank you — you've completed all games in this session! "
+            "You can safely close this tab.",
             gr.skip(), gr.skip(), gr.skip(), gr.skip(),
             gr.skip(),                   # annotation_page — never shown again
-            gr.update(visible=False),    # verdict_page
-            gr.update(visible=True),     # session_survey_page
+            gr.skip(),                   # verdict_page — STAYS visible, showing the message
             gr.skip(),                   # action_btn — page is left behind
         )
     new_idx = playlist_idx + 1
@@ -216,7 +197,6 @@ def _verdict_finish(ok, playlist, playlist_idx):
         datetime.now().isoformat(),   # started_at
         gr.update(visible=True),      # annotation_page
         gr.update(visible=False),     # verdict_page
-        gr.skip(),                    # session_survey_page
         # Relabel in the SAME atomic event that advances playlist_idx_state,
         # rather than a separate .change() listener on that state — a
         # standalone listener reacting to the same mutation raced with
@@ -226,7 +206,7 @@ def _verdict_finish(ok, playlist, playlist_idx):
     )
 
 
-def build(welcome_page, annotation_page, verdict_page, session_survey_page,
+def build(welcome_page, annotation_page, verdict_page,
           game_state, annotator_state, block_state, playlist_state,
           playlist_idx_state, started_at_state, session_day_state, clearing_state):
     with verdict_page:
@@ -365,29 +345,6 @@ def build(welcome_page, annotation_page, verdict_page, session_survey_page,
             elem_classes=["verdict-comment"],
         )
 
-        # ── Pilot micro-survey — feedback about the STUDY DESIGN, not the AI.
-        # Kept deliberately short (confidence + one optional tap) to avoid
-        # survey fatigue across repeated games in a sitting.
-        with gr.Group(elem_classes=["question-card"]):
-            gr.Markdown("### 📋 Pilot feedback — about the questions, not the AI")
-            gr.Markdown("How confident are you in the ratings you just gave for this game?")
-            survey_confidence = gr.Radio(
-                choices=[("1\nGuessing", "1"), ("2\nUnsure", "2"),
-                         ("3\nMixed", "3"), ("4\nConfident", "4"),
-                         ("5\nCertain", "5")],
-                show_label=False, elem_classes=["scale-radio"],
-            )
-            gr.Markdown("How well do you feel the questions aligned to this game? *(optional)*")
-            fit_flag = gr.Radio(
-                choices=[("1", "1"), ("2", "2"), ("3", "3"), ("4", "4"), ("5", "5")],
-                show_label=False, elem_classes=["scale-radio"],
-            )
-            survey_comment = gr.Textbox(
-                placeholder="Anything confusing or missing in the questions or the app? (optional)",
-                lines=2, show_label=False,
-                elem_classes=["verdict-comment"],
-            )
-
         status = gr.Markdown("")
 
         with gr.Row():
@@ -409,27 +366,26 @@ def build(welcome_page, annotation_page, verdict_page, session_survey_page,
 
         # ONE button now does what used to take two clicks: validate+save
         # (and, if continuing, blank every verdict widget) in ONE event, then
-        # (chained via .then) advance to the next game / route to the new
-        # end-of-session survey — the exact same TWO-event clearing_state
-        # shape the old "Next game →" flow used (_next_game_clear that also
-        # did the reset, then _next_game_advance), just with the leading
-        # event now also doing validate+save. See _verdict_save_and_clear's
-        # docstring for why this stayed two events rather than three.
+        # (chained via .then) advance to the next game / show the "all done"
+        # message — the exact same TWO-event clearing_state shape the old
+        # "Next game →" flow used (_next_game_clear that also did the reset,
+        # then _next_game_advance), just with the leading event now also
+        # doing validate+save. See _verdict_save_and_clear's docstring for
+        # why this stayed two events rather than three.
         action_btn.click(
             fn=_verdict_save_and_clear,
             inputs=[game_state, annotator_state, block_state, playlist_state,
                     playlist_idx_state, coherence, overall, overall_touched,
-                    comment, survey_confidence, fit_flag, survey_comment,
-                    specific_state],
+                    comment, specific_state],
             outputs=[status, clearing_state, coherence, *coh_cols, *coh_btns,
-                     overall, overall_touched, comment, survey_confidence,
-                     fit_flag, survey_comment, specific_state, verdict_ok_state],
+                     overall, overall_touched, comment, specific_state,
+                     verdict_ok_state],
         ).then(
             fn=_verdict_finish,
             inputs=[verdict_ok_state, playlist_state, playlist_idx_state],
             outputs=[clearing_state, status, playlist_idx_state, game_state,
                      block_state, started_at_state, annotation_page, verdict_page,
-                     session_survey_page, action_btn],
+                     action_btn],
         )
 
         # Syncs the button label for the very FIRST view of this page in a

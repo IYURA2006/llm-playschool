@@ -1,14 +1,16 @@
-"""Consent gate shown before anything else — the University of Edinburgh
-Informatics Research Ethics participant information sheet + consent
-statement. Blocks welcome_page until "I agree" is clicked.
+"""Consent popup content — the University of Edinburgh Informatics Research
+Ethics participant information sheet + consent statement, shown inside a
+modal triggered by welcome.py's "Start Annotation" button. This module only
+builds the static content and the tick/confirm widgets; welcome.py owns all
+the event wiring (deciding when to show/hide the popup, recording consent,
+proceeding into the study) so there's a single place — welcome._start —
+deciding "show popup vs. proceed", not two functions racing each other.
 
 Two still-unresolved placeholders are rendered as visible ⚠️ TODO markers
 (ethics reference number, compensation amount) rather than guessed — the
-study coordinator must fill these in (see the TODOs in _INFO_SHEET_MD)
-before this goes in front of real participants."""
+study coordinator must fill these in before this goes in front of real
+participants."""
 import gradio as gr
-
-import db
 
 _TODO = ('<span class="consent-todo">⚠️ TODO: {}</span>')
 
@@ -141,46 +143,21 @@ By proceeding with the study, I agree to all of the following statements:
 """
 
 
-def build(consent_page, welcome_page, annotator_state):
-    with consent_page:
-        with gr.Column(elem_classes=["welcome-col"]):
-            with gr.Row(elem_classes=["annot-topnav"]):
-                gr.HTML(
-                    '<div class="welcome-nav">'
-                    '<span class="game-name-tag">LM-PLAYSCHOOL</span>'
-                    '<span class="game-id-tag">EMNLP 2026 · University of Edinburgh</span>'
-                    '</div>'
-                )
+def build(consent_popup):
+    """Builds the popup's static content and widgets only — no DB calls, no
+    event wiring. Returns (agree_cb, confirm_btn, popup_note) for welcome.py
+    to wire up alongside _start."""
+    with consent_popup:
+        with gr.Column(elem_classes=["consent-modal-card"]):
             with gr.Group(elem_classes=["question-card", "consent-sheet"]):
                 gr.Markdown(_INFO_SHEET_MD)
-            agree_btn = gr.Button(
+            agree_cb = gr.Checkbox(
+                label="I have read and understood the information above and agree to take part",
+                value=False,
+            )
+            popup_note = gr.Markdown("")
+            confirm_btn = gr.Button(
                 "I agree — take me to the study", variant="primary", size="lg",
                 elem_classes=["start-btn"],
             )
-
-    def _agree(annotator_id):
-        db.record_consent(annotator_id)
-        return gr.update(visible=False), gr.update(visible=True)
-
-    agree_btn.click(_agree, inputs=[annotator_state], outputs=[consent_page, welcome_page])
-
-
-def route_consent(annotator_id):
-    """app.load routing (chained after _capture_session_params, so
-    annotator_id is already resolved for the Prolific path by the time this
-    runs): skip straight to welcome_page if this identity has already
-    consented — e.g. a returning Prolific PID resuming their batch shouldn't
-    have to re-consent on every reload. An empty annotator_id (bare-URL
-    visitor who hasn't picked a name yet, or a legacy pilot link) always
-    sees the gate, since db.has_consented("") is unconditionally False.
-
-    The "not yet consented" branch returns no-ops, NOT gr.update(visible=False)
-    on welcome_page: this fires on page load, before welcome_page (which
-    starts visible=False) has ever been mounted, and Gradio 6 lazily mounts
-    hidden columns — sending visible=False to a never-mounted column poisons
-    it so a later visible=True (from _agree, below) never actually shows it.
-    Both pages already start at the right visibility (consent_page=True,
-    welcome_page=False), so "stay put" needs no explicit value at all."""
-    if db.has_consented(annotator_id):
-        return gr.update(visible=False), gr.update(visible=True)
-    return gr.update(), gr.update()
+    return agree_cb, confirm_btn, popup_note
