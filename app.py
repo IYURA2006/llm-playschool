@@ -1093,8 +1093,16 @@ force_dark = """
                 retryIv = setInterval(function () {
                     if (ready()) {
                         clearInterval(retryIv);
-                        wireAria();
-                        observeCols();   // re-observe the freshly-rendered column
+                        // init() re-attaches the delegated listeners (a no-op if
+                        // they're already bound — addEventListener dedupes the
+                        // same function reference) — the safety net for when the
+                        // very first mount was too slow for init()'s own 10s
+                        // retry budget (line ~1042) and gave up before ready()
+                        // ever went true, permanently leaving clicks dead. This
+                        // observer keeps firing on every later render, so it's
+                        // this path's job to grab the one successful ready()
+                        // moment init() itself missed.
+                        init();   // also re-observes cols internally (observeCols())
                         current = 0;
                         refresh();
                     } else if (++attempts > 80) {

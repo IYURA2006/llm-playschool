@@ -8,6 +8,12 @@ import db
 from annotation import (DEFAULT_GAME, load_game, game_slug, slug_to_path,
                         whole_game_questions, whole_game_only)
 
+# Prolific's "submit" completion URL for this study, appended with the study's
+# completion code (?cc=...) — Prolific uses this to auto-approve participants
+# who reach it. TODO: this is the placeholder code for now; swap for the real
+# study's completion URL/code before sending live Prolific links.
+PROLIFIC_COMPLETION_URL = "https://app.prolific.com/submissions/complete?cc=C10WMMGK"
+
 _COHERENCE = [
     ("1", "No plan",   "Each move seems disconnected from the last — no consistent logic across turns."),
     ("2", "Rigid",     "Had a plan but kept following it even when feedback clearly showed it was not working."),
@@ -181,7 +187,8 @@ def _verdict_finish(ok, playlist, playlist_idx):
         return (
             gr.skip(),                   # clearing_state — irrelevant from here on
             "🎉 Thank you — you've completed all games in this session! "
-            "You can safely close this tab.",
+            "You'll be redirected to Prolific to confirm completion. If "
+            f"nothing happens, [click here to return to Prolific]({PROLIFIC_COMPLETION_URL}).",
             gr.skip(), gr.skip(), gr.skip(), gr.skip(),
             gr.skip(),                   # annotation_page — never shown again
             gr.skip(),                   # verdict_page — STAYS visible, showing the message
@@ -386,6 +393,23 @@ def build(welcome_page, annotation_page, verdict_page,
             outputs=[clearing_state, status, playlist_idx_state, game_state,
                      block_state, started_at_state, annotation_page, verdict_page,
                      action_btn],
+        ).then(
+            # Pure client-side (fn=None skips a server round trip): reads the
+            # status Markdown _verdict_finish just wrote and redirects to
+            # Prolific only on the genuine "all done" branch (identified by
+            # its fixed substring) — never on the "advance to next game"
+            # branch, where status is "". A few seconds' delay lets the
+            # participant actually see the thank-you message before leaving.
+            fn=None,
+            inputs=[status],
+            outputs=None,
+            js="""(status) => {
+                if (status && status.includes("completed all games")) {
+                    setTimeout(() => {
+                        window.location.href = "%s";
+                    }, 3000);
+                }
+            }""" % PROLIFIC_COMPLETION_URL,
         )
 
         # Syncs the button label for the very FIRST view of this page in a

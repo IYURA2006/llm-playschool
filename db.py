@@ -28,13 +28,11 @@ DB_PATH = os.path.join(_dir, "annotations.db")
 # annotations.db is wiped on every restart. We mirror it to a private HF dataset
 # repo after each submit and restore it on startup.
 #
-# THIS BRANCH ONLY READS HF_PILOT_DATASET_REPO — never HF_DATASET_REPO. The old
-# fallback to the production dataset meant any local run with the developer's
-# .env (which holds a live write token and no pilot var) silently overwrote the
-# production backup with local test data — this actually happened once and had
-# to be restored from the HF dataset's commit history. Unset => backup/restore
-# are disabled outright; the pilot branch must never be able to touch production.
-HF_DATASET_REPO = os.environ.get("HF_PILOT_DATASET_REPO")
+# Reads HF_DATASET_REPO — the production dataset for the general Prolific study
+# (main deploys straight to the production Space via sync_to_hub.yml). Unset =>
+# backup/restore are disabled outright rather than silently no-op, since a
+# missing secret must never look like a working backup.
+HF_DATASET_REPO = os.environ.get("HF_DATASET_REPO")
 _HF_TOKEN = os.environ.get("HF_TOKEN")
 
 _SCHEMA = """
@@ -108,9 +106,8 @@ _backup_lock = threading.Lock()
 def backup_db_to_hf():
     """Best-effort push of annotations.db to the HF dataset repo. Never raises."""
     if not HF_DATASET_REPO:
-        print("⚠️ HF backup DISABLED: HF_PILOT_DATASET_REPO is not set — the pilot "
-              "branch never writes the production dataset. Annotations live only "
-              "in the local annotations.db until the secret is configured.")
+        print("⚠️ HF backup DISABLED: HF_DATASET_REPO is not set — annotations live "
+              "only in the local annotations.db until the secret is configured.")
         return
     if not _HF_TOKEN:
         # Loud, because a missing token silently drops every annotation: the
@@ -172,9 +169,8 @@ def _restore_db_from_hf():
     if os.path.exists(DB_PATH):
         return
     if not HF_DATASET_REPO:
-        print("⚠️ HF restore DISABLED: HF_PILOT_DATASET_REPO is not set — starting "
-              "with an empty local DB; the pilot branch never reads the "
-              "production dataset.")
+        print("⚠️ HF restore DISABLED: HF_DATASET_REPO is not set — starting "
+              "with an empty local DB.")
         return
     if not _HF_TOKEN:
         print("⚠️ HF restore SKIPPED: HF_TOKEN is not set — starting with an empty DB "
@@ -477,6 +473,6 @@ def save_verdict(game_slug, annotator_id, condition, coherence, overall, comment
 
 
 print(f"🗄️  DB config: HF_TOKEN={'set' if _HF_TOKEN else 'MISSING'}, "
-      f"HF_PILOT_DATASET_REPO={HF_DATASET_REPO or 'UNSET — cloud backup/restore disabled'}")
+      f"HF_DATASET_REPO={HF_DATASET_REPO or 'UNSET — cloud backup/restore disabled'}")
 _restore_db_from_hf()   # pull backup first (no-op if local DB present)
 init_db()               # then ensure schema exists (CREATE TABLE IF NOT EXISTS)
