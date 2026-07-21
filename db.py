@@ -6,6 +6,7 @@ Gradio runs event handlers across threads, and per-call connections sidestep
 SQLite's same-thread restriction. WAL mode allows concurrent writers.
 """
 
+import contextlib
 import json
 import os
 import shutil
@@ -89,6 +90,12 @@ CREATE TABLE IF NOT EXISTS turn_ratings (
     comment TEXT,
     extra_responses TEXT,
     UNIQUE(annotation_id, turn_index)
+);
+
+CREATE TABLE IF NOT EXISTS consents (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    annotator_id TEXT NOT NULL UNIQUE,
+    consented_at TEXT NOT NULL
 );
 """
 
@@ -367,6 +374,159 @@ def completed_pairs(annotator_id):
             (annotator_id or "",),
         ).fetchall()
     return {(r[0], r[1]) for r in rows}
+
+
+def has_consented(annotator_id):
+    """Whether this identity has already accepted the consent form — an
+    empty annotator_id (identity not resolved yet, e.g. a bare-URL visitor
+    who hasn't picked a name) can never have a consent record, by
+    construction, so this is always False for it rather than hitting the DB."""
+    if not annotator_id:
+        return False
+    with _connect() as conn:
+        row = conn.execute(
+            "SELECT 1 FROM consents WHERE annotator_id=?", (annotator_id,)
+        ).fetchone()
+    return row is not None
+
+
+def record_consent(annotator_id):
+    """Record that `annotator_id` accepted the consent form, once. A no-op
+    for an empty annotator_id (nothing to key the record on yet) — the
+    consent screen still gates the UI client-side in that case, it just
+    isn't persisted until an identity exists."""
+    if not annotator_id:
+        return
+    now = datetime.now().isoformat()
+    with _connect() as conn:
+        conn.execute(
+            "INSERT INTO consents (annotator_id, consented_at) VALUES (?, ?) "
+            "ON CONFLICT(annotator_id) DO NOTHING",
+            (annotator_id, now),
+        )
+    backup_db_to_hf_async()
+
+
+@contextlib.contextmanager
+def write_transaction():
+    """Yield a connection holding an immediate write lock (BEGIN IMMEDIATE),
+    for callers needing an atomic read-decide-write sequence across multiple
+    statements — e.g. assignment.py's coverage-balanced reservation: read
+    current per-game coverage counts, decide what to reserve, insert the
+    reservation, all atomically. Without this, two concurrent callers could
+    both read the same under-target count and both reserve past the
+    coverage target (a Prolific study "release" moment is exactly this kind
+    of thundering-herd scenario). BEGIN IMMEDIATE acquires SQLite's write
+    lock up front rather than lazily at the first write, so a second
+    concurrent write_transaction() blocks (subject to busy_timeout=10000)
+    instead of interleaving with this one. Safe to issue right after
+    _connect(): no DML has run yet on that connection, so it can't collide
+    with sqlite3's own implicit-transaction handling (which only triggers
+    before the first INSERT/UPDATE/DELETE, never on PRAGMA/SELECT). WAL mode
+    still lets other participants' reads (people actively annotating)
+    proceed unaffected. Commits on clean exit, rolls back and re-raises on
+    exception."""
+    conn = _connect()
+    conn.execute("BEGIN IMMEDIATE")
+    try:
+        yield conn
+        conn.commit()
+    except Exception:
+        conn.rollback()
+        raise
+    finally:
+        conn.close()
+
+
+def assigned_games(annotator_id, condition=None, conn=None):
+    """[{"game": slug, "condition": condition}, …] already reserved for this
+    annotator/PID, in reservation order (insertion order == id order, since
+    reserve_games is the only inserter for a brand-new pair). The source of
+    truth for rebuilding a playlist on any reload/resume — a returning PID
+    must get back the SAME playlist, not a freshly recomputed one, both
+    because re-picking would defeat the reservation-as-claim mechanism and
+    because it must match whatever condition a resumed session used."""
+    q = "SELECT game_slug, condition FROM annotations WHERE annotator_id=?"
+    params = [annotator_id or ""]
+    if condition is not None:
+        q += " AND condition=?"
+        params.append(condition)
+    q += " ORDER BY id"
+    if conn is not None:
+        rows = conn.execute(q, params).fetchall()
+    else:
+        with _connect() as c:
+            rows = c.execute(q, params).fetchall()
+    return [{"game": r[0], "condition": r[1]} for r in rows]
+
+
+def coverage_counts(condition, stale_before=None, conn=None):
+    """{game_slug: distinct-annotator count} under `condition`. A row counts
+    as "covering" its slug if it has a verdict, OR — when `stale_before` is
+    given — if it was touched (reserved, turns saved, or verdicted) more
+    recently than `stale_before`.
+
+    `stale_before` MUST be an ISO string produced the same way every other
+    timestamp in this module is (datetime.now().isoformat() — naive local
+    time, 'T'-separated), e.g. via assignment._stale_cutoff(). Do NOT
+    compute it with SQLite's datetime('now', ...): that's UTC and
+    space-separated, and comparing the two formats as raw strings is wrong
+    two ways — a timezone offset, and a lexicographic bug where 'T' (0x54)
+    always sorts after ' ' (0x20), so a same-day Python timestamp would
+    always compare "greater than" a SQLite-generated cutoff regardless of
+    actual time-of-day. Keeping both sides of the comparison Python-generated
+    avoids this entirely.
+
+    Omit `stale_before` for a pure "verdicted only" count (e.g. a final
+    coverage report, where in-flight reservations shouldn't count)."""
+    sql = "SELECT game_slug, COUNT(DISTINCT annotator_id) FROM annotations WHERE condition=?"
+    params = [condition]
+    if stale_before is not None:
+        sql += " AND (verdict_at IS NOT NULL OR updated_at > ?)"
+        params.append(stale_before)
+    else:
+        sql += " AND verdict_at IS NOT NULL"
+    sql += " GROUP BY game_slug"
+    if conn is not None:
+        rows = conn.execute(sql, params).fetchall()
+    else:
+        with _connect() as c:
+            rows = c.execute(sql, params).fetchall()
+    return dict(rows)
+
+
+def reserve_games(annotator_id, condition, game_slugs, conn=None):
+    """Claim `game_slugs` for `annotator_id` under `condition`: bare
+    placeholder annotation rows (game_id/game_name/source_path/has_reasoning
+    left NULL — save_turns' own upsert fills them in on first turn-submit,
+    same as it always has). Reuses UNIQUE(game_slug, annotator_id, condition)
+    via ON CONFLICT DO NOTHING so re-calling with an already-reserved slug is
+    a no-op, not an error or a duplicate.
+
+    updated_at is stamped now — this is what makes the reservation
+    immediately count as "claimed" in coverage_counts' staleness check.
+    Without it, a fresh reservation with a NULL updated_at would look
+    abandoned to a concurrently-arriving participant's coverage read and get
+    double-assigned.
+
+    Does NOT call backup_db_to_hf_async() itself when `conn` is supplied
+    (mid-transaction — backing up before commit could snapshot a state that
+    then rolls back). Callers using write_transaction() must trigger the
+    backup themselves after the `with` block exits successfully."""
+    game_slugs = list(game_slugs)
+    if not game_slugs:
+        return
+    now = datetime.now().isoformat()
+    rows = [(slug, annotator_id or "", condition, now) for slug in game_slugs]
+    sql = ("INSERT INTO annotations (game_slug, annotator_id, condition, updated_at) "
+           "VALUES (?, ?, ?, ?) "
+           "ON CONFLICT(game_slug, annotator_id, condition) DO NOTHING")
+    if conn is not None:
+        conn.executemany(sql, rows)
+        return
+    with _connect() as c:
+        c.executemany(sql, rows)
+    backup_db_to_hf_async()
 
 
 def save_verdict(game_slug, annotator_id, condition, coherence, overall, comment,

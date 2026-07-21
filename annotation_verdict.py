@@ -1,3 +1,4 @@
+import html
 import json
 from datetime import datetime
 
@@ -239,8 +240,8 @@ def build(welcome_page, annotation_page, verdict_page, session_survey_page,
                 meta = load_game(path or DEFAULT_GAME).meta
                 gr.HTML(
                     f'<div class="nav-left">'
-                    f'<span class="game-id-tag">#{meta["game_id"]}</span>'
-                    f'<span class="game-name-tag">{meta["game_name"].title()}</span>'
+                    f'<span class="game-id-tag">#{html.escape(str(meta["game_id"]))}</span>'
+                    f'<span class="game-name-tag">{html.escape(str(meta["game_name"]).title())}</span>'
                     f'</div>'
                 )
             gr.HTML(
