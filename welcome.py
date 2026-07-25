@@ -95,9 +95,12 @@ def _start(err, playlist, block, annotator, session_day):
         if not path:
             return stay(f"⚠️ Your assignment references an unknown game "
                         f"({item['game']!r}) — tell the study coordinator.")
-        # Practice only on the very first game — a general-study session is
-        # always a single sitting, no day-2-skips-practice concept anymore.
-        if idx == 0 and session_day != "2":
+        # Practice only on the very first game of a participant's FIRST
+        # sitting. session_day carries assignment.current_session_index as a
+        # string ("1", "2", … up to MAX_SESSIONS); a returning participant has
+        # already done the practice round and goes straight to annotation.
+        # "" covers the legacy debug link, which has no session concept.
+        if idx == 0 and session_day in ("", "1"):
             pages = (gr.update(visible=False), noop, gr.update(visible=True))
         else:          # resuming → straight to annotation
             pages = (gr.update(visible=False), gr.update(visible=True), noop)

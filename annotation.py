@@ -46,9 +46,26 @@ DEFAULT_GAME = _DEFAULT if any(p == _DEFAULT for _, p in GAMES) else (
 
 
 def game_slug(game_path):
-    """Stable, filesystem-free identifier for a game transcript."""
+    """Stable, filesystem-free identifier for a game transcript (unique across
+    the whole tree — used for output filenames and URL params)."""
     rel = os.path.relpath(game_path, _games_dir)
     return rel.replace(os.sep, "__").replace("interactions.json", "").strip("_")
+
+
+def game_key(game_path):
+    """The clembench game-FAMILY name (taboo, mmlu_pro, …), the routing key for
+    BESPOKE_QUESTIONS / reasoning / map rendering. clembench always ends
+    …/<game>/<variant>/<instance>/interactions.json, so the family is the
+    4th-from-last path component — true whether the transcript is filed under
+    the original games/<game>/… tree OR the test_newgames
+    games/<domain>/<model>/<game>/… tree, so routing survives either placement.
+    Falls back to the first segment for any shallower (debug) placement.
+
+    NB: distinct from game_slug().split("__")[0], which returned the *first*
+    path segment and so silently became the domain ("clem_indomain") once the
+    deeper layout put a domain/model dir above the game."""
+    parts = os.path.relpath(game_path, _games_dir).split(os.sep)
+    return parts[-4] if len(parts) >= 4 else parts[0]
 
 
 _SLUG_TO_PATH = {game_slug(path): path for _, path in GAMES}
@@ -87,6 +104,28 @@ def _scaleN(n, ends=None):
             for i in range(1, n + 1)]
 
 
+# The single-turn QA benchmarks (bbh, cladder, mmlu_pro) are auto-scored — the
+# gold answer and the win/lose banner are shown on the left panel — so the human
+# judgement worth capturing is the REASONING that led there, not the answer.
+# One shared Q1 replaces the generic Q1/Q2, which are multi-turn-oriented ("prior
+# information use" / "sensible next step" don't apply to a one-shot answer). The
+# player's game_role is "Answerer" in all three. Applied to reasoning games only:
+# ifeval (instruction-following) and eqbench (emotion scoring) aren't reasoning
+# tasks, are absent here, and so keep the generic questions.
+_QA_REASONING_ROLE = {
+    "roles": {
+        "Answerer": {
+            "q1": (
+                "**Q1 — Reasoning Soundness**\n\nIs the reasoning that leads to "
+                "the answer logically valid?",
+                _scale4(["Flawed", "Weak", "Mostly sound", "Fully sound"]),
+            ),
+            "q2": None,
+        },
+    },
+}
+
+
 # Hybrid-mode bespoke per-turn question sets, wired up only when block_type ==
 # "hybrid" (see BLOCK_TO_TYPE). Wording/scales sourced from question_set.md
 # (the pilot's design doc) — each entry replaces the universal Q1/Q2 for the
@@ -94,6 +133,10 @@ def _scaleN(n, ends=None):
 # (the same widget universal mode uses). Games not listed here get no
 # branching at all in hybrid mode (matches plan.md: Wordle/Dond need none).
 BESPOKE_QUESTIONS = {
+    # QA reasoning benchmarks — see _QA_REASONING_ROLE above.
+    "bbh": _QA_REASONING_ROLE,
+    "cladder": _QA_REASONING_ROLE,
+    "mmlu_pro": _QA_REASONING_ROLE,
     "codenames": {
         "flags": None,  # keep the generic 3 (+ reasoning-mismatch) flags
         "roles": {
@@ -374,8 +417,7 @@ def whole_game_questions(game_path, block):
     """
     if BLOCK_TO_TYPE.get(block, "universal") != "hybrid":
         return []
-    game_key = game_slug(game_path).split("__", 1)[0]
-    return BESPOKE_QUESTIONS.get(game_key, {}).get("whole_game") or []
+    return BESPOKE_QUESTIONS.get(game_key(game_path), {}).get("whole_game") or []
 
 
 def whole_game_only(game_path, block):
@@ -386,8 +428,7 @@ def whole_game_only(game_path, block):
     a two-role game where a single "overall quality" score doesn't fit)."""
     if BLOCK_TO_TYPE.get(block, "universal") != "hybrid":
         return False
-    game_key = game_slug(game_path).split("__", 1)[0]
-    return bool(BESPOKE_QUESTIONS.get(game_key, {}).get("whole_game_only"))
+    return bool(BESPOKE_QUESTIONS.get(game_key(game_path), {}).get("whole_game_only"))
 
 
 def output_path_for(game_path):
@@ -399,7 +440,7 @@ class _Game:
     """Lightweight container for everything a screen needs about one game."""
 
 
-def _detect_outcome(turns):
+def _detect_outcome(turns, data=None):
     """One game outcome — "won"/"lost"/"aborted"/"ended" — from the structured
     end-of-game signals each clembench game family logs. Replaces the old
     per-event keyword banners, which misfired two ways: every _END_TYPES event
@@ -410,6 +451,20 @@ def _detect_outcome(turns):
     most-explicit-first; families whose transcripts carry no verdict at all
     (imagegame — scored offline against the target grid; privateshared;
     textmapworld's walker 'stop') fall through to the neutral "ended"."""
+    # Top-level Success/Lose/Aborted flags — the authoritative verdict for the
+    # test_newgames families (the QA benchmarks, clockwork, cryptolect, the ta_*
+    # TextArena games, toh, wordle-crazy, …), whose per-turn events otherwise
+    # only carry a 'game_result = WIN/LOSE' string this scan doesn't reach.
+    # Checked first because it's the record's own summary; games without these
+    # keys (codenames, guesswhat, imagegame, …) fall through to the event scan.
+    if isinstance(data, dict):
+        if str(data.get("Aborted", "")).strip() in ("1", "True"):
+            return "aborted"
+        if str(data.get("Success", "")).strip() in ("1", "True"):
+            return "won"
+        if str(data.get("Lose", "")).strip() in ("1", "True"):
+            return "lost"
+
     acts = [m["action"] for turn in turns for m in turn]
 
     def first(t):
@@ -592,7 +647,7 @@ def load_game(path):
     g.rules = rules
     g.ai_turns = ai_turns
     g.n_turns = len(ai_turns)
-    g.outcome = _detect_outcome(turns)
+    g.outcome = _detect_outcome(turns, data)
     # Response messages to NOT render as turn cards — kept in sync with the
     # ai_turns filter above so transcript turn_counter matches ai_turns indices.
     g.skip_msg_ids = skip_ids
@@ -601,9 +656,9 @@ def load_game(path):
     # misses Dond, whose negotiation prose explains itself without the exact
     # marker words (1 of 4 turns hit; threshold needs half). Game list first,
     # heuristic as the catch-all for anything else that visibly reasons.
-    game_key = os.path.relpath(path, _games_dir).split(os.sep)[0]
+    g.game_key = game_key(path)
     _REASONING_GAMES = {"wordle", "wordle_withclue", "wordle_withcritic", "dond"}
-    g.has_reasoning = game_key in _REASONING_GAMES or _detect_reasoning(ai_turns)
+    g.has_reasoning = g.game_key in _REASONING_GAMES or _detect_reasoning(ai_turns)
     g.multi_role = len(ai_ids) > 1
     g.flag_choices = [
         "Repeated a move that already failed",
@@ -825,13 +880,31 @@ _MAP_LEGEND_HTML = (
 # referencegame's letter/number grids use ▢ (U+25A2) but its line/random
 # grids use the near-identical □ (U+25A1) — missing it rendered those two
 # variants' boards as wrapped prose.
-_GRID_CHARS = set("╔╗╚╝║═╟╢╤╧┼┤├┬┴┌┐└┘─│◌▢□")
+#
+# The second run of glyphs (#+|_√▓█○●) covers the test_newgames spatial
+# families whose boards are plain ASCII rather than box-drawing: ta_sokoban /
+# st_clean_up (# wall, _ floor, √ box-on-goal, O goal, X box, P player),
+# ta_frozen_lake (+--+ / | cell frames), clockwork_courier (# . and a +--+
+# border). Without these the rows counted zero grid chars and fell through to
+# proportional-font prose, shredding the boards (same failure mode the ▢ set
+# fixed for clean_up). Prose stays safe via the n≥4 + ratio≥0.5 guards in
+# _is_grid_line — verified against QA prose, "'Cable' no." loops, arrow paths
+# like (3,5) -> (3,4), and year ranges like 1804-1813. Note '-' and '.' are
+# deliberately NOT here (too common in prose); board borders/rulers made of
+# them are instead absorbed by _is_frame_line during block accumulation.
+_GRID_CHARS = set("╔╗╚╝║═╟╢╤╧┼┤├┬┴┌┐└┘─│◌▢□" "#+|_√▓█○●")
 _GRID_OBJ_RE = re.compile(r"(?<![A-Za-z])([A-Z])(?![A-Za-z])")
+# Lone single digits are grid cells too — clockwork's coordinate rulers and its
+# numbered pickup cells (1, 2). Adjacent digits (a multi-digit number in prose)
+# are NOT matched, so "1804" stays prose while a standalone "1" counts.
+_GRID_DIGIT_RE = re.compile(r"(?<!\w)\d(?!\w)")
 
 # Wordle guess feedback arrives as 'm<red> o<yellow> e<green>' markup; matched
 # AFTER html.escape (hence &lt;/&gt;), so only this exact token shape can ever
-# produce markup — anything else stays escaped text.
-_WD_TILE_RE = re.compile(r"([A-Za-z])&lt;(red|green|yellow)&gt;")
+# produce markup — anything else stays escaped text. purple/black are the
+# wordle-crazy variants' deliberately-scrambled key: the tiles are painted the
+# LITERAL named colour and the episode's own rules text defines their meaning.
+_WD_TILE_RE = re.compile(r"([A-Za-z])&lt;(red|green|yellow|purple|black)&gt;")
 
 # The single end-of-transcript outcome banner (see _detect_outcome).
 _OUTCOME_BANNERS = {
@@ -853,11 +926,32 @@ def _is_grid_line(ln):
     entirely). The density test still keeps object-mentioning sentences inline:
     prose is dominated by lowercase word-letters, pushing the ratio well under
     0.5."""
-    n = sum(1 for ch in ln if ch in _GRID_CHARS) + len(_GRID_OBJ_RE.findall(ln))
+    n = (sum(1 for ch in ln if ch in _GRID_CHARS)
+         + len(_GRID_OBJ_RE.findall(ln))
+         + len(_GRID_DIGIT_RE.findall(ln)))
     if n < 4:
         return False
     non_space = sum(1 for ch in ln if not ch.isspace())
     return n / non_space >= 0.5
+
+
+# A board's frame/ruler lines — a +---+ border, a run of ═/─, a bare column
+# ruler like "123456789" — carry few grid CELLS and so fail _is_grid_line, which
+# split clockwork's map into a de-gridded top border + gridded interior. Once a
+# real grid run is found we absorb IMMEDIATELY-adjacent frame lines into it so
+# the whole board renders as one <pre>. Kept strict (only frame glyphs / digits
+# / spaces, and at least a couple of them) so ordinary prose is never absorbed.
+_FRAME_CHARS = set("+-=|_" "╔╗╚╝║═╟╢╤╧┼┤├┬┴┌┐└┘─│")
+
+
+def _is_frame_line(ln):
+    s = ln.strip()
+    if not s:
+        return False
+    kept = [ch for ch in s if not ch.isspace()]
+    if len(kept) < 2:
+        return False
+    return all(ch in _FRAME_CHARS or ch.isdigit() for ch in kept)
 
 
 def _grid_block(lines):
@@ -868,55 +962,183 @@ def _grid_block(lines):
     return f'<pre class="ascii-grid">{body}</pre>'
 
 
+def _board_mask(lines):
+    """Mark which of `lines` belong to a board. Within each maximal run of
+    consecutive non-blank lines that contains at least one grid ROW, absorb the
+    neighbours that either (a) are frame/ruler lines (+---+ border, digit ruler)
+    or (b) share the board's width and carry board glyphs. This keeps a board
+    together even when some interior rows dilute below the per-line grid ratio:
+    clockwork_courier's map has dense-wall rows that grid and sparse-floor rows
+    (' 2|.p#.#....|') that don't, but all rows are the same width and delimited
+    the same way, so the run-plus-width rule reunites them into one <pre>.
+    Ordinary prose never triggers this — a paragraph with no grid row is left
+    untouched."""
+    grid = [_is_grid_line(ln) for ln in lines]
+    mask = list(grid)
+    n = len(lines)
+    i = 0
+    while i < n:
+        if not lines[i].strip():
+            i += 1
+            continue
+        j = i
+        while j < n and lines[j].strip():
+            j += 1
+        span = range(i, j)
+        widths = [len(lines[k].rstrip()) for k in span if grid[k]]
+        if widths:
+            wmin, wmax = min(widths), max(widths)
+            for k in span:
+                if grid[k]:
+                    continue
+                w = len(lines[k].rstrip())
+                glyphs = sum(1 for ch in lines[k]
+                             if ch in _GRID_CHARS or ch in _FRAME_CHARS)
+                if _is_frame_line(lines[k]) or (wmin - 2 <= w <= wmax + 2
+                                                and glyphs >= 2):
+                    mask[k] = True
+        i = j
+    return mask
+
+
+def _fence_is_board(lines):
+    """Whether a fenced (```) block should render as a monospace board rather
+    than wrapping prose. True when any line is a grid row (the existing rule —
+    fenced boards in the current games all have grid rows), OR when the block is
+    dominated by frame lines (Tower-of-Hanoi's peg diagram is all │/─ pegs and
+    stacks, whose lines are too sparse to pass the per-line grid test). Ordinary
+    fenced prose has long letter-dominated lines and stays wrapping."""
+    if any(_is_grid_line(ln) for ln in lines):
+        return True
+    non_blank = [ln for ln in lines if ln.strip()]
+    if len(non_blank) < 2:
+        return False
+    return sum(1 for ln in non_blank if _is_frame_line(ln)) >= 0.6 * len(non_blank)
+
+
 def _rich_content_html(text):
     """html.escape + proper rendering for board art.
 
     The transcript containers use white-space:pre-line/pre-wrap with a
     proportional font, which (a) collapses runs of spaces and (b) gives every
     glyph a different width — both destroy grid alignment (clean_up's board
-    was unreadable, see the pilot feedback). Fenced (```) blocks that contain
-    board rows, and unfenced runs of board rows, are re-emitted as an
-    .ascii-grid <pre>; fence markers are dropped either way. Fenced PROSE
-    stays ordinary wrapping text — freezing it into a no-wrap block forced
-    horizontal scrolling. Everything is escaped in all paths.
+    was unreadable, see the pilot feedback). Fenced (```) blocks that are board-
+    structured, and unfenced runs of board rows (with their +---+ borders and
+    coordinate rulers absorbed), are re-emitted as an .ascii-grid <pre>; fence
+    markers are dropped either way. Fenced PROSE stays ordinary wrapping text —
+    freezing it into a no-wrap block forced horizontal scrolling. Everything is
+    escaped in all paths.
     """
-    parts, plain, block = [], [], []
-    in_fence = False
-
     def esc(lines):
         # escape first, THEN swap wordle letter<color> tokens for tiles —
         # operating on the escaped text keeps every other '<' inert.
         return _WD_TILE_RE.sub(r'<span class="wd-tile wd-\2">\1</span>',
                                html.escape("\n".join(lines)))
 
-    def flush_plain():
-        if plain:
-            parts.append(esc(plain))
-            plain.clear()
-
-    def flush_block():
-        if block:
-            if any(_is_grid_line(ln) for ln in block):
-                parts.append(_grid_block(block))
-            else:
-                parts.append(esc(block))
-            block.clear()
-
+    # Partition into alternating unfenced / fenced segments so each is handled
+    # by its own rule. An unterminated fence closes at end-of-text.
+    segments, cur, in_fence = [], [], False
     for ln in str(text).split("\n"):
         if ln.strip().startswith("```"):
-            flush_block() if in_fence else flush_plain()
-            in_fence = not in_fence
+            segments.append(("fence" if in_fence else "open", cur))
+            cur, in_fence = [], not in_fence
             continue
-        if in_fence or _is_grid_line(ln):
-            if not in_fence and plain:
-                flush_plain()
-            block.append(ln)
-        else:
-            flush_block()
-            plain.append(ln)
-    flush_plain()
-    flush_block()
+        cur.append(ln)
+    segments.append(("fence" if in_fence else "open", cur))
+
+    parts = []
+    for kind, seg in segments:
+        if not seg:
+            continue
+        if kind == "fence":
+            parts.append(_grid_block(seg) if _fence_is_board(seg) else esc(seg))
+            continue
+        # Unfenced: split into maximal board / non-board runs. Board runs render
+        # as one aligned <pre>; everything else as wrapping (tile-substituted)
+        # prose.
+        mask = _board_mask(seg)
+        run, run_board = [], False
+        for ln, is_b in zip(seg, mask):
+            if run and is_b != run_board:
+                parts.append(_grid_block(run) if run_board else esc(run))
+                run = []
+            run_board = is_b
+            run.append(ln)
+        if run:
+            parts.append(_grid_block(run) if run_board else esc(run))
     return "".join(parts)
+
+
+# Some test_newgames responses run to 10–15k chars, and several degenerate into
+# a short unit repeated hundreds of times ("'Cable' no." ×250). Clamp the card
+# body to a readable head + a <details> reveal, and badge the ones that looped.
+_CLAMP_CHARS = 1200
+
+
+def _looks_looped(text):
+    """Heuristic flag for a degenerate repetition loop: the tail of the response
+    reuses only a tiny vocabulary. A healthy long response keeps introducing new
+    words; a loop ("'Cable' no. 'Cable' no. …") does not. Display cue only — it
+    never changes what the annotator rates."""
+    words = str(text).split()
+    if len(words) < 60:
+        return False
+    tail = words[-200:]
+    return len(set(tail)) <= max(6, len(tail) * 0.08)
+
+
+def _render_response_body(content):
+    """Turn-card body for a normal (non-map) response: rich content, clamped to
+    a head + expandable tail when very long, with a loop badge when it degenerated."""
+    raw = str(content)
+    badge = ('<div class="turn-loop-badge">⟳ Repetition loop detected</div>'
+             if _looks_looped(raw) else "")
+    if len(raw) <= _CLAMP_CHARS:
+        return badge + _rich_content_html(raw)
+    # Split on a line boundary near the clamp so a board/fence isn't cut mid-row.
+    cut = raw.rfind("\n", 0, _CLAMP_CHARS)
+    if cut < _CLAMP_CHARS // 2:
+        cut = _CLAMP_CHARS
+    head, tail = raw[:cut], raw[cut:]
+    return (
+        badge
+        + _rich_content_html(head)
+        + '<details class="turn-longclamp"><summary>▾ Show full response '
+        + f'({len(tail):,} more characters)</summary>'
+        + _rich_content_html(tail)
+        + '</details>'
+    )
+
+
+def _fmt_reference(c):
+    """Human-readable gold answer. ifeval logs a dict of instruction ids
+    ({"change_case:english_lowercase": {}}) → show the id(s); everything else is
+    a string (a letter, "yes", or eqbench's multi-line emotion scores)."""
+    if isinstance(c, dict):
+        return html.escape(", ".join(str(k) for k in c) or json.dumps(c))
+    return html.escape(str(c))
+
+
+def _reference_answer(g):
+    """Gold/reference answer for the single-turn QA benchmarks (mmlu_pro, bbh,
+    cladder, eqbench, ifeval), logged as a GM 'target' event (or bbh's
+    "Target: …" metadata) and otherwise dropped by the renderer. Gated on a
+    one-turn game so multi-turn transcripts that mention a target mid-play
+    (e.g. wordle's 'target_word') never surface one."""
+    if getattr(g, "n_turns", 0) != 1:
+        return None
+    for turn in g.data["turns"]:
+        for m in turn:
+            if m["from"] != "GM":
+                continue
+            a = m["action"]
+            t, c = a.get("type"), a.get("content")
+            if t == "target":
+                return _fmt_reference(c)
+            if (t == "metadata" and isinstance(c, str)
+                    and c.strip().lower().startswith("target:")):
+                return html.escape(c.split(":", 1)[1].strip())
+    return None
 
 
 def _progress_html(g, rated):
@@ -1096,7 +1318,7 @@ def _build_transcript_html(g, current_idx, pretty_map=False,
                 # rings, dashed ring = current position — see the renderer
                 # block above). Shown in BOTH conditions — only the questions
                 # differ between universal and hybrid, not the visualization.
-                body_html = _rich_content_html(str(content))
+                body_html = _render_response_body(content)
                 if pretty_map and isinstance(content, str):
                     parsed = _parse_map_response(content)
                     if parsed:
@@ -1126,6 +1348,18 @@ def _build_transcript_html(g, current_idx, pretty_map=False,
                     f'</div>'
                 )
                 turn_counter += 1
+
+    # Reference answer for the single-turn QA benchmarks — shown AFTER the
+    # model's turn card (so the annotator reads the response first), styled as
+    # reference material rather than part of the episode.
+    ref = _reference_answer(g)
+    if ref:
+        parts.append(
+            '<div class="ref-answer">'
+            '<div class="ref-answer-label">✓ REFERENCE ANSWER</div>'
+            f'<div class="ref-answer-body">{ref}</div>'
+            '</div>'
+        )
 
     # Exactly ONE outcome banner, computed by _detect_outcome — never emitted
     # inline per event (see the _END_TYPES comment above).
@@ -1220,8 +1454,7 @@ def build(welcome_page, annotation_page, verdict_page, game_state, annotator_sta
                 return
             g = load_game(path)
             block_type = BLOCK_TO_TYPE.get(block, "universal")
-            game_key = g.slug.split("__", 1)[0]
-            bespoke = BESPOKE_QUESTIONS.get(game_key) if block_type == "hybrid" else None
+            bespoke = BESPOKE_QUESTIONS.get(g.game_key) if block_type == "hybrid" else None
             # Q3 (Reasoning Clarity) gating by condition:
             #  - universal ("general"): only where the AI actually explains its
             #    reasoning (g.has_reasoning) — i.e. where it can be answered.
@@ -1234,7 +1467,7 @@ def build(welcome_page, annotation_page, verdict_page, game_state, annotator_sta
             # 2026-07-06): raw graph JSON is unreadable no matter which
             # question set you're answering, so only the QUESTIONS differ
             # between universal and hybrid — not the visualization.
-            pretty_map = bool(BESPOKE_QUESTIONS.get(game_key, {}).get("render_graph"))
+            pretty_map = bool(BESPOKE_QUESTIONS.get(g.game_key, {}).get("render_graph"))
 
             # Playlist sessions show where the annotator is in today's queue.
             seq_chip = ""

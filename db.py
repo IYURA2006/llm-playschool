@@ -45,6 +45,13 @@ CREATE TABLE IF NOT EXISTS annotations (
     has_reasoning INTEGER,
     annotator_id TEXT NOT NULL DEFAULT '',
     condition TEXT,
+    -- Which sitting this reservation belongs to: 1 for a participant's first
+    -- session, 2 for their second, … up to assignment.MAX_SESSIONS. A
+    -- returning Prolific PID gets a fresh batch under the next index, and
+    -- every batch is disjoint from the ones before it (assignment.py excludes
+    -- already-reserved slugs), which is what makes the session-agnostic
+    -- completed_pairs() still resolve resume position correctly.
+    session_index INTEGER,
     session_day TEXT,
     session_started_at TEXT,
     started_at TEXT,
@@ -93,9 +100,27 @@ def _connect():
     return conn
 
 
+def _migrate_session_index(conn):
+    """Additive upgrade for DBs created before multi-session participation
+    existed. CREATE TABLE IF NOT EXISTS never alters an existing table, so a
+    live annotations.db (one already holding real participant data) would
+    otherwise keep the old column set and every session_index write would
+    fail. Additive-only by design — no DROP/rebuild — so it is safe to run
+    against the production dataset, and it is a no-op once applied.
+
+    Pre-existing rows keep session_index NULL rather than being backfilled to
+    1: they were reserved when a PID could only ever have one batch, and
+    assignment.py treats NULL as session 1 (COALESCE) precisely so no
+    historical row has to be rewritten."""
+    cols = {row[1] for row in conn.execute("PRAGMA table_info(annotations)")}
+    if "session_index" not in cols:
+        conn.execute("ALTER TABLE annotations ADD COLUMN session_index INTEGER")
+
+
 def init_db():
     with _connect() as conn:
         conn.executescript(_SCHEMA)
+        _migrate_session_index(conn)
 
 
 # Serializes snapshot+upload: concurrent submits must not interleave uploads
@@ -346,19 +371,30 @@ def write_transaction():
         conn.close()
 
 
-def assigned_games(annotator_id, condition=None, conn=None):
+def assigned_games(annotator_id, condition=None, session_index=None, conn=None):
     """[{"game": slug, "condition": condition}, …] already reserved for this
     annotator/PID, in reservation order (insertion order == id order, since
     reserve_games is the only inserter for a brand-new pair). The source of
     truth for rebuilding a playlist on any reload/resume — a returning PID
     must get back the SAME playlist, not a freshly recomputed one, both
     because re-picking would defeat the reservation-as-claim mechanism and
-    because it must match whatever condition a resumed session used."""
+    because it must match whatever condition a resumed session used.
+
+    `session_index` narrows the result to ONE sitting. Pass it whenever the
+    result will be used as a playlist: a returning participant has several
+    sessions' worth of reservations on file, and handing back all of them
+    would replay games they already finished. Omit it only for
+    whole-participant questions (e.g. the no-repeat exclusion set).
+    NULL session_index rows (reserved before multi-session support — see
+    _migrate_session_index) are treated as session 1."""
     q = "SELECT game_slug, condition FROM annotations WHERE annotator_id=?"
     params = [annotator_id or ""]
     if condition is not None:
         q += " AND condition=?"
         params.append(condition)
+    if session_index is not None:
+        q += " AND COALESCE(session_index, 1)=?"
+        params.append(session_index)
     q += " ORDER BY id"
     if conn is not None:
         rows = conn.execute(q, params).fetchall()
@@ -366,6 +402,47 @@ def assigned_games(annotator_id, condition=None, conn=None):
         with _connect() as c:
             rows = c.execute(q, params).fetchall()
     return [{"game": r[0], "condition": r[1]} for r in rows]
+
+
+def reserved_slugs(annotator_id, conn=None):
+    """Every game_slug this participant has EVER been reserved, across all
+    sessions and conditions. Drives the no-repeat rule: a returning PID must
+    never be handed a transcript they have already seen, in any earlier
+    sitting. Deliberately not filtered by condition — seeing the same
+    transcript again under a different question set would still be a repeat
+    viewing, and the second rating could not be treated as independent."""
+    q = "SELECT DISTINCT game_slug FROM annotations WHERE annotator_id=?"
+    params = [annotator_id or ""]
+    if conn is not None:
+        rows = conn.execute(q, params).fetchall()
+    else:
+        with _connect() as c:
+            rows = c.execute(q, params).fetchall()
+    return {r[0] for r in rows}
+
+
+def session_summary(annotator_id, condition=None, conn=None):
+    """[(session_index, n_games, n_with_verdict), …] ascending, for this PID.
+
+    Everything the cap and the resume decision need in one read: how many
+    sittings exist, and whether the latest one is finished. A session counts
+    as COMPLETED only when every reserved game in it carries a verdict —
+    a half-finished sitting must resume, not burn one of the participant's
+    allowed sessions."""
+    q = ("SELECT COALESCE(session_index, 1) AS s, COUNT(*), "
+         "       COUNT(verdict_at) "
+         "FROM annotations WHERE annotator_id=?")
+    params = [annotator_id or ""]
+    if condition is not None:
+        q += " AND condition=?"
+        params.append(condition)
+    q += " GROUP BY s ORDER BY s"
+    if conn is not None:
+        rows = conn.execute(q, params).fetchall()
+    else:
+        with _connect() as c:
+            rows = c.execute(q, params).fetchall()
+    return [(int(r[0]), int(r[1]), int(r[2])) for r in rows]
 
 
 def coverage_counts(condition, stale_before=None, conn=None):
@@ -403,13 +480,21 @@ def coverage_counts(condition, stale_before=None, conn=None):
     return dict(rows)
 
 
-def reserve_games(annotator_id, condition, game_slugs, conn=None):
+def reserve_games(annotator_id, condition, game_slugs, session_index=1, conn=None):
     """Claim `game_slugs` for `annotator_id` under `condition`: bare
     placeholder annotation rows (game_id/game_name/source_path/has_reasoning
     left NULL — save_turns' own upsert fills them in on first turn-submit,
     same as it always has). Reuses UNIQUE(game_slug, annotator_id, condition)
     via ON CONFLICT DO NOTHING so re-calling with an already-reserved slug is
     a no-op, not an error or a duplicate.
+
+    `session_index` records which of the participant's sittings this batch
+    belongs to. The ON CONFLICT clause means a slug already reserved under an
+    EARLIER session is silently skipped rather than re-stamped into the new
+    one (the UNIQUE key has no session column, by design — a transcript may
+    only ever be reserved once per participant). Callers must therefore
+    exclude already-reserved slugs when picking, or the new session comes out
+    silently short; assignment.py does this via db.reserved_slugs().
 
     updated_at is stamped now — this is what makes the reservation
     immediately count as "claimed" in coverage_counts' staleness check.
@@ -425,9 +510,11 @@ def reserve_games(annotator_id, condition, game_slugs, conn=None):
     if not game_slugs:
         return
     now = datetime.now().isoformat()
-    rows = [(slug, annotator_id or "", condition, now) for slug in game_slugs]
-    sql = ("INSERT INTO annotations (game_slug, annotator_id, condition, updated_at) "
-           "VALUES (?, ?, ?, ?) "
+    rows = [(slug, annotator_id or "", condition, session_index, now)
+            for slug in game_slugs]
+    sql = ("INSERT INTO annotations "
+           "    (game_slug, annotator_id, condition, session_index, updated_at) "
+           "VALUES (?, ?, ?, ?, ?) "
            "ON CONFLICT(game_slug, annotator_id, condition) DO NOTHING")
     if conn is not None:
         conn.executemany(sql, rows)

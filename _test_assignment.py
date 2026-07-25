@@ -48,6 +48,28 @@ def _raw_reservation_counts():
     return dict(rows)
 
 
+def complete_session(pid, condition="hybrid"):
+    """Stamp a verdict on every unverdicted reservation this PID holds, i.e.
+    simulate them finishing their current sitting. A session only counts
+    toward the cap (and only frees the participant to start a new batch)
+    once every game in it is verdicted — see assignment._resume_target."""
+    with sqlite3.connect(db.DB_PATH) as conn:
+        conn.execute(
+            "UPDATE annotations SET verdict_at=?, updated_at=? "
+            "WHERE annotator_id=? AND condition=? AND verdict_at IS NULL",
+            (datetime.now().isoformat(), datetime.now().isoformat(), pid, condition),
+        )
+
+
+def batch_seconds(playlist):
+    """Estimated length of a playlist, the same way assignment.py sizes it:
+    every transcript's cost plus ONE rules-reading charge for the shared
+    game type."""
+    slugs = [item["game"] for item in playlist]
+    return (sum(assignment.transcript_seconds(s) for s in slugs)
+            + assignment.rules_seconds(slugs[0]))
+
+
 failures = []
 
 
@@ -77,44 +99,69 @@ def test_basic_batch_and_idempotency():
 
     pid = "fakepid_basic"
     playlist1, err1 = assignment.build_playlist_for(pid)
-    check("first call returns a batch, no error", err1 is None and len(playlist1) == assignment.BATCH_SIZE)
-    types = [assignment._game_type(item["game"]) for item in playlist1]
-    check("batch has no duplicate game types (pool has room)", len(types) == len(set(types)))
+    check("first call returns a batch, no error", err1 is None and len(playlist1) >= 1)
+    types = {assignment._game_type(item["game"]) for item in playlist1}
+    check("batch holds exactly ONE game type", len(types) == 1)
     check("every item uses the hybrid condition", all(item["condition"] == "hybrid" for item in playlist1))
+    check("no duplicate transcripts within the batch",
+          len({i["game"] for i in playlist1}) == len(playlist1))
+
+    est = batch_seconds(playlist1)
+    within = est <= assignment.TARGET_SECONDS * assignment.OVERSHOOT
+    check(f"batch fits the time budget (~{est / 60:.1f} min vs "
+          f"{assignment.TARGET_SECONDS / 60:.0f} min target), or is a single "
+          f"over-long transcript", within or len(playlist1) == 1)
+    print(f"  batch: {len(playlist1)} × {types.pop()} ≈ {est / 60:.1f} min")
 
     playlist2, err2 = assignment.build_playlist_for(pid)
-    check("re-calling the same PID returns the identical playlist (idempotent)",
+    check("re-calling mid-session returns the identical playlist (resume, not re-pick)",
           playlist1 == playlist2 and err2 is None)
 
 
-def _safe_pid_count(margin=5):
-    """Number of participants that can be assigned a full batch without the
-    pool running dry — computed from the actual pool size so this doesn't
-    silently start asserting the wrong thing if the game roster changes."""
-    max_full_batches = (len(assignment.POOL_SLUGS) * assignment.COVERAGE_TARGET) // assignment.BATCH_SIZE
-    return max(1, max_full_batches - margin)
+def _pid_count():
+    """Enough participants to drive the pool toward exhaustion. Batch size is
+    no longer fixed (the time budget decides it, so it varies from 1 game for
+    a long adventuregame transcript to a dozen short taboo ones), which means
+    the exact number the pool can serve is not predictable up front. These
+    tests therefore oversubscribe deliberately and assert the invariant that
+    actually matters — no transcript is ever assigned past COVERAGE_TARGET —
+    treating a late NO_TASKS_MESSAGE as the expected terminal state rather
+    than a failure."""
+    return len(assignment.POOL_SLUGS) * assignment.COVERAGE_TARGET
+
+
+def _report(results):
+    served = [p for p, err in results if err is None and p]
+    exhausted = [err for _, err in results if err == assignment.NO_TASKS_MESSAGE]
+    unexpected = [err for _, err in results
+                  if err is not None and err != assignment.NO_TASKS_MESSAGE]
+    return served, exhausted, unexpected
 
 
 def test_coverage_balances_across_many_pids():
     reset_db()
-    n_pids = _safe_pid_count()
-    print(f"  using {n_pids} participants (pool capacity supports "
-          f"~{len(assignment.POOL_SLUGS) * assignment.COVERAGE_TARGET // assignment.BATCH_SIZE} "
-          f"full batches before exhaustion)")
-    for i in range(n_pids):
-        playlist, err = assignment.build_playlist_for(f"fakepid_cov_{i:03d}")
-        assert err is None, f"unexpected error for pid {i}: {err}"
+    n_pids = _pid_count()
+    results = [assignment.build_playlist_for(f"fakepid_cov_{i:03d}")
+               for i in range(n_pids)]
+    served, exhausted, unexpected = _report(results)
+    print(f"  {len(served)}/{n_pids} participants served, {len(exhausted)} hit "
+          f"an exhausted pool (pool: {len(assignment.POOL_SLUGS)} transcripts "
+          f"× target {assignment.COVERAGE_TARGET})")
 
+    check("no participant got an unexpected error", not unexpected)
+    check("at least some participants were served", len(served) > 0)
     counts = _raw_reservation_counts()
     over_target = {slug: c for slug, c in counts.items() if c > assignment.COVERAGE_TARGET}
     check(f"no transcript exceeds COVERAGE_TARGET={assignment.COVERAGE_TARGET} "
           f"after {n_pids} sequential participants", not over_target)
+    check("every batch held a single game type",
+          all(len({assignment._game_type(i["game"]) for i in p}) == 1 for p in served))
     print(f"  coverage distribution: {sorted(Counter(counts.values()).items())}")
 
 
 def test_concurrent_distinct_pids_stay_within_target():
     reset_db()
-    n_pids = _safe_pid_count()
+    n_pids = _pid_count()
 
     def assign(i):
         return assignment.build_playlist_for(f"fakepid_conc_{i:03d}")
@@ -122,12 +169,14 @@ def test_concurrent_distinct_pids_stay_within_target():
     with concurrent.futures.ThreadPoolExecutor(max_workers=16) as pool:
         results = list(pool.map(assign, range(n_pids)))
 
-    check("all concurrent distinct-PID requests succeeded",
-          all(err is None for _, err in results))
+    served, exhausted, unexpected = _report(results)
+    check("no concurrent request failed unexpectedly (only pool exhaustion)",
+          not unexpected)
+    check("concurrent participants were served", len(served) > 0)
     counts = _raw_reservation_counts()
     over_target = {slug: c for slug, c in counts.items() if c > assignment.COVERAGE_TARGET}
-    check(f"no transcript exceeds COVERAGE_TARGET under concurrent distinct PIDs "
-          f"(write_transaction() serialization holds)", not over_target)
+    check(f"no transcript exceeds COVERAGE_TARGET under {n_pids} concurrent "
+          f"distinct PIDs (write_transaction() serialization holds)", not over_target)
 
 
 def test_concurrent_same_pid_no_double_reservation():
@@ -143,9 +192,11 @@ def test_concurrent_same_pid_no_double_reservation():
     check("both concurrent calls for the same new PID succeeded", e1 is None and e2 is None)
     check("both concurrent calls return the SAME playlist", r1 == r2)
     reserved = db.assigned_games(pid, condition="hybrid")
-    check(f"exactly BATCH_SIZE={assignment.BATCH_SIZE} rows reserved, not "
-          f"{2 * assignment.BATCH_SIZE} (double-checked lock holds)",
-          len(reserved) == assignment.BATCH_SIZE)
+    check(f"one batch reserved ({len(r1)} rows), not two (double-checked lock "
+          f"holds — otherwise the PID silently burns 2 of their sessions)",
+          len(reserved) == len(r1))
+    sessions = db.session_summary(pid, condition="hybrid")
+    check("the race produced exactly ONE session, not two", len(sessions) == 1)
 
 
 def test_stale_reservation_frees_its_slot():
@@ -182,13 +233,13 @@ def test_stale_reservation_frees_its_slot():
 
 def test_pool_exhaustion_returns_no_tasks_message():
     reset_db()
-    orig_target, orig_batch = assignment.COVERAGE_TARGET, assignment.BATCH_SIZE
+    orig_target, orig_max = assignment.COVERAGE_TARGET, assignment.MAX_BATCH_GAMES
     try:
         assignment.COVERAGE_TARGET = 1
-        assignment.BATCH_SIZE = 1
+        assignment.MAX_BATCH_GAMES = 1
         n_slugs = len(assignment.POOL_SLUGS)
-        # At target=1/batch=1, each participant claims exactly one
-        # never-before-picked slug, so exhausting the whole pool takes
+        # At target=1 and one game per batch, each participant claims exactly
+        # one never-before-picked slug, so exhausting the whole pool takes
         # exactly one participant per slug (not per type).
         for i in range(n_slugs):
             playlist, err = assignment.build_playlist_for(f"fakepid_exhaust_{i:03d}")
@@ -198,7 +249,88 @@ def test_pool_exhaustion_returns_no_tasks_message():
         check("once every transcript hits target, a new PID gets [] + NO_TASKS_MESSAGE",
               playlist == [] and err == assignment.NO_TASKS_MESSAGE)
     finally:
-        assignment.COVERAGE_TARGET, assignment.BATCH_SIZE = orig_target, orig_batch
+        assignment.COVERAGE_TARGET, assignment.MAX_BATCH_GAMES = orig_target, orig_max
+
+
+def test_returning_participant_gets_a_new_disjoint_batch():
+    reset_db()
+    pid = "fakepid_return"
+    first, err = assignment.build_playlist_for(pid)
+    assert err is None and first, f"no first batch: {err}"
+    check("session index starts at 1", assignment.current_session_index(pid) == 1)
+
+    # Still mid-session → must resume, NOT start a second sitting.
+    again, _ = assignment.build_playlist_for(pid)
+    check("an unfinished session is resumed, never replaced", again == first)
+
+    complete_session(pid)
+    second, err2 = assignment.build_playlist_for(pid)
+    check("after finishing, a returning participant gets a NEW batch",
+          err2 is None and second and second != first)
+    check("session index advances to 2", assignment.current_session_index(pid) == 2)
+
+    first_slugs = {i["game"] for i in first}
+    second_slugs = {i["game"] for i in second}
+    check("the new batch shares NO transcript with the previous one "
+          "(never annotate the same thing twice)",
+          not (first_slugs & second_slugs))
+    check("the new batch is still a single game type",
+          len({assignment._game_type(i["game"]) for i in second}) == 1)
+
+    sessions = db.session_summary(pid, condition="hybrid")
+    check("exactly two sessions on file, the first complete and the second not",
+          [(i, t == d) for i, t, d in sessions] == [(1, True), (2, False)])
+
+
+def test_session_cap_blocks_further_work():
+    reset_db()
+    pid = "fakepid_cap"
+    orig_max_sessions, orig_max_games = assignment.MAX_SESSIONS, assignment.MAX_BATCH_GAMES
+    try:
+        # Small numbers so the cap — not the pool — is what stops this PID.
+        assignment.MAX_SESSIONS = 3
+        assignment.MAX_BATCH_GAMES = 1
+        for n in range(assignment.MAX_SESSIONS):
+            playlist, err = assignment.build_playlist_for(pid)
+            assert err is None and playlist, f"session {n + 1} refused early: {err}"
+            complete_session(pid)
+
+        playlist, err = assignment.build_playlist_for(pid)
+        check(f"after {assignment.MAX_SESSIONS} completed sessions the PID is "
+              f"blocked with CAP_MESSAGE",
+              playlist == [] and err == assignment.CAP_MESSAGE)
+
+        done = db.session_summary(pid, condition="hybrid")
+        check("no extra session was reserved by the refused attempt",
+              len(done) == assignment.MAX_SESSIONS)
+    finally:
+        assignment.MAX_SESSIONS = orig_max_sessions
+        assignment.MAX_BATCH_GAMES = orig_max_games
+
+
+def test_half_finished_session_does_not_count_toward_cap():
+    reset_db()
+    pid = "fakepid_partial"
+    playlist, err = assignment.build_playlist_for(pid)
+    assert err is None and playlist, f"no batch: {err}"
+    if len(playlist) < 2:
+        print("  (skipped: pool produced a 1-game batch, nothing to half-finish)")
+        return
+
+    # Verdict exactly one game, leaving the sitting unfinished.
+    with sqlite3.connect(db.DB_PATH) as conn:
+        conn.execute(
+            "UPDATE annotations SET verdict_at=?, updated_at=? "
+            "WHERE annotator_id=? AND game_slug=?",
+            (datetime.now().isoformat(), datetime.now().isoformat(),
+             pid, playlist[0]["game"]),
+        )
+
+    resumed, err = assignment.build_playlist_for(pid)
+    check("a half-finished sitting resumes with the same playlist",
+          err is None and resumed == playlist)
+    check("and does not open a second session",
+          len(db.session_summary(pid, condition="hybrid")) == 1)
 
 
 # ──────────────────────────────────────────────────────────────────────────
@@ -208,6 +340,9 @@ run("concurrent distinct PIDs stay within COVERAGE_TARGET", test_concurrent_dist
 run("concurrent same-PID double-checked lock", test_concurrent_same_pid_no_double_reservation)
 run("stale reservation frees its slot", test_stale_reservation_frees_its_slot)
 run("pool exhaustion returns NO_TASKS_MESSAGE", test_pool_exhaustion_returns_no_tasks_message)
+run("returning participant gets a new, disjoint batch", test_returning_participant_gets_a_new_disjoint_batch)
+run("session cap blocks further work", test_session_cap_blocks_further_work)
+run("half-finished session resumes and doesn't count", test_half_finished_session_does_not_count_toward_cap)
 
 for suffix in ("", "-wal", "-shm"):
     try:

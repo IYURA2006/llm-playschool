@@ -334,6 +334,51 @@ div:focus, div:focus-visible {
 .wd-green  { background: #22c55e; color: #052e16; }
 .wd-yellow { background: #eab308; color: #3b2a03; }
 .wd-red    { background: #64748b; color: #0b1220; }
+/* wordle-crazy variants scramble the key, so its tiles are painted the LITERAL
+   named colour — the episode's own rules (in the GAME GOAL box) define meaning. */
+.wd-purple { background: #a855f7; color: #faf5ff; }
+.wd-black  { background: #1f2937; color: #f3f4f6; }
+
+/* ── Reference answer (single-turn QA benchmarks) ─────────────────
+   Styled as reference material, deliberately unlike a turn card. Sits on the
+   light transcript panel, so text colours need !important to survive HF's
+   forced-dark theme (see the .goal-text/.gm-msg note above). */
+.ref-answer {
+    background: #f0fdf4;
+    border: 1px solid #86efac;
+    border-left: 4px solid #22c55e;
+    border-radius: 8px;
+    padding: 10px 14px;
+    margin: 12px 0;
+}
+.ref-answer-label {
+    font-size: 10px; font-weight: 700;
+    color: #16a34a !important; letter-spacing: .08em;
+    margin-bottom: 4px;
+}
+.ref-answer-body {
+    font-size: 14px; font-weight: 600;
+    color: #14532d !important;
+    white-space: pre-line; overflow-wrap: anywhere;
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+/* ── Long-response clamp + repetition-loop badge (test_newgames) ───
+   Both live INSIDE a dark turn card, so light text is fine here. */
+.turn-loop-badge {
+    display: inline-block;
+    background: #7c2d12; color: #fed7aa;
+    font-size: 10px; font-weight: 700; letter-spacing: .06em;
+    padding: 2px 8px; border-radius: 999px; margin-bottom: 8px;
+}
+.turn-longclamp { margin-top: 6px; }
+.turn-longclamp > summary {
+    cursor: pointer; list-style: none;
+    color: #7dd3fc; font-size: 12px; font-weight: 600;
+    padding: 4px 0; user-select: none;
+}
+.turn-longclamp > summary::-webkit-details-marker { display: none; }
+.turn-longclamp[open] > summary { color: #38bdf8; }
 
 /* ── TextMapWorld map renderer (hybrid mode) ──────────────────── */
 /* Legend row sits on the light transcript panel, above the turn cards */
@@ -1176,12 +1221,12 @@ def _capture_session_params(request: gr.Request):
                 f"this study. Thank you!"
             )
         item = playlist[idx]
-        # session_day="1" (never "2") reuses welcome.py's existing "practice
-        # only on idx==0 when session_day != '2'" logic to show the practice
-        # round once, on the very first game, and never again on resume —
-        # a Prolific PID is always a single sitting, no day-2 concept.
+        # The last element carries the participant's 1-based SESSION INDEX
+        # (they may return for up to assignment.MAX_SESSIONS sittings). It
+        # reaches welcome._start, which shows the practice round only on
+        # session "1" — a returning participant has already done it.
         return (prolific_pid, item["condition"], annotation.slug_to_path(item["game"]),
-                "", playlist, idx, "1")
+                "", playlist, idx, str(assignment.current_session_index(prolific_pid)))
 
     annotator = (qp.get("annotator") or "").strip()
     block = (qp.get("block") or "").strip()
@@ -1231,7 +1276,11 @@ with gr.Blocks() as app:
     # it. Empty list = legacy single-game debug link.
     playlist_state = gr.State([])
     playlist_idx_state = gr.State(0)
-    # Always "1" in playlist mode (a single-sitting study, no day-2 concept).
+    # The participant's 1-based session index as a string ("1", "2", … up to
+    # assignment.MAX_SESSIONS) in playlist mode; "" on the legacy debug link.
+    # Decides whether the practice round is shown (welcome._start) and is
+    # persisted on every annotation row, so an export can tell which sitting
+    # a rating came from.
     session_day_state = gr.State("")
     # ISO timestamp stamped whenever annotation of a game actually starts
     # (leaving welcome/training, or clicking "Next game"); per-game duration

@@ -6,32 +6,31 @@ the event wiring (deciding when to show/hide the popup, recording consent,
 proceeding into the study) so there's a single place — welcome._start —
 deciding "show popup vs. proceed", not two functions racing each other.
 
-Two still-unresolved placeholders are rendered as visible ⚠️ TODO markers
-(ethics reference number, compensation amount) rather than guessed — the
-study coordinator must fill these in before this goes in front of real
-participants."""
+The text below is the FINAL approved participant information sheet (ethics
+reference 171955), supplied verbatim by the study coordinator on 2026-07-22.
+Treat it as a controlled document: do not reword, tighten, or "fix" it
+without the coordinator's say-so — it is what the ethics application was
+certified against. The earlier ⚠️ TODO placeholders (ethics reference number,
+compensation amount) are now filled in and the marker mechanism is gone."""
 import gradio as gr
 
-_TODO = ('<span class="consent-todo">⚠️ TODO: {}</span>')
-
-_INFO_SHEET_MD = f"""
+_INFO_SHEET_MD = """
 ## Participant Information Sheet
 
 **Project title:** LM Playschool — Improving Language Models through Learning from Dialogue Interaction
 
 **Principal investigator:** Alessandro Suglia
 
-**Researchers collecting data:** Yurii Ilnytskyi, Sabrina McCallum-Exner
+**Researcher collecting data:** Yurii Ilnytskyi, Sabrina McCallum-Exner
 
 This study was certified according to the Informatics Research Ethics Process,
-reference number {_TODO.format("ethics reference number")}. Please take time to
-read the following information carefully. You should keep this page for your
-records.
+reference number 171955. Please take time to read the following information
+carefully. You should keep this page for your records.
 
 ### Who are the researchers?
 
-This study is run by Alessandro Suglia together with Yurii Ilnytskyi (LM
-Playschool Intern) and Sabrina McCallum-Exner, who are collecting and working
+This study is run by Alessandro Suglia together with Yurii Ilnytskyi (LLM
+Playschool Intern) and Sabrina McCallum-Exner who are collecting and working
 with the data. All three are part of the School of Informatics at the
 University of Edinburgh.
 
@@ -41,39 +40,42 @@ We are studying how AI language models behave when they interact in simple,
 multi-turn games (like word-guessing or negotiating). To figure out if our AI
 training methods are working, we need humans to grade the AI's conversations.
 In this study you will help us by reading short transcripts of AI gameplay
-and answering straightforward questions about how well the models reasoned
-and made decisions.
+and answering questions about how well the models reasoned and made
+decisions.
 
 ### Why have I been asked to take part?
 
 We're looking for adult participants who are comfortable reading and
-understanding English, since the task involves reading conversations and
+understanding English since the task involves reading conversations and
 answering questions about them. No other special background or experience is
 needed.
 
 ### Do I have to take part?
 
-No — participation in this study is voluntary. You can withdraw from the
-study at any time, without giving a reason. Your rights will not be affected,
-and there will be no penalty or negative consequences. If you wish to
-withdraw, contact the PI. We will stop using your data in any publications or
-presentations submitted after you have withdrawn consent. However, we will
-keep copies of your original consent, and of your withdrawal request.
+Participation in this study is entirely voluntary. You can withdraw from the
+study at any time, without giving a reason, and without any penalty or
+negative consequences. If you wish to withdraw, contact the PI. We will stop
+using your data in any publications or presentations submitted after you have
+withdrawn consent. However, we will keep copies of your original consent, and
+of your withdrawal request.
 
 ### What will happen if I decide to take part?
 
 You'll read short transcripts of an AI playing a game (for example, guessing
 a word, or negotiating with another AI). For each one you'll answer a number
-of rating questions — some are short scales (like rating something from 1 to
-4) and some are yes/no checkboxes. You can also leave optional short comments
-if you want to. This is done entirely online, through a web page — there's no
-audio or video recording involved and no in-person meeting. Each session
-takes about 10–15 minutes, and how many sessions you do depends on the study.
+of rating questions — some are scales (like rating something from 1 to 4) and
+some are yes/no checkboxes. You can also leave optional short comments if you
+want to. This is done entirely online, through a web page, and there's no
+audio or video recording involved. Each session takes about 15–20 minutes and
+how many sessions you do depends on the study.
 
 ### Compensation
 
-You will be paid {_TODO.format("compensation amount")} for your participation
-in this study.
+Payment for this study will be made through Prolific, the platform hosting
+the study. You will be paid **£4.48** for each 20-minute session you
+complete, in line with the current UK Real Living Wage (£13.45 per hour). If
+you choose to take part in further sessions or studies as part of this
+project, you will be paid accordingly for each one you complete.
 
 ### Are there any risks associated with taking part?
 
@@ -89,7 +91,7 @@ reliable.
 ### What will happen to the results of this study?
 
 The results of this study may be summarised in published articles, reports
-and presentations. Any quotes or key findings will be anonymised: we will
+and presentations. Any quotes or key findings will be anonymized: We will
 remove any information that could, in our assessment, allow anyone to
 identify you. With your consent, information can also be used for future
 research. Your data may be archived for a minimum of two years.
@@ -99,15 +101,15 @@ research. Your data may be archived for a minimum of two years.
 Your data will be processed in accordance with Data Protection Law. All
 information collected about you will be kept strictly confidential. Your data
 will be referred to by a unique participant number rather than by name. Your
-data will only be viewed by the research team: Alessandro Suglia, Yurii
-Ilnytskyi, and Sabrina McCallum-Exner.
+data will only be viewed by the researcher/research team Yurii Ilnytskyi,
+Alessandro Suglia, Sabrina McCallum-Exner.
 
-All electronic data will be stored on a password-protected encrypted
-computer, on the School of Informatics' secure file servers, or on the
-University's secure encrypted cloud storage services (DataShare, ownCloud, or
-Sharepoint), and all paper records will be stored in a locked filing cabinet
-in the PI's office. Your consent information will be kept separately from
-your responses in order to minimise risk.
+All electronic data will be stored on a password-protected encrypted computer
+on the School of Informatics' secure file servers, or on the University's
+secure encrypted cloud storage services (DataShare, ownCloud, or Sharepoint),
+and all paper records will be stored in a locked filing cabinet in the PI's
+office. Your consent information will be kept separately from your responses
+to minimise risk.
 
 ### What are my data protection rights?
 
@@ -120,8 +122,8 @@ Commissioner's Office, please visit [www.ico.org.uk](https://www.ico.org.uk).
 Questions, comments and requests about your personal data can also be sent to
 the University Data Protection Officer at dpo@ed.ac.uk.
 
-For general information about how we use your data, see the
-[Edinburgh Research Office privacy notice](https://www.ed.ac.uk/research-office).
+For general information about how we use your data, go to:
+[Privacy notice | Edinburgh Research Office](https://www.ed.ac.uk/research-office/research-integrity-governance/research-data-protection/privacy-notice).
 
 ### Who can I contact?
 
@@ -157,7 +159,7 @@ def build(consent_popup):
             )
             popup_note = gr.Markdown("")
             confirm_btn = gr.Button(
-                "I agree — take me to the study", variant="primary", size="lg",
+                "I agree", variant="primary", size="lg",
                 elem_classes=["start-btn"],
             )
     return agree_cb, confirm_btn, popup_note
