@@ -1,0 +1,253 @@
+{
+  "meta": {
+    "game_name": "get_to_the_point",
+    "experiment_name": "exp_level_easy_english",
+    "game_id": 1,
+    "results_folder": "qwen3.5-27b",
+    "clem_version": "3.7.2",
+    "round_count": 4,
+    "completed": true
+  },
+  "player_models": {
+    "0": {
+      "model_spec": {
+        "model_name": "qwen3.5-27b",
+        "backend": "huggingface_local",
+        "context_size": "262k",
+        "huggingface_id": "Qwen/Qwen3.5-27B",
+        "languages": [
+          "en",
+          "zh"
+        ],
+        "license": {
+          "name": "Apache 2.0",
+          "url": "https://www.apache.org/licenses/LICENSE-2.0"
+        },
+        "lookup_source": "/project/mmanina/lm-playschool-test-set/playpen/model_registry.json",
+        "model_config": {
+          "premade_chat_template": true,
+          "eos_to_cull": "<\\|im_end\\|>|<\\|endoftext\\|>",
+          "chat_template_kwargs": {
+            "enable_thinking": false
+          },
+          "multimodality": {
+            "single_image": true,
+            "multiple_images": true,
+            "audio": false,
+            "video": true
+          }
+        },
+        "open_weight": true,
+        "parameters": "27B",
+        "release_date": "2026-02-24"
+      },
+      "gen_args": {
+        "temperature": 0.0,
+        "max_tokens": 5000
+      }
+    }
+  },
+  "players": {
+    "GM": {
+      "game_role": "Game Master",
+      "model_name": "programmatic"
+    },
+    "Player 1": {
+      "game_role": "Helper",
+      "model_name": "qwen3.5-27b"
+    },
+    "Player 2": {
+      "game_role": "Seeker",
+      "model_name": "qwen3.5-27b"
+    }
+  },
+  "turns": [
+    [
+      {
+        "from": "GM",
+        "to": "Player 1",
+        "timestamp": "2026-07-02T02:08:04.282006",
+        "action": {
+          "type": "send message",
+          "content": "You are playing a collaborative word guessing game in which you have to strategically hint at the target word to the other player without revealing it. For that, you have to build small indirect sentences each round.\n\nRules:\n(a) You always have to reply in the form: CLUE: <start word + up to 3 words>. Guesses from the other player will start with GUESS. The sentence should always contain the start word.\n(b) Your sentence cannot contain the target word itself.\n\nEnd conditions:\n(i) If you use the target word in your sentence, then you lose.\n(ii) If the other player can guess the target word in 5 tries, you both win.\n\nLet us start.\n\nThis is the target word that you need to make the other player guess:\nleader\n\nThis is the start word that you need to add your words to:\nminister\n\nImportant: \n-You are under time pressure, give short **coherent** sentences that are to the point!\n\n\nminister",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 1",
+        "to": "GM",
+        "timestamp": "2026-07-02T02:08:04.282026",
+        "action": {
+          "type": "get message",
+          "content": "CLUE: minister leads the team.",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 2",
+        "timestamp": "2026-07-02T02:08:17.543480",
+        "action": {
+          "type": "send message",
+          "content": "You are playing a collaborative word guessing game in which you have to guess a target word that another player describes to you.\n\nRules:\n(a) You can make one guess at each trial.\n(b) You win when you guess the target word.\n(c) You lose when you cannot guess it in 5 tries.\n\n\nAfter each trial you will get a new hint from the other player which starts with CLUE. The hint is a small sentence containing the start word which never alters and up to three additional words that will help you both get to the point.\n\nOutput format:\nMake your guesses by just saying the word using the following form: GUESS: <a word>\n\n\nLet us start.\n\n clue: minister leads the team.",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 2",
+        "to": "GM",
+        "timestamp": "2026-07-02T02:08:17.543495",
+        "action": {
+          "type": "get message",
+          "content": "GUESS: cabinet",
+          "label": "response"
+        }
+      }
+    ],
+    [
+      {
+        "from": "GM",
+        "to": "Player 1",
+        "timestamp": "2026-07-02T02:08:20.349093",
+        "action": {
+          "type": "send message",
+          "content": "guess: cabinet",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 1",
+        "to": "GM",
+        "timestamp": "2026-07-02T02:08:20.349108",
+        "action": {
+          "type": "get message",
+          "content": "CLUE: minister guides the nation.",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 2",
+        "timestamp": "2026-07-02T02:08:22.234300",
+        "action": {
+          "type": "send message",
+          "content": " clue: minister guides the nation.",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 2",
+        "to": "GM",
+        "timestamp": "2026-07-02T02:08:22.234315",
+        "action": {
+          "type": "get message",
+          "content": "GUESS: prime",
+          "label": "response"
+        }
+      }
+    ],
+    [
+      {
+        "from": "GM",
+        "to": "Player 1",
+        "timestamp": "2026-07-02T02:08:23.366713",
+        "action": {
+          "type": "send message",
+          "content": "guess: prime",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 1",
+        "to": "GM",
+        "timestamp": "2026-07-02T02:08:23.366728",
+        "action": {
+          "type": "get message",
+          "content": "CLUE: minister is the chief.",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 2",
+        "timestamp": "2026-07-02T02:08:24.063737",
+        "action": {
+          "type": "send message",
+          "content": " clue: minister is the chief.",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 2",
+        "to": "GM",
+        "timestamp": "2026-07-02T02:08:24.063753",
+        "action": {
+          "type": "get message",
+          "content": "GUESS: minister",
+          "label": "response"
+        }
+      }
+    ],
+    [
+      {
+        "from": "GM",
+        "to": "Player 1",
+        "timestamp": "2026-07-02T02:08:25.214957",
+        "action": {
+          "type": "send message",
+          "content": "guess: minister",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 1",
+        "to": "GM",
+        "timestamp": "2026-07-02T02:08:25.214972",
+        "action": {
+          "type": "get message",
+          "content": "CLUE: minister serves under the leader.",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-02T02:08:25.215005",
+        "action": {
+          "type": "Helper added 4 words. Allowed: 3",
+          "content": "abort game"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-02T02:08:25.215023",
+        "action": {
+          "type": "Helper added 4 words. Allowed: 3",
+          "content": "failed game"
+        }
+      }
+    ]
+  ],
+  "Aborted": 0,
+  "Lose": 1,
+  "Success": 0,
+  "Request Count": [
+    2,
+    2,
+    2,
+    1
+  ],
+  "Violated Request Count": [
+    0,
+    0,
+    0,
+    0
+  ],
+  "Parsed Request Count": [
+    2,
+    2,
+    2,
+    1
+  ]
+}

@@ -1,0 +1,186 @@
+{
+  "game_id": 4,
+  "width": 9,
+  "height": 9,
+  "walls": [
+    [
+      1,
+      1
+    ],
+    [
+      1,
+      2
+    ],
+    [
+      1,
+      4
+    ],
+    [
+      2,
+      4
+    ],
+    [
+      3,
+      7
+    ],
+    [
+      5,
+      7
+    ],
+    [
+      6,
+      8
+    ],
+    [
+      6,
+      9
+    ],
+    [
+      7,
+      4
+    ],
+    [
+      7,
+      6
+    ],
+    [
+      7,
+      7
+    ],
+    [
+      7,
+      8
+    ],
+    [
+      7,
+      9
+    ],
+    [
+      8,
+      3
+    ],
+    [
+      9,
+      6
+    ],
+    [
+      9,
+      7
+    ]
+  ],
+  "start": [
+    1,
+    9
+  ],
+  "gates": [
+    {
+      "id": "A",
+      "cell": [
+        7,
+        5
+      ],
+      "period": 2,
+      "open_phases": [
+        1
+      ]
+    },
+    {
+      "id": "B",
+      "cell": [
+        8,
+        6
+      ],
+      "period": 4,
+      "open_phases": [
+        0,
+        3
+      ]
+    }
+  ],
+  "patrols": [
+    {
+      "id": "P",
+      "route": [
+        [
+          5,
+          2
+        ],
+        [
+          6,
+          2
+        ],
+        [
+          7,
+          2
+        ],
+        [
+          6,
+          2
+        ]
+      ]
+    },
+    {
+      "id": "Q",
+      "route": [
+        [
+          2,
+          8
+        ],
+        [
+          1,
+          8
+        ],
+        [
+          1,
+          7
+        ],
+        [
+          2,
+          7
+        ],
+        [
+          1,
+          7
+        ],
+        [
+          1,
+          8
+        ]
+      ]
+    }
+  ],
+  "parcels": [
+    {
+      "id": 1,
+      "pickup": [
+        1,
+        3
+      ],
+      "dropoff": [
+        5,
+        8
+      ]
+    },
+    {
+      "id": 2,
+      "pickup": [
+        2,
+        1
+      ],
+      "dropoff": [
+        4,
+        8
+      ]
+    }
+  ],
+  "action_mode": "cardinal",
+  "initial_heading": "N",
+  "plan_length": 5,
+  "tick_budget": 45,
+  "max_rounds": 9,
+  "optimal_ticks": 24,
+  "static_optimal_ticks": 23,
+  "map_render": "   123456789\n  +---------+\n 1|#2.......|\n 2|#...p....|\n 3|1......#.|\n 4|##....#..|\n 5|......A..|\n 6|......#B#|\n 7|..#.#.#.#|\n 8|.q.yx##..|\n 9|S....##..|\n  +---------+",
+  "schedules_text": "Gate A at (7,5): open exactly when (t mod 2) is in {1}. So it is open at t=1,3,... and closed at t=0,2,... You can only step ONTO it at a tick t+1 where it is open.\nGate B at (8,6): open exactly when (t mod 4) is in {0, 3}. So it is open at t=0,3,4,7,... and closed at t=1,2,5,6,... You can only step ONTO it at a tick t+1 where it is open.\nGuard P: walks a fixed cycle of length 4. Its position at tick t is determined by (t mod 4) as follows: t mod 4=0: (5,2); t mod 4=1: (6,2); t mod 4=2: (7,2); t mod 4=3: (6,2). This repeats forever.\nGuard Q: walks a fixed cycle of length 6. Its position at tick t is determined by (t mod 6) as follows: t mod 6=0: (2,8); t mod 6=1: (1,8); t mod 6=2: (1,7); t mod 6=3: (2,7); t mod 6=4: (1,7); t mod 6=5: (1,8). This repeats forever.",
+  "parcels_text": "Parcel 1: pick it up at (1,3) (map glyph '1'), deliver it to (5,8) (map glyph 'x'). Pickup and delivery happen automatically when you end a tick on the cell.\nParcel 2: pick it up at (2,1) (map glyph '2'), deliver it to (4,8) (map glyph 'y'). Pickup and delivery happen automatically when you end a tick on the cell."
+}

@@ -1,0 +1,301 @@
+{
+  "meta": {
+    "game_name": "toh_multi_turn",
+    "experiment_name": "toh_5_disks_horizontal_alpha_ascending",
+    "game_id": 0,
+    "results_folder": "qwen3.5-27b",
+    "clem_version": "3.7.2",
+    "round_count": 5,
+    "completed": true
+  },
+  "player_models": {
+    "0": {
+      "model_spec": {
+        "model_name": "qwen3.5-27b",
+        "backend": "huggingface_local",
+        "context_size": "262k",
+        "huggingface_id": "Qwen/Qwen3.5-27B",
+        "languages": [
+          "en",
+          "zh"
+        ],
+        "license": {
+          "name": "Apache 2.0",
+          "url": "https://www.apache.org/licenses/LICENSE-2.0"
+        },
+        "lookup_source": "/project/mmanina/lm-playschool-test-set/playpen/model_registry.json",
+        "model_config": {
+          "premade_chat_template": true,
+          "eos_to_cull": "<\\|im_end\\|>|<\\|endoftext\\|>",
+          "chat_template_kwargs": {
+            "enable_thinking": false
+          },
+          "multimodality": {
+            "single_image": true,
+            "multiple_images": true,
+            "audio": false,
+            "video": true
+          }
+        },
+        "open_weight": true,
+        "parameters": "27B",
+        "release_date": "2026-02-24"
+      },
+      "gen_args": {
+        "temperature": 0.0,
+        "max_tokens": 5000
+      }
+    }
+  },
+  "players": {
+    "GM": {
+      "game_role": "Game Master",
+      "model_name": "programmatic"
+    },
+    "Player 1": {
+      "game_role": "PegHopper",
+      "model_name": "qwen3.5-27b"
+    }
+  },
+  "turns": [
+    [
+      {
+        "from": "GM",
+        "to": "Player 1",
+        "timestamp": "2026-07-01T19:05:52.324436",
+        "action": {
+          "type": "send message",
+          "content": "[GAME MASTER] You are playing the game 'Tower of Hanoi'. Your goal is to move all disks from the first peg to the last peg, following these rules:\n1. Only one disk can be moved at a time.\n\n2. Each move consists of taking the upper disk from one of the stacks and placing it on top of another stack or on an empty peg.\n\n3. No larger disk may be placed on top of a smaller disk.\n\nThe pegs are named A, B, C.\n\nThe game starts with all disks stacked in ascending order of size on the first peg, with the smallest disk at the top.\n\nHere is the initial configuration of the game:\n\n```\n     |           |           |     \n    -5-          |           |     \n   --4--         |           |     \n  ---3---        |           |     \n ----2----       |           |     \n-----1-----      |           |     \n     A           B           C     \n\n```\n\nYou can make your moves by specifying the disk you want to move and the destination peg. For example, to move a disk from A to C, you would say: '[A C]'\n\nYou have 64 turns to finish the game.\n\nPlease make your first move!",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 1",
+        "to": "GM",
+        "timestamp": "2026-07-01T19:05:52.324451",
+        "action": {
+          "type": "get message",
+          "content": "[A C]",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T19:05:52.393712",
+        "action": {
+          "type": "Success",
+          "content": "Valid move. Game finished: False\n\nGame solvable in 30 steps."
+        }
+      }
+    ],
+    [
+      {
+        "from": "GM",
+        "to": "Player 1",
+        "timestamp": "2026-07-01T19:05:58.572860",
+        "action": {
+          "type": "send message",
+          "content": "Moved disk '-5-' from 'A' to 'C'.\n[GAME MASTER] Here is the current configuration of the game:\n\n```\n     |           |           |     \n     |           |           |     \n   --4--         |           |     \n  ---3---        |           |     \n ----2----       |           |     \n-----1-----      |          -5-    \n     A           B           C     \n\n```\n\nYou have 63 turns left. Please make your next move.",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 1",
+        "to": "GM",
+        "timestamp": "2026-07-01T19:05:58.572876",
+        "action": {
+          "type": "get message",
+          "content": "[A B]",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T19:05:58.650446",
+        "action": {
+          "type": "Success",
+          "content": "Valid move. Game finished: False\n\nGame solvable in 29 steps."
+        }
+      }
+    ],
+    [
+      {
+        "from": "GM",
+        "to": "Player 1",
+        "timestamp": "2026-07-01T19:06:05.465523",
+        "action": {
+          "type": "send message",
+          "content": "Moved disk '--4--' from 'A' to 'B'.\n[GAME MASTER] Here is the current configuration of the game:\n\n```\n     |           |           |     \n     |           |           |     \n     |           |           |     \n  ---3---        |           |     \n ----2----       |           |     \n-----1-----    --4--        -5-    \n     A           B           C     \n\n```\n\nYou have 62 turns left. Please make your next move.",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 1",
+        "to": "GM",
+        "timestamp": "2026-07-01T19:06:05.465540",
+        "action": {
+          "type": "get message",
+          "content": "[A C]",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T19:06:05.465604",
+        "action": {
+          "type": "Error Count",
+          "content": "Current consecutive errors: 1"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T19:06:05.465618",
+        "action": {
+          "type": "Invalid Move",
+          "content": "Invalid move: you cannot place disk '---3---' on top of smaller disk '-5-'!"
+        }
+      }
+    ],
+    [
+      {
+        "from": "GM",
+        "to": "Player 1",
+        "timestamp": "2026-07-01T19:06:12.619197",
+        "action": {
+          "type": "send message",
+          "content": "[GAME MASTER] Error: you cannot place disk '---3---' on top of smaller disk '-5-'!. Please try again!",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 1",
+        "to": "GM",
+        "timestamp": "2026-07-01T19:06:12.619213",
+        "action": {
+          "type": "get message",
+          "content": "[A B]",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T19:06:12.619274",
+        "action": {
+          "type": "Error Count",
+          "content": "Current consecutive errors: 2"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T19:06:12.619288",
+        "action": {
+          "type": "Invalid Move",
+          "content": "Invalid move: you cannot place disk '---3---' on top of smaller disk '--4--'!"
+        }
+      }
+    ],
+    [
+      {
+        "from": "GM",
+        "to": "Player 1",
+        "timestamp": "2026-07-01T19:17:27.175594",
+        "action": {
+          "type": "send message",
+          "content": "[GAME MASTER] Error: you cannot place disk '---3---' on top of smaller disk '--4--'!. Please try again!",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 1",
+        "to": "GM",
+        "timestamp": "2026-07-01T19:17:27.175610",
+        "action": {
+          "type": "get message",
+          "content": "[A C]",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T19:17:27.175682",
+        "action": {
+          "type": "Error Count",
+          "content": "Current consecutive errors: 3"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T19:17:27.175696",
+        "action": {
+          "type": "Aborting",
+          "content": "Too many errors, aborting game."
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T19:17:27.175708",
+        "action": {
+          "type": "Invalid Move",
+          "content": "Invalid move: you cannot place disk '---3---' on top of smaller disk '-5-'!"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T19:17:27.175929",
+        "action": {
+          "type": "Final Board",
+          "content": "Final Board:\n```\n     |           |           |     \n     |           |           |     \n     |           |           |     \n  ---3---        |           |     \n ----2----       |           |     \n-----1-----    --4--        -5-    \n     A           B           C     \n\n```"
+        }
+      }
+    ]
+  ],
+  "Turns": 5,
+  "Aborted": 1,
+  "Lose": 0,
+  "Success": 0,
+  "Main Score": 0.0,
+  "Optimal Steps": 31,
+  "Steps to Finish": [
+    [
+      0,
+      30
+    ],
+    [
+      1,
+      29
+    ]
+  ],
+  "Valid Moves": 2,
+  "Invalid Moves": 3,
+  "Request Count": [
+    1,
+    1,
+    1,
+    1,
+    1
+  ],
+  "Violated Request Count": [
+    0,
+    0,
+    0,
+    0,
+    0
+  ],
+  "Parsed Request Count": [
+    1,
+    1,
+    1,
+    1,
+    1
+  ]
+}

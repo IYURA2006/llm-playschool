@@ -333,6 +333,33 @@ def test_half_finished_session_does_not_count_toward_cap():
           len(db.session_summary(pid, condition="hybrid")) == 1)
 
 
+def test_pseudonymization_is_deterministic():
+    """db.pseudonymize_pid — required so a returning participant's raw PID
+    always resolves to the same stored identifier across sessions (see
+    app.py's _capture_session_params, the only real caller)."""
+    orig_salt = db._PSEUDONYM_SALT
+    try:
+        db._PSEUDONYM_SALT = "test-salt-value"
+        p1 = db.pseudonymize_pid("realpid_abc")
+        p2 = db.pseudonymize_pid("realpid_abc")
+        p3 = db.pseudonymize_pid("realpid_xyz")
+        check("same raw PID -> same pseudonym", p1 == p2)
+        check("different raw PIDs -> different pseudonyms", p1 != p3)
+        check("raw PID never appears verbatim in its own pseudonym",
+              "realpid_abc" not in p1)
+
+        db._PSEUDONYM_SALT = None
+        raised = False
+        try:
+            db.pseudonymize_pid("realpid_abc")
+        except RuntimeError:
+            raised = True
+        check("unset PSEUDONYM_SALT raises rather than silently hashing unsalted",
+              raised)
+    finally:
+        db._PSEUDONYM_SALT = orig_salt
+
+
 # ──────────────────────────────────────────────────────────────────────────
 run("basic batch + idempotency", test_basic_batch_and_idempotency)
 run("coverage balances across many sequential PIDs", test_coverage_balances_across_many_pids)
@@ -343,6 +370,7 @@ run("pool exhaustion returns NO_TASKS_MESSAGE", test_pool_exhaustion_returns_no_
 run("returning participant gets a new, disjoint batch", test_returning_participant_gets_a_new_disjoint_batch)
 run("session cap blocks further work", test_session_cap_blocks_further_work)
 run("half-finished session resumes and doesn't count", test_half_finished_session_does_not_count_toward_cap)
+run("pseudonymization is deterministic and fails loudly when unsalted", test_pseudonymization_is_deterministic)
 
 for suffix in ("", "-wal", "-shm"):
     try:

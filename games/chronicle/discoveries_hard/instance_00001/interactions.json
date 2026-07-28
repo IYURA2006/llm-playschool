@@ -1,0 +1,201 @@
+{
+  "meta": {
+    "game_name": "chronicle",
+    "experiment_name": "discoveries_hard",
+    "game_id": 1,
+    "results_folder": "qwen3.5-27b",
+    "clem_version": "3.7.2",
+    "round_count": 3,
+    "completed": true
+  },
+  "player_models": {
+    "0": {
+      "model_spec": {
+        "model_name": "qwen3.5-27b",
+        "backend": "huggingface_local",
+        "context_size": "262k",
+        "huggingface_id": "Qwen/Qwen3.5-27B",
+        "languages": [
+          "en",
+          "zh"
+        ],
+        "license": {
+          "name": "Apache 2.0",
+          "url": "https://www.apache.org/licenses/LICENSE-2.0"
+        },
+        "lookup_source": "/project/mmanina/lm-playschool-test-set/playpen/model_registry.json",
+        "model_config": {
+          "premade_chat_template": true,
+          "eos_to_cull": "<\\|im_end\\|>|<\\|endoftext\\|>",
+          "chat_template_kwargs": {
+            "enable_thinking": false
+          },
+          "multimodality": {
+            "single_image": true,
+            "multiple_images": true,
+            "audio": false,
+            "video": true
+          }
+        },
+        "open_weight": true,
+        "parameters": "27B",
+        "release_date": "2026-02-24"
+      },
+      "gen_args": {
+        "temperature": 0.0,
+        "max_tokens": 5000
+      }
+    }
+  },
+  "players": {
+    "GM": {
+      "game_role": "Game Master",
+      "model_name": "programmatic"
+    },
+    "Player 1": {
+      "game_role": "ChronicleNarrator",
+      "model_name": "qwen3.5-27b"
+    },
+    "Player 2": {
+      "game_role": "ChronicleDetective",
+      "model_name": "qwen3.5-27b"
+    }
+  },
+  "turns": [
+    [
+      {
+        "from": "GM",
+        "to": "Player 1",
+        "timestamp": "2026-07-02T02:09:16.335150",
+        "action": {
+          "type": "send message",
+          "content": "You are playing a historical deduction game as the NARRATOR.\n\nYou have been given the name of a historical event, discovery, or milestone. Your goal is to help the DETECTIVE figure out which event you are describing — but you must describe it indirectly, without ever naming it.\n\nRules:\n1. Each round, write exactly ONE sentence describing the event. Add NEW information each round — do not repeat what you wrote before.\n2. You must NEVER use any of the following forbidden keywords (these would make the event too easy to identify): eigil knuth, expedition\n3. You must NEVER state the event name directly or any close variant of it.\n4. You may freely describe causes, consequences, the broader context, the sequence of events, and the significance — but only using general, non-identifying language.\n\nFormat your response EXACTLY as follows (required):\nPARAGRAPH: <exactly one sentence describing the event without forbidden keywords>\n\nThe event you must describe (without naming it) is: Mørkefjord expedition\n",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 1",
+        "to": "GM",
+        "timestamp": "2026-07-02T02:09:16.335167",
+        "action": {
+          "type": "get message",
+          "content": "PARAGRAPH: A team of researchers set out to explore a remote, ice-bound inlet in Greenland to study the region's unique geological formations and historical significance.",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 2",
+        "timestamp": "2026-07-02T02:14:47.165664",
+        "action": {
+          "type": "send message",
+          "content": "You are playing a historical deduction game as the DETECTIVE.\n\nA Narrator will describe a historical event, discovery, or milestone to you over several rounds. Each round you receive a new sentence of description that builds on what came before. Your job is to figure out which specific event is being described.\n\nAfter EACH new sentence, respond briefly. Keep your entire response under 100 words. Use this exact format (both sections are required):\n\nANALYSIS: <2–3 short sentences: what does the growing description suggest? What type of event is this? What are the key features you are noticing?>\n\nGUESS: <your best guess for the name of the event being described — be specific, e.g. \"The French Revolution\" not just \"a revolution\">\n\nRules:\n- You may refine your GUESS each round as more information arrives.\n- Your GUESS should name the specific event, not just a broad category.\n- You have up to 10 rounds total.\n- Be concise — quality of reasoning matters more than length.\n\nThe first sentence from the Narrator is coming now.\n\n\n[Sentence 1]\nA team of researchers set out to explore a remote, ice-bound inlet in Greenland to study the region's unique geological formations and historical significance.",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 2",
+        "to": "GM",
+        "timestamp": "2026-07-02T02:14:47.165683",
+        "action": {
+          "type": "get message",
+          "content": "ANALYSIS: The mention of a remote, ice-bound inlet in Greenland suggests an expedition focused on polar geology or history. This could relate to the discovery of ancient settlements, climate data, or a specific geological anomaly.\n\nGUESS: The discovery of the Norse settlement at L'Anse aux Meadows (though that is Canada, so perhaps a Greenlandic Norse site like Brattahlíð or a specific modern expedition to a hidden fjord). Let's guess: The 1932 discovery of the \"Greenland Ice Sheet\" core samples? No, too vague. Maybe the discovery of the \"Sermilik\" or a specific lost expedition? I will guess: The discovery of the ancient Norse ruins in Greenland.",
+          "label": "response"
+        }
+      }
+    ],
+    [
+      {
+        "from": "GM",
+        "to": "Player 1",
+        "timestamp": "2026-07-02T02:16:35.737003",
+        "action": {
+          "type": "send message",
+          "content": "Round 1 complete. The Detective's current guess: \"The discovery of the Norse settlement at L'Anse aux Meadows (though that is Canada, so perhaps a Greenlandic Norse site like Brattahlíð or a specific modern expedition to a hidden fjord). Let's guess: The 1932 discovery of the \"Greenland Ice Sheet\" core samples? No, too vague. Maybe the discovery of the \"Sermilik\" or a specific lost expedition? I will guess: The discovery of the ancient Norse ruins in Greenland.\". Please write a new paragraph with fresh information.",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 1",
+        "to": "GM",
+        "timestamp": "2026-07-02T02:16:35.737023",
+        "action": {
+          "type": "get message",
+          "content": "PARAGRAPH: The journey was specifically undertaken to locate and document the remains of a 19th-century whaling vessel that had been lost in the treacherous waters of a dark, narrow fjord.",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 2",
+        "timestamp": "2026-07-02T02:26:40.987667",
+        "action": {
+          "type": "send message",
+          "content": "[Sentence 2]\nThe journey was specifically undertaken to locate and document the remains of a 19th-century whaling vessel that had been lost in the treacherous waters of a dark, narrow fjord.",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 2",
+        "to": "GM",
+        "timestamp": "2026-07-02T02:26:40.987686",
+        "action": {
+          "type": "get message",
+          "content": "ANALYSIS: The focus has shifted from general geology to a specific 19th-century whaling shipwreck in a dark, narrow Greenlandic fjord. This points to a modern archaeological expedition recovering a lost vessel, likely one famous for its historical significance or tragic end.\n\nGUESS: The discovery of the *Polaris* wreck (1873) or the *Jeannette*? No, *Jeannette* is Arctic Russia. Perhaps the *Gjøa*? Unlikely. I will guess: The discovery of the *HMS Erebus* or *Terror*? No, those are Canadian. Let's guess: The discovery of the *Polaris* wreck in Greenland.",
+          "label": "response"
+        }
+      }
+    ],
+    [
+      {
+        "from": "GM",
+        "to": "Player 1",
+        "timestamp": "2026-07-02T02:35:34.149177",
+        "action": {
+          "type": "send message",
+          "content": "Round 2 complete. The Detective's current guess: \"The discovery of the *Polaris* wreck (1873) or the *Jeannette*? No, *Jeannette* is Arctic Russia. Perhaps the *Gjøa*? Unlikely. I will guess: The discovery of the *HMS Erebus* or *Terror*? No, those are Canadian. Let's guess: The discovery of the *Polaris* wreck in Greenland.\". Please write a new paragraph with fresh information.",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 1",
+        "to": "GM",
+        "timestamp": "2026-07-02T02:35:34.149199",
+        "action": {
+          "type": "get message",
+          "content": "PARAGRAPH: The specific vessel they sought to find had been abandoned by its crew in 1871 after a catastrophic collision with an iceberg, leaving it to drift and eventually sink in the very fjord that shares its name with the darkness of the surrounding landscape.",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 2",
+        "timestamp": "2026-07-02T02:46:54.757432",
+        "action": {
+          "type": "send message",
+          "content": "[Sentence 3]\nThe specific vessel they sought to find had been abandoned by its crew in 1871 after a catastrophic collision with an iceberg, leaving it to drift and eventually sink in the very fjord that shares its name with the darkness of the surrounding landscape.",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 2",
+        "to": "GM",
+        "timestamp": "2026-07-02T02:46:54.757449",
+        "action": {
+          "type": "get message",
+          "content": "ANALYSIS: The key details are a 19th-century whaling ship, abandoned in 1871 after an iceberg collision, and a fjord named after \"darkness.\" This strongly points to the *Polaris* expedition, but the specific ship lost in 1871 in a \"dark\" fjord is likely the *Polaris* itself or a specific whaler like the *Polaris* (which was lost in 1873). Wait, the *Polaris* was lost in 1873. A ship lost in 1871 in a \"dark\" fjord? The *Polaris* expedition wintered in 1871-72. Perhaps the *Polaris* is the answer, but the date is slightly off. Let's reconsider the \"dark\" fjord. \"Darkness\" in Danish is \"Mørke\". The *Polaris* was lost in \"Polaris Bay\". Is there a \"Darkness Fjord\"? Yes, *Mørkefjord*. The ship lost there in 1871? The *Polaris* expedition's ship *Polaris* was lost in 1873. Maybe the *Polaris* is the intended answer despite the date discrepancy, or it's the *Polaris* expedition's *Polaris* ship. Actually, the *Polaris* was lost in 1873. Is there another ship? The *Polaris* expedition is the most famous. Let's guess the *Polaris* wreck discovery.\n\nGUESS: The discovery of the wreck of the USS *Polaris* (1873) in the Greenland fjord. (Note: The prompt says 1871, which might be a slight error in the riddle or refers to the start of the expedition, but *Polaris* is the only major 1870s Greenland shipwreck fitting the \"dark\" description if we assume \"darkness\" refers to the expedition's fate or a specific fjord name like *Mørkefjord*). Let's refine: The *Polaris* was lost in 1873. Is there a ship lost in 1871? The *Polaris* expedition started in 1871. The ship *Polaris* was lost in 1873. Maybe the riddle implies the *Polaris* expedition. I will guess: The discovery of the USS *Polaris* wreck.",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-02T02:46:54.757570",
+        "action": {
+          "type": "correct guess",
+          "content": "round 3"
+        }
+      }
+    ]
+  ]
+}

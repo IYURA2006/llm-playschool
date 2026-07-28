@@ -61,10 +61,13 @@ SECONDS_PER_VERDICT = 60.0
 SECONDS_PER_RULES_CAP = 180.0
 
 # Transcripts to keep out of the general pool even though they're
-# discoverable and their game-type has a bespoke set. Empty until the study
-# coordinator explicitly decides otherwise (e.g. holding back the pilot's
-# confirmed-bug transcripts, or games/taboo/low_en).
-EXCLUDED_SLUGS = frozenset()
+# discoverable and their game-type has a bespoke set.
+EXCLUDED_SLUGS = frozenset({
+    # 58 AI turns — alone estimates to ~1563s, 130% of the entire 20-minute
+    # TARGET_SECONDS session budget (transcript_seconds() below). The other 4
+    # adventuregame instances (16-32 turns, 39-74% of budget) stay in the pool.
+    "adventuregame__potion_brewing_basic_undefined__instance_00000",
+})
 
 NO_TASKS_MESSAGE = (
     "🙏 There are no annotation tasks available right now — every transcript "

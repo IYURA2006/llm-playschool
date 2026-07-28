@@ -1,0 +1,327 @@
+{
+  "meta": {
+    "game_name": "chronicle",
+    "experiment_name": "battles_hard",
+    "game_id": 2,
+    "results_folder": "qwen3.5-27b",
+    "clem_version": "3.7.2",
+    "round_count": 6,
+    "completed": true
+  },
+  "player_models": {
+    "0": {
+      "model_spec": {
+        "model_name": "qwen3.5-27b",
+        "backend": "huggingface_local",
+        "context_size": "262k",
+        "huggingface_id": "Qwen/Qwen3.5-27B",
+        "languages": [
+          "en",
+          "zh"
+        ],
+        "license": {
+          "name": "Apache 2.0",
+          "url": "https://www.apache.org/licenses/LICENSE-2.0"
+        },
+        "lookup_source": "/project/mmanina/lm-playschool-test-set/playpen/model_registry.json",
+        "model_config": {
+          "premade_chat_template": true,
+          "eos_to_cull": "<\\|im_end\\|>|<\\|endoftext\\|>",
+          "chat_template_kwargs": {
+            "enable_thinking": false
+          },
+          "multimodality": {
+            "single_image": true,
+            "multiple_images": true,
+            "audio": false,
+            "video": true
+          }
+        },
+        "open_weight": true,
+        "parameters": "27B",
+        "release_date": "2026-02-24"
+      },
+      "gen_args": {
+        "temperature": 0.0,
+        "max_tokens": 5000
+      }
+    }
+  },
+  "players": {
+    "GM": {
+      "game_role": "Game Master",
+      "model_name": "programmatic"
+    },
+    "Player 1": {
+      "game_role": "ChronicleNarrator",
+      "model_name": "qwen3.5-27b"
+    },
+    "Player 2": {
+      "game_role": "ChronicleDetective",
+      "model_name": "qwen3.5-27b"
+    }
+  },
+  "turns": [
+    [
+      {
+        "from": "GM",
+        "to": "Player 1",
+        "timestamp": "2026-07-02T02:08:56.206888",
+        "action": {
+          "type": "send message",
+          "content": "You are playing a historical deduction game as the NARRATOR.\n\nYou have been given the name of a historical event, discovery, or milestone. Your goal is to help the DETECTIVE figure out which event you are describing — but you must describe it indirectly, without ever naming it.\n\nRules:\n1. Each round, write exactly ONE sentence describing the event. Add NEW information each round — do not repeat what you wrote before.\n2. You must NEVER use any of the following forbidden keywords (these would make the event too easy to identify): perth, scotland\n3. You must NEVER state the event name directly or any close variant of it.\n4. You may freely describe causes, consequences, the broader context, the sequence of events, and the significance — but only using general, non-identifying language.\n\nFormat your response EXACTLY as follows (required):\nPARAGRAPH: <exactly one sentence describing the event without forbidden keywords>\n\nThe event you must describe (without naming it) is: Siege of Perth (1339)\n",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 1",
+        "to": "GM",
+        "timestamp": "2026-07-02T02:08:56.206905",
+        "action": {
+          "type": "get message",
+          "content": "PARAGRAPH: A royal force marched north to reclaim a key stronghold that had fallen into the hands of a rebellious nobleman during a turbulent period of civil strife.",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 2",
+        "timestamp": "2026-07-02T02:12:56.407329",
+        "action": {
+          "type": "send message",
+          "content": "You are playing a historical deduction game as the DETECTIVE.\n\nA Narrator will describe a historical event, discovery, or milestone to you over several rounds. Each round you receive a new sentence of description that builds on what came before. Your job is to figure out which specific event is being described.\n\nAfter EACH new sentence, respond briefly. Keep your entire response under 100 words. Use this exact format (both sections are required):\n\nANALYSIS: <2–3 short sentences: what does the growing description suggest? What type of event is this? What are the key features you are noticing?>\n\nGUESS: <your best guess for the name of the event being described — be specific, e.g. \"The French Revolution\" not just \"a revolution\">\n\nRules:\n- You may refine your GUESS each round as more information arrives.\n- Your GUESS should name the specific event, not just a broad category.\n- You have up to 10 rounds total.\n- Be concise — quality of reasoning matters more than length.\n\nThe first sentence from the Narrator is coming now.\n\n\n[Sentence 1]\nA royal force marched north to reclaim a key stronghold that had fallen into the hands of a rebellious nobleman during a turbulent period of civil strife.",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 2",
+        "to": "GM",
+        "timestamp": "2026-07-02T02:12:56.407348",
+        "action": {
+          "type": "get message",
+          "content": "ANALYSIS: The description points to a civil war involving a monarch and a rebellious noble. The movement of a royal army north to retake a specific stronghold suggests a pivotal military campaign within a larger conflict, likely in European history.\n\nGUESS: The English Civil War (specifically the Royalist campaign to retake a northern fortress)",
+          "label": "response"
+        }
+      }
+    ],
+    [
+      {
+        "from": "GM",
+        "to": "Player 1",
+        "timestamp": "2026-07-02T02:16:16.052788",
+        "action": {
+          "type": "send message",
+          "content": "Round 1 complete. The Detective's current guess: \"The English Civil War (specifically the Royalist campaign to retake a northern fortress)\". Please write a new paragraph with fresh information.",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 1",
+        "to": "GM",
+        "timestamp": "2026-07-02T02:16:16.052804",
+        "action": {
+          "type": "get message",
+          "content": "PARAGRAPH: This specific military action took place in the early fourteenth century, well before the conflicts of the seventeenth century that your guess suggests.",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 2",
+        "timestamp": "2026-07-02T02:17:57.864201",
+        "action": {
+          "type": "send message",
+          "content": "[Sentence 2]\nThis specific military action took place in the early fourteenth century, well before the conflicts of the seventeenth century that your guess suggests.",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 2",
+        "to": "GM",
+        "timestamp": "2026-07-02T02:17:57.864221",
+        "action": {
+          "type": "get message",
+          "content": "ANALYSIS: The timeline correction to the early 14th century rules out the English Civil War. This points toward the Wars of Scottish Independence or the Hundred Years' War, where royal forces often marched north to reclaim castles from rebellious nobles or foreign occupiers.\n\nGUESS: The Siege of Stirling Castle (1304) during the First War of Scottish Independence",
+          "label": "response"
+        }
+      }
+    ],
+    [
+      {
+        "from": "GM",
+        "to": "Player 1",
+        "timestamp": "2026-07-02T02:35:23.050074",
+        "action": {
+          "type": "send message",
+          "content": "Round 2 complete. The Detective's current guess: \"The Siege of Stirling Castle (1304) during the First War of Scottish Independence\". Please write a new paragraph with fresh information.",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 1",
+        "to": "GM",
+        "timestamp": "2026-07-02T02:35:23.050090",
+        "action": {
+          "type": "get message",
+          "content": "PARAGRAPH: The fortress under siege was not a castle but a walled town that served as a major administrative center for the region.",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 2",
+        "timestamp": "2026-07-02T02:44:59.040051",
+        "action": {
+          "type": "send message",
+          "content": "[Sentence 3]\nThe fortress under siege was not a castle but a walled town that served as a major administrative center for the region.",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 2",
+        "to": "GM",
+        "timestamp": "2026-07-02T02:44:59.040071",
+        "action": {
+          "type": "get message",
+          "content": "ANALYSIS: The target is a walled town, not a castle, serving as a regional administrative hub. This detail, combined with the early 14th-century timeline and a royal march north, strongly suggests the conflict between Edward I/II of England and the Scots, or perhaps a French royal campaign against a rebellious city.\n\nGUESS: The Siege of Berwick-upon-Tweed (1318) during the First War of Scottish Independence",
+          "label": "response"
+        }
+      }
+    ],
+    [
+      {
+        "from": "GM",
+        "to": "Player 1",
+        "timestamp": "2026-07-02T02:55:28.514609",
+        "action": {
+          "type": "send message",
+          "content": "Round 3 complete. The Detective's current guess: \"The Siege of Berwick-upon-Tweed (1318) during the First War of Scottish Independence\". Please write a new paragraph with fresh information.",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 1",
+        "to": "GM",
+        "timestamp": "2026-07-02T02:55:28.514625",
+        "action": {
+          "type": "get message",
+          "content": "PARAGRAPH: The conflict occurred during the reign of David II, following the death of the famous warrior king who had previously secured the nation's independence.",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 2",
+        "timestamp": "2026-07-02T02:56:58.128518",
+        "action": {
+          "type": "send message",
+          "content": "[Sentence 4]\nThe conflict occurred during the reign of David II, following the death of the famous warrior king who had previously secured the nation's independence.",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 2",
+        "to": "GM",
+        "timestamp": "2026-07-02T02:56:58.128534",
+        "action": {
+          "type": "get message",
+          "content": "ANALYSIS: The mention of David II and the death of a \"famous warrior king\" who secured independence confirms the context is Scotland after Robert the Bruce's death in 1329. The royal force marching north to reclaim a walled town from a rebellious noble fits the 1332-1334 period of the Second War of Scottish Independence, specifically the English-backed invasion by Edward Balliol.\n\nGUESS: The Battle of Dupplin Moor (1332) or the subsequent Siege of Edinburgh Castle (1332)",
+          "label": "response"
+        }
+      }
+    ],
+    [
+      {
+        "from": "GM",
+        "to": "Player 1",
+        "timestamp": "2026-07-02T03:22:24.544256",
+        "action": {
+          "type": "send message",
+          "content": "Round 4 complete. The Detective's current guess: \"The Battle of Dupplin Moor (1332) or the subsequent Siege of Edinburgh Castle (1332)\". Please write a new paragraph with fresh information.",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 1",
+        "to": "GM",
+        "timestamp": "2026-07-02T03:22:24.544271",
+        "action": {
+          "type": "get message",
+          "content": "PARAGRAPH: The target of this specific operation was a major inland city located on the Tay, rather than a coastal fortress or a battlefield in the south.",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 2",
+        "timestamp": "2026-07-02T03:23:16.078878",
+        "action": {
+          "type": "send message",
+          "content": "[Sentence 5]\nThe target of this specific operation was a major inland city located on the Tay, rather than a coastal fortress or a battlefield in the south.",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 2",
+        "to": "GM",
+        "timestamp": "2026-07-02T03:23:16.078900",
+        "action": {
+          "type": "get message",
+          "content": "ANALYSIS: The location is an inland city on the River Tay, which identifies Perth. In 1332, following the Battle of Dupplin Moor, the English-backed forces under Edward Balliol marched north to capture Perth, a key administrative center, from the loyalist Scottish nobles.\n\nGUESS: The Capture of Perth (1332) during the Second War of Scottish Independence",
+          "label": "response"
+        }
+      }
+    ],
+    [
+      {
+        "from": "GM",
+        "to": "Player 1",
+        "timestamp": "2026-07-02T03:24:15.585366",
+        "action": {
+          "type": "send message",
+          "content": "Round 5 complete. The Detective's current guess: \"The Capture of Perth (1332) during the Second War of Scottish Independence\". Please write a new paragraph with fresh information.",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 1",
+        "to": "GM",
+        "timestamp": "2026-07-02T03:24:15.585382",
+        "action": {
+          "type": "get message",
+          "content": "PARAGRAPH: This particular engagement occurred seven years after the initial capture of the city, when the young king's forces returned to retake the stronghold from the usurper's supporters.",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 2",
+        "timestamp": "2026-07-02T03:32:51.263690",
+        "action": {
+          "type": "send message",
+          "content": "[Sentence 6]\nThis particular engagement occurred seven years after the initial capture of the city, when the young king's forces returned to retake the stronghold from the usurper's supporters.",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 2",
+        "to": "GM",
+        "timestamp": "2026-07-02T03:32:51.263707",
+        "action": {
+          "type": "get message",
+          "content": "ANALYSIS: The timeline shifts to 1339 (7 years after 1332), when the young King David II returned to Scotland to reclaim Perth from the English-backed usurper Edward Balliol. This specific event marks the successful recapture of the city by the loyalist Scottish forces.\n\nGUESS: The Recapture of Perth (1339) by King David II",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-02T03:32:51.263813",
+        "action": {
+          "type": "correct guess",
+          "content": "round 6"
+        }
+      }
+    ]
+  ]
+}

@@ -1,0 +1,316 @@
+{
+  "meta": {
+    "game_name": "wordle-crazy",
+    "experiment_name": "medium_frequency_words_no_clue_no_critic",
+    "game_id": 4,
+    "results_folder": "qwen3.5-27b",
+    "clem_version": "3.7.2",
+    "round_count": 6,
+    "completed": true
+  },
+  "player_models": {
+    "0": {
+      "model_spec": {
+        "model_name": "qwen3.5-27b",
+        "backend": "huggingface_local",
+        "context_size": "262k",
+        "huggingface_id": "Qwen/Qwen3.5-27B",
+        "languages": [
+          "en",
+          "zh"
+        ],
+        "license": {
+          "name": "Apache 2.0",
+          "url": "https://www.apache.org/licenses/LICENSE-2.0"
+        },
+        "lookup_source": "/project/mmanina/lm-playschool-test-set/playpen/model_registry.json",
+        "model_config": {
+          "premade_chat_template": true,
+          "eos_to_cull": "<\\|im_end\\|>|<\\|endoftext\\|>",
+          "chat_template_kwargs": {
+            "enable_thinking": false
+          },
+          "multimodality": {
+            "single_image": true,
+            "multiple_images": true,
+            "audio": false,
+            "video": true
+          }
+        },
+        "open_weight": true,
+        "parameters": "27B",
+        "release_date": "2026-02-24"
+      },
+      "gen_args": {
+        "temperature": 0.0,
+        "max_tokens": 5000
+      }
+    }
+  },
+  "players": {
+    "GM": {
+      "game_role": "Game Master",
+      "model_name": "programmatic"
+    },
+    "Player 1": {
+      "game_role": "WordGuesser",
+      "model_name": "qwen3.5-27b"
+    }
+  },
+  "turns": [
+    [
+      {
+        "from": "GM",
+        "to": "Player 1",
+        "timestamp": "2026-07-02T00:17:35.300152",
+        "action": {
+          "type": "send message",
+          "content": "You are a language wizard who likes to guess words by using the given rules.\n\nWelcome to Wordle! You have six attempts to guess the target word, a valid English word of five lowercase letters (a-z). Please use the tags \"explanation:\" and \"guess:\" to provide a concise explanation for each guess.\n\nFor instance, if your guess is \"apple\", your response should be\nexplanation: this is a common five-letter English word, and I am starting my guess with this word.\nguess: apple\n\nAfter each guess, your answer will be validated, and you will receive feedback indicating which letters are correct (yellow), which letters are correct but in the wrong position (black), and which letters are incorrect (purple). This feedback can be useful in determining which letters to include or exclude in your next guess.\n\nFor example, the feedback for \"apple\" might be:\nguess_feedback: a<black> p<black> p<yellow> l<black> e<purple>\n\nThe explanation should contain details about how the guess_feedback is used to arrive at a new guess.\n\nDo not generate any other text.\n\nLet's begin with your first guess.",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 1",
+        "to": "GM",
+        "timestamp": "2026-07-02T00:17:35.300170",
+        "action": {
+          "type": "get message",
+          "content": "explanation: I am starting with a common five-letter word containing frequent vowels and consonants to maximize the information gained from the first feedback.\nguess: slate",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-02T00:17:35.300348",
+        "action": {
+          "type": "metadata",
+          "content": "attempts = 1\ntarget_word = lager\nguess = slate\nguess_feedback = s<purple> l<black> a<black> t<purple> e<black>"
+        }
+      }
+    ],
+    [
+      {
+        "from": "GM",
+        "to": "Player 1",
+        "timestamp": "2026-07-02T00:33:44.867485",
+        "action": {
+          "type": "send message",
+          "content": "guess_feedback: s<purple> l<black> a<black> t<purple> e<black>\n\nProvide your response only in this format.\nexplanation: details\nguess: word",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 1",
+        "to": "GM",
+        "timestamp": "2026-07-02T00:33:44.867505",
+        "action": {
+          "type": "get message",
+          "content": "explanation: The feedback indicates 'l' is in the second position, 'a' is in the third, and 'e' is in the fifth. 's' and 't' are not in the word. I need a word matching the pattern _ l a _ e, using new consonants for the first and fourth positions.\nguess: plane",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-02T00:33:44.867807",
+        "action": {
+          "type": "metadata",
+          "content": "attempts = 2\ntarget_word = lager\nguess = plane\nguess_feedback = p<purple> l<black> a<black> n<purple> e<black>"
+        }
+      }
+    ],
+    [
+      {
+        "from": "GM",
+        "to": "Player 1",
+        "timestamp": "2026-07-02T00:43:02.246190",
+        "action": {
+          "type": "send message",
+          "content": "guess_feedback: p<purple> l<black> a<black> n<purple> e<black>\n\nProvide your response only in this format.\nexplanation: details\nguess: word",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 1",
+        "to": "GM",
+        "timestamp": "2026-07-02T00:43:02.246207",
+        "action": {
+          "type": "get message",
+          "content": "explanation: The feedback confirms 'l' is in the second position, 'a' is in the third, and 'e' is in the fifth. 's', 't', 'p', and 'n' are not in the word. I need a word matching the pattern _ l a _ e, using new consonants for the first and fourth positions.\nguess: flame",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-02T00:43:02.246292",
+        "action": {
+          "type": "metadata",
+          "content": "attempts = 3\ntarget_word = lager\nguess = flame\nguess_feedback = f<purple> l<black> a<black> m<purple> e<black>"
+        }
+      }
+    ],
+    [
+      {
+        "from": "GM",
+        "to": "Player 1",
+        "timestamp": "2026-07-02T01:32:09.295392",
+        "action": {
+          "type": "send message",
+          "content": "guess_feedback: f<purple> l<black> a<black> m<purple> e<black>\n\nProvide your response only in this format.\nexplanation: details\nguess: word",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 1",
+        "to": "GM",
+        "timestamp": "2026-07-02T01:32:09.295417",
+        "action": {
+          "type": "get message",
+          "content": "explanation: The feedback confirms 'l' is in the second position, 'a' is in the third, and 'e' is in the fifth. 's', 't', 'p', 'n', 'f', and 'm' are not in the word. I need a word matching the pattern _ l a _ e, using new consonants for the first and fourth positions.\nguess: blaze",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-02T01:32:09.295494",
+        "action": {
+          "type": "metadata",
+          "content": "attempts = 4\ntarget_word = lager\nguess = blaze\nguess_feedback = b<purple> l<black> a<black> z<purple> e<black>"
+        }
+      }
+    ],
+    [
+      {
+        "from": "GM",
+        "to": "Player 1",
+        "timestamp": "2026-07-02T01:57:48.826637",
+        "action": {
+          "type": "send message",
+          "content": "guess_feedback: b<purple> l<black> a<black> z<purple> e<black>\n\nProvide your response only in this format.\nexplanation: details\nguess: word",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 1",
+        "to": "GM",
+        "timestamp": "2026-07-02T01:57:48.826657",
+        "action": {
+          "type": "get message",
+          "content": "explanation: The feedback confirms 'l' is in the second position, 'a' is in the third, and 'e' is in the fifth. 's', 't', 'p', 'n', 'f', 'm', 'b', and 'z' are not in the word. I need a word matching the pattern _ l a _ e, using new consonants for the first and fourth positions. 'c' and 'r' are common consonants not yet tested.\nguess: clare",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-02T01:57:48.827057",
+        "action": {
+          "type": "metadata",
+          "content": "Error: The guessed word is not a valid word for this game."
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 1",
+        "timestamp": "2026-07-02T02:06:00.373227",
+        "action": {
+          "type": "send message",
+          "content": "Your guess is not a valid word for this game. Please try again.\n\nProvide your response only in this format.\nexplanation: details\nguess: word",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 1",
+        "to": "GM",
+        "timestamp": "2026-07-02T02:06:00.373244",
+        "action": {
+          "type": "get message",
+          "content": "explanation: The feedback confirms 'l' is in the second position, 'a' is in the third, and 'e' is in the fifth. 's', 't', 'p', 'n', 'f', 'm', 'b', and 'z' are not in the word. 'clare' was invalid, so I will try 'glare', which fits the pattern _ l a _ e and uses 'g' and 'r', common consonants not yet excluded.\nguess: glare",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-02T02:06:00.373530",
+        "action": {
+          "type": "metadata",
+          "content": "attempts = 5\ntarget_word = lager\nguess = glare\nguess_feedback = g<black> l<black> a<black> r<black> e<black>"
+        }
+      }
+    ],
+    [
+      {
+        "from": "GM",
+        "to": "Player 1",
+        "timestamp": "2026-07-02T02:08:02.267272",
+        "action": {
+          "type": "send message",
+          "content": "guess_feedback: g<black> l<black> a<black> r<black> e<black>\n\nProvide your response only in this format.\nexplanation: details\nguess: word",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 1",
+        "to": "GM",
+        "timestamp": "2026-07-02T02:08:02.267292",
+        "action": {
+          "type": "get message",
+          "content": "explanation: The feedback shows all letters in 'glare' are black, meaning they are in the word but in the wrong positions. We know 'l' is 2nd, 'a' is 3rd, and 'e' is 5th from previous turns. 'g' cannot be 1st, 'r' cannot be 4th. Since 'g' is in the word and not 1st, it must be 4th. Since 'r' is in the word and not 4th, it must be 1st. This forms the word 'grale', but that is not a valid word. Wait, let's re-evaluate. 'l' is 2nd, 'a' is 3rd, 'e' is 5th. 'g' is in the word, not 1st. 'r' is in the word, not 4th. If 'g' is 4th, the word is _ l a g e. If 'r' is 1st, the word is r l a g e (invalid). If 'r' is 4th, it conflicts with 'g' being 4th? No, 'r' is black in 'glare' at pos 4, so 'r' is not 4th. 'g' is black at pos 1, so 'g' is not 1st. Possible positions for 'g': 4. Possible positions for 'r': 1. So the word is r l a g e? No. Let's try 'large'. 'l' is 2nd (correct), 'a' is 3rd (correct), 'r' is 4th (but 'r' was black in 'glare' at 4th, so 'r' cannot be 4th). Wait, in 'glare', 'r' is at 4 and is black. So 'r' is not at 4. In 'large', 'r' is at 4. That would be wrong. Let's try 'grale' again? No. What about 'gale'? No, 5 letters. 'glade'? 'd' was not tested. 'glade': g(1)-black, l(2)-black, a(3)-black, d(4)-?, e(5)-black. If 'd' is new, it might be correct. But 'g' is black at 1, so 'g' is not 1. 'glade' has 'g' at 1. So 'glade' is wrong. 'grale' is not a word. 'gale' is 4. 'glare' letters: g, l, a, r, e. Positions: 1,2,3,4,5. Feedback: all black. So: g is in word, not 1. l is in word, not 2? Wait, previous feedback for 'slate' said l<black>. 'black' means correct letter, wrong position. So 'l' is in the word, but NOT at position 2. My previous deduction was wrong. Let's re-read the rules. \"correct but in the wrong position (black)\". Okay. So in 'slate', l<black> means 'l' is in the word but not at pos 2. In 'plane', l<black> means 'l' is in the word but not at pos 2. In 'flame', l<black> means 'l' is in the word but not at pos 2. In 'blaze', l<black> means 'l' is in the word but not at pos 2. In 'glare', l<black> means 'l' is in the word but not at pos 2. So 'l' is NOT at pos 2. My previous assumption that 'l' is fixed at 2 was incorrect. Let's restart the logic.\nKnown:\nFrom 'slate': s, t out. l, a, e in (l not 2, a not 3, e not 5).\nFrom 'plane': p, n out. l, a, e in (l not 2, a not 3, e not 5).\nFrom 'flame': f, m out. l, a, e in (l not 2, a not 3, e not 5).\nFrom 'blaze': b, z out. l, a, e in (l not 2, a not 3, e not 5).\nFrom 'glare': g, r in. l, a, e in. All black.\nSo letters in word: l, a, e, g, r.\nPositions:\nl: not 2.\na: not 3.\ne: not 5.\ng: not 1 (from glare).\nr: not 4 (from glare).\nWe need to arrange {l, a, e, g, r} such that:\nl != 2\na != 3\ne != 5\ng != 1\nr != 4\nPossible words: \"large\"? l(1), a(2), r(3), g(4), e(5).\nCheck constraints:\nl at 1 (ok, !=2).\na at 2 (ok, !=3).\nr at 3 (ok, !=4).\ng at 4 (ok, !=1).\ne at 5 (FAIL, e != 5).\nSo 'large' is invalid because e is at 5.\nTry \"grale\"? Not a word.\nTry \"galer\"? g(1) - FAIL.\nTry \"regal\"? r(1), e(2), g(3), a(4), l(5).\nCheck constraints:\nr at 1 (ok, !=4).\ne at 2 (ok, !=5).\ng at 3 (ok, !=1).\na at 4 (ok, !=3).\nl at 5 (ok, !=2).\nAll constraints satisfied. \"regal\" is a valid word.\nguess: regal",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-02T02:08:02.267763",
+        "action": {
+          "type": "metadata",
+          "content": "attempts = 6\ntarget_word = lager\nguess = regal\nguess_feedback = r<black> e<black> g<yellow> a<black> l<black>"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-02T02:08:02.267784",
+        "action": {
+          "type": "max rounds played",
+          "content": "game_result = LOSS"
+        }
+      }
+    ]
+  ],
+  "Aborted": 0,
+  "Lose": 1,
+  "Success": 0,
+  "Request Count": 7,
+  "Parsed Request Count": 7,
+  "Violated Request Count": 0,
+  "Guesser Guesses": [
+    "slate",
+    "plane",
+    "flame",
+    "blaze",
+    "glare",
+    "regal"
+  ],
+  "Guesser Feedbacks": [
+    "s<purple> l<black> a<black> t<purple> e<black>",
+    "p<purple> l<black> a<black> n<purple> e<black>",
+    "f<purple> l<black> a<black> m<purple> e<black>",
+    "b<purple> l<black> a<black> z<purple> e<black>",
+    "g<black> l<black> a<black> r<black> e<black>",
+    "r<black> e<black> g<yellow> a<black> l<black>"
+  ],
+  "Guesser Explanations": [
+    "I am starting with a common five-letter word containing frequent vowels and consonants to maximize the information gained from the first feedback.",
+    "The feedback indicates 'l' is in the second position, 'a' is in the third, and 'e' is in the fifth. 's' and 't' are not in the word. I need a word matching the pattern _ l a _ e, using new consonants for the first and fourth positions.",
+    "The feedback confirms 'l' is in the second position, 'a' is in the third, and 'e' is in the fifth. 's', 't', 'p', and 'n' are not in the word. I need a word matching the pattern _ l a _ e, using new consonants for the first and fourth positions.",
+    "The feedback confirms 'l' is in the second position, 'a' is in the third, and 'e' is in the fifth. 's', 't', 'p', 'n', 'f', and 'm' are not in the word. I need a word matching the pattern _ l a _ e, using new consonants for the first and fourth positions.",
+    "The feedback confirms 'l' is in the second position, 'a' is in the third, and 'e' is in the fifth. 's', 't', 'p', 'n', 'f', 'm', 'b', and 'z' are not in the word. 'clare' was invalid, so I will try 'glare', which fits the pattern _ l a _ e and uses 'g' and 'r', common consonants not yet excluded.",
+    "The feedback shows all letters in 'glare' are black, meaning they are in the word but in the wrong positions. We know 'l' is 2nd, 'a' is 3rd, and 'e' is 5th from previous turns. 'g' cannot be 1st, 'r' cannot be 4th. Since 'g' is in the word and not 1st, it must be 4th. Since 'r' is in the word and not 4th, it must be 1st. This forms the word 'grale', but that is not a valid word. Wait, let's re-evaluate. 'l' is 2nd, 'a' is 3rd, 'e' is 5th. 'g' is in the word, not 1st. 'r' is in the word, not 4th. If 'g' is 4th, the word is _ l a g e. If 'r' is 1st, the word is r l a g e (invalid). If 'r' is 4th, it conflicts with 'g' being 4th? No, 'r' is black in 'glare' at pos 4, so 'r' is not 4th. 'g' is black at pos 1, so 'g' is not 1st. Possible positions for 'g': 4. Possible positions for 'r': 1. So the word is r l a g e? No. Let's try 'large'. 'l' is 2nd (correct), 'a' is 3rd (correct), 'r' is 4th (but 'r' was black in 'glare' at 4th, so 'r' cannot be 4th). Wait, in 'glare', 'r' is at 4 and is black. So 'r' is not at 4. In 'large', 'r' is at 4. That would be wrong. Let's try 'grale' again? No. What about 'gale'? No, 5 letters. 'glade'? 'd' was not tested. 'glade': g(1)-black, l(2)-black, a(3)-black, d(4)-?, e(5)-black. If 'd' is new, it might be correct. But 'g' is black at 1, so 'g' is not 1. 'glade' has 'g' at 1. So 'glade' is wrong. 'grale' is not a word. 'gale' is 4. 'glare' letters: g, l, a, r, e. Positions: 1,2,3,4,5. Feedback: all black. So: g is in word, not 1. l is in word, not 2? Wait, previous feedback for 'slate' said l<black>. 'black' means correct letter, wrong position. So 'l' is in the word, but NOT at position 2. My previous deduction was wrong. Let's re-read the rules. \"correct but in the wrong position (black)\". Okay. So in 'slate', l<black> means 'l' is in the word but not at pos 2. In 'plane', l<black> means 'l' is in the word but not at pos 2. In 'flame', l<black> means 'l' is in the word but not at pos 2. In 'blaze', l<black> means 'l' is in the word but not at pos 2. In 'glare', l<black> means 'l' is in the word but not at pos 2. So 'l' is NOT at pos 2. My previous assumption that 'l' is fixed at 2 was incorrect. Let's restart the logic."
+  ]
+}

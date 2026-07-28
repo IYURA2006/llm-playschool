@@ -1,0 +1,294 @@
+{
+  "meta": {
+    "game_name": "ta_frozen_lake",
+    "experiment_name": "FrozenLake-v0-hardcore",
+    "game_id": 0,
+    "results_folder": "qwen3.5-27b",
+    "clem_version": "3.7.2",
+    "round_count": 8,
+    "completed": true,
+    "ta_version": "0.7.3"
+  },
+  "player_models": {
+    "0": {
+      "model_spec": {
+        "model_name": "qwen3.5-27b",
+        "backend": "huggingface_local",
+        "context_size": "262k",
+        "huggingface_id": "Qwen/Qwen3.5-27B",
+        "languages": [
+          "en",
+          "zh"
+        ],
+        "license": {
+          "name": "Apache 2.0",
+          "url": "https://www.apache.org/licenses/LICENSE-2.0"
+        },
+        "lookup_source": "/project/mmanina/lm-playschool-test-set/playpen/model_registry.json",
+        "model_config": {
+          "premade_chat_template": true,
+          "eos_to_cull": "<\\|im_end\\|>|<\\|endoftext\\|>",
+          "chat_template_kwargs": {
+            "enable_thinking": false
+          },
+          "multimodality": {
+            "single_image": true,
+            "multiple_images": true,
+            "audio": false,
+            "video": true
+          }
+        },
+        "open_weight": true,
+        "parameters": "27B",
+        "release_date": "2026-02-24"
+      },
+      "gen_args": {
+        "temperature": 0.0,
+        "max_tokens": 5000
+      }
+    }
+  },
+  "players": {
+    "GM": {
+      "game_role": "Game Master",
+      "model_name": "programmatic"
+    },
+    "Player 0": {
+      "game_role": "Player 0",
+      "model_name": "qwen3.5-27b"
+    }
+  },
+  "turns": [
+    [
+      {
+        "from": "GM",
+        "to": "Player 0",
+        "timestamp": "2026-07-01T19:29:02.370519",
+        "action": {
+          "type": "send message",
+          "content": "You are a competitive game player. Make sure you read the game instructions carefully, and always follow the required format.\n\n[GAME] Welcome to Frozen Lake!\n\nYou are represented by 'P' on the grid.\nGrid symbols:\n  ' ' = Frozen surface (safe to walk on)\n  'H' = Hole (fall in and lose!)\n  'G' = Goal (reach this to win!)\n  'P' = Your current position\n\nAvailable actions: up, down, left, right (or w, a, s, d)\nType your action as: [up], [down], [left], [right] or [w], [a], [s], [d]\n\nObjective: Navigate from the start (top-left) to the goal (bottom-right) without falling into any holes!\n\n[GAME] Current Board:\n\n+-----+-----+-----+-----+-----+\n|  P  |     |     |     |     |\n+-----+-----+-----+-----+-----+\n|     |     |     |     |     |\n+-----+-----+-----+-----+-----+\n|     |     |     |  H  |     |\n+-----+-----+-----+-----+-----+\n|  H  |     |  H  |  H  |     |\n+-----+-----+-----+-----+-----+\n|  H  |     |     |  H  |  G  |\n+-----+-----+-----+-----+-----+\n\nAvailable Actions: [up], [down], [left], [right], [w], [a], [s], [d]\n",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 0",
+        "to": "GM",
+        "timestamp": "2026-07-01T19:29:03.014378",
+        "action": {
+          "type": "get message",
+          "content": "[right]",
+          "label": "response"
+        }
+      }
+    ],
+    [
+      {
+        "from": "GM",
+        "to": "Player 0",
+        "timestamp": "2026-07-01T19:29:07.269322",
+        "action": {
+          "type": "send message",
+          "content": "[GAME] You moved right to position (0, 1).\n[GAME] Current Board:\n\n+-----+-----+-----+-----+-----+\n|     |  P  |     |     |     |\n+-----+-----+-----+-----+-----+\n|     |     |     |     |     |\n+-----+-----+-----+-----+-----+\n|     |     |     |  H  |     |\n+-----+-----+-----+-----+-----+\n|  H  |     |  H  |  H  |     |\n+-----+-----+-----+-----+-----+\n|  H  |     |     |  H  |  G  |\n+-----+-----+-----+-----+-----+\n\nAvailable Actions: [up], [down], [left], [right], [w], [a], [s], [d]\n",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 0",
+        "to": "GM",
+        "timestamp": "2026-07-01T19:29:08.153675",
+        "action": {
+          "type": "get message",
+          "content": "[right]",
+          "label": "response"
+        }
+      }
+    ],
+    [
+      {
+        "from": "GM",
+        "to": "Player 0",
+        "timestamp": "2026-07-01T19:29:14.227689",
+        "action": {
+          "type": "send message",
+          "content": "[GAME] You moved right to position (0, 2).\n[GAME] Current Board:\n\n+-----+-----+-----+-----+-----+\n|     |     |  P  |     |     |\n+-----+-----+-----+-----+-----+\n|     |     |     |     |     |\n+-----+-----+-----+-----+-----+\n|     |     |     |  H  |     |\n+-----+-----+-----+-----+-----+\n|  H  |     |  H  |  H  |     |\n+-----+-----+-----+-----+-----+\n|  H  |     |     |  H  |  G  |\n+-----+-----+-----+-----+-----+\n\nAvailable Actions: [up], [down], [left], [right], [w], [a], [s], [d]\n",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 0",
+        "to": "GM",
+        "timestamp": "2026-07-01T19:29:15.430275",
+        "action": {
+          "type": "get message",
+          "content": "[right]",
+          "label": "response"
+        }
+      }
+    ],
+    [
+      {
+        "from": "GM",
+        "to": "Player 0",
+        "timestamp": "2026-07-01T19:29:20.297145",
+        "action": {
+          "type": "send message",
+          "content": "[GAME] You moved right to position (0, 3).\n[GAME] Current Board:\n\n+-----+-----+-----+-----+-----+\n|     |     |     |  P  |     |\n+-----+-----+-----+-----+-----+\n|     |     |     |     |     |\n+-----+-----+-----+-----+-----+\n|     |     |     |  H  |     |\n+-----+-----+-----+-----+-----+\n|  H  |     |  H  |  H  |     |\n+-----+-----+-----+-----+-----+\n|  H  |     |     |  H  |  G  |\n+-----+-----+-----+-----+-----+\n\nAvailable Actions: [up], [down], [left], [right], [w], [a], [s], [d]\n",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 0",
+        "to": "GM",
+        "timestamp": "2026-07-01T19:29:21.796891",
+        "action": {
+          "type": "get message",
+          "content": "[right]",
+          "label": "response"
+        }
+      }
+    ],
+    [
+      {
+        "from": "GM",
+        "to": "Player 0",
+        "timestamp": "2026-07-01T19:29:26.681659",
+        "action": {
+          "type": "send message",
+          "content": "[GAME] You moved right to position (0, 4).\n[GAME] Current Board:\n\n+-----+-----+-----+-----+-----+\n|     |     |     |     |  P  |\n+-----+-----+-----+-----+-----+\n|     |     |     |     |     |\n+-----+-----+-----+-----+-----+\n|     |     |     |  H  |     |\n+-----+-----+-----+-----+-----+\n|  H  |     |  H  |  H  |     |\n+-----+-----+-----+-----+-----+\n|  H  |     |     |  H  |  G  |\n+-----+-----+-----+-----+-----+\n\nAvailable Actions: [up], [down], [left], [right], [w], [a], [s], [d]\n",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 0",
+        "to": "GM",
+        "timestamp": "2026-07-01T19:29:28.379094",
+        "action": {
+          "type": "get message",
+          "content": "[down]",
+          "label": "response"
+        }
+      }
+    ],
+    [
+      {
+        "from": "GM",
+        "to": "Player 0",
+        "timestamp": "2026-07-01T19:29:34.503294",
+        "action": {
+          "type": "send message",
+          "content": "[GAME] You moved down to position (1, 4).\n[GAME] Current Board:\n\n+-----+-----+-----+-----+-----+\n|     |     |     |     |     |\n+-----+-----+-----+-----+-----+\n|     |     |     |     |  P  |\n+-----+-----+-----+-----+-----+\n|     |     |     |  H  |     |\n+-----+-----+-----+-----+-----+\n|  H  |     |  H  |  H  |     |\n+-----+-----+-----+-----+-----+\n|  H  |     |     |  H  |  G  |\n+-----+-----+-----+-----+-----+\n\nAvailable Actions: [up], [down], [left], [right], [w], [a], [s], [d]\n",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 0",
+        "to": "GM",
+        "timestamp": "2026-07-01T19:29:36.581961",
+        "action": {
+          "type": "get message",
+          "content": "[down]",
+          "label": "response"
+        }
+      }
+    ],
+    [
+      {
+        "from": "GM",
+        "to": "Player 0",
+        "timestamp": "2026-07-01T19:29:37.657110",
+        "action": {
+          "type": "send message",
+          "content": "[GAME] You moved down to position (2, 4).\n[GAME] Current Board:\n\n+-----+-----+-----+-----+-----+\n|     |     |     |     |     |\n+-----+-----+-----+-----+-----+\n|     |     |     |     |     |\n+-----+-----+-----+-----+-----+\n|     |     |     |  H  |  P  |\n+-----+-----+-----+-----+-----+\n|  H  |     |  H  |  H  |     |\n+-----+-----+-----+-----+-----+\n|  H  |     |     |  H  |  G  |\n+-----+-----+-----+-----+-----+\n\nAvailable Actions: [up], [down], [left], [right], [w], [a], [s], [d]\n",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 0",
+        "to": "GM",
+        "timestamp": "2026-07-01T19:29:39.866114",
+        "action": {
+          "type": "get message",
+          "content": "[down]",
+          "label": "response"
+        }
+      }
+    ],
+    [
+      {
+        "from": "GM",
+        "to": "Player 0",
+        "timestamp": "2026-07-01T19:29:39.866778",
+        "action": {
+          "type": "send message",
+          "content": "[GAME] You moved down to position (3, 4).\n[GAME] Current Board:\n\n+-----+-----+-----+-----+-----+\n|     |     |     |     |     |\n+-----+-----+-----+-----+-----+\n|     |     |     |     |     |\n+-----+-----+-----+-----+-----+\n|     |     |     |  H  |     |\n+-----+-----+-----+-----+-----+\n|  H  |     |  H  |  H  |  P  |\n+-----+-----+-----+-----+-----+\n|  H  |     |     |  H  |  G  |\n+-----+-----+-----+-----+-----+\n\nAvailable Actions: [up], [down], [left], [right], [w], [a], [s], [d]\n",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 0",
+        "to": "GM",
+        "timestamp": "2026-07-01T19:29:42.320169",
+        "action": {
+          "type": "get message",
+          "content": "[down]",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T19:29:42.320318",
+        "action": {
+          "type": "rewards",
+          "content": "role: Player 0\ninvalid_move: False\nturn_count: 8\nreason: Congratulations! You reached the goal!\nreward: 1.0"
+        }
+      }
+    ]
+  ],
+  "ta_reward": {
+    "0": 1.0
+  },
+  "ta_reward_details": {
+    "0": {
+      "role": "Player 0",
+      "invalid_move": false,
+      "turn_count": 8,
+      "reason": "Congratulations! You reached the goal!",
+      "reward": 1.0
+    }
+  },
+  "numeric_reward": 1.0,
+  "Aborted": 0,
+  "Success": 1,
+  "Lose": 0,
+  "Request Count": [
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1
+  ],
+  "Violated Request Count": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+  ],
+  "Parsed Request Count": [
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1
+  ]
+}

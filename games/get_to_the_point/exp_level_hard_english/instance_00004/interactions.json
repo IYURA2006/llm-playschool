@@ -1,0 +1,163 @@
+{
+  "meta": {
+    "game_name": "get_to_the_point",
+    "experiment_name": "exp_level_hard_english",
+    "game_id": 4,
+    "results_folder": "qwen3.5-27b",
+    "clem_version": "3.7.2",
+    "round_count": 2,
+    "completed": true
+  },
+  "player_models": {
+    "0": {
+      "model_spec": {
+        "model_name": "qwen3.5-27b",
+        "backend": "huggingface_local",
+        "context_size": "262k",
+        "huggingface_id": "Qwen/Qwen3.5-27B",
+        "languages": [
+          "en",
+          "zh"
+        ],
+        "license": {
+          "name": "Apache 2.0",
+          "url": "https://www.apache.org/licenses/LICENSE-2.0"
+        },
+        "lookup_source": "/project/mmanina/lm-playschool-test-set/playpen/model_registry.json",
+        "model_config": {
+          "premade_chat_template": true,
+          "eos_to_cull": "<\\|im_end\\|>|<\\|endoftext\\|>",
+          "chat_template_kwargs": {
+            "enable_thinking": false
+          },
+          "multimodality": {
+            "single_image": true,
+            "multiple_images": true,
+            "audio": false,
+            "video": true
+          }
+        },
+        "open_weight": true,
+        "parameters": "27B",
+        "release_date": "2026-02-24"
+      },
+      "gen_args": {
+        "temperature": 0.0,
+        "max_tokens": 5000
+      }
+    }
+  },
+  "players": {
+    "GM": {
+      "game_role": "Game Master",
+      "model_name": "programmatic"
+    },
+    "Player 1": {
+      "game_role": "Helper",
+      "model_name": "qwen3.5-27b"
+    },
+    "Player 2": {
+      "game_role": "Seeker",
+      "model_name": "qwen3.5-27b"
+    }
+  },
+  "turns": [
+    [
+      {
+        "from": "GM",
+        "to": "Player 1",
+        "timestamp": "2026-07-02T02:08:12.500801",
+        "action": {
+          "type": "send message",
+          "content": "You are playing a collaborative word guessing game in which you have to strategically hint at the target word to the other player without revealing it. For that, you have to build small indirect sentences each round.\n\nRules:\n(a) You always have to reply in the form: CLUE: <start word + up to 3 words>. Guesses from the other player will start with GUESS. The sentence should always contain the start word.\n(b) Your sentence cannot contain the target word itself.\n\nEnd conditions:\n(i) If you use the target word in your sentence, then you lose.\n(ii) If the other player can guess the target word in 5 tries, you both win.\n\nLet us start.\n\nThis is the target word that you need to make the other player guess:\ndress\n\nThis is the start word that you need to add your words to:\ncollar\n\nImportant: \n-You are under time pressure, give short **coherent** sentences that are to the point!\n\n\ncollar",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 1",
+        "to": "GM",
+        "timestamp": "2026-07-02T02:08:12.500817",
+        "action": {
+          "type": "get message",
+          "content": "CLUE: collar and sleeves",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 2",
+        "timestamp": "2026-07-02T02:08:19.194199",
+        "action": {
+          "type": "send message",
+          "content": "You are playing a collaborative word guessing game in which you have to guess a target word that another player describes to you.\n\nRules:\n(a) You can make one guess at each trial.\n(b) You win when you guess the target word.\n(c) You lose when you cannot guess it in 5 tries.\n\n\nAfter each trial you will get a new hint from the other player which starts with CLUE. The hint is a small sentence containing the start word which never alters and up to three additional words that will help you both get to the point.\n\nOutput format:\nMake your guesses by just saying the word using the following form: GUESS: <a word>\n\n\nLet us start.\n\n clue: collar and sleeves",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 2",
+        "to": "GM",
+        "timestamp": "2026-07-02T02:08:19.194215",
+        "action": {
+          "type": "get message",
+          "content": "GUESS: shirt",
+          "label": "response"
+        }
+      }
+    ],
+    [
+      {
+        "from": "GM",
+        "to": "Player 1",
+        "timestamp": "2026-07-02T02:08:21.452874",
+        "action": {
+          "type": "send message",
+          "content": "guess: shirt",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 1",
+        "to": "GM",
+        "timestamp": "2026-07-02T02:08:21.452893",
+        "action": {
+          "type": "get message",
+          "content": "CLUE: collar on a formal gown",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-02T02:08:21.452922",
+        "action": {
+          "type": "Helper added 4 words. Allowed: 3",
+          "content": "abort game"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-02T02:08:21.452941",
+        "action": {
+          "type": "Helper added 4 words. Allowed: 3",
+          "content": "failed game"
+        }
+      }
+    ]
+  ],
+  "Aborted": 0,
+  "Lose": 1,
+  "Success": 0,
+  "Request Count": [
+    2,
+    1
+  ],
+  "Violated Request Count": [
+    0,
+    0
+  ],
+  "Parsed Request Count": [
+    2,
+    1
+  ]
+}

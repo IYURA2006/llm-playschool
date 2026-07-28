@@ -1,0 +1,144 @@
+{
+  "game_id": 0,
+  "width": 8,
+  "height": 8,
+  "walls": [
+    [
+      5,
+      2
+    ],
+    [
+      6,
+      1
+    ],
+    [
+      6,
+      6
+    ],
+    [
+      6,
+      8
+    ]
+  ],
+  "start": [
+    6,
+    4
+  ],
+  "gates": [
+    {
+      "id": "A",
+      "cell": [
+        6,
+        7
+      ],
+      "period": 6,
+      "open_phases": [
+        2,
+        3,
+        4
+      ]
+    }
+  ],
+  "patrols": [
+    {
+      "id": "P",
+      "route": [
+        [
+          8,
+          6
+        ],
+        [
+          7,
+          6
+        ],
+        [
+          7,
+          5
+        ],
+        [
+          6,
+          5
+        ],
+        [
+          7,
+          5
+        ],
+        [
+          7,
+          6
+        ]
+      ]
+    },
+    {
+      "id": "Q",
+      "route": [
+        [
+          3,
+          6
+        ],
+        [
+          2,
+          6
+        ],
+        [
+          2,
+          7
+        ],
+        [
+          3,
+          7
+        ],
+        [
+          4,
+          7
+        ],
+        [
+          3,
+          7
+        ],
+        [
+          2,
+          7
+        ],
+        [
+          2,
+          6
+        ]
+      ]
+    }
+  ],
+  "parcels": [
+    {
+      "id": 1,
+      "pickup": [
+        5,
+        7
+      ],
+      "dropoff": [
+        2,
+        8
+      ]
+    },
+    {
+      "id": 2,
+      "pickup": [
+        2,
+        3
+      ],
+      "dropoff": [
+        1,
+        6
+      ]
+    }
+  ],
+  "action_mode": "egocentric",
+  "initial_heading": "N",
+  "plan_length": 6,
+  "tick_budget": 42,
+  "max_rounds": 7,
+  "optimal_ticks": 23,
+  "static_optimal_ticks": 23,
+  "map_render": "   12345678\n  +--------+\n 1|.....#..|\n 2|....#...|\n 3|.2......|\n 4|.....S..|\n 5|........|\n 6|y.q..#.p|\n 7|....1A..|\n 8|.x...#..|\n  +--------+",
+  "schedules_text": "Gate A at (6,7): open exactly when (t mod 6) is in {2, 3, 4}. So it is open at t=2,3,4,8,9,10,... and closed at t=0,1,5,6,7,11,... You can only step ONTO it at a tick t+1 where it is open.\nGuard P: walks a fixed cycle of length 6. Its position at tick t is determined by (t mod 6) as follows: t mod 6=0: (8,6); t mod 6=1: (7,6); t mod 6=2: (7,5); t mod 6=3: (6,5); t mod 6=4: (7,5); t mod 6=5: (7,6). This repeats forever.\nGuard Q: walks a fixed cycle of length 8. Its position at tick t is determined by (t mod 8) as follows: t mod 8=0: (3,6); t mod 8=1: (2,6); t mod 8=2: (2,7); t mod 8=3: (3,7); t mod 8=4: (4,7); t mod 8=5: (3,7); t mod 8=6: (2,7); t mod 8=7: (2,6). This repeats forever.",
+  "parcels_text": "Parcel 1: pick it up at (5,7) (map glyph '1'), deliver it to (2,8) (map glyph 'x'). Pickup and delivery happen automatically when you end a tick on the cell.\nParcel 2: pick it up at (2,3) (map glyph '2'), deliver it to (1,6) (map glyph 'y'). Pickup and delivery happen automatically when you end a tick on the cell."
+}

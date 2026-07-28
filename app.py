@@ -1209,6 +1209,9 @@ def _capture_session_params(request: gr.Request):
     if prolific_pid:
         if len(prolific_pid) > 100:  # sanity bound, not a strict format check
             return _session_error("⚠️ Malformed participant link.")
+        # The raw Prolific PID is never stored — everything downstream (and
+        # the DB) only ever sees this pseudonym. See db.pseudonymize_pid.
+        prolific_pid = db.pseudonymize_pid(prolific_pid)
         playlist, err_msg = assignment.build_playlist_for(prolific_pid)
         if err_msg:
             return _session_error(err_msg)

@@ -1,0 +1,301 @@
+{
+  "meta": {
+    "game_name": "toh_multi_turn",
+    "experiment_name": "toh_4_disks_vertical_num_ascending",
+    "game_id": 0,
+    "results_folder": "qwen3.5-27b",
+    "clem_version": "3.7.2",
+    "round_count": 5,
+    "completed": true
+  },
+  "player_models": {
+    "0": {
+      "model_spec": {
+        "model_name": "qwen3.5-27b",
+        "backend": "huggingface_local",
+        "context_size": "262k",
+        "huggingface_id": "Qwen/Qwen3.5-27B",
+        "languages": [
+          "en",
+          "zh"
+        ],
+        "license": {
+          "name": "Apache 2.0",
+          "url": "https://www.apache.org/licenses/LICENSE-2.0"
+        },
+        "lookup_source": "/project/mmanina/lm-playschool-test-set/playpen/model_registry.json",
+        "model_config": {
+          "premade_chat_template": true,
+          "eos_to_cull": "<\\|im_end\\|>|<\\|endoftext\\|>",
+          "chat_template_kwargs": {
+            "enable_thinking": false
+          },
+          "multimodality": {
+            "single_image": true,
+            "multiple_images": true,
+            "audio": false,
+            "video": true
+          }
+        },
+        "open_weight": true,
+        "parameters": "27B",
+        "release_date": "2026-02-24"
+      },
+      "gen_args": {
+        "temperature": 0.0,
+        "max_tokens": 5000
+      }
+    }
+  },
+  "players": {
+    "GM": {
+      "game_role": "Game Master",
+      "model_name": "programmatic"
+    },
+    "Player 1": {
+      "game_role": "PegHopper",
+      "model_name": "qwen3.5-27b"
+    }
+  },
+  "turns": [
+    [
+      {
+        "from": "GM",
+        "to": "Player 1",
+        "timestamp": "2026-07-01T19:05:51.446354",
+        "action": {
+          "type": "send message",
+          "content": "[GAME MASTER] You are playing the game 'Tower of Hanoi'. Your goal is to move all disks from the first peg to the last peg, following these rules:\n1. Only one disk can be moved at a time.\n\n2. Each move consists of taking the upper disk from one of the stacks and placing it on top of another stack or on an empty peg.\n\n3. No larger disk may be placed on top of a smaller disk.\n\nThe pegs are named 1, 2, 3.\n\nThe game starts with all disks stacked in ascending order of size on the first peg, with the smallest disk at the top.\n\nHere is the initial configuration of the game:\n\n```\n1: A B C D \n2: \n3: \n\n```\n\nYou can make your moves by specifying the disk you want to move and the destination peg. For example, to move a disk from 1 to 3, you would say: '[1 3]'\n\nYou have 32 turns to finish the game.\n\nPlease make your first move!",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 1",
+        "to": "GM",
+        "timestamp": "2026-07-01T19:05:51.446372",
+        "action": {
+          "type": "get message",
+          "content": "[1 3]",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T19:05:51.467058",
+        "action": {
+          "type": "Success",
+          "content": "Valid move. Game finished: False\n\nGame solvable in 15 steps."
+        }
+      }
+    ],
+    [
+      {
+        "from": "GM",
+        "to": "Player 1",
+        "timestamp": "2026-07-01T19:05:57.551933",
+        "action": {
+          "type": "send message",
+          "content": "Moved disk 'D' from '1' to '3'.\n[GAME MASTER] Here is the current configuration of the game:\n\n```\n1: A B C \n2: \n3: D \n\n```\n\nYou have 31 turns left. Please make your next move.",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 1",
+        "to": "GM",
+        "timestamp": "2026-07-01T19:05:57.551950",
+        "action": {
+          "type": "get message",
+          "content": "[1 2]",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T19:05:57.571447",
+        "action": {
+          "type": "Success",
+          "content": "Valid move. Game finished: False\n\nGame solvable in 15 steps."
+        }
+      }
+    ],
+    [
+      {
+        "from": "GM",
+        "to": "Player 1",
+        "timestamp": "2026-07-01T19:06:04.312297",
+        "action": {
+          "type": "send message",
+          "content": "Moved disk 'C' from '1' to '2'.\n[GAME MASTER] Here is the current configuration of the game:\n\n```\n1: A B \n2: C \n3: D \n\n```\n\nYou have 30 turns left. Please make your next move.",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 1",
+        "to": "GM",
+        "timestamp": "2026-07-01T19:06:04.312315",
+        "action": {
+          "type": "get message",
+          "content": "[1 3]",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T19:06:04.312343",
+        "action": {
+          "type": "Error Count",
+          "content": "Current consecutive errors: 1"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T19:06:04.312355",
+        "action": {
+          "type": "Invalid Move",
+          "content": "Invalid move: you cannot place disk 'B' on top of smaller disk 'D'!"
+        }
+      }
+    ],
+    [
+      {
+        "from": "GM",
+        "to": "Player 1",
+        "timestamp": "2026-07-01T19:06:11.341131",
+        "action": {
+          "type": "send message",
+          "content": "[GAME MASTER] Error: you cannot place disk 'B' on top of smaller disk 'D'!. Please try again!",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 1",
+        "to": "GM",
+        "timestamp": "2026-07-01T19:06:11.341160",
+        "action": {
+          "type": "get message",
+          "content": "[1 2]",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T19:06:11.341204",
+        "action": {
+          "type": "Error Count",
+          "content": "Current consecutive errors: 2"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T19:06:11.341223",
+        "action": {
+          "type": "Invalid Move",
+          "content": "Invalid move: you cannot place disk 'B' on top of smaller disk 'C'!"
+        }
+      }
+    ],
+    [
+      {
+        "from": "GM",
+        "to": "Player 1",
+        "timestamp": "2026-07-01T19:17:25.707545",
+        "action": {
+          "type": "send message",
+          "content": "[GAME MASTER] Error: you cannot place disk 'B' on top of smaller disk 'C'!. Please try again!",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 1",
+        "to": "GM",
+        "timestamp": "2026-07-01T19:17:25.707563",
+        "action": {
+          "type": "get message",
+          "content": "[1 3]",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T19:17:25.707590",
+        "action": {
+          "type": "Error Count",
+          "content": "Current consecutive errors: 3"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T19:17:25.707603",
+        "action": {
+          "type": "Aborting",
+          "content": "Too many errors, aborting game."
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T19:17:25.707614",
+        "action": {
+          "type": "Invalid Move",
+          "content": "Invalid move: you cannot place disk 'B' on top of smaller disk 'D'!"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T19:17:25.707679",
+        "action": {
+          "type": "Final Board",
+          "content": "Final Board:\n```\n1: A B \n2: C \n3: D \n\n```"
+        }
+      }
+    ]
+  ],
+  "Turns": 5,
+  "Aborted": 1,
+  "Lose": 0,
+  "Success": 0,
+  "Main Score": 0.0,
+  "Optimal Steps": 15,
+  "Steps to Finish": [
+    [
+      0,
+      15
+    ],
+    [
+      1,
+      15
+    ]
+  ],
+  "Valid Moves": 2,
+  "Invalid Moves": 3,
+  "Request Count": [
+    1,
+    1,
+    1,
+    1,
+    1
+  ],
+  "Violated Request Count": [
+    0,
+    0,
+    0,
+    0,
+    0
+  ],
+  "Parsed Request Count": [
+    1,
+    1,
+    1,
+    1,
+    1
+  ]
+}

@@ -1,0 +1,294 @@
+{
+  "meta": {
+    "game_name": "chronicle",
+    "experiment_name": "battles_hard",
+    "game_id": 1,
+    "results_folder": "qwen3.5-27b",
+    "clem_version": "3.7.2",
+    "round_count": 5,
+    "completed": true
+  },
+  "player_models": {
+    "0": {
+      "model_spec": {
+        "model_name": "qwen3.5-27b",
+        "backend": "huggingface_local",
+        "context_size": "262k",
+        "huggingface_id": "Qwen/Qwen3.5-27B",
+        "languages": [
+          "en",
+          "zh"
+        ],
+        "license": {
+          "name": "Apache 2.0",
+          "url": "https://www.apache.org/licenses/LICENSE-2.0"
+        },
+        "lookup_source": "/project/mmanina/lm-playschool-test-set/playpen/model_registry.json",
+        "model_config": {
+          "premade_chat_template": true,
+          "eos_to_cull": "<\\|im_end\\|>|<\\|endoftext\\|>",
+          "chat_template_kwargs": {
+            "enable_thinking": false
+          },
+          "multimodality": {
+            "single_image": true,
+            "multiple_images": true,
+            "audio": false,
+            "video": true
+          }
+        },
+        "open_weight": true,
+        "parameters": "27B",
+        "release_date": "2026-02-24"
+      },
+      "gen_args": {
+        "temperature": 0.0,
+        "max_tokens": 5000
+      }
+    }
+  },
+  "players": {
+    "GM": {
+      "game_role": "Game Master",
+      "model_name": "programmatic"
+    },
+    "Player 1": {
+      "game_role": "ChronicleNarrator",
+      "model_name": "qwen3.5-27b"
+    },
+    "Player 2": {
+      "game_role": "ChronicleDetective",
+      "model_name": "qwen3.5-27b"
+    }
+  },
+  "turns": [
+    [
+      {
+        "from": "GM",
+        "to": "Player 1",
+        "timestamp": "2026-07-02T02:08:42.773271",
+        "action": {
+          "type": "send message",
+          "content": "You are playing a historical deduction game as the NARRATOR.\n\nYou have been given the name of a historical event, discovery, or milestone. Your goal is to help the DETECTIVE figure out which event you are describing — but you must describe it indirectly, without ever naming it.\n\nRules:\n1. Each round, write exactly ONE sentence describing the event. Add NEW information each round — do not repeat what you wrote before.\n2. You must NEVER use any of the following forbidden keywords (these would make the event too easy to identify): bulanbuli\n3. You must NEVER state the event name directly or any close variant of it.\n4. You may freely describe causes, consequences, the broader context, the sequence of events, and the significance — but only using general, non-identifying language.\n\nFormat your response EXACTLY as follows (required):\nPARAGRAPH: <exactly one sentence describing the event without forbidden keywords>\n\nThe event you must describe (without naming it) is: Battle of Bulanbuli\n",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 1",
+        "to": "GM",
+        "timestamp": "2026-07-02T02:08:42.773287",
+        "action": {
+          "type": "get message",
+          "content": "PARAGRAPH: This conflict erupted in the highlands of Sulawesi as a decisive confrontation between colonial forces and local resistance fighters.",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 2",
+        "timestamp": "2026-07-02T02:10:51.399120",
+        "action": {
+          "type": "send message",
+          "content": "You are playing a historical deduction game as the DETECTIVE.\n\nA Narrator will describe a historical event, discovery, or milestone to you over several rounds. Each round you receive a new sentence of description that builds on what came before. Your job is to figure out which specific event is being described.\n\nAfter EACH new sentence, respond briefly. Keep your entire response under 100 words. Use this exact format (both sections are required):\n\nANALYSIS: <2–3 short sentences: what does the growing description suggest? What type of event is this? What are the key features you are noticing?>\n\nGUESS: <your best guess for the name of the event being described — be specific, e.g. \"The French Revolution\" not just \"a revolution\">\n\nRules:\n- You may refine your GUESS each round as more information arrives.\n- Your GUESS should name the specific event, not just a broad category.\n- You have up to 10 rounds total.\n- Be concise — quality of reasoning matters more than length.\n\nThe first sentence from the Narrator is coming now.\n\n\n[Sentence 1]\nThis conflict erupted in the highlands of Sulawesi as a decisive confrontation between colonial forces and local resistance fighters.",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 2",
+        "to": "GM",
+        "timestamp": "2026-07-02T02:10:51.399135",
+        "action": {
+          "type": "get message",
+          "content": "ANALYSIS: The setting is Sulawesi, Indonesia, involving a clash between colonial powers and indigenous resistance. This suggests a specific anti-colonial war or rebellion in the Dutch East Indies, likely occurring in the 19th or early 20th century.\n\nGUESS: The War of Bone (1859)",
+          "label": "response"
+        }
+      }
+    ],
+    [
+      {
+        "from": "GM",
+        "to": "Player 1",
+        "timestamp": "2026-07-02T02:16:16.052642",
+        "action": {
+          "type": "send message",
+          "content": "Round 1 complete. The Detective's current guess: \"The War of Bone (1859)\". Please write a new paragraph with fresh information.",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 1",
+        "to": "GM",
+        "timestamp": "2026-07-02T02:16:16.052662",
+        "action": {
+          "type": "get message",
+          "content": "PARAGRAPH: The fighting took place in a specific valley within the Luwu region, where the terrain played a crucial role in the outcome of the engagement.",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 2",
+        "timestamp": "2026-07-02T02:17:57.864088",
+        "action": {
+          "type": "send message",
+          "content": "[Sentence 2]\nThe fighting took place in a specific valley within the Luwu region, where the terrain played a crucial role in the outcome of the engagement.",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 2",
+        "to": "GM",
+        "timestamp": "2026-07-02T02:17:57.864106",
+        "action": {
+          "type": "get message",
+          "content": "ANALYSIS: The location is narrowed to the Luwu region in South Sulawesi, specifically a valley where terrain was decisive. This points toward a localized battle within a larger conflict rather than a general war, likely involving the Dutch against the Luwu kingdom or a specific sultanate.\n\nGUESS: The Battle of Luwu (1905)",
+          "label": "response"
+        }
+      }
+    ],
+    [
+      {
+        "from": "GM",
+        "to": "Player 1",
+        "timestamp": "2026-07-02T02:35:18.002901",
+        "action": {
+          "type": "send message",
+          "content": "Round 2 complete. The Detective's current guess: \"The Battle of Luwu (1905)\". Please write a new paragraph with fresh information.",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 1",
+        "to": "GM",
+        "timestamp": "2026-07-02T02:35:18.002918",
+        "action": {
+          "type": "get message",
+          "content": "PARAGRAPH: The engagement was triggered by a specific refusal to pay a newly imposed tax, leading to a swift and brutal suppression of the uprising by the Dutch military.",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 2",
+        "timestamp": "2026-07-02T02:44:05.529458",
+        "action": {
+          "type": "send message",
+          "content": "[Sentence 3]\nThe engagement was triggered by a specific refusal to pay a newly imposed tax, leading to a swift and brutal suppression of the uprising by the Dutch military.",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 2",
+        "to": "GM",
+        "timestamp": "2026-07-02T02:44:05.529490",
+        "action": {
+          "type": "get message",
+          "content": "ANALYSIS: The trigger was a tax refusal, leading to a swift Dutch suppression in the Luwu highlands. This specific detail strongly points to the 1905 uprising in the Luwu kingdom, often associated with the resistance against Dutch fiscal policies and the subsequent military crackdown.\n\nGUESS: The Luwu Rebellion of 1905",
+          "label": "response"
+        }
+      }
+    ],
+    [
+      {
+        "from": "GM",
+        "to": "Player 1",
+        "timestamp": "2026-07-02T02:55:28.514474",
+        "action": {
+          "type": "send message",
+          "content": "Round 3 complete. The Detective's current guess: \"The Luwu Rebellion of 1905\". Please write a new paragraph with fresh information.",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 1",
+        "to": "GM",
+        "timestamp": "2026-07-02T02:55:28.514493",
+        "action": {
+          "type": "get message",
+          "content": "PARAGRAPH: The clash occurred in the year 1905, marking a significant moment in the final consolidation of Dutch control over the eastern islands of the archipelago.",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 2",
+        "timestamp": "2026-07-02T02:56:58.128398",
+        "action": {
+          "type": "send message",
+          "content": "[Sentence 4]\nThe clash occurred in the year 1905, marking a significant moment in the final consolidation of Dutch control over the eastern islands of the archipelago.",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 2",
+        "to": "GM",
+        "timestamp": "2026-07-02T02:56:58.128417",
+        "action": {
+          "type": "get message",
+          "content": "ANALYSIS: The year 1905 confirms the timeline for the final Dutch consolidation in eastern Indonesia. The combination of the Luwu region, the tax trigger, and the specific year points directly to the suppression of the Luwu kingdom's resistance, often cited as the last major conflict in that specific area before full colonial control.\n\nGUESS: The Luwu Rebellion of 1905",
+          "label": "response"
+        }
+      }
+    ],
+    [
+      {
+        "from": "GM",
+        "to": "Player 1",
+        "timestamp": "2026-07-02T03:22:24.544146",
+        "action": {
+          "type": "send message",
+          "content": "Round 4 complete. The Detective's current guess: \"The Luwu Rebellion of 1905\". Please write a new paragraph with fresh information.",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 1",
+        "to": "GM",
+        "timestamp": "2026-07-02T03:22:24.544165",
+        "action": {
+          "type": "get message",
+          "content": "PARAGRAPH: The specific location of this confrontation, a valley known locally as Bulanbuli, became the site where the resistance was ultimately crushed by superior artillery.",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-02T03:22:24.544201",
+        "action": {
+          "type": "forbidden keyword violation",
+          "content": "bulanbuli"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 2",
+        "timestamp": "2026-07-02T03:23:15.991869",
+        "action": {
+          "type": "send message",
+          "content": "[Sentence 5]\nThe specific location of this confrontation, a valley known locally as Bulanbuli, became the site where the resistance was ultimately crushed by superior artillery.",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 2",
+        "to": "GM",
+        "timestamp": "2026-07-02T03:23:15.991889",
+        "action": {
+          "type": "get message",
+          "content": "ANALYSIS: The specific location \"Bulanbuli\" valley and the use of superior artillery to crush the resistance in 1905 within the Luwu region confirms the event. This is the decisive battle that ended the Luwu kingdom's independence against the Dutch.\n\nGUESS: The Battle of Bulanbuli (1905)",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-02T03:23:15.991938",
+        "action": {
+          "type": "correct guess",
+          "content": "round 5"
+        }
+      }
+    ]
+  ]
+}

@@ -7,6 +7,8 @@ SQLite's same-thread restriction. WAL mode allows concurrent writers.
 """
 
 import contextlib
+import hashlib
+import hmac
 import json
 import os
 import shutil
@@ -34,6 +36,24 @@ DB_PATH = os.path.join(_dir, "annotations.db")
 # missing secret must never look like a working backup.
 HF_DATASET_REPO = os.environ.get("HF_DATASET_REPO")
 _HF_TOKEN = os.environ.get("HF_TOKEN")
+_PSEUDONYM_SALT = os.environ.get("PSEUDONYM_SALT")
+
+
+def pseudonymize_pid(raw_pid):
+    """Deterministic participant identifier derived from a raw Prolific PID —
+    the same raw PID always maps to the same pseudonym (required for
+    assignment.py's multi-session resume), but the raw PID itself is never
+    stored. Fails loudly if PSEUDONYM_SALT is unset rather than silently
+    falling back to an unsalted hash, which would defeat the point."""
+    if not _PSEUDONYM_SALT:
+        raise RuntimeError(
+            "PSEUDONYM_SALT is not set — required before any real Prolific "
+            "PID may be processed. Set it in .env (or the deployment's "
+            "repository secrets)."
+        )
+    return hmac.new(_PSEUDONYM_SALT.encode(), raw_pid.encode(),
+                     hashlib.sha256).hexdigest()[:16]
+
 
 _SCHEMA = """
 CREATE TABLE IF NOT EXISTS annotations (

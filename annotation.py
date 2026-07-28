@@ -404,7 +404,605 @@ BESPOKE_QUESTIONS = {
             ),
         ],
     },
+
+    # ── test_newgames additions (2026-07-26) ──────────────────────────────
+    # 13 families brought in from the test_newgames bundle (see games/<name>/
+    # for the transcript data). cryptolect, ta_blackjack, and the data-less
+    # bbh/cladder/mmlu_pro placeholders above are deliberately excluded.
+
+    "eqbench": {
+        # 1-turn QA benchmark (predict a character's emotional-intensity
+        # scores for a dialogue, auto-scored against a reference distribution
+        # shown via _reference_answer). Not a reasoning task — no chain of
+        # thought to check — so it does NOT share _QA_REASONING_ROLE with
+        # bbh/cladder/mmlu_pro. What's left for a human is whether the READ
+        # of the dialogue is plausible, independent of hitting the exact
+        # reference numbers.
+        "flags": [],  # one-shot answer — no per-turn "repeated a move" concept
+        "roles": {
+            "Answerer": {
+                "q1": (
+                    "**Q1 — Emotional Plausibility**\n\nEven if it doesn't "
+                    "match the reference numbers exactly, is this a "
+                    "plausible, well-grounded read of the character's likely "
+                    "emotions given the dialogue?",
+                    _scale4(["Implausible", "Some stretch", "Mostly plausible", "Fully plausible"]),
+                ),
+                "q2": None,
+            },
+        },
+    },
+    "ifeval": {
+        # 1-turn instruction-following benchmark — mechanical compliance
+        # (case, format, word count, …) is auto-checked and shown via the
+        # reference-answer strip; the human judgement is whether the response
+        # is ALSO still sensible, on-topic content, not just compliant.
+        "flags": [],
+        "roles": {
+            "InstructionFollower": {
+                "q1": (
+                    "**Q1 — Instruction Compliance**\n\nDoes the response "
+                    "follow the stated instruction/constraint, while still "
+                    "being sensible, on-topic content?",
+                    _scale4(["Ignores it", "Partly follows", "Mostly follows", "Fully follows"]),
+                ),
+                "q2": None,
+            },
+        },
+    },
+    "chronicle": {
+        "flags": [
+            "Narrator's sentence contradicts an earlier clue",
+            "Narrator came close to directly naming the event",
+            "Detective's guess ignores or contradicts the clues given so far",
+        ],
+        "roles": {
+            "ChronicleNarrator": {
+                "q1": (
+                    "**Q1 — Clue Safety**\n\nDoes this sentence add "
+                    "genuinely new, accurate information without giving away "
+                    "the event directly?",
+                    _scale4(["Gives it away", "Risky", "Mostly indirect", "Fully indirect"]),
+                ),
+                "q2": None,
+            },
+            "ChronicleDetective": {
+                "q1": None,
+                "q2": (
+                    "**Q2 — Guess Groundedness**\n\nDoes the guess/analysis "
+                    "logically follow from the clues given so far?",
+                    _scale4(["Ignores them", "Weak link", "Mostly grounded", "Fully grounded"]),
+                ),
+            },
+        },
+        "whole_game": [
+            (
+                "**Whole game — Did the pair converge on the correct event "
+                "through genuine deduction?**",
+                _scaleN(7),
+            ),
+        ],
+    },
+    "get_to_the_point": {
+        # Codenames-shaped: Helper gives one indirect clue per round toward a
+        # secret target word, Seeker guesses from it — same clue-safety /
+        # guess-match split as codenames' ClueGiver/Guesser.
+        "flags": [
+            "Clue directly reveals (or nearly reveals) the target word",
+            "Guess ignores the clue actually given",
+            "Repeated a guess already made",
+        ],
+        "roles": {
+            "Helper": {
+                "q1": (
+                    "**Q1 — Clue Indirection**\n\nIs this clue genuinely "
+                    "indirect (doesn't give the target word away) while "
+                    "still being useful?",
+                    _scale4(["Gives it away", "Risky", "Mostly indirect", "Fully indirect"]),
+                ),
+                "q2": None,
+            },
+            "Seeker": {
+                "q1": None,
+                "q2": (
+                    "**Q2 — Guess Match**\n\nDoes the guess sensibly follow "
+                    "from the clue that was actually given?",
+                    _scale4(["No match", "Weak match", "Good match", "Strong match"]),
+                ),
+            },
+        },
+        "whole_game": [
+            (
+                "**Whole game — Did the pair converge on the target "
+                "efficiently, each clue narrowing it down?**",
+                _scaleN(7),
+            ),
+        ],
+    },
+    "st_clean_up": {
+        # Spatial variant of clean_up: same collaborative move-objects-to-
+        # positions mechanic and SAY/MOVE actions, just on a coordinate grid
+        # with more objects — clean_up's question design fits directly.
+        "flags": [
+            "Repeated a proposal already rejected",
+            "Misstated its own object's position",
+            "Declared success without re-checking actual positions",
+        ],
+        "roles": {
+            "GridCleaner": {
+                "q1": (
+                    "**Q1 — Uses Stated Positions**\n\nDid this turn "
+                    "correctly use positions either player already stated?",
+                    _scale4([
+                        "Ignored/contradicted one", "Used some, missed one",
+                        "Mostly consistent", "Fully correct",
+                    ]),
+                ),
+                "q2": (
+                    "**Q2 — Sensible Next Step**\n\nDid this proposal make "
+                    "sense as a next step?",
+                    _scale4([
+                        "Nonsensical", "Wastes a turn",
+                        "Reasonable", "Efficient, well-targeted",
+                    ]),
+                ),
+            },
+        },
+        "whole_game": [
+            (
+                "**Whole game (1 of 2) — Did they communicate clearly, "
+                "without confusion?**",
+                _scaleN(4),
+            ),
+            (
+                "**Whole game (2 of 2) — Did they reach agreement without "
+                "unnecessary repetition?**",
+                _scaleN(4),
+            ),
+        ],
+    },
+    "ta_frozen_lake": {
+        # TextArena Frozen Lake — single-seat, navigates a grid avoiding
+        # holes revealed as it moves. Role key is literally "Player 0" (this
+        # family logs no more descriptive game_role — verified against real
+        # transcripts), unlike most other games here.
+        "flags": [
+            "Moved onto a cell it had already identified as a hole",
+            "Repeated a move that already failed",
+            "Ignored information revealed by an earlier step",
+        ],
+        "roles": {
+            "Player 0": {
+                "q1": (
+                    "**Q1 — Hazard Avoidance**\n\nDoes this move avoid a "
+                    "hole the board has already revealed to it?",
+                    _scale4(["Walks into a known hole", "Risky", "Mostly careful", "Fully careful"]),
+                ),
+                "q2": (
+                    "**Q2 — Progress**\n\nIs this move a sensible step "
+                    "toward the goal given what's currently visible?",
+                    _scale4(["Nonsensical", "Wastes a turn", "Reasonable", "Efficient"]),
+                ),
+            },
+        },
+        "whole_game": [
+            (
+                "**Whole game — Did it navigate carefully and purposefully "
+                "toward the goal?**",
+                _scaleN(7),
+            ),
+        ],
+    },
+    "ta_mastermind": {
+        "flags": [
+            "Guess contradicts the feedback from an earlier guess",
+            "Repeated a combination already ruled out",
+            "Ignored a peg count it could have deduced from prior feedback",
+        ],
+        "roles": {
+            "Codebreaker": {
+                "q1": (
+                    "**Q1 — Feedback Consistency**\n\nDoes this guess stay "
+                    "consistent with the black/white-peg feedback from every "
+                    "earlier guess?",
+                    _scale4(["Contradicts it", "Partly consistent", "Mostly consistent", "Fully consistent"]),
+                ),
+                "q2": (
+                    "**Q2 — Information Gain**\n\nIs this guess a genuine "
+                    "attempt to narrow down the code, not a redundant "
+                    "repeat?",
+                    _scale4(["Redundant", "Weak", "Reasonable", "Well-targeted"]),
+                ),
+            },
+        },
+        "whole_game": [
+            (
+                "**Whole game — Did it deduce the code efficiently from the "
+                "feedback it received?**",
+                _scaleN(7),
+            ),
+        ],
+    },
+    "ta_sokoban": {
+        # Role key is literally "Player 0" (same TextArena convention as
+        # ta_frozen_lake — no custom game_role logged).
+        "flags": [
+            "Misread the board (wrong wall/box/target position)",
+            "Pushed a box somewhere it can no longer be recovered from (deadlock)",
+            "Repeated a move that already failed or made no progress",
+        ],
+        "roles": {
+            "Player 0": {
+                "q1": (
+                    "**Q1 — Board Reading**\n\nDoes the move correctly "
+                    "reflect the actual current positions of walls, boxes, "
+                    "and targets?",
+                    _scale4(["Misreads it", "Partly right", "Mostly right", "Fully right"]),
+                ),
+                "q2": (
+                    "**Q2 — Progress Without Deadlock**\n\nDoes this move "
+                    "make progress toward solving the puzzle without risking "
+                    "an unrecoverable deadlock?",
+                    _scale4(["Creates a deadlock", "Risky", "Safe, some progress", "Safe, clear progress"]),
+                ),
+            },
+        },
+        "whole_game": [
+            (
+                "**Whole game — Did it solve the puzzle through genuine "
+                "planning, not trial-and-error?**",
+                _scaleN(7),
+            ),
+        ],
+    },
+    "toh_multi_turn": {
+        "flags": [
+            "Move violates the 'no larger disk on a smaller one' rule",
+            "Move repeats or immediately undoes the previous move (no progress)",
+            "Misreads which disk is on top of a peg",
+        ],
+        "roles": {
+            "PegHopper": {
+                "q1": (
+                    "**Q1 — Move Legality**\n\nIs the submitted move "
+                    "consistent with the actual current peg configuration "
+                    "and the game's legality rule?",
+                    _scale4(["Illegal / misreads state", "Legal but confused", "Mostly sound", "Fully sound"]),
+                ),
+                "q2": (
+                    "**Q2 — Plan Efficiency**\n\nDoes this move look like "
+                    "part of an efficient plan toward solving in the minimum "
+                    "number of steps, rather than a wasted or backtracking "
+                    "move?",
+                    _scale4(["Wasted/backtracks", "Inefficient", "Reasonable", "Efficient"]),
+                ),
+            },
+        },
+        "whole_game": [
+            (
+                "**Whole game — Did it solve the puzzle with a coherent, "
+                "efficient plan?**",
+                _scaleN(7),
+            ),
+        ],
+    },
+    "clockwork_courier": {
+        "flags": [
+            "Misread the map or a guard/gate position",
+            "Plan ignores the guard/gate schedule it was just told",
+            "Wasted a full round making no delivery progress",
+        ],
+        "roles": {
+            "Courier": {
+                "q1": (
+                    "**Q1 — Schedule Reading**\n\nDoes the courier's stated "
+                    "plan correctly account for the map and the guard/gate "
+                    "schedule as known at this point?",
+                    _scale4(["Ignores it", "Partly accounts for it", "Mostly correct", "Fully correct"]),
+                ),
+                "q2": (
+                    "**Q2 — Delivery Progress**\n\nIs this round's plan a "
+                    "sensible step toward pickups/deliveries given the "
+                    "remaining time?",
+                    _scale4(["Not sensible", "Weak", "Reasonable", "Efficient"]),
+                ),
+            },
+        },
+        "whole_game": [
+            (
+                "**Whole game — Was the overall route efficient and "
+                "schedule-aware?**",
+                _scaleN(7),
+            ),
+        ],
+    },
 }
+
+# wordle-crazy's twist vs. standard (unbuilt-bespoke) Wordle: the guess-
+# feedback colors are deliberately SCRAMBLED (purple/black instead of
+# green/yellow — see _WD_TILE_RE) and the mapping is defined only in that
+# episode's own rules text. The skill being tested is therefore "did it
+# correctly re-derive and apply THIS episode's color key", not just word-
+# guessing — worth a bespoke Q1 shared across all three wordle-crazy variants
+# (the guessing mechanic itself is identical).
+_WORDLE_CRAZY_Q1 = (
+    "**Q1 — Rule Application**\n\nDoes this guess correctly use what the "
+    "PREVIOUS feedback colors meant according to *this episode's own* rules "
+    "(the color key is scrambled — don't assume standard Wordle green/yellow)?",
+    _scale4(["Misapplies it", "Partly right", "Mostly right", "Fully right"]),
+)
+_WORDLE_CRAZY_FLAGS = [
+    "Guess ignores or contradicts a color clue from an earlier guess",
+    "Reused a letter already ruled out by this episode's own rules",
+]
+_WORDLE_CRAZY_WHOLE_GAME = [
+    (
+        "**Whole game — Did it correctly track and apply this episode's "
+        "scrambled color key across guesses?**",
+        _scaleN(7),
+    ),
+]
+
+BESPOKE_QUESTIONS.update({
+    "wordle-crazy": {
+        "flags": _WORDLE_CRAZY_FLAGS,
+        "roles": {
+            "WordGuesser": {
+                "q1": _WORDLE_CRAZY_Q1,
+                "q2": "generic",  # standard "sensible next guess" still applies
+            },
+        },
+        "whole_game": _WORDLE_CRAZY_WHOLE_GAME,
+    },
+    "wordle-crazy_withclue": {
+        "flags": _WORDLE_CRAZY_FLAGS,
+        "roles": {
+            "WordGuesser": {
+                "q1": _WORDLE_CRAZY_Q1,
+                "q2": "generic",
+            },
+        },
+        "whole_game": _WORDLE_CRAZY_WHOLE_GAME,
+    },
+    "wordle-crazy_withcritic": {
+        "flags": _WORDLE_CRAZY_FLAGS + [
+            "Critic's comment doesn't engage with the actual feedback",
+        ],
+        "roles": {
+            "ReflectingWordGuesser": {
+                "q1": _WORDLE_CRAZY_Q1,
+                "q2": "generic",
+            },
+            "WordCritic": {
+                "q1": None,
+                "q2": (
+                    "**Q2 — Critique Quality**\n\nDoes the critique "
+                    "correctly evaluate the guess against the actual "
+                    "feedback, rather than generic praise or criticism?",
+                    _scale4(["Generic/wrong", "Superficial", "Mostly grounded", "Fully grounded"]),
+                ),
+            },
+        },
+        "whole_game": [
+            (
+                "**Whole game — Did the guesser and critic correctly track "
+                "this episode's scrambled color key across guesses?**",
+                _scaleN(7),
+            ),
+        ],
+    },
+})
+
+
+# Shared Q1/Q2 for plain Wordle and its clue variant (identical mechanic —
+# the clue variant's "use the clue's meaning" nuance is folded into Q2's
+# wording rather than special-cased to turn 1, since role_cfg applies
+# uniformly across all of a role's turns).
+_WORDLE_Q1 = (
+    "**Q1 — Uses All Feedback**\n\nDid the AI correctly use letter feedback "
+    "from every earlier guess, not just the last one?",
+    _scale4(["Ignored it", "Partial use", "Mostly consistent", "Fully consistent"]),
+)
+_WORDLE_Q2 = (
+    "**Q2 — Strategic Next Step**\n\nDid this guess make strategic sense as "
+    "a next step — including using the clue's meaning, where one was given?",
+    _scale4(["Nonsensical", "Weak", "Reasonable", "Strong"]),
+)
+
+# original-17-pilot games that still fell back to the generic Q1/Q2 (see
+# question_set.md for the drafted wording each of these reuses).
+BESPOKE_QUESTIONS.update({
+    "guesswhat": {
+        "roles": {
+            "Guesser": {
+                "q1": (
+                    "**Q1 — Useful Question**\n\nWas this question a sharp, "
+                    "useful choice given everything learned from earlier "
+                    "answers?",
+                    _scale4(["Not useful", "Weak", "Reasonable", "Sharp, well-targeted"]),
+                ),
+                "q2": None,
+            },
+            # The Answerer's forced yes/no has no strategy to judge —
+            # question_set.md: "the Answerer's yes/no is probably best left
+            # out." Deliberately no per-turn question; its turns still get a
+            # card, just with only flags/comment, no q1/q2.
+            "Answerer": {"q1": None, "q2": None},
+        },
+        "flags": ["Repeated a question already asked and answered (exact or near-exact)"],
+        "whole_game": [
+            (
+                "**Whole game — Did the Guesser's questioning use its turns "
+                "efficiently, narrowing things down rather than wasting turns?**",
+                _scaleN(7),
+            ),
+        ],
+    },
+    "matchit_ascii": {
+        "roles": {
+            # Both seats share the "MatchItPlayer" role.
+            "MatchItPlayer": {
+                "q1": (
+                    "**Q1 — Grid Accuracy**\n\nDoes this description or "
+                    "answer correctly match what's actually in the player's "
+                    "own grid?",
+                    _scale4(["Wrong", "Partly right", "Mostly right", "Fully right"]),
+                ),
+                "q2": "generic",
+            },
+        },
+        "flags": [
+            "Uses a symbol that doesn't exist in this game's format",
+            "Contradicts something the same player already said earlier",
+        ],
+        "whole_game": [
+            (
+                "**Whole game — How accurate were the claims that led to "
+                "the final decision?**",
+                _scaleN(7),
+            ),
+        ],
+    },
+    "privateshared": {
+        # Player 2 ("Questioner") is model_name: "programmatic" — not a real
+        # AI seat, already excluded by _is_ai_player(). Only "Answerer" is
+        # annotatable.
+        "roles": {
+            "Answerer": {
+                "q1": (
+                    "**Q1 — Knowledge & Disclosure Tracking**\n\nDoes this "
+                    "answer correctly reflect what the model actually knows "
+                    "and what it has (or hasn't) already told the other "
+                    "party?",
+                    _scale4(["Wrong on both", "Wrong on one", "Mostly right", "Fully correct"]),
+                ),
+                "q2": None,
+            },
+        },
+        "flags": [
+            "Got its own private fact wrong or forgot it",
+            "Lost track of what it had already revealed to the other party",
+            "Format was wrong but the underlying answer was correct",
+        ],
+        "whole_game": [
+            (
+                "**Whole game — Where did most of the model's errors come from?**",
+                [
+                    ("Mostly forgot or got facts wrong", "facts"),
+                    ("Mostly lost track of what it had revealed", "tracking"),
+                    ("A mix of both roughly equally", "mixed"),
+                    ("Neither — performance was clean throughout", "clean"),
+                ],
+            ),
+        ],
+    },
+    # reasoning_clarity: True is required here — the moment a game gets ANY
+    # bespoke entry, show_q3's gating switches from the g.has_reasoning
+    # heuristic / _REASONING_GAMES set to bool(bespoke.get("reasoning_clarity")).
+    # question_set.md wants Q3 always shown for this family ("explanation is
+    # mandatory"), so omitting this flag would silently drop Q3 in hybrid mode.
+    "wordle": {
+        "reasoning_clarity": True,
+        "roles": {"WordGuesser": {"q1": _WORDLE_Q1, "q2": _WORDLE_Q2}},
+        # No flags override — the existing generic set (repeat a failed move /
+        # invent-or-get-a-fact-wrong / self-corrected + "explanation doesn't
+        # match the move" for reasoning games) already covers question_set.md's
+        # suggested ticks here. No whole_game — outcome is already exact
+        # (Win/Lose, Closeness Score).
+    },
+    "wordle_withclue": {
+        "reasoning_clarity": True,
+        "roles": {"WordGuesser": {"q1": _WORDLE_Q1, "q2": _WORDLE_Q2}},
+    },
+    "wordle_withcritic": {
+        # Separate game_key from plain wordle — different game_role strings
+        # (ReflectingWordGuesser / WordCritic, not WordGuesser).
+        "reasoning_clarity": True,
+        "roles": {
+            "ReflectingWordGuesser": {"q1": _WORDLE_Q1, "q2": _WORDLE_Q2},
+            "WordCritic": {
+                "q1": None,
+                "q2": (
+                    "**Q2 — Critique Quality**\n\nDoes this critique point at "
+                    "something real and specific about the guess, not just a "
+                    "vague comment?",
+                    _scale4(["Vague/generic", "Somewhat specific", "Mostly specific", "Fully specific"]),
+                ),
+            },
+        },
+        "flags": ["Guesser ignored a valid critic objection without explanation"],
+        # No whole_game — sample size too thin for a confident whole-game claim.
+    },
+    "referencegame": {
+        "roles": {
+            "InstructionGiver": {
+                "q1": (
+                    "**Q1 — Distinguishing Description**\n\nWas the "
+                    "description specific enough to tell this grid apart "
+                    "from the others?",
+                    _scale4(["Not specific", "Weak", "Mostly specific", "Fully specific"]),
+                ),
+                "q2": None,
+            },
+            "InstructionFollower": {
+                "q1": None,
+                "q2": (
+                    "**Q2 — Matches Every Detail**\n\nDoes the chosen grid "
+                    "match every detail in the description, checked piece "
+                    "by piece?",
+                    _scale4(["No match", "Partial match", "Mostly matches", "Fully matches"]),
+                ),
+            },
+        },
+        # No flags/whole_game override — episode is always exactly 2 turns.
+    },
+    "adventuregame": {
+        "roles": {
+            "Adventurer": {
+                "q1": (
+                    "**Q1 — Useful Progress**\n\nWas this step useful "
+                    "progress toward the goal, or a wasted detour?",
+                    _scale4(["Wasted detour", "Weak", "Reasonable", "Clearly useful"]),
+                ),
+                "q2": "generic",
+            },
+        },
+        "flags": [
+            "Repeated a move already shown to fail",
+            "Claimed something false about the game world",
+            "Ignored an object's stated features (open/closed, location, capacity) before acting",
+        ],
+    },
+    "textmapworld_specificroom": {
+        # No self-reported map here (bare "GO: <dir>"/"DONE" only) — see the
+        # PATH RENDERER block for why _map_svg/render_graph don't apply.
+        # render_path triggers _path_svg instead, in both conditions (same
+        # rationale as render_graph: the raw GO/DONE text is unreadable
+        # without a visual no matter which question set is active).
+        "render_path": True,
+        "roles": {
+            "PathGuesser": {
+                "q1": (
+                    "**Q1 — New Ground**\n\nDoes this move use what the "
+                    "model has already learned about the map, or repeat "
+                    "ground it already covered?",
+                    [("1\nRepeats already-covered ground", "1"),
+                     ("2\nUses new information", "2")],
+                ),
+                "q2": None,
+            },
+        },
+        "flags": ["Tried to move through a connection that doesn't exist "
+                  "on the model's own explored map"],
+        "whole_game": [
+            (
+                "**Whole game — Did it navigate to the target efficiently, "
+                "without unnecessary backtracking?**",
+                _scaleN(7),
+            ),
+        ],
+    },
+})
 
 
 def whole_game_questions(game_path, block):
@@ -872,6 +1470,154 @@ _MAP_LEGEND_HTML = (
 
 
 # ──────────────────────────────────────────────────────────────────────────
+# TEXTMAPWORLD (SPECIFIC ROOM) PATH RENDERER
+# Unlike graph reasoning, the model here never self-reports a map — each turn
+# is a bare "GO: <dir>" or "DONE". There is no claim to validate against the
+# walk, so this draws only the actual explored path (no green/red
+# correctness rings), plus the target room highlighted once its position is
+# known from the full episode's walk (matches the "target room highlighted"
+# ask — the annotator is judging the AI, not roleplaying it, so showing
+# ground truth the AI may not have reached yet is consistent with how the
+# graph-reasoning renderer already reveals ground truth via its rings).
+# ──────────────────────────────────────────────────────────────────────────
+
+# The GM's rules text opens with a WORKED EXAMPLE ("The target room is a
+# Bedroom. You are in the Kitchen...") before the real episode — a naive
+# search for "target room is X" would match the example, not the real
+# answer. Anchoring on "Let us start." (which only precedes the real target)
+# avoids that trap.
+_SPECIFICROOM_START_RE = re.compile(
+    r"Let us start\.\s*The target room is ([^.]+?)\.\s*You are in (?:the |a )?([^.]+?)\."
+)
+
+
+def _path_truth_and_layout(g):
+    """Sibling of _map_truth_and_layout for textmapworld_specificroom.
+
+    Same GM `move` event tracking and stable full-game grid layout, but
+    resp_dir comes straight from the raw "GO: <dir>" response text (no
+    graph blob to parse) and there is no self-reported starting room, so the
+    start/target room names are pulled once from the opening rules text
+    instead. Returns (snapshots, positions, target_room).
+    """
+    m = _SPECIFICROOM_START_RE.search(g.rules or "")
+    target_room = m.group(1).strip() if m else None
+    start_room = m.group(2).strip() if m else None
+
+    snapshots = []
+    visited = {start_room} if start_room else set()
+    edges = set()
+    current = start_room
+    moves = []
+    resp_dir = None
+
+    for round_msgs in g.data["turns"]:
+        for msg in round_msgs:
+            a = msg["action"]
+            if msg["from"] in g.ai_ids and a.get("label") == "response":
+                m2 = re.search(r"GO:\s*(north|south|east|west)",
+                                str(a.get("content", "")), re.I)
+                resp_dir = m2.group(1).lower() if m2 else None
+                snapshots.append({"visited": set(visited), "edges": set(edges),
+                                  "current": current})
+            elif msg["from"] == "GM" and a.get("type") == "move":
+                try:
+                    mv = json.loads(a.get("content", ""))
+                except (ValueError, TypeError):
+                    continue
+                old, new = str(mv.get("old")), str(mv.get("new"))
+                visited.update((old, new))
+                if resp_dir:
+                    edges.add((old, resp_dir, new))
+                    edges.add((new, _DIR_OPP[resp_dir], old))
+                moves.append((old, resp_dir, new))
+                current = new
+
+    pos = {}
+
+    def _place(room, cand):
+        while cand in pos.values():
+            cand = (cand[0] + 0.45, cand[1] + 0.35)
+        pos[room] = cand
+
+    if moves:
+        _place(moves[0][0], (0, 0))
+    elif start_room:
+        _place(start_room, (0, 0))
+    for old, d, new in moves:
+        if old not in pos:
+            _place(old, (0, 0))
+        if new not in pos:
+            vec = _DIR_VEC.get(d, (1, 1))
+            _place(new, (pos[old][0] + vec[0], pos[old][1] + vec[1]))
+    return snapshots, pos, target_room
+
+
+def _path_svg(snap, pos_global, target_room):
+    """Inline SVG of the explored path up to this turn, or None if there's
+    nothing placeable yet. Rooms are drawn plain (no claim-correctness
+    coloring — there's no self-report to validate); the target room gets a
+    gold ring once its position is known from the full walk, even before
+    the AI has actually reached it."""
+    nodes = set(snap["visited"])
+    if target_room and target_room in pos_global:
+        nodes.add(target_room)
+    nodes &= set(pos_global)
+    if not nodes:
+        return None
+
+    SX, SY, R = 92, 84, 13
+    xs = [pos_global[n][0] for n in nodes]
+    ys = [pos_global[n][1] for n in nodes]
+    minx, miny = min(xs), min(ys)
+    px = {n: ((pos_global[n][0] - minx) * SX + 46, (pos_global[n][1] - miny) * SY + 34)
+          for n in nodes}
+    w = int(max(x for x, _ in px.values()) + 46)
+    h = int(max(y for _, y in px.values()) + 44)
+
+    parts = []
+    # Edges: one solid line per walked room pair shown on this snapshot.
+    seen_pairs = set()
+    for a, _d, b in snap["edges"]:
+        if a not in px or b not in px:
+            continue
+        key = frozenset((a, b))
+        if key in seen_pairs:
+            continue
+        seen_pairs.add(key)
+        (x1, y1), (x2, y2) = px[a], px[b]
+        parts.append(f'<line x1="{x1:.0f}" y1="{y1:.0f}" x2="{x2:.0f}" y2="{y2:.0f}" '
+                     f'stroke="#8b98ab" stroke-width="1.6" opacity="0.85"/>')
+
+    # Nodes: gold ring = target room, dashed outer ring = current room.
+    for n, (x, y) in px.items():
+        colour = "#f5b942" if n == target_room else "#3b82f6"
+        if n == snap["current"]:
+            parts.append(f'<circle cx="{x:.0f}" cy="{y:.0f}" r="{R + 6}" fill="none" '
+                         f'stroke="#3b82f6" stroke-width="2" stroke-dasharray="4 4"/>')
+        parts.append(f'<circle cx="{x:.0f}" cy="{y:.0f}" r="{R}" fill="#0e1a30" '
+                     f'stroke="{colour}" stroke-width="2.5"/>')
+        parts.append(f'<text x="{x:.0f}" y="{y + R + 15:.0f}" text-anchor="middle" '
+                     f'font-size="10.5" font-weight="600" fill="#dbe4f0">{html.escape(n)}</text>')
+
+    return (f'<svg class="map-svg" viewBox="0 0 {w} {h}" width="{w}" height="{h}" '
+            f'xmlns="http://www.w3.org/2000/svg" role="img" '
+            f'aria-label="Explored path so far">{"".join(parts)}</svg>')
+
+
+_PATH_LEGEND_HTML = (
+    '<div class="map-legend">'
+    '<span><svg width="14" height="14" viewBox="0 0 14 14"><circle cx="7" cy="7" r="5" '
+    'fill="none" stroke="#3b82f6" stroke-width="2.5"/></svg> visited room</span>'
+    '<span><svg width="14" height="14" viewBox="0 0 14 14"><circle cx="7" cy="7" r="5.5" '
+    'fill="none" stroke="#3b82f6" stroke-width="1.8" stroke-dasharray="3 2.4"/></svg> current position</span>'
+    '<span><svg width="14" height="14" viewBox="0 0 14 14"><circle cx="7" cy="7" r="5" '
+    'fill="none" stroke="#f5b942" stroke-width="2.5"/></svg> target room</span>'
+    '</div>'
+)
+
+
+# ──────────────────────────────────────────────────────────────────────────
 # HTML BUILDERS  (pure functions of a loaded game `g`)
 # ──────────────────────────────────────────────────────────────────────────
 
@@ -1186,7 +1932,7 @@ def _turn_nav_html(g):
     )
 
 
-def _build_transcript_html(g, current_idx, pretty_map=False,
+def _build_transcript_html(g, current_idx, pretty_map=False, pretty_path=False,
                            scroll_cls="txscroll", id_prefix="tc-"):
     # scroll_cls/id_prefix let the training screen reuse this renderer without
     # colliding with the annotation page's JS (which targets .txscroll and
@@ -1209,6 +1955,13 @@ def _build_transcript_html(g, current_idx, pretty_map=False,
     if pretty_map:
         map_snapshots, map_grid = _map_truth_and_layout(g)
         parts.append(_MAP_LEGEND_HTML)
+
+    # TextMapWorld (Specific Room) path renderer state — see
+    # _path_truth_and_layout. Only computed in hybrid mode (pretty_path).
+    path_snapshots, path_grid, path_target = ([], {}, None)
+    if pretty_path:
+        path_snapshots, path_grid, path_target = _path_truth_and_layout(g)
+        parts.append(_PATH_LEGEND_HTML)
 
     # Content already shown in the GAME GOAL box up top (g.rules) — skip a
     # verbatim repeat of it in the turn-0 body. Deliberately NOT every turn-0
@@ -1337,6 +2090,21 @@ def _build_transcript_html(g, current_idx, pretty_map=False,
                                 f'<div class="map-action"><strong>Action:</strong> {action_txt}</div>'
                                 f'<pre style="white-space:pre-wrap;margin-top:6px;">{graph_txt}</pre>'
                             )
+
+                # TextMapWorld (Specific Room): draw the actual explored path
+                # so far (no claim to validate — the model only ever emits a
+                # bare direction), with the target room highlighted gold once
+                # its position is known from the full walk.
+                if pretty_path and isinstance(content, str):
+                    snap = (path_snapshots[turn_counter]
+                            if turn_counter < len(path_snapshots) else None)
+                    svg = _path_svg(snap, path_grid, path_target) if snap else None
+                    if svg:
+                        action_txt = html.escape(content.strip())
+                        body_html = (
+                            f'<div class="map-action"><strong>Action:</strong> {action_txt}</div>'
+                            f'<div class="map-wrap">{svg}</div>'
+                        )
 
                 # Show just the sender ID in the card header — clean and unambiguous.
                 parts.append(
@@ -1468,6 +2236,7 @@ def build(welcome_page, annotation_page, verdict_page, game_state, annotator_sta
             # question set you're answering, so only the QUESTIONS differ
             # between universal and hybrid — not the visualization.
             pretty_map = bool(BESPOKE_QUESTIONS.get(g.game_key, {}).get("render_graph"))
+            pretty_path = bool(BESPOKE_QUESTIONS.get(g.game_key, {}).get("render_path"))
 
             # Playlist sessions show where the annotator is in today's queue.
             seq_chip = ""
@@ -1505,7 +2274,8 @@ def build(welcome_page, annotation_page, verdict_page, game_state, annotator_sta
 
                 # LEFT: scrollable transcript
                 with gr.Column(scale=3, elem_classes=["tx-col"]):
-                    gr.HTML(_build_transcript_html(g, 0, pretty_map=pretty_map))
+                    gr.HTML(_build_transcript_html(g, 0, pretty_map=pretty_map,
+                                                   pretty_path=pretty_path))
 
                 # RIGHT: per-turn annotation cards.
                 # NO key= on anything created inside this @gr.render: keyed

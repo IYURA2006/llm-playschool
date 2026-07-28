@@ -1,0 +1,90 @@
+{
+  "meta": {
+    "game_name": "get_to_the_point",
+    "experiment_name": "exp_level_easy_english",
+    "game_id": 3,
+    "results_folder": "qwen3.5-27b",
+    "clem_version": "3.7.2",
+    "round_count": 2,
+    "completed": true
+  },
+  "players": {
+    "GM": {
+      "game_role": "Game Master",
+      "model_name": "programmatic"
+    },
+    "Player 1": {
+      "game_role": "Helper",
+      "model_name": "qwen3.5-27b"
+    },
+    "Player 2": {
+      "game_role": "Seeker",
+      "model_name": "qwen3.5-27b"
+    }
+  },
+  "round scores": {
+    "0": {
+      "Request Count": 2,
+      "Violated Request Count": 0,
+      "Parsed Request Count": 2,
+      "Request Success Ratio": 1.0,
+      "Accuracy": 0
+    },
+    "1": {
+      "Request Count": 2,
+      "Violated Request Count": 0,
+      "Parsed Request Count": 2,
+      "Request Success Ratio": 1.0,
+      "Accuracy": 1
+    }
+  },
+  "episode scores": {
+    "Request Count": 4,
+    "Parsed Request Count": 4,
+    "Violated Request Count": 0,
+    "Request Success Ratio": 1.0,
+    "Aborted": 0,
+    "Lose": 0,
+    "Success": 1,
+    "Main Score": 50.0
+  },
+  "player_models": {
+    "0": {
+      "model_spec": {
+        "model_name": "qwen3.5-27b",
+        "backend": "huggingface_local",
+        "context_size": "262k",
+        "huggingface_id": "Qwen/Qwen3.5-27B",
+        "languages": [
+          "en",
+          "zh"
+        ],
+        "license": {
+          "name": "Apache 2.0",
+          "url": "https://www.apache.org/licenses/LICENSE-2.0"
+        },
+        "lookup_source": "/project/mmanina/lm-playschool-test-set/playpen/model_registry.json",
+        "model_config": {
+          "premade_chat_template": true,
+          "eos_to_cull": "<\\|im_end\\|>|<\\|endoftext\\|>",
+          "chat_template_kwargs": {
+            "enable_thinking": false
+          },
+          "multimodality": {
+            "single_image": true,
+            "multiple_images": true,
+            "audio": false,
+            "video": true
+          }
+        },
+        "open_weight": true,
+        "parameters": "27B",
+        "release_date": "2026-02-24"
+      },
+      "gen_args": {
+        "temperature": 0.0,
+        "max_tokens": 5000
+      }
+    }
+  }
+}

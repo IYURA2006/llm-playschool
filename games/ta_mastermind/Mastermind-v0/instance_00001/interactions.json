@@ -1,0 +1,369 @@
+{
+  "meta": {
+    "game_name": "ta_mastermind",
+    "experiment_name": "Mastermind-v0",
+    "game_id": 1,
+    "results_folder": "qwen3.5-27b",
+    "clem_version": "3.7.2",
+    "round_count": 11,
+    "completed": true,
+    "ta_version": "0.7.3"
+  },
+  "player_models": {
+    "0": {
+      "model_spec": {
+        "model_name": "qwen3.5-27b",
+        "backend": "huggingface_local",
+        "context_size": "262k",
+        "huggingface_id": "Qwen/Qwen3.5-27B",
+        "languages": [
+          "en",
+          "zh"
+        ],
+        "license": {
+          "name": "Apache 2.0",
+          "url": "https://www.apache.org/licenses/LICENSE-2.0"
+        },
+        "lookup_source": "/project/mmanina/lm-playschool-test-set/playpen/model_registry.json",
+        "model_config": {
+          "premade_chat_template": true,
+          "eos_to_cull": "<\\|im_end\\|>|<\\|endoftext\\|>",
+          "chat_template_kwargs": {
+            "enable_thinking": false
+          },
+          "multimodality": {
+            "single_image": true,
+            "multiple_images": true,
+            "audio": false,
+            "video": true
+          }
+        },
+        "open_weight": true,
+        "parameters": "27B",
+        "release_date": "2026-02-24"
+      },
+      "gen_args": {
+        "temperature": 0.0,
+        "max_tokens": 5000
+      }
+    }
+  },
+  "players": {
+    "GM": {
+      "game_role": "Game Master",
+      "model_name": "programmatic"
+    },
+    "Player 0": {
+      "game_role": "Codebreaker",
+      "model_name": "qwen3.5-27b"
+    }
+  },
+  "turns": [
+    [
+      {
+        "from": "GM",
+        "to": "Player 0",
+        "timestamp": "2026-07-02T14:45:56.231848",
+        "action": {
+          "type": "send message",
+          "content": "You are a competitive game player. Make sure you read the game instructions carefully, and always follow the required format.\n\n[GAME] You are playing Mastermind.\nYou need to find the code that is 4 digits long, each digit from 1 to 6, with no duplicates.\nIn your response, you can submit your guess in the following format: '[2 1 4 5]'.\nAfter each guess, you will receive feedback in the form of black and white pegs.\nA black peg indicates a correct digit in the correct position, while a white peg indicates a correct digit in the wrong position.\nYou have 20 turns to guess the code.\n\n",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 0",
+        "to": "GM",
+        "timestamp": "2026-07-02T14:45:57.324342",
+        "action": {
+          "type": "get message",
+          "content": "[1 2 3 4]",
+          "label": "response"
+        }
+      }
+    ],
+    [
+      {
+        "from": "GM",
+        "to": "Player 0",
+        "timestamp": "2026-07-02T14:46:01.584458",
+        "action": {
+          "type": "send message",
+          "content": "[GAME] Submitted [1 2 3 4]. Feedback: 0 black peg(s), 3 white peg(s).\n",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 0",
+        "to": "GM",
+        "timestamp": "2026-07-02T14:46:02.722268",
+        "action": {
+          "type": "get message",
+          "content": "[2 3 4 5]",
+          "label": "response"
+        }
+      }
+    ],
+    [
+      {
+        "from": "GM",
+        "to": "Player 0",
+        "timestamp": "2026-07-02T14:46:07.277187",
+        "action": {
+          "type": "send message",
+          "content": "[GAME] Submitted [2 3 4 5]. Feedback: 2 black peg(s), 1 white peg(s).\n",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 0",
+        "to": "GM",
+        "timestamp": "2026-07-02T14:46:08.455506",
+        "action": {
+          "type": "get message",
+          "content": "[2 3 4 6]",
+          "label": "response"
+        }
+      }
+    ],
+    [
+      {
+        "from": "GM",
+        "to": "Player 0",
+        "timestamp": "2026-07-02T14:46:13.164735",
+        "action": {
+          "type": "send message",
+          "content": "[GAME] Submitted [2 3 4 6]. Feedback: 1 black peg(s), 1 white peg(s).\n",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 0",
+        "to": "GM",
+        "timestamp": "2026-07-02T14:46:14.407007",
+        "action": {
+          "type": "get message",
+          "content": "[2 3 5 4]",
+          "label": "response"
+        }
+      }
+    ],
+    [
+      {
+        "from": "GM",
+        "to": "Player 0",
+        "timestamp": "2026-07-02T14:46:19.502028",
+        "action": {
+          "type": "send message",
+          "content": "[GAME] Submitted [2 3 5 4]. Feedback: 1 black peg(s), 2 white peg(s).\n",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 0",
+        "to": "GM",
+        "timestamp": "2026-07-02T14:46:20.792272",
+        "action": {
+          "type": "get message",
+          "content": "[2 4 3 5]",
+          "label": "response"
+        }
+      }
+    ],
+    [
+      {
+        "from": "GM",
+        "to": "Player 0",
+        "timestamp": "2026-07-02T14:46:25.714890",
+        "action": {
+          "type": "send message",
+          "content": "[GAME] Submitted [2 4 3 5]. Feedback: 3 black peg(s), 0 white peg(s).\n",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 0",
+        "to": "GM",
+        "timestamp": "2026-07-02T14:46:27.033778",
+        "action": {
+          "type": "get message",
+          "content": "[2 4 3 6]",
+          "label": "response"
+        }
+      }
+    ],
+    [
+      {
+        "from": "GM",
+        "to": "Player 0",
+        "timestamp": "2026-07-02T14:46:32.080621",
+        "action": {
+          "type": "send message",
+          "content": "[GAME] Submitted [2 4 3 6]. Feedback: 2 black peg(s), 0 white peg(s).\n",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 0",
+        "to": "GM",
+        "timestamp": "2026-07-02T14:46:33.464683",
+        "action": {
+          "type": "get message",
+          "content": "[2 4 5 3]",
+          "label": "response"
+        }
+      }
+    ],
+    [
+      {
+        "from": "GM",
+        "to": "Player 0",
+        "timestamp": "2026-07-02T14:46:38.750493",
+        "action": {
+          "type": "send message",
+          "content": "[GAME] Submitted [2 4 5 3]. Feedback: 2 black peg(s), 1 white peg(s).\n",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 0",
+        "to": "GM",
+        "timestamp": "2026-07-02T14:46:40.168581",
+        "action": {
+          "type": "get message",
+          "content": "[2 4 6 3]",
+          "label": "response"
+        }
+      }
+    ],
+    [
+      {
+        "from": "GM",
+        "to": "Player 0",
+        "timestamp": "2026-07-02T14:46:45.580631",
+        "action": {
+          "type": "send message",
+          "content": "[GAME] Submitted [2 4 6 3]. Feedback: 2 black peg(s), 0 white peg(s).\n",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 0",
+        "to": "GM",
+        "timestamp": "2026-07-02T14:46:47.064532",
+        "action": {
+          "type": "get message",
+          "content": "[2 4 3 1]",
+          "label": "response"
+        }
+      }
+    ],
+    [
+      {
+        "from": "GM",
+        "to": "Player 0",
+        "timestamp": "2026-07-02T14:46:52.734629",
+        "action": {
+          "type": "send message",
+          "content": "[GAME] Submitted [2 4 3 1]. Feedback: 2 black peg(s), 1 white peg(s).\n",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 0",
+        "to": "GM",
+        "timestamp": "2026-07-02T14:46:54.268161",
+        "action": {
+          "type": "get message",
+          "content": "[2 4 1 3]",
+          "label": "response"
+        }
+      }
+    ],
+    [
+      {
+        "from": "GM",
+        "to": "Player 0",
+        "timestamp": "2026-07-02T14:51:35.081026",
+        "action": {
+          "type": "send message",
+          "content": "[GAME] Submitted [2 4 1 3]. Feedback: 3 black peg(s), 0 white peg(s).\n",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 0",
+        "to": "GM",
+        "timestamp": "2026-07-02T14:51:36.759339",
+        "action": {
+          "type": "get message",
+          "content": "[2 4 1 5]",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-02T14:51:36.759421",
+        "action": {
+          "type": "rewards",
+          "content": "role: Player 0\ninvalid_move: False\nturn_count: 11\nreason: You have cracked the code, solving 4 out of 4 pegs correctly\nreward: 1"
+        }
+      }
+    ]
+  ],
+  "ta_reward": {
+    "0": 1
+  },
+  "ta_reward_details": {
+    "0": {
+      "role": "Player 0",
+      "invalid_move": false,
+      "turn_count": 11,
+      "reason": "You have cracked the code, solving 4 out of 4 pegs correctly",
+      "reward": 1
+    }
+  },
+  "numeric_reward": 1,
+  "Aborted": 0,
+  "Success": 1,
+  "Lose": 0,
+  "Request Count": [
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1
+  ],
+  "Violated Request Count": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+  ],
+  "Parsed Request Count": [
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1
+  ]
+}
