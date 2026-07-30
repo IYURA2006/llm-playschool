@@ -1,14 +1,3 @@
----
-title: LLM Playschool
-emoji: 🚀
-colorFrom: blue
-colorTo: indigo
-sdk: gradio
-sdk_version: "6.15.2"
-app_file: app.py
-pinned: false
----
-
 # LM Playschool — Annotation Tool
 
 A web app for rating how well AI models play simple games. Built for the

@@ -13,7 +13,7 @@ import psycopg2
 from psycopg2 import errors as pg_errors
 from dotenv import load_dotenv
 
-# No-op on HF Spaces (no .env file there); vars come from repository secrets instead.
+# Silently does nothing if .env doesn't exist, e.g. when vars are set some other way.
 load_dotenv()
 
 DB_HOST = os.environ.get("DB_HOST")

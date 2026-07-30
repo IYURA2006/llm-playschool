@@ -90,7 +90,7 @@ div:focus, div:focus-visible {
 .txscroll {
     padding: 16px 18px;
     /* Fallback only, before syncTxHeight (JS) sets the real height. Not
-       viewport-based — HF's content-sized iframe makes 100vh grow unbounded. */
+       viewport-based — a content-sized iframe would make 100vh grow unbounded. */
     overflow-y: auto !important;
     height: 600px;
 }
@@ -106,7 +106,7 @@ div:focus, div:focus-visible {
     color: #3b82f6; letter-spacing: .08em;
     margin-bottom: 6px;
 }
-/* !important keeps these dark on the light .tx-col panel even under HF's forced dark theme. */
+/* !important keeps these dark on the light .tx-col panel even under the app's own forced dark theme. */
 .goal-text { font-size: 13px; color: #374151 !important; line-height: 1.5; margin: 0; white-space: pre-line; overflow-wrap: anywhere; }
 .gm-msg {
     font-size: 12px; color: #6b7280 !important;
@@ -307,7 +307,7 @@ div:focus, div:focus-visible {
 .wd-purple { background: #a855f7; color: #faf5ff; }
 .wd-black  { background: #1f2937; color: #f3f4f6; }
 
-/* !important keeps this readable on the light panel under HF's forced dark theme. */
+/* !important keeps this readable on the light panel under the app's own forced dark theme. */
 .ref-answer {
     background: #f0fdf4;
     border: 1px solid #86efac;
@@ -367,8 +367,8 @@ div:focus, div:focus-visible {
     border-radius: 10px; padding: 5px 10px; margin-bottom: 8px;
 }
 .tn-chips { display: flex; flex-wrap: wrap; gap: 6px; flex: 1; justify-content: center; }
-/* !important is required on HF Spaces only — Gradio's own button theme rule
-   outranks a bare .tn-chip.is-rated there, repainting rated chips grey. */
+/* !important guards against Gradio's own button theme rule outranking a
+   bare .tn-chip.is-rated in some environments, repainting rated chips grey. */
 .tn-chip {
     min-width: 30px; height: 30px; padding: 0 8px;
     border: 1px solid #2d3748 !important; border-radius: 8px;
@@ -1157,8 +1157,8 @@ theme = gr.themes.Soft(
     font=[gr.themes.Font(f) for f in ("system-ui", "-apple-system", "Segoe UI", "sans-serif")],
     font_mono=[gr.themes.Font(f) for f in ("ui-monospace", "SFMono-Regular", "monospace")],
 )
-# share=True serves the frontend from Gradio's CDN, where a failed lazy-load
-# can leave a component unmounted — not worth the risk since HF disables it anyway.
+# share=True tunnels through Gradio's own servers, which we don't need —
+# the VM's own domain/TLS setup is the real public entry point.
 # PORT lets deployments override the default without code changes.
 app.launch(css=css, theme=theme, head=force_dark, share=False,
            server_port=int(os.environ.get("PORT", 3000)))
