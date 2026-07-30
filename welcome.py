@@ -1,4 +1,3 @@
-import os
 from datetime import datetime
 
 import gradio as gr
@@ -7,9 +6,6 @@ import consent
 import db
 import annotation
 
-_dir = os.path.dirname(os.path.abspath(__file__))
-
-# tuple with (icon, number, title, description)
 _STEPS = [
     ("📖", "1", "Read the transcript",
      "A full AI game session is shown on the left. Take your time to read "
@@ -22,7 +18,6 @@ _STEPS = [
      "and Overall Quality, then submit."),
 ]
 
-# (number, accent colour, label, description)
 _RATINGS = [
     ("1", "#ef4444", "Poor",          "Completely fails — random, rule-breaking, or incoherent."),
     ("2", "#f59e0b", "Below average", "Struggling — makes obvious mistakes or wastes turns."),
@@ -32,39 +27,14 @@ _RATINGS = [
 
 
 def _start(err, playlist, block, annotator, session_day):
-    """Route the Start click.
-
-    Priority: malformed-link error → consent gate → playlist (the general
-    study's link, always populated by assignment.build_playlist_for before
-    Start is ever clickable) → legacy single-game link (ad-hoc testing of one
-    game/question-set combo, self-contained, unrelated to participant
-    assignment). BOTH of the first two resume at the first game without a
-    submitted verdict — reopening a link must never silently restart at game
-    1 and overwrite completed work via the DB upsert.
-
-    Consent gate: only checked when `annotator` is non-empty. A bare URL with
-    no resolvable identity (no PROLIFIC_PID, no legacy annotator= param)
-    always has annotator=="", and db.record_consent("") is a documented
-    no-op — gating on has_consented("") (unconditionally False) would show an
-    unconfirmable popup that can never actually be dismissed. Skipping the
-    gate for an empty identity just falls through to the existing
-    no-playlist/no-block fallback below.
-
-    Pages that stay hidden get a no-op gr.update(), NOT visible=False: Gradio 6
-    lazily mounts hidden columns, and sending visible=False to a never-mounted
-    column breaks every later visible=True on it (the page would stay blank).
-    welcome_page itself no longer has this concern — it starts visible=True
-    (there's no separate full-page consent gate anymore), so it's genuinely
-    mounted from process start and toggling it either direction afterward is
-    always safe. States that shouldn't change get gr.skip().
-
-    The final element of every return is clearing_state=False — the Start
-    click's first chained event set it True (blanking the annotation page so
-    no widget values survive from a previous game, see app.py); leaving it
-    True on any branch would strand a permanently blank page.
-    """
+    """Route the Start click: error banner > consent gate > playlist (resumes
+    at the first game without a submitted verdict) > legacy single-game link."""
+    # Never visible=False — Gradio 6 lazily mounts hidden columns, and
+    # visible=False on a never-mounted column breaks a later visible=True.
     noop = gr.update()
 
+    # Last element is always clearing_state=False — Start's first chained
+    # event set it True to blank the page; every branch here resets it.
     def stay(note, show_popup=False):
         return (noop, noop, noop, gr.skip(), gr.skip(), gr.skip(), gr.skip(),
                 gr.skip(), gr.skip(), gr.skip(), gr.skip(), note,
@@ -73,12 +43,12 @@ def _start(err, playlist, block, annotator, session_day):
     if err:
         return stay("")
 
+    # has_consented("") is always False, so this only gates real participants.
     if annotator and not db.has_consented(annotator):
         return stay("", show_popup=True)
 
-    # `now` doubles as the session clock (stamped once per Start click — the
-    # practice round counts toward the session) and the first game's clock
-    # (training re-stamps started_at when real annotation begins).
+    # Doubles as the session clock (practice counts toward it) and the first
+    # game's clock; training re-stamps started_at once real annotation begins.
     now = datetime.now().isoformat()
 
     if playlist:  # the general study's link — the only path a real participant takes
@@ -95,11 +65,8 @@ def _start(err, playlist, block, annotator, session_day):
         if not path:
             return stay(f"⚠️ Your assignment references an unknown game "
                         f"({item['game']!r}) — tell the study coordinator.")
-        # Practice only on the very first game of a participant's FIRST
-        # sitting. session_day carries assignment.current_session_index as a
-        # string ("1", "2", … up to MAX_SESSIONS); a returning participant has
-        # already done the practice round and goes straight to annotation.
-        # "" covers the legacy debug link, which has no session concept.
+        # Practice only on a first-time participant's very first game;
+        # session_day == "1" (or "" for the legacy debug link) means this.
         if idx == 0 and session_day in ("", "1"):
             pages = (gr.update(visible=False), noop, gr.update(visible=True))
         else:          # resuming → straight to annotation
@@ -117,19 +84,8 @@ def _start(err, playlist, block, annotator, session_day):
 
 
 def _confirm_consent(agreed, annotator_id):
-    """The consent popup's own confirm button — step 1 of its click chain,
-    mirroring the main Start button's own leading `lambda: True` (priming
-    the chained _start's page swap). Both branches return True for
-    clearing_state: harmless even on an unticked click (annotation_page is
-    hidden the whole time consent is being decided), and _start's stay()
-    branch resets it to False a moment later regardless.
-
-    An unticked click leaves consent_popup untouched (gr.skip() — it's
-    already open) and shows a validation note INSIDE the popup. _start still
-    runs next unconditionally (no separate gating state — _start alone
-    decides "show popup vs. proceed"): finding has_consented still False, it
-    independently re-shows the popup (a redundant but harmless second
-    visible=True) and doesn't touch this popup_note, so the message persists."""
+    """Step 1 of the consent popup's click chain; _start runs next and
+    decides whether to keep the popup open."""
     if not agreed:
         return True, gr.skip(), "⚠️ Please tick the box above to confirm before continuing."
     db.record_consent(annotator_id)
@@ -141,12 +97,10 @@ def build(welcome_page, annotation_page, training_page, error_state,
           annotator_state, block_state, game_state, playlist_idx_state,
           session_day_state, clearing_state, consent_popup):
 
-    #everything below goes into screen Welcome
     with welcome_page:
 
         with gr.Column(elem_classes=["welcome-col"]):
 
-            # top NAV
             with gr.Row(elem_classes=["annot-topnav"]):
                 gr.HTML(
                     '<div class="welcome-nav">'
@@ -163,7 +117,6 @@ def build(welcome_page, annotation_page, training_page, error_state,
                 if msg:
                     gr.Markdown(f"**{msg}**", elem_classes=["info-box"])
 
-            # HEADER
             gr.Markdown("# Human Annotation Study")
             gr.Markdown(
                 "You will review transcripts of AI models playing dialogue games and "
@@ -172,13 +125,11 @@ def build(welcome_page, annotation_page, training_page, error_state,
                 elem_classes=["welcome-sub"],
             )
 
-            # INFO CARDS
             with gr.Row(equal_height=True):
                 for icon, n, title, desc in _STEPS:
                     with gr.Group(elem_classes=["question-card", "step-card"]):
                         gr.Markdown(f"{icon} **{n}** \n\n ### {title}  \n\n {desc}")
 
-            # CALLOUT
             with gr.Group(elem_classes=["info-box"]):
                 gr.Markdown(
                     "**ℹ️ You are evaluating AI reasoning quality — not the game itself**\n\n"
@@ -189,7 +140,6 @@ def build(welcome_page, annotation_page, training_page, error_state,
                     "play. Judge the **thinking**, not the outcome."
                 )
 
-            # RATING SCALE
             gr.Markdown("**Rating scale** - applies to all scored questions")
 
             with gr.Group(elem_classes=["question-card"]):
@@ -213,13 +163,7 @@ def build(welcome_page, annotation_page, training_page, error_state,
 
             status_note = gr.Markdown("")
 
-            # NEXT PAGE — two chained events: the first blanks the annotation
-            # page (clearing_state=True → empty @gr.render) so no widget
-            # values can survive from a previously annotated game; _start
-            # then sets the game states AND clearing_state=False in one
-            # event, mounting the page fresh exactly once (or, if consent
-            # hasn't been given yet, shows the consent popup instead). See
-            # app.py's clearing_state comment.
+            # First chained click blanks the annotation page, then _start (below) mounts it fresh.
             start_btn = gr.Button(
                 "Start Annotation →", variant="primary", size="lg",
                 elem_classes=["start-btn"],

@@ -1,17 +1,9 @@
-"""Consent popup content — the University of Edinburgh Informatics Research
-Ethics participant information sheet + consent statement, shown inside a
-modal triggered by welcome.py's "Start Annotation" button. This module only
-builds the static content and the tick/confirm widgets; welcome.py owns all
-the event wiring (deciding when to show/hide the popup, recording consent,
-proceeding into the study) so there's a single place — welcome._start —
-deciding "show popup vs. proceed", not two functions racing each other.
+"""Consent popup content and widgets — welcome.py owns all the show/hide and
+consent-recording logic, so there's one place deciding that, not two.
 
-The text below is the FINAL approved participant information sheet (ethics
-reference 171955), supplied verbatim by the study coordinator on 2026-07-22.
-Treat it as a controlled document: do not reword, tighten, or "fix" it
-without the coordinator's say-so — it is what the ethics application was
-certified against. The earlier ⚠️ TODO placeholders (ethics reference number,
-compensation amount) are now filled in and the marker mechanism is gone."""
+The text below is the approved participant information sheet (ethics
+reference 171955). Do not reword it without the study coordinator's say-so —
+it's what the ethics application was certified against."""
 import gradio as gr
 
 _INFO_SHEET_MD = """
@@ -146,9 +138,8 @@ By proceeding with the study, I agree to all of the following statements:
 
 
 def build(consent_popup):
-    """Builds the popup's static content and widgets only — no DB calls, no
-    event wiring. Returns (agree_cb, confirm_btn, popup_note) for welcome.py
-    to wire up alongside _start."""
+    """Static content and widgets only — no DB calls, no event wiring.
+    Returns (agree_cb, confirm_btn, popup_note) for welcome.py to wire up."""
     with consent_popup:
         with gr.Column(elem_classes=["consent-modal-card"]):
             with gr.Group(elem_classes=["question-card", "consent-sheet"]):

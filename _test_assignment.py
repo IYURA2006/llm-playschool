@@ -1,12 +1,9 @@
 """Test harness: exercise assignment.py's coverage-balanced reservation logic
-against a disposable test Postgres database. No Gradio, no browser.
-Run via: python _test_assignment.py
+against a disposable test Postgres database. Run via: python _test_assignment.py
 
-Requires TEST_DB_NAME to be set (in .env or the environment) to a database
-distinct from the real `study` DB, with the same schema + grants applied
-(see postgres_schema.sql). Refuses to run rather than risk mutating real
-annotation data — there is no cheap "swap to a scratch file" trick with
-Postgres the way there was with SQLite."""
+Requires TEST_DB_NAME (in .env), a database distinct from the real `study`
+DB with the same schema/grants (see postgres_schema.sql) — refuses to run
+rather than risk mutating real annotation data."""
 import concurrent.futures
 import os
 import traceback
@@ -41,12 +38,8 @@ def reset_db():
 
 
 def _raw_reservation_counts():
-    """Distinct-annotator count per game_slug from ALL reservations (turns
-    saved or not, verdicted or not) — unlike db.coverage_counts (which is
-    deliberately verdict/staleness-gated for the assignment algorithm's own
-    use), this is the direct ground truth for "how many annotators actually
-    hold a claim on this slug right now", which is what the over-assignment
-    checks below need to verify against."""
+    """Distinct-annotator count per game_slug from ALL reservations — the
+    ground truth for over-assignment checks, unlike the gated db.coverage_counts."""
     with db._connect() as conn:
         cur = conn.cursor()
         cur.execute(
@@ -58,10 +51,8 @@ def _raw_reservation_counts():
 
 
 def complete_session(pid, condition="hybrid"):
-    """Stamp a verdict on every unverdicted reservation this PID holds, i.e.
-    simulate them finishing their current sitting. A session only counts
-    toward the cap (and only frees the participant to start a new batch)
-    once every game in it is verdicted — see assignment._resume_target."""
+    """Simulate this PID finishing their current sitting by verdicting every
+    unverdicted reservation they hold (see assignment._resume_target)."""
     with db._connect() as conn:
         cur = conn.cursor()
         cur.execute(
@@ -72,9 +63,7 @@ def complete_session(pid, condition="hybrid"):
 
 
 def batch_seconds(playlist):
-    """Estimated length of a playlist, the same way assignment.py sizes it:
-    every transcript's cost plus ONE rules-reading charge for the shared
-    game type."""
+    """Estimated length of a playlist, the same way assignment.py sizes it."""
     slugs = [item["game"] for item in playlist]
     return (sum(assignment.transcript_seconds(s) for s in slugs)
             + assignment.rules_seconds(slugs[0]))
@@ -101,7 +90,6 @@ def run(name, fn):
         failures.append(f"{name} (exception)")
 
 
-# ──────────────────────────────────────────────────────────────────────────
 def test_basic_batch_and_idempotency():
     reset_db()
     print(f"  pool size: {len(assignment.POOL_SLUGS)} transcripts across "
@@ -129,14 +117,8 @@ def test_basic_batch_and_idempotency():
 
 
 def _pid_count():
-    """Enough participants to drive the pool toward exhaustion. Batch size is
-    no longer fixed (the time budget decides it, so it varies from 1 game for
-    a long adventuregame transcript to a dozen short taboo ones), which means
-    the exact number the pool can serve is not predictable up front. These
-    tests therefore oversubscribe deliberately and assert the invariant that
-    actually matters — no transcript is ever assigned past COVERAGE_TARGET —
-    treating a late NO_TASKS_MESSAGE as the expected terminal state rather
-    than a failure."""
+    """Enough participants to drive the pool toward exhaustion — batch size
+    varies, so tests deliberately oversubscribe and expect a late NO_TASKS_MESSAGE."""
     return len(assignment.POOL_SLUGS) * assignment.COVERAGE_TARGET
 
 
@@ -211,9 +193,7 @@ def test_concurrent_same_pid_no_double_reservation():
 
 def test_stale_reservation_frees_its_slot():
     reset_db()
-    # Fill every slug in one game-type up to COVERAGE_TARGET with plain
-    # (non-stale) reservations, then hand-craft one more that's artificially
-    # old, and confirm coverage_counts drops it once stale_before excludes it.
+    # One artificially-old reservation, on top of COVERAGE_TARGET fresh ones.
     slug = assignment.POOL_SLUGS[0]
     with db._connect() as conn:
         cur = conn.cursor()
@@ -249,9 +229,7 @@ def test_pool_exhaustion_returns_no_tasks_message():
         assignment.COVERAGE_TARGET = 1
         assignment.MAX_BATCH_GAMES = 1
         n_slugs = len(assignment.POOL_SLUGS)
-        # At target=1 and one game per batch, each participant claims exactly
-        # one never-before-picked slug, so exhausting the whole pool takes
-        # exactly one participant per slug (not per type).
+        # At target=1, one participant per slug exhausts the whole pool.
         for i in range(n_slugs):
             playlist, err = assignment.build_playlist_for(f"fakepid_exhaust_{i:03d}")
             assert err is None, f"unexpected exhaustion before the pool was full: {err}"
@@ -346,9 +324,7 @@ def test_half_finished_session_does_not_count_toward_cap():
 
 
 def test_pseudonymization_is_deterministic():
-    """db.pseudonymize_pid — required so a returning participant's raw PID
-    always resolves to the same stored identifier across sessions (see
-    app.py's _capture_session_params, the only real caller)."""
+    """A returning participant's raw PID must resolve to the same pseudonym every time."""
     orig_salt = db._PSEUDONYM_SALT
     try:
         db._PSEUDONYM_SALT = "test-salt-value"
@@ -372,7 +348,6 @@ def test_pseudonymization_is_deterministic():
         db._PSEUDONYM_SALT = orig_salt
 
 
-# ──────────────────────────────────────────────────────────────────────────
 run("basic batch + idempotency", test_basic_batch_and_idempotency)
 run("coverage balances across many sequential PIDs", test_coverage_balances_across_many_pids)
 run("concurrent distinct PIDs stay within COVERAGE_TARGET", test_concurrent_distinct_pids_stay_within_target)

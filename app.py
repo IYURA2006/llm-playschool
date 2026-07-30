@@ -8,10 +8,7 @@ import annotation
 import annotation_verdict
 import assignment
 
-_dir = os.path.dirname(os.path.abspath(__file__))
-
 css = """
-/* ── Shared ───────────────────────────────────────────────────── */
 .info-box {
     background: #11233f !important;
     border: 1px solid #1e3a5f !important;
@@ -27,7 +24,6 @@ css = """
 * { outline: none !important; }
 *:focus, *:focus-visible, *:focus-within { outline: none !important; box-shadow: none !important; }
 input:focus, textarea:focus, button:focus, [tabindex]:focus { box-shadow: none !important; border-color: inherit !important; }
-/* Override Gradio Soft theme focus variables */
 :root {
     --block-border-color-focus: transparent !important;
     --input-border-color-focus: transparent !important;
@@ -41,7 +37,6 @@ div:focus, div:focus-visible {
     border-color: inherit !important;
 }
 
-/* ── Top nav bar ──────────────────────────────────────────────── */
 .annot-topnav {
     background: #0f172a !important;
     border-radius: 10px !important;
@@ -76,9 +71,7 @@ div:focus, div:focus-visible {
     font-size: 12px !important;
     min-width: 56px !important;
 }
-/* Leaving a game via "Quit" abandons any unsaved turn ratings with no
-   confirmation — red signals that more clearly than the default "stop"
-   variant, which renders as a muted grey in this theme, not red. */
+/* Red, not the default muted grey — Quit abandons unsaved ratings with no confirmation. */
 .quit-btn {
     background: #7f1d1d !important;
     border: 1px solid #b91c1c !important;
@@ -86,10 +79,7 @@ div:focus, div:focus-visible {
 }
 .quit-btn:hover { background: #991b1b !important; border-color: #ef4444 !important; }
 
-/* ── Left transcript column ───────────────────────────────────── */
-/* Both columns are the same fixed height (viewport-fit) and scroll
-   vertically on their own — the dialogue on the left and the questions on
-   the right always line up, no page-level scrolling of the pair. */
+/* Fixed height, scrolls on its own, so it stays lined up with the questions column. */
 .tx-col {
     background: #f1f5f9 !important;
     border-radius: 10px !important;
@@ -99,12 +89,8 @@ div:focus, div:focus-visible {
 }
 .txscroll {
     padding: 16px 18px;
-    /* Height is set by JS (syncTxHeight): the transcript matches the right
-       column (#annot-col) when the questions are tall, and floors at a
-       comfortable reading height when they're short. The value below is only a
-       fallback for before JS runs — it must NOT be viewport-based, because HF
-       embeds the app in a content-sized iframe where `100vh` feeds back and
-       grows unbounded. Non-!important so the JS inline height wins. */
+    /* Fallback only, before syncTxHeight (JS) sets the real height. Not
+       viewport-based — HF's content-sized iframe makes 100vh grow unbounded. */
     overflow-y: auto !important;
     height: 600px;
 }
@@ -120,9 +106,7 @@ div:focus, div:focus-visible {
     color: #3b82f6; letter-spacing: .08em;
     margin-bottom: 6px;
 }
-/* These three sit on the permanently-light .tx-col panel, so their dark text
-   colours need !important to survive the forced dark theme on HF Spaces —
-   otherwise Gradio's --body-text-color turns them near-white (invisible). */
+/* !important keeps these dark on the light .tx-col panel even under HF's forced dark theme. */
 .goal-text { font-size: 13px; color: #374151 !important; line-height: 1.5; margin: 0; white-space: pre-line; overflow-wrap: anywhere; }
 .gm-msg {
     font-size: 12px; color: #6b7280 !important;
@@ -191,15 +175,11 @@ div:focus, div:focus-visible {
 }
 
 
-/* ── Right annotation column (stacked turn cards) ─────────────── */
 #annot-col {
     background: #0a0e1a !important;
     border-radius: 10px !important;
     padding: 10px 12px !important;
-    /* Right column shows the whole current card at once — no internal scroll,
-       height follows its content. It must NOT stretch to the flex row height, or
-       its offsetHeight would stop being the true content height that
-       syncTxHeight measures to size the transcript. */
+    /* Must stay auto-height — syncTxHeight reads offsetHeight to size the transcript. */
     height: auto !important;
     align-self: flex-start !important;
     flex-wrap: nowrap !important;
@@ -209,10 +189,8 @@ div:focus, div:focus-visible {
 #annot-col > .wrap, #annot-col > .wrap > div { background: transparent !important; border: none !important; }
 #annot-col label { color: #cbd5e1 !important; }
 
-/* Per-turn annotation card.
-   gr.Group applies elem_classes to a nested wrapper+inner pair (Gradio 6), so each
-   card is two .turn-anno-card nodes. Style the outer wrapper as the visual card and
-   pass the inner one through transparently. */
+/* gr.Group nests elem_classes into a wrapper+inner pair (Gradio 6), giving
+   each card two .turn-anno-card nodes — style only the outer one. */
 .turn-anno-card:has(.turn-anno-card) {
     background: #0e1a30 !important;
     border: 1px solid #1e3a5f !important;
@@ -246,15 +224,12 @@ div:focus, div:focus-visible {
     border: none !important;
     box-shadow: none !important;
 }
-/* Rated state: green border once every question the card renders is answered.
-   The .is-rated class is toggled by the turn-navigator JS (see isRated in the
-   head script) — pure CSS :has() can't express "all rendered Q1/Q2 answered"
-   for hybrid cards that only show one of the two. */
+/* .is-rated is toggled by JS (isRated) — CSS :has() can't express "all
+   rendered questions answered" since hybrid cards render different sets. */
 .turn-anno-card.is-rated {
     border-color: #22c55e !important;
     box-shadow: 0 0 0 1px rgba(34,197,94,.35) !important;
 }
-/* Card header */
 .ta-head { display: flex; align-items: center; gap: 10px; margin-bottom: 2px; }
 .ta-badge {
     width: 26px; height: 26px; border-radius: 50%;
@@ -284,9 +259,7 @@ div:focus, div:focus-visible {
 }
 .rated-badge { margin-left: auto; color: #22c55e; font-size: 12px; font-weight: 600; display: none; }
 .turn-anno-card.is-rated .rated-badge { display: inline-flex; }
-/* Rating buttons share the card width equally (flex:1 1 0 + min-width:0) and
-   are allowed to wrap onto a second row when space runs out (browser zoom,
-   narrow windows) — never clip an option out of view. */
+/* Buttons share the card width and wrap to a second row instead of clipping. */
 .turn-anno-card .scale-radio .wrap {
     width: 100% !important; gap: 5px !important;
     background: transparent !important; border: none !important;
@@ -300,11 +273,7 @@ div:focus, div:focus-visible {
     font-size: 11px !important;
 }
 
-/* ── ASCII board blocks (clean_up / imagegame grids) ──────────── */
-/* Board art needs a monospace font AND white-space:pre — the containers'
-   proportional font + pre-line space-collapsing shredded the grids. One
-   dark block style works on both the light transcript panel and the dark
-   turn cards. */
+/* Monospace + pre — the container's proportional font shredded board grids otherwise. */
 .ascii-grid {
     font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace !important;
     font-size: 16px !important;
@@ -334,15 +303,11 @@ div:focus, div:focus-visible {
 .wd-green  { background: #22c55e; color: #052e16; }
 .wd-yellow { background: #eab308; color: #3b2a03; }
 .wd-red    { background: #64748b; color: #0b1220; }
-/* wordle-crazy variants scramble the key, so its tiles are painted the LITERAL
-   named colour — the episode's own rules (in the GAME GOAL box) define meaning. */
+/* wordle-crazy scrambles the key, so these tiles use the literal named colour. */
 .wd-purple { background: #a855f7; color: #faf5ff; }
 .wd-black  { background: #1f2937; color: #f3f4f6; }
 
-/* ── Reference answer (single-turn QA benchmarks) ─────────────────
-   Styled as reference material, deliberately unlike a turn card. Sits on the
-   light transcript panel, so text colours need !important to survive HF's
-   forced-dark theme (see the .goal-text/.gm-msg note above). */
+/* !important keeps this readable on the light panel under HF's forced dark theme. */
 .ref-answer {
     background: #f0fdf4;
     border: 1px solid #86efac;
@@ -363,8 +328,8 @@ div:focus, div:focus-visible {
     font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
 }
 
-/* ── Long-response clamp + repetition-loop badge (test_newgames) ───
-   Both live INSIDE a dark turn card, so light text is fine here. */
+/* Long-response clamp + repetition-loop badge; both live inside a dark
+   turn card, so light text is fine here. */
 .turn-loop-badge {
     display: inline-block;
     background: #7c2d12; color: #fed7aa;
@@ -380,7 +345,6 @@ div:focus, div:focus-visible {
 .turn-longclamp > summary::-webkit-details-marker { display: none; }
 .turn-longclamp[open] > summary { color: #38bdf8; }
 
-/* ── TextMapWorld map renderer (hybrid mode) ──────────────────── */
 /* Legend row sits on the light transcript panel, above the turn cards */
 .map-legend {
     display: flex; flex-wrap: wrap; align-items: center;
@@ -396,7 +360,6 @@ div:focus, div:focus-visible {
 .map-svg { display: block; max-width: 100%; height: auto; }
 .map-action { font-size: 13px; }
 
-/* ── Turn navigator (client-side pagination) ──────────────────── */
 .turn-nav {
     position: sticky; top: 4px; z-index: 5;
     display: flex; align-items: center; gap: 8px;
@@ -404,15 +367,8 @@ div:focus, div:focus-visible {
     border-radius: 10px; padding: 5px 10px; margin-bottom: 8px;
 }
 .tn-chips { display: flex; flex-wrap: wrap; gap: 6px; flex: 1; justify-content: center; }
-/* !important on every colour here is load-bearing on HF Spaces: Gradio's theme
-   ships `.gradio-container-… .gradio-style button { background/border/color }`
-   (specificity 0,2,1, no !important). These chips ARE <button>s, so that rule
-   outranks a bare `.tn-chip.is-rated` (0,2,0) and repaints rated chips theme-
-   grey — the exact "I answered it but the number goes back to grey" bug. Only
-   `.is-current.is-rated` (0,3,0) happened to win, which is why a rated chip
-   looked green *while selected* and grey once you moved off it. Locally the
-   cascade order let our rules win without !important; on HF it doesn't. Since
-   the Gradio rule isn't !important, !important here wins in BOTH places. */
+/* !important is required on HF Spaces only — Gradio's own button theme rule
+   outranks a bare .tn-chip.is-rated there, repainting rated chips grey. */
 .tn-chip {
     min-width: 30px; height: 30px; padding: 0 8px;
     border: 1px solid #2d3748 !important; border-radius: 8px;
@@ -422,8 +378,7 @@ div:focus, div:focus-visible {
     transition: background .12s, border-color .12s, color .12s;
 }
 .tn-chip:hover { border-color: #3b82f6 !important; color: #cbd5e1 !important; }
-/* Rated-but-not-current: a solid green fill (not just a green outline) so a
-   completed turn stays unmistakably "done" after you navigate away from it. */
+/* Solid green fill, not just an outline, so "done" stays obvious after navigating away. */
 .tn-chip.is-rated {
     background: #166534 !important; border-color: #22c55e !important; color: #dcfce7 !important;
 }
@@ -455,7 +410,6 @@ div:focus, div:focus-visible {
     font-size: 13px; font-weight: 700; flex-shrink: 0;
 }
 .turn-title { font-size: 14px; }
-/* ── Markdown question labels inside dark panel ───────────────── */
 #annot-col .prose strong, #annot-col p strong { color: #e2e8f0 !important; }
 #annot-col .prose p, #annot-col p { color: #64748b !important; font-size: 12px !important; margin: 1px 0 3px !important; }
 .cond-tag {
@@ -466,7 +420,6 @@ div:focus, div:focus-visible {
 .flags-lbl { color: #cbd5e1; font-size: 13px; font-weight: 600; margin-top: 3px; margin-bottom: 2px; }
 .flags-sub { color: #64748b; font-weight: 400; font-size: 11px; }
 
-/* ── Scale radio buttons ──────────────────────────────────────── */
 .scale-radio fieldset { border: none !important; padding: 0 !important; }
 /* Visually hide the radio but keep it keyboard-focusable (a11y) */
 .scale-radio input[type=radio] {
@@ -489,7 +442,7 @@ div:focus, div:focus-visible {
     border: none !important;
     border-radius: 10px !important;
 }
-/* Higher-specificity override so this beats .turn-anno-card .wrap from Fix 1 */
+/* Higher specificity so this wins over .turn-anno-card .wrap above */
 .turn-anno-card .scale-radio .wrap {
     background: #0e1a30 !important;
     border: none !important;
@@ -511,9 +464,7 @@ div:focus, div:focus-visible {
     align-items: center !important;
     justify-content: center !important;
 }
-/* 3-class specificity wins over any 2-class Gradio or our own rules.
-   Colours only — geometry (flex/min-width/padding) comes from the rule above
-   so the buttons can shrink/wrap instead of overflowing at high zoom. */
+/* Colours only — geometry stays in the rule above so buttons can shrink/wrap. */
 .turn-anno-card .scale-radio label {
     background: #0d1828 !important;
     border: 1px solid #1e3a5f !important;
@@ -533,11 +484,7 @@ div:focus, div:focus-visible {
 /* Firefox fallback: checked state via sibling */
 .scale-radio input[type=radio]:checked ~ span { color: white !important; }
 
-/* ── Flags checkboxes — compact 2-column grid ──────────────────── */
-/* A 2-column grid (rather than one full-width row per flag) roughly halves
-   this block's vertical footprint — the annotation card must fit on one
-   screen without an internal scroll, and 3-4 stacked full-width rows was
-   the single largest contributor to a card exceeding viewport height. */
+/* 2 columns instead of 1 — keeps the card short enough to fit one screen. */
 .flags-check .wrap {
     display: grid !important;
     grid-template-columns: 1fr 1fr !important;
@@ -556,7 +503,6 @@ div:focus, div:focus-visible {
 }
 .flags-check label:hover { border-color: #3b82f6 !important; }
 
-/* ── Comment textbox ──────────────────────────────────────────── */
 /* Strip the Gradio outer wrapper so only the textarea colour shows */
 .turn-comment,
 .turn-comment .block,
@@ -580,7 +526,6 @@ div:focus, div:focus-visible {
 }
 .turn-comment textarea::placeholder { color: #64748b !important; }
 
-/* ── Verdict comment textbox ─────────────────────────────────── */
 .verdict-comment { background: transparent !important; border: none !important; padding: 0 !important; box-shadow: none !important; }
 .verdict-comment textarea {
     background: #1e2130 !important;
@@ -590,7 +535,6 @@ div:focus, div:focus-visible {
 }
 .verdict-comment textarea::placeholder { color: #94a3b8 !important; }
 
-/* ── Page containers — no focus ring ─────────────────────────── */
 #annot-page, #annot-page:focus, #annot-page:focus-visible,
 #annot-page > *, #annot-page > *:focus,
 #verdict-page, #verdict-page:focus, #verdict-page:focus-visible,
@@ -602,11 +546,9 @@ div:focus, div:focus-visible {
     border-color: transparent !important;
 }
 
-/* ── Verdict page option descriptions ────────────────────────── */
 .option-desc p { font-size: 12px !important; color: #64748b !important; line-height: 1.6 !important; margin: 4px 0 !important; }
 .option-desc strong { color: #374151 !important; }
 
-/* ── Question cards (verdict page) ───────────────────────────── */
 .question-card {
     background: #1a2236 !important;
     border: 1px solid #2d3748 !important;
@@ -627,7 +569,6 @@ div:focus, div:focus-visible {
     border: none !important;
     box-shadow: none !important;
 }
-/* ── Coherence column cards (pure Gradio layout) ──────────────── */
 .coh-col {
     background: #1e293b !important;
     border: 1px solid #334155 !important;
@@ -669,7 +610,6 @@ div:focus, div:focus-visible {
     background: transparent !important; border: none !important;
 }
 
-/* ── Overall Game Quality — 1–7 slider with labelled endpoints ─── */
 .ovr-slider-ends {
     display: flex !important; justify-content: space-between !important;
     gap: 24px !important; margin-bottom: 6px !important;
@@ -691,22 +631,16 @@ div:focus, div:focus-visible {
     font-size: 12px !important; color: #64748b !important;
     line-height: 1.45 !important; margin-top: 3px !important;
 }
-/* Untouched-slider error ring (parallel to .scale-radio.radio-error for Radio
-   questions). Applied to the OUTER block wrapper ONLY — elem_classes lands there,
-   and bordering the inner .wrap / > div as well drew two/three nested rings
-   ("double border"). One ring around the whole slider block is what we want. */
+/* Applied to the outer block only — bordering inner wraps too drew a double ring. */
 .ovr-slider.ovr-slider-err {
     border: 1px solid #ef4444 !important;
     border-radius: 10px !important;
     box-shadow: 0 0 0 3px rgba(239,68,68,.18) !important;
 }
-/* whole_game_only games (imagegame): the head script adds .hide-generic to
-   #verdict-page when the game-specific block renders a .wg-only marker, hiding
-   the generic Coherence/Overall cards so only the game's own sliders show. */
+/* whole_game_only games: JS adds .hide-generic when a .wg-only marker renders. */
 #verdict-page.hide-generic .g1-card,
 #verdict-page.hide-generic .g2-card { display: none !important; }
 
-/* ── Rating-scale legend rows (welcome page) ──────────────────── */
 .ovr-row {
     align-items: center !important;
     gap: 14px !important;
@@ -715,7 +649,6 @@ div:focus, div:focus-visible {
     flex-wrap: nowrap !important;
 }
 .ovr-row:last-child { border-bottom: none !important; }
-/* Number badge column */
 .ovr-num {
     flex: 0 0 46px !important; min-width: 46px !important;
     display: flex !important; align-items: center !important;
@@ -725,13 +658,11 @@ div:focus, div:focus-visible {
     padding: 0 !important; margin: 0 !important;
     display: flex !important; align-items: center !important; justify-content: center !important;
 }
-/* Bold label column */
 .ovr-label { flex: 0 0 130px !important; min-width: 0 !important; }
 .ovr-label p, .ovr-label strong {
     font-size: 14px !important; font-weight: 700 !important;
     color: #e2e8f0 !important; margin: 0 !important;
 }
-/* Description column */
 .ovr-desc { flex: 1 1 0 !important; min-width: 0 !important; }
 .ovr-desc p {
     font-size: 13px !important; color: #64748b !important;
@@ -742,7 +673,6 @@ div:focus, div:focus-visible {
     background: transparent !important; border: none !important; padding: 0 !important;
 }
 
-/* Buttons stretch to fill the card */
 .question-card .scale-radio .wrap {
     width: 100% !important;
     justify-content: space-evenly !important;
@@ -750,7 +680,6 @@ div:focus, div:focus-visible {
     border: 1px solid rgba(100,116,139,.12) !important;
 }
 
-/* ── Welcome page ─────────────────────────────────────────────── */
 .welcome-col { max-width: 880px; margin: 0 auto !important; }
 .welcome-sub p { color: #94a3b8 !important; font-size: 14px !important; line-height: 1.6 !important; }
 .welcome-foot p { color: #475569 !important; font-size: 12px !important; text-align: center !important; margin-top: 8px !important; }
@@ -774,7 +703,6 @@ div:focus, div:focus-visible {
 }
 .start-btn { width: 100% !important; margin-top: 6px !important; }
 
-/* ── Consent modal (popup, triggered by Start — not a full page) ─── */
 #consent-modal {
     position: fixed !important;
     inset: 0 !important;
@@ -805,7 +733,6 @@ div:focus, div:focus-visible {
     white-space: nowrap;
 }
 
-/* ── Rules panel ──────────────────────────────────────────────── */
 .rules-panel {
     background: #f8fafc !important;
     border: 1px solid #e2e8f0 !important;
@@ -814,7 +741,6 @@ div:focus, div:focus-visible {
     margin-top: 10px !important;
 }
 
-/* ── Game selector ────────────────────────────────────────────── */
 .game-select-row { margin-bottom: 10px !important; }
 .game-select { background: transparent !important; }
 .game-select label span { color: #94a3b8 !important; font-size: 12px !important; }
@@ -824,25 +750,19 @@ div:focus, div:focus-visible {
 }
 .game-select .container { background: transparent !important; }
 
-/* ── Playlist position chip (nav bar) ─────────────────────────── */
 .game-seq-tag {
     color: #e2e8f0; font-size: 12px; font-weight: 600;
     background: #1e293b; border: 1px solid #334155;
     padding: 3px 10px; border-radius: 5px; margin-left: 8px;
 }
 
-/* ── Training (practice round) page ───────────────────────────── */
 #train-col { background: #0a0e1a !important; border-radius: 10px !important; padding: 10px 12px !important;
-    /* Match the annotation page: content-height, no internal scroll, no stretch
-       (see #annot-col). syncTxHeight sizes .train-txscroll to this column. */
+    /* Same auto-height rule as #annot-col. */
     height: auto !important; align-self: flex-start !important; }
 #train-col label { color: #cbd5e1 !important; }
 #train-col .prose strong, #train-col p strong { color: #e2e8f0 !important; }
 #train-col .prose p, #train-col p { color: #64748b !important; font-size: 12px !important; margin: 2px 0 6px !important; }
-/* Training transcript: its own class so it can be styled independently of the
-   annotation page's .txscroll. Height set by syncTxHeight (matches #train-col,
-   floored at a comfortable minimum); the fixed px below is a pre-JS fallback,
-   NOT viewport-based (see .txscroll for the HF content-sized-iframe reason). */
+/* Same pre-JS fallback rule as .txscroll, styled separately for the training page. */
 .train-txscroll { padding: 16px 18px; overflow-y: auto !important; height: 600px; }
 /* Practice card — same wrapper+inner doubling handling as .turn-anno-card */
 .train-card:has(.train-card) {
@@ -888,11 +808,7 @@ div:focus, div:focus-visible {
 .fb-note { font-size: 12px; color: #7dd3fc; margin-top: 6px; line-height: 1.5; }
 """
 
-# Head scripts:
-#  1. Force dark mode (runs as <head> parses, before render — no light-theme flash).
-#  2. Live "X of N turns rated" counter — counts cards where EVERY rendered
-#     question is answered (submitting is blocked server-side until all are),
-#     so the nav progress updates without wiring a Gradio event per turn.
+# Forces dark mode before render, then wires up the live "X of N rated" counter.
 force_dark = """
 <script>
 (function () {
@@ -905,22 +821,13 @@ force_dark = """
 </script>
 <script>
 (function () {
-    // .turn-anno-card/.tn-chip are shared by more than one PAGE (the practice
-    // round and the real annotation page both use them) — Gradio never
-    // unmounts a hidden gr.Column(visible=False), so a finished practice
-    // round's cards/chips stay in the DOM (just under a hidden #train-page)
-    // even once the annotation page is showing. Querying the whole document
-    // would double-count them (wrong panes().length/chips().length, and
-    // current=0 would land on the WRONG page's first card) — scope every
-    // query to elements whose nearest *-page ancestor is actually visible.
+    // Gradio never unmounts a hidden page, so a finished practice round's
+    // cards stay in the DOM — scope every query to a visible page only.
     function onHiddenPage(el) {
         var page = el.closest('#train-page, #annot-page, #verdict-page');
         return !!(page && getComputedStyle(page).display === 'none');
     }
-    // Each turn is one annotation card. Some Gradio versions double the class
-    // onto a wrapper+inner pair; others don't. Either way the "real" cards are
-    // the TOP-LEVEL .turn-anno-card nodes (those with no .turn-anno-card
-    // ancestor), so this works whether or not the class is doubled.
+    // Gradio doubles the class onto a wrapper+inner pair; only count the outer node.
     function panes() {
         return Array.prototype.filter.call(
             document.querySelectorAll('.turn-anno-card'),
@@ -936,12 +843,7 @@ force_dark = """
             function (c) { return !onHiddenPage(c); }
         );
     }
-    // A card is rated when EVERY radio question it actually renders is
-    // answered — Q1/Q2 (universal or bespoke), Q3, and any bespoke bolt-on.
-    // This mirrors the server-side rule in annotation._submit: all questions
-    // are mandatory, only flags and comments are optional. The invisible
-    // preset-N/A Q3 on no-reasoning games is either unmounted (not counted)
-    // or already checked, so it never blocks.
+    // Mirrors annotation._submit's rule: only flags and comments are optional.
     function isRated(card) {
         var groups = card.querySelectorAll('.scale-radio');
         if (!groups.length) return false;
@@ -952,12 +854,9 @@ force_dark = """
 
     var current = 0;
 
-    // The real annotation page's transcript cards use id="tc-N"; the
-    // practice page uses id="ttc-N" instead (deliberately namespaced so the
-    // two pages' transcripts never collide) — try both, but only accept a
-    // match that's actually on the currently-visible page, since a finished
-    // practice round's cards stay in the DOM (hidden) once the real
-    // annotation page is showing, and vice versa.
+    // Real annotation cards use id="tc-N", practice cards "ttc-N" — try both,
+    // but only accept a match on the currently-visible page (the other
+    // page's cards stay in the DOM, just hidden).
     function transcriptCardEl(idx) {
         var ids = ['tc-' + idx, 'ttc-' + idx];
         for (var i = 0; i < ids.length; i++) {
@@ -967,11 +866,7 @@ force_dark = """
         return null;
     }
 
-    // Match the transcript (left) height to the questions column (right): when
-    // the questions are tall the two line up; when the questions are short the
-    // transcript keeps a comfortable reading height (TX_MIN_H). The right column
-    // is content-height with no internal scroll, so its offsetHeight is the real
-    // target. No viewport units anywhere — safe inside HF's content-sized iframe.
+    // Matches the transcript height to the questions column, floored at TX_MIN_H.
     var TX_MIN_H = 500;
     function syncCol(colSel, txSel) {
         var col = document.querySelector(colSel);
@@ -983,9 +878,7 @@ force_dark = """
         syncCol('#annot-col', '.txscroll');
         syncCol('#train-col', '.train-txscroll');
     }
-    // Re-sync when the questions column reflows (radio picked, comment box grows,
-    // window resize) — not just on turn switch. Setting .txscroll height never
-    // resizes #annot-col (separate column, flex-start), so this can't loop.
+    // Re-sync whenever the questions column reflows, not just on turn switch.
     var _txRO = window.ResizeObserver ? new ResizeObserver(function () { syncHeights(); }) : null;
     function observeCols() {
         if (!_txRO) return;
@@ -1004,9 +897,6 @@ force_dark = """
         cards.forEach(function (card, i) {
             card.style.display = (i === current ? '' : 'none');
             var r = isRated(card);
-            // CSS rated styling (green ring/badge) keys off this class — the
-            // old pure-CSS :has() rules couldn't express "all rendered
-            // questions answered" for hybrid cards with a single question.
             card.classList.toggle('is-rated', r);
             if (r) rated++;
             var chip = cs[i];
@@ -1061,11 +951,7 @@ force_dark = """
         else if (e.key === 'End') { goTo(n - 1, true); e.preventDefault(); }
     }
 
-    // Ready only once every chip AND every card has actually mounted. Chips
-    // render as one atomic gr.HTML block of exactly n_turns chips, so their
-    // count never partially updates — comparing counts is a reliable "fully
-    // painted" signal, unlike "at least one of each" (see the retry loop
-    // below for why that weaker check is unsafe).
+    // Comparing chip and card counts is a reliable "fully painted" signal.
     function ready() {
         var p = panes(), c = chips();
         return p.length > 0 && p.length === c.length;
@@ -1091,27 +977,12 @@ force_dark = """
         }, 100);
     }
 
-    // Re-initialise when @gr.render swaps the per-game cards in/out
-    // (selecting a different game rebuilds the whole annotation column).
-    // Long games take longer to paint, so we use a retry loop inside the
-    // observer callback rather than a single fixed timeout — this guarantees
-    // refresh() is only called once BOTH cards AND chips are in the DOM.
+    // Re-initialise when @gr.render swaps the per-game cards in/out.
     (function () {
         if (!window.MutationObserver) return;
-        // Observe document.documentElement (<html>), NOT #annot-page: this
-        // whole head script runs while <head> is still parsing, before
-        // Gradio has mounted ANYTHING — annotation_page starts life as a
-        // hidden gr.Column, which Gradio 6 lazily mounts, so
-        // getElementById('annot-page') reliably returns null at this point.
-        // An observer built on that null host was silently never attached,
-        // so every later @gr.render swap (e.g. "Next game") went unwatched
-        // and its cards were stranded at whatever raw display Svelte left
-        // them at. <html> always exists, even mid-parse, so observing it
-        // from the start needs no existence check or retry of its own.
+        // Observe <html>, not #annot-page — the page doesn't exist yet when this script runs.
         var debounceTimer, retryIv;
-        // Only react to a genuine re-render (cards/chips added or removed).
-        // refresh() itself rewrites the .prog-rated text node, which is a
-        // childList mutation too — reacting to that would loop forever (blinking).
+        // Ignore refresh()'s own text-node writes, or this would re-trigger itself forever.
         function isStructural(muts) {
             function has(nodes) {
                 return Array.prototype.some.call(nodes, function (n) {
@@ -1128,26 +999,12 @@ force_dark = """
             clearTimeout(debounceTimer);
             clearInterval(retryIv);
             debounceTimer = setTimeout(function () {
-                // Poll until every card AND every chip has mounted — NOT just
-                // "at least one of each". @gr.render streams a long game's
-                // turn cards into the DOM one at a time; firing as soon as
-                // the first couple exist would refresh() against a half-built
-                // page, permanently stranding every later card at its default
-                // (visible) display since nothing revisits them afterward.
+                // Poll until every card is mounted — @gr.render streams cards in one at a time.
                 var attempts = 0;
                 retryIv = setInterval(function () {
                     if (ready()) {
                         clearInterval(retryIv);
-                        // init() re-attaches the delegated listeners (a no-op if
-                        // they're already bound — addEventListener dedupes the
-                        // same function reference) — the safety net for when the
-                        // very first mount was too slow for init()'s own 10s
-                        // retry budget (line ~1042) and gave up before ready()
-                        // ever went true, permanently leaving clicks dead. This
-                        // observer keeps firing on every later render, so it's
-                        // this path's job to grab the one successful ready()
-                        // moment init() itself missed.
-                        init();   // also re-observes cols internally (observeCols())
+                        init();   // re-attaches listeners; addEventListener dedupes, so safe to call again
                         current = 0;
                         refresh();
                     } else if (++attempts > 80) {
@@ -1161,11 +1018,7 @@ force_dark = """
 </script>
 <script>
 (function () {
-    // whole_game_only games (imagegame) render a .wg-only marker in their
-    // game-specific verdict block. When it's present, hide the generic G1/G2
-    // cards by toggling .hide-generic on #verdict-page (CSS does the hiding).
-    // The server skips G1/G2 validation for these games, so this is purely
-    // cosmetic — safe even if it briefly lags a render.
+    // Toggles .hide-generic on #verdict-page when a .wg-only marker renders (see CSS).
     function toggleGeneric() {
         var vp = document.getElementById('verdict-page');
         if (!vp) return;
@@ -1186,22 +1039,10 @@ def _session_error(msg):
 
 
 def _capture_session_params(request: gr.Request):
-    # Two link forms are accepted:
-    #   Prolific (the general study): ?PROLIFIC_PID=...&STUDY_ID=...&SESSION_ID=...
-    #     — the standard Prolific redirect. The playlist is built live
-    #     (coverage-balanced) by assignment.py, not read from a file.
-    #   Legacy single game (ad-hoc testing only): ?annotator=x&block=hybrid&game=<slug>
-    #     — lets a developer load one specific game/question-set combo
-    #     directly, without going through Prolific or the assignment
-    #     algorithm. Self-contained; unrelated to participant assignment.
-    # A bare URL (no recognized params) shows a friendly explanation instead
-    # of a crash or a silent fallback — this study is only reachable via its
-    # Prolific link or a coordinator-issued debug link.
+    # Accepts either a Prolific redirect link or a legacy single-game debug link.
     qp = dict(request.query_params or {})
 
-    # Case-insensitive lookup defensively — we don't control how the link
-    # gets constructed/copy-pasted, and Prolific's own docs are inconsistent
-    # about casing in examples.
+    # Case-insensitive — Prolific's own docs are inconsistent about casing.
     prolific_pid = next(
         (v.strip() for k, v in qp.items() if k.upper() == "PROLIFIC_PID" and v.strip()),
         "",
@@ -1224,10 +1065,8 @@ def _capture_session_params(request: gr.Request):
                 f"this study. Thank you!"
             )
         item = playlist[idx]
-        # The last element carries the participant's 1-based SESSION INDEX
-        # (they may return for up to assignment.MAX_SESSIONS sittings). It
-        # reaches welcome._start, which shows the practice round only on
-        # session "1" — a returning participant has already done it.
+        # Session index reaches welcome._start, which only shows the practice
+        # round on session "1" — a returning participant has already done it.
         return (prolific_pid, item["condition"], annotation.slug_to_path(item["game"]),
                 "", playlist, idx, str(assignment.current_session_index(prolific_pid)))
 
@@ -1235,7 +1074,6 @@ def _capture_session_params(request: gr.Request):
     block = (qp.get("block") or "").strip()
     game = (qp.get("game") or "").strip()
 
-    # ── Legacy single-game debug link ──
     if block or game or annotator:
         missing = [name for name, val in (("annotator", annotator), ("block", block), ("game", game)) if not val]
         if missing:
@@ -1263,56 +1101,35 @@ def _capture_session_params(request: gr.Request):
 
 
 with gr.Blocks() as app:
-    # Shared selected-game path; the URL params write it and both the
-    # annotation and verdict screens render off it.
+    # Shared selected-game path; annotation and verdict screens render off it.
     game_state = gr.State(annotation.DEFAULT_GAME)
-    # Annotator identity, captured from the URL's `annotator` param on page load.
-    annotator_state = gr.State("")
-    # Question-set condition for the CURRENT game: "universal"/"hybrid" in
-    # playlist mode (per item), or a legacy day1_*/day2_* block value.
+    annotator_state = gr.State("")  # captured from the URL's annotator param
+    # "universal"/"hybrid" for the current game, or a legacy day1_*/day2_* value
     block_state = gr.State("")
-    # Non-empty when the session URL is malformed; gates the welcome page's
-    # "Start Annotation" button so the annotation UI never becomes reachable.
+    # Non-empty when the session URL is malformed; gates Start Annotation
     error_state = gr.State("")
-    # The general-study playlist: ordered [{"game": slug, "condition": ...}, …],
-    # built live by assignment.build_playlist_for, plus the position within
-    # it. Empty list = legacy single-game debug link.
+    # Ordered [{"game": slug, "condition": ...}, …] from
+    # assignment.build_playlist_for; empty list = legacy single-game debug link
     playlist_state = gr.State([])
     playlist_idx_state = gr.State(0)
-    # The participant's 1-based session index as a string ("1", "2", … up to
-    # assignment.MAX_SESSIONS) in playlist mode; "" on the legacy debug link.
-    # Decides whether the practice round is shown (welcome._start) and is
-    # persisted on every annotation row, so an export can tell which sitting
-    # a rating came from.
+    # 1-based session index as a string ("1".."MAX_SESSIONS"), "" on the
+    # legacy debug link; gates the practice round and is persisted per row
     session_day_state = gr.State("")
-    # ISO timestamp stamped whenever annotation of a game actually starts
-    # (leaving welcome/training, or clicking "Next game"); per-game duration
-    # is verdict_at − started_at, computed at export time.
+    # Stamped when a game's annotation actually starts; duration is
+    # verdict_at − started_at
     started_at_state = gr.State("")
-    # ISO timestamp stamped ONCE per sitting, at the Start click on the welcome
-    # page — never re-stamped by training or "Next game", so it anchors the
-    # whole-session timer (incl. the practice round). Per-session duration is
-    # max(verdict_at) − session_started_at, computed at export time.
+    # Stamped once per sitting at the Start click; anchors the whole-session
+    # timer (duration is max(verdict_at) − session_started_at)
     session_started_at_state = gr.State("")
-    # True only for the instant between two chained events when switching games
-    # ("Next game →", and Start on the welcome page): the first event sets it,
-    # making annotation's @gr.render produce an EMPTY page (every widget
-    # unmounts); the second event clears it alongside the new game/block
-    # values, mounting everything fresh. This blank intermediate render is the
-    # fix for a confirmed Gradio 6.15.2 bug where @gr.render carries a Radio's
-    # checked value / a Textbox's text from game N into game N+1's
-    # same-position widget whenever the two renders' choices are textually
-    # identical — `key=` does NOT prevent it, and tagging choice values makes
-    # the frontend submit stale values that crash server-side validation.
+    # True only between the two chained events of a game switch, while the
+    # annotation page is blanked so no stale widget value survives.
     clearing_state = gr.State(False)
 
     welcome_page = gr.Column(visible=True)
     training_page = gr.Column(visible=False, elem_id="train-page")
     annotation_page = gr.Column(visible=False, elem_id="annot-page")
     verdict_page = gr.Column(visible=False, elem_id="verdict-page")
-    # Consent popup: a modal overlay, not a page — starts hidden, toggled by
-    # welcome.py's Start button / the popup's own confirm button. See
-    # welcome._start / welcome._confirm_consent.
+    # Modal overlay, not a page — toggled by welcome._start / _confirm_consent.
     consent_popup = gr.Column(visible=False, elem_id="consent-modal")
 
     welcome.build(welcome_page, annotation_page, training_page, error_state,
@@ -1334,16 +1151,14 @@ with gr.Blocks() as app:
               outputs=[annotator_state, block_state, game_state, error_state,
                        playlist_state, playlist_idx_state, session_day_state])
 
-# System fonts so first paint needs no remote Google Fonts fetch (slow over the
-# gradio.live share tunnel). Must be gr.themes.Font objects, not plain strings —
-# Gradio compares theme fonts via .name and a bare str crashes that check.
+# System fonts avoid a remote Google Fonts fetch on first paint. Must be
+# gr.themes.Font objects — a plain string crashes Gradio's font comparison.
 theme = gr.themes.Soft(
     font=[gr.themes.Font(f) for f in ("system-ui", "-apple-system", "Segoe UI", "sans-serif")],
     font_mono=[gr.themes.Font(f) for f in ("ui-monospace", "SFMono-Regular", "monospace")],
 )
-# share=False: HF Spaces force-disables share anyway (warns), and on any other
-# host share=True serves the whole frontend from Gradio's S3 CDN — when a lazily
-# loaded component chunk (Dropdown/Radio) fails to fetch it silently doesn't
-# mount, leaving e.g. an empty "Start your session" card. Participants get the
-# HF Space URL, not a gradio.live link, so the tunnel was never needed.
-app.launch(css=css, theme=theme, head=force_dark, share=False)
+# share=True serves the frontend from Gradio's CDN, where a failed lazy-load
+# can leave a component unmounted — not worth the risk since HF disables it anyway.
+# PORT lets deployments override the default without code changes.
+app.launch(css=css, theme=theme, head=force_dark, share=False,
+           server_port=int(os.environ.get("PORT", 3000)))

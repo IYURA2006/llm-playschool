@@ -8,10 +8,7 @@ import db
 from annotation import (DEFAULT_GAME, load_game, game_slug, slug_to_path,
                         whole_game_questions, whole_game_only)
 
-# Prolific's "submit" completion URL for this study, appended with the study's
-# completion code (?cc=...) — Prolific uses this to auto-approve participants
-# who reach it. TODO: this is the placeholder code for now; swap for the real
-# study's completion URL/code before sending live Prolific links.
+# TODO: placeholder completion code — swap for the real one before going live.
 PROLIFIC_COMPLETION_URL = "https://app.prolific.com/submissions/complete?cc=C10WMMGK"
 
 _COHERENCE = [
@@ -68,25 +65,13 @@ def _action_label(playlist, playlist_idx):
 
 def _verdict_save_and_clear(game_path, annotator_id, condition, playlist, playlist_idx,
                             coherence, overall, overall_touched, comment, specific):
-    """Step 1 of the merged action button: validate + persist, AND (only if
-    that succeeds and another playlist game remains) blank/reset every
-    verdict widget in the SAME event — mirroring the old _next_game_clear,
-    which likewise set clearing_state=True together with every widget reset
-    in one event. Keeping validate+save+clear as ONE event (not two chained
-    ones) matters: an earlier version split "clear" into its own .then()
-    step, and that separate event — despite being a no-op on error and
-    otherwise identical in shape to the old code — reliably threw ~200
-    frontend "Cannot read properties of null" errors on every game switch
-    that the old 2-event (this event + _verdict_finish) shape never did.
-    Root cause not fully pinned down (likely a Gradio 6 quirk with 3-deep
-    .then() chains feeding into annotation.py's own @gr.render), but the
-    old 2-event shape is proven not to trigger it, so this collapses back
-    to that shape rather than chasing the internals further.
+    """Step 1 of the merged action button: validate + persist, and — only if
+    that succeeds and another playlist game remains — blank every verdict
+    widget in the same event. Splitting "clear" into its own .then() step
+    threw frontend errors on every game switch, so this stays one event.
 
-    A slider never reports a falsy value (minimum=1), so "not overall" can
-    no longer detect an untouched G2 — overall_touched (set only by the
-    slider's .release() event, never by a programmatic reset) is the sole
-    authority on that."""
+    A slider is never falsy, so overall_touched (set only by .release()) is
+    the sole signal for whether G2 was actually answered."""
     # Hybrid-only game-specific whole-game question(s): mandatory when shown.
     # `specific` is the accumulated {str(index): value} dict from specific_state.
     wg = whole_game_questions(game_path or DEFAULT_GAME, condition)
@@ -94,9 +79,7 @@ def _verdict_save_and_clear(game_path, annotator_id, condition, playlist, playli
     specific = specific or {}
     specific_incomplete = bool(wg) and any(
         not specific.get(str(i)) for i in range(len(wg)))
-    # whole_game_only games (imagegame) hide G1/G2 — only the specific sliders
-    # are required there; every other game still requires coherence + a
-    # touched overall slider.
+    # whole_game_only games hide G1/G2, so only the specific sliders are required there.
     if wg_only:
         err = specific_incomplete
     else:
@@ -136,9 +119,8 @@ def _verdict_save_and_clear(game_path, annotator_id, condition, playlist, playli
             False,
         )
 
-    # Saved OK. Real status text is set by _verdict_finish (it knows which
-    # branch — advance / finish study / legacy — actually fires); only clear
-    # the widgets here if we're about to advance to another playlist game.
+    # Saved OK. _verdict_finish sets the real status text; only clear widgets
+    # here if we're about to advance to another playlist game.
     if playlist and playlist_idx + 1 < len(playlist):
         return (
             "",
@@ -146,9 +128,7 @@ def _verdict_save_and_clear(game_path, annotator_id, condition, playlist, playli
             "",                            # coherence value
             *_col_updates(_COHERENCE, ""),
             *_btn_updates(_COHERENCE, ""),
-            # Reset value is cosmetic only — overall_touched (reset right
-            # after) is what actually gates validation, so this number is
-            # never mistaken for a recorded judgment even if briefly shown.
+            # Cosmetic only — overall_touched (reset next) is what gates validation.
             gr.update(value=4, elem_classes=["ovr-slider"]),  # overall
             False,                         # overall_touched
             "",                            # verdict comment
@@ -172,10 +152,8 @@ def _verdict_save_and_clear(game_path, annotator_id, condition, playlist, playli
 
 def _verdict_finish(ok, playlist, playlist_idx):
     """Step 3 (chained via .then): route to the next game, or a static
-    "saved"/"all done" status — whichever applies. Deliberately does NOT
-    touch clearing_state on the last-game branch: that mechanism only
-    protects annotation.py's @gr.render from stale widgets, which stops
-    mattering once the annotator is leaving the annotation flow for good."""
+    "saved"/"all done" status. Leaves clearing_state alone on the last-game
+    branch — it only matters while still inside the annotation flow."""
     if not ok:
         return (gr.skip(),) * 9
     if not playlist:
@@ -204,11 +182,8 @@ def _verdict_finish(ok, playlist, playlist_idx):
         datetime.now().isoformat(),   # started_at
         gr.update(visible=True),      # annotation_page
         gr.update(visible=False),     # verdict_page
-        # Relabel in the SAME atomic event that advances playlist_idx_state,
-        # rather than a separate .change() listener on that state — a
-        # standalone listener reacting to the same mutation raced with
-        # annotation.py's own @gr.render (also keyed on playlist_idx_state),
-        # throwing frontend "Cannot read properties of null" errors.
+        # Relabel here, not via a separate listener on playlist_idx_state —
+        # a standalone listener races with annotation.py's own @gr.render.
         gr.update(value=_action_label(playlist, new_idx)),
     )
 
@@ -218,9 +193,8 @@ def build(welcome_page, annotation_page, verdict_page,
           playlist_idx_state, started_at_state, session_day_state, clearing_state):
     with verdict_page:
 
-        # ── TOP NAV ───────────────────────────────────────────────────
-        # The game id/name reflects whichever game was selected for annotation,
-        # so it re-renders whenever game_state changes.
+        # Re-renders whenever game_state changes, to reflect whichever game
+        # was selected for annotation.
         with gr.Row(elem_classes=["annot-topnav"]):
             @gr.render(inputs=[game_state])
             def _verdict_nav(path):
@@ -242,13 +216,11 @@ def build(welcome_page, annotation_page, verdict_page,
             gr.HTML('<div class="nav-right"><div class="nav-timer"></div></div>')
             gr.Button("", visible=False, size="sm")
 
-        # ── MAIN CONTENT
         gr.Markdown("## Overall Verdict")
         gr.Markdown("You have rated all individual turns. Now give your overall assessment of this game session.")
 
-        # ── G1: Strategic Coherence
-        # (.g1-card / .g2-card let the head script hide the generic pair for
-        # whole_game_only games — see #verdict-page.hide-generic in app.py.)
+        # .g1-card / .g2-card let the head script hide the generic pair for
+        # whole_game_only games — see #verdict-page.hide-generic in app.py.
         with gr.Group(elem_classes=["question-card", "g1-card"]):
             gr.Markdown("### G1 — Strategic Coherence")
             gr.Markdown("How well did the AI stick to and adapt its plan throughout the game?")
@@ -265,7 +237,6 @@ def build(welcome_page, annotation_page, verdict_page,
                     coh_btns.append(btn)
             coherence = gr.Textbox(value="", visible=False)
 
-        # ── G2: Overall Game Quality
         with gr.Group(elem_classes=["question-card", "g2-card"]):
             gr.Markdown("### G2 — Overall Game Quality")
             gr.Markdown("Looking at the whole game, how well did the AI actually play to achieve the main goal?")
@@ -281,26 +252,17 @@ def build(welcome_page, annotation_page, verdict_page,
                 f'<span class="ovr-end-desc">{_hi_desc}</span></div>'
                 '</div>'
             )
-            # A slider, with explicit "touched" tracking: unlike a Radio, a
-            # Slider always reports a numeric value (never falsy), so "chose
-            # 4" and "never touched it" are indistinguishable from the value
-            # alone. overall_touched is flipped True only by .release() — the
-            # user-gesture-only event that (unlike .change()) never fires on a
-            # programmatic gr.update(value=...) reset — and is what
-            # _verdict_save_and_clear actually checks instead of the slider's value.
+            # overall_touched tracks whether this was actually moved (see the
+            # docstring on _verdict_save_and_clear for why the value alone can't tell).
             overall = gr.Slider(
                 minimum=1, maximum=7, step=1, value=4,
                 show_label=False, elem_classes=["ovr-slider"],
             )
             overall_touched = gr.State(False)
 
-        # ── Game-specific whole-game question(s) — HYBRID condition only.
-        # Normally rendered ON TOP of the generic G1/G2 (kept for everyone). For a
-        # "whole_game_only" game (imagegame) these REPLACE G1/G2 — the .wg-only
-        # marker below tells the head script to hide .g1-card/.g2-card, and the
-        # server skips the coherence/overall checks (see _verdict_save_and_clear).
-        # Each widget writes its value into specific_state ({index: value}) so the
-        # fixed-shape save chain needs only ONE extra input, never dynamic ones.
+        # Bespoke whole-game questions, hybrid only. The .wg-only marker below
+        # tells the head script to hide G1/G2 for whole_game_only games.
+        # Each widget writes into specific_state so the save chain stays fixed-shape.
         specific_state = gr.State({})
 
         @gr.render(inputs=[game_state, block_state])
@@ -345,7 +307,6 @@ def build(welcome_page, annotation_page, verdict_page,
                             inputs=[r, specific_state], outputs=[specific_state],
                         )
 
-        # ── Comment
         comment = gr.Textbox(
             placeholder="Any overall observations about this game? (optional)",
             lines=4, show_label=False,
@@ -358,11 +319,10 @@ def build(welcome_page, annotation_page, verdict_page,
             back_btn = gr.Button("← Back to Annotation", variant="secondary")
             action_btn = gr.Button(_action_label([], 0), variant="primary")
 
-        # Local-only pass-through signal for the 3-step click chain below —
-        # never threaded to app.py.
+        # Local-only pass-through signal for the click chain below — never
+        # threaded to app.py.
         verdict_ok_state = gr.State(False)
 
-        # ── EVENT WIRING
         for i, (val, *_) in enumerate(_COHERENCE):
             coh_btns[i].click(
                 fn=lambda v=val: _coh_select(v),
@@ -371,14 +331,7 @@ def build(welcome_page, annotation_page, verdict_page,
 
         overall.release(fn=lambda: True, outputs=[overall_touched])
 
-        # ONE button now does what used to take two clicks: validate+save
-        # (and, if continuing, blank every verdict widget) in ONE event, then
-        # (chained via .then) advance to the next game / show the "all done"
-        # message — the exact same TWO-event clearing_state shape the old
-        # "Next game →" flow used (_next_game_clear that also did the reset,
-        # then _next_game_advance), just with the leading event now also
-        # doing validate+save. See _verdict_save_and_clear's docstring for
-        # why this stayed two events rather than three.
+        # See _verdict_save_and_clear's docstring for why save+clear stays one event.
         action_btn.click(
             fn=_verdict_save_and_clear,
             inputs=[game_state, annotator_state, block_state, playlist_state,
@@ -394,12 +347,7 @@ def build(welcome_page, annotation_page, verdict_page,
                      block_state, started_at_state, annotation_page, verdict_page,
                      action_btn],
         ).then(
-            # Pure client-side (fn=None skips a server round trip): reads the
-            # status Markdown _verdict_finish just wrote and redirects to
-            # Prolific only on the genuine "all done" branch (identified by
-            # its fixed substring) — never on the "advance to next game"
-            # branch, where status is "". A few seconds' delay lets the
-            # participant actually see the thank-you message before leaving.
+            # Client-side only — redirects to Prolific after the thank-you message shows.
             fn=None,
             inputs=[status],
             outputs=None,
@@ -412,17 +360,8 @@ def build(welcome_page, annotation_page, verdict_page,
             }""" % PROLIFIC_COMPLETION_URL,
         )
 
-        # Syncs the button label for the very FIRST view of this page in a
-        # sitting (playlist_state is assigned once, on page load / Start,
-        # before verdict_page is ever shown — this fires reliably then,
-        # mirroring the top-nav game-name @gr.render's proven reliance on the
-        # same mechanism). Deliberately NOT also listening on
-        # playlist_idx_state: that state is mutated by _verdict_finish above,
-        # and a second independent listener reacting to the same mutation
-        # raced with annotation.py's own @gr.render (also keyed on
-        # playlist_idx_state), corrupting the frontend — _verdict_finish's
-        # own action_btn output (this same atomic event) handles resyncing
-        # the label for every game after the first instead.
+        # Syncs the label for the first view only — _verdict_finish's own
+        # action_btn output resyncs it after that (see its comment above).
         def _sync_action_label(playlist, playlist_idx):
             return gr.update(value=_action_label(playlist, playlist_idx))
 

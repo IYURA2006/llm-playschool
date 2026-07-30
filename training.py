@@ -1,13 +1,6 @@
-"""Interactive practice round shown before a playlist session starts.
-
-The annotator rates a short, easily-verifiable Wordle game (weaker model, real
-transcript) with the universal Q1/Q2, then reveals reference ratings with
-explanations. Nothing here is persisted — it exists purely to calibrate people
-on the 1–4 scales before their first real game.
-
-The reference ratings and wording live in _REFERENCE below so the team can
-tweak them without touching the UI code.
-"""
+"""Interactive practice round shown before a playlist session starts. Rates a
+short reference Wordle game, then reveals explained reference ratings to
+calibrate the 1-4 scales. Nothing here is persisted."""
 
 import os
 from datetime import datetime
@@ -29,9 +22,7 @@ _Q2_MD = ("**Q2 — Sensible Next Step**\n\nDid this move make sense "
 _SCALE_Q1 = [("1\nNone", "1"), ("2\nPartial", "2"), ("3\nGood", "3"), ("4\nExcellent", "4")]
 _SCALE_Q2 = [("1\nNonsensical", "1"), ("2\nPoor", "2"), ("3\nReasonable", "3"), ("4\nStrong", "4")]
 
-# Per-turn reference ratings. `lower` is the teaching note: what kind of move
-# WOULD have earned a lower score, so the bottom of the scale gets calibrated
-# even on a decently-played game.
+# `lower` teaches what would have scored worse, calibrating the scale's bottom too.
 _REFERENCE = {
     0: {
         "q1": "4",
@@ -133,7 +124,6 @@ def build(welcome_page, training_page, annotation_page, started_at_state):
     g = load_game(TRAINING_GAME)
 
     with training_page:
-        # ── TOP NAV
         with gr.Row(elem_classes=["annot-topnav"]):
             gr.HTML(
                 '<div class="nav-left">'
@@ -158,17 +148,15 @@ def build(welcome_page, training_page, annotation_page, started_at_state):
             )
 
         with gr.Row(equal_height=False):
-            # LEFT: transcript (train-specific scroll class + card ids so the
-            # annotation page's JS never touches these nodes)
+            # train-specific scroll class + card ids keep the annotation
+            # page's JS from touching these nodes.
             with gr.Column(scale=3, elem_classes=["tx-col"]):
                 gr.HTML(_build_transcript_html(g, current_idx=-1,
                                                scroll_cls="train-txscroll",
                                                id_prefix="ttc-"))
 
-            # RIGHT: one practice turn at a time, same chip navigator as the
-            # real annotation page — "turn-anno-card" is what app.py's JS
-            # (panes()/chips()) targets, "train-card" only adds practice-only
-            # styling on top of it.
+            # "turn-anno-card" is what app.py's JS (panes()/chips()) targets;
+            # "train-card" only adds practice-only styling on top of it.
             with gr.Column(scale=2, elem_id="train-col"):
                 gr.HTML(_turn_nav_html(g))
                 radios, feedbacks = [], []

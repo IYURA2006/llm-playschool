@@ -16,7 +16,6 @@ def analyze(path):
     meta = data["meta"]
     players = data["players"]
 
-    # ── rules extraction ──
     def extract_rules():
         for turn in data["turns"]:
             for msg in turn:
@@ -33,7 +32,6 @@ def analyze(path):
 
     rules = extract_rules()
 
-    # ── AI players ──
     def is_ai(pid):
         info = players.get(pid, {})
         if pid == "GM":
@@ -46,7 +44,6 @@ def analyze(path):
     def role(pid):
         return players.get(pid, {}).get("game_role", pid)
 
-    # ── AI response turns ──
     ai_turns = []
     for turn in data["turns"]:
         for msg in turn:
@@ -54,7 +51,6 @@ def analyze(path):
                 ai_turns.append(msg)
     n_turns = len(ai_turns)
 
-    # ── reasoning detection ──
     def detect_reasoning(turns):
         if not turns:
             return False
@@ -146,11 +142,8 @@ if problems:
         print(f"  • {g}: {fl}")
 
 
-# ──────────────────────────────────────────────────────────────────────────
-# RENDER CHECK: actually build the transcript HTML and inspect the output
-# ──────────────────────────────────────────────────────────────────────────
+# Actually build the transcript HTML and inspect the output.
 import html as _html
-import re as _re
 
 def render_check(path):
     with open(path) as f:
@@ -165,7 +158,6 @@ def render_check(path):
         return m not in ("programmatic", "")
     ai_ids = {pid for pid in players if is_ai(pid)}
 
-    # rules
     rules = "(none)"
     for turn in data["turns"]:
         for msg in turn:
