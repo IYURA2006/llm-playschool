@@ -1,35 +1,42 @@
 """Test harness: exercise assignment.py's coverage-balanced reservation logic
-against a scratch SQLite DB. No Gradio, no browser, no real HF upload.
-Run via: python _test_assignment.py"""
+against a disposable test Postgres database. No Gradio, no browser.
+Run via: python _test_assignment.py
+
+Requires TEST_DB_NAME to be set (in .env or the environment) to a database
+distinct from the real `study` DB, with the same schema + grants applied
+(see postgres_schema.sql). Refuses to run rather than risk mutating real
+annotation data — there is no cheap "swap to a scratch file" trick with
+Postgres the way there was with SQLite."""
 import concurrent.futures
 import os
-import sqlite3
-import tempfile
 import traceback
 from collections import Counter
 from datetime import datetime, timedelta
 
-# Neutralize any real HF backup credentials from .env *before* importing db —
-# this script writes ~150 synthetic PIDs and must never touch a real HF
-# dataset. dotenv's default override=False means these empty strings stick.
-os.environ["HF_TOKEN"] = ""
-os.environ["HF_PILOT_DATASET_REPO"] = ""
-os.environ["HF_DATASET_REPO"] = ""
+from dotenv import load_dotenv
+
+load_dotenv()
+
+_test_db = os.environ.get("TEST_DB_NAME")
+if not _test_db:
+    raise SystemExit(
+        "TEST_DB_NAME is not set — refusing to run against the real `study` "
+        "database. Set TEST_DB_NAME in .env to a separate, disposable "
+        "Postgres database (same schema/grants as study — see "
+        "postgres_schema.sql) before running this script."
+    )
+os.environ["DB_NAME"] = _test_db
 
 import db
 import assignment
 
-_tmp = tempfile.NamedTemporaryFile(suffix=".db", delete=False)
-_tmp.close()
-db.DB_PATH = _tmp.name
-
 
 def reset_db():
-    for suffix in ("", "-wal", "-shm"):
-        try:
-            os.remove(db.DB_PATH + suffix)
-        except OSError:
-            pass
+    with db._connect() as conn:
+        cur = conn.cursor()
+        cur.execute("DELETE FROM turn_ratings")
+        cur.execute("DELETE FROM annotations")
+        cur.execute("DELETE FROM consents")
     db.init_db()
 
 
@@ -40,11 +47,13 @@ def _raw_reservation_counts():
     use), this is the direct ground truth for "how many annotators actually
     hold a claim on this slug right now", which is what the over-assignment
     checks below need to verify against."""
-    with sqlite3.connect(db.DB_PATH) as conn:
-        rows = conn.execute(
+    with db._connect() as conn:
+        cur = conn.cursor()
+        cur.execute(
             "SELECT game_slug, COUNT(DISTINCT annotator_id) FROM annotations "
             "WHERE condition='hybrid' GROUP BY game_slug"
-        ).fetchall()
+        )
+        rows = cur.fetchall()
     return dict(rows)
 
 
@@ -53,10 +62,11 @@ def complete_session(pid, condition="hybrid"):
     simulate them finishing their current sitting. A session only counts
     toward the cap (and only frees the participant to start a new batch)
     once every game in it is verdicted — see assignment._resume_target."""
-    with sqlite3.connect(db.DB_PATH) as conn:
-        conn.execute(
-            "UPDATE annotations SET verdict_at=?, updated_at=? "
-            "WHERE annotator_id=? AND condition=? AND verdict_at IS NULL",
+    with db._connect() as conn:
+        cur = conn.cursor()
+        cur.execute(
+            "UPDATE annotations SET verdict_at=%s, updated_at=%s "
+            "WHERE annotator_id=%s AND condition=%s AND verdict_at IS NULL",
             (datetime.now().isoformat(), datetime.now().isoformat(), pid, condition),
         )
 
@@ -205,17 +215,18 @@ def test_stale_reservation_frees_its_slot():
     # (non-stale) reservations, then hand-craft one more that's artificially
     # old, and confirm coverage_counts drops it once stale_before excludes it.
     slug = assignment.POOL_SLUGS[0]
-    with sqlite3.connect(db.DB_PATH) as conn:
+    with db._connect() as conn:
+        cur = conn.cursor()
         for i in range(assignment.COVERAGE_TARGET):
-            conn.execute(
+            cur.execute(
                 "INSERT INTO annotations (game_slug, annotator_id, condition, updated_at) "
-                "VALUES (?, ?, 'hybrid', ?)",
+                "VALUES (%s, %s, 'hybrid', %s)",
                 (slug, f"filler_{i}", datetime.now().isoformat()),
             )
         stale_ts = (datetime.now() - timedelta(hours=assignment.STALE_AFTER_HOURS + 1)).isoformat()
-        conn.execute(
+        cur.execute(
             "INSERT INTO annotations (game_slug, annotator_id, condition, updated_at) "
-            "VALUES (?, 'filler_stale', 'hybrid', ?)",
+            "VALUES (%s, 'filler_stale', 'hybrid', %s)",
             (slug, stale_ts),
         )
 
@@ -318,10 +329,11 @@ def test_half_finished_session_does_not_count_toward_cap():
         return
 
     # Verdict exactly one game, leaving the sitting unfinished.
-    with sqlite3.connect(db.DB_PATH) as conn:
-        conn.execute(
-            "UPDATE annotations SET verdict_at=?, updated_at=? "
-            "WHERE annotator_id=? AND game_slug=?",
+    with db._connect() as conn:
+        cur = conn.cursor()
+        cur.execute(
+            "UPDATE annotations SET verdict_at=%s, updated_at=%s "
+            "WHERE annotator_id=%s AND game_slug=%s",
             (datetime.now().isoformat(), datetime.now().isoformat(),
              pid, playlist[0]["game"]),
         )
@@ -372,11 +384,7 @@ run("session cap blocks further work", test_session_cap_blocks_further_work)
 run("half-finished session resumes and doesn't count", test_half_finished_session_does_not_count_toward_cap)
 run("pseudonymization is deterministic and fails loudly when unsalted", test_pseudonymization_is_deterministic)
 
-for suffix in ("", "-wal", "-shm"):
-    try:
-        os.remove(db.DB_PATH + suffix)
-    except OSError:
-        pass
+reset_db()  # leave the test DB clean, it's shared across runs
 
 print("\n" + "=" * 60)
 if failures:

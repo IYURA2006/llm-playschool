@@ -320,7 +320,6 @@ def build_playlist_for(annotator_id, condition=CONDITION):
     if not picked:
         return [], NO_TASKS_MESSAGE
 
-    db.backup_db_to_hf_async()
     est = sum(transcript_seconds(s) for s in picked) + rules_seconds(picked[0])
     if est < TARGET_SECONDS / 2:
         # Non-blocking: the participant still gets a valid (shorter) session

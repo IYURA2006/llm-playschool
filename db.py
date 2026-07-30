@@ -1,9 +1,9 @@
-"""SQLite persistence for annotation results.
+"""PostgreSQL persistence for annotation results.
 
 Annotations are keyed by (game_slug, annotator_id) so each annotator's work on a
-game is stored separately. A fresh short-lived connection is opened per operation —
-Gradio runs event handlers across threads, and per-call connections sidestep
-SQLite's same-thread restriction. WAL mode allows concurrent writers.
+game is stored separately. A fresh connection is opened per operation and always
+closed on exit — Gradio runs event handlers across threads, so no connection is
+ever shared across calls.
 """
 
 import contextlib
@@ -11,11 +11,10 @@ import hashlib
 import hmac
 import json
 import os
-import shutil
-import sqlite3
-import threading
 from datetime import datetime
 
+import psycopg2
+from psycopg2 import errors as pg_errors
 from dotenv import load_dotenv
 
 # Load secrets from a local .env (gitignored) for local dev. On an HF Space the
@@ -23,20 +22,26 @@ from dotenv import load_dotenv
 # harmless no-op there since no .env file is present.
 load_dotenv()
 
-_dir = os.path.dirname(os.path.abspath(__file__))
-DB_PATH = os.path.join(_dir, "annotations.db")
+DB_HOST = os.environ.get("DB_HOST")
+DB_NAME = os.environ.get("DB_NAME")
+DB_USER = os.environ.get("DB_USER")
+DB_PASSWORD = os.environ.get("DB_PASSWORD")
+DB_SSLMODE = os.environ.get("DB_SSLMODE", "require")
+DB_GSSENCMODE = os.environ.get("DB_GSSENCMODE", "disable")
 
-# HF Dataset backup target. An HF Space has an ephemeral filesystem, so the local
-# annotations.db is wiped on every restart. We mirror it to a private HF dataset
-# repo after each submit and restore it on startup.
-#
-# Reads HF_DATASET_REPO — the production dataset for the general Prolific study
-# (main deploys straight to the production Space via sync_to_hub.yml). Unset =>
-# backup/restore are disabled outright rather than silently no-op, since a
-# missing secret must never look like a working backup.
-HF_DATASET_REPO = os.environ.get("HF_DATASET_REPO")
-_HF_TOKEN = os.environ.get("HF_TOKEN")
 _PSEUDONYM_SALT = os.environ.get("PSEUDONYM_SALT")
+
+
+def _require_db_config():
+    missing = [name for name, val in (
+        ("DB_HOST", DB_HOST), ("DB_NAME", DB_NAME),
+        ("DB_USER", DB_USER), ("DB_PASSWORD", DB_PASSWORD),
+    ) if not val]
+    if missing:
+        raise RuntimeError(
+            f"Missing required DB config: {', '.join(missing)}. Set them in .env "
+            "(or the deployment's repository secrets) before the app can start."
+        )
 
 
 def pseudonymize_pid(raw_pid):
@@ -57,12 +62,12 @@ def pseudonymize_pid(raw_pid):
 
 _SCHEMA = """
 CREATE TABLE IF NOT EXISTS annotations (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    id INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     game_slug TEXT NOT NULL,
     game_id INTEGER,
     game_name TEXT,
     source_path TEXT,
-    has_reasoning INTEGER,
+    has_reasoning BOOLEAN,
     annotator_id TEXT NOT NULL DEFAULT '',
     condition TEXT,
     -- Which sitting this reservation belongs to: 1 for a participant's first
@@ -73,20 +78,20 @@ CREATE TABLE IF NOT EXISTS annotations (
     -- completed_pairs() still resolve resume position correctly.
     session_index INTEGER,
     session_day TEXT,
-    session_started_at TEXT,
-    started_at TEXT,
-    annotated_at TEXT,
+    session_started_at TIMESTAMP,
+    started_at TIMESTAMP,
+    annotated_at TIMESTAMP,
     strategic_coherence TEXT,
     overall_rating INTEGER,
     verdict_comment TEXT,
-    verdict_at TEXT,
+    verdict_at TIMESTAMP,
     verdict_specific TEXT,
-    updated_at TEXT,
+    updated_at TIMESTAMP,
     UNIQUE(game_slug, annotator_id, condition)
 );
 
 CREATE TABLE IF NOT EXISTS turn_ratings (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    id INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     annotation_id INTEGER NOT NULL REFERENCES annotations(id) ON DELETE CASCADE,
     turn_index INTEGER NOT NULL,
     from_player TEXT,
@@ -102,138 +107,103 @@ CREATE TABLE IF NOT EXISTS turn_ratings (
 );
 
 CREATE TABLE IF NOT EXISTS consents (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    id INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     annotator_id TEXT NOT NULL UNIQUE,
-    consented_at TEXT NOT NULL
+    consented_at TIMESTAMP NOT NULL
 );
 """
 
 
+def _open():
+    return psycopg2.connect(
+        host=DB_HOST,
+        dbname=DB_NAME,
+        user=DB_USER,
+        password=DB_PASSWORD,
+        sslmode=DB_SSLMODE,
+        gssencmode=DB_GSSENCMODE,
+    )
+
+
+@contextlib.contextmanager
 def _connect():
-    conn = sqlite3.connect(DB_PATH)
-    conn.execute("PRAGMA journal_mode=WAL")
-    conn.execute("PRAGMA foreign_keys=ON")
-    # WAL allows only one writer; without a busy_timeout a second concurrent
-    # writer (two annotators submitting at once) gets SQLITE_BUSY immediately,
-    # which propagates as an uncaught OperationalError and the save is lost.
-    conn.execute("PRAGMA busy_timeout=10000")
-    return conn
+    conn = _open()
+    try:
+        yield conn
+        conn.commit()
+    except Exception:
+        conn.rollback()
+        raise
+    finally:
+        conn.close()
 
 
-def _migrate_session_index(conn):
-    """Additive upgrade for DBs created before multi-session participation
-    existed. CREATE TABLE IF NOT EXISTS never alters an existing table, so a
-    live annotations.db (one already holding real participant data) would
-    otherwise keep the old column set and every session_index write would
-    fail. Additive-only by design — no DROP/rebuild — so it is safe to run
-    against the production dataset, and it is a no-op once applied.
-
-    Pre-existing rows keep session_index NULL rather than being backfilled to
-    1: they were reserved when a PID could only ever have one batch, and
-    assignment.py treats NULL as session 1 (COALESCE) precisely so no
-    historical row has to be rewritten."""
-    cols = {row[1] for row in conn.execute("PRAGMA table_info(annotations)")}
-    if "session_index" not in cols:
-        conn.execute("ALTER TABLE annotations ADD COLUMN session_index INTEGER")
+def _check_schema_exists():
+    with _connect() as conn:
+        cur = conn.cursor()
+        cur.execute(
+            "SELECT to_regclass('public.annotations'), "
+            "to_regclass('public.turn_ratings'), to_regclass('public.consents')"
+        )
+        row = cur.fetchone()
+    missing = [name for name, present in zip(
+        ("annotations", "turn_ratings", "consents"), row) if present is None]
+    if missing:
+        raise RuntimeError(
+            f"Postgres schema is missing table(s) {missing}, and this DB user "
+            "lacks CREATE privilege to create them itself. Run "
+            "postgres_schema.sql as an admin role against breezy/study first, "
+            "then restart the app."
+        )
 
 
 def init_db():
-    with _connect() as conn:
-        conn.executescript(_SCHEMA)
-        _migrate_session_index(conn)
-
-
-# Serializes snapshot+upload: concurrent submits must not interleave uploads
-# (stale-over-fresh races) or snapshot while another backup is mid-flight.
-_backup_lock = threading.Lock()
-
-
-def backup_db_to_hf():
-    """Best-effort push of annotations.db to the HF dataset repo. Never raises."""
-    if not HF_DATASET_REPO:
-        print("⚠️ HF backup DISABLED: HF_DATASET_REPO is not set — annotations live "
-              "only in the local annotations.db until the secret is configured.")
-        return
-    if not _HF_TOKEN:
-        # Loud, because a missing token silently drops every annotation: the
-        # annotator sees "saved" while nothing reaches the HF dataset backup.
-        print("⚠️ HF backup SKIPPED: HF_TOKEN is not set — annotation NOT persisted "
-              "to the HF dataset. Set HF_TOKEN in the Space's Repository secrets.")
-        return
-    snapshot = DB_PATH + ".hfsnapshot"
-    with _backup_lock:
-        try:
-            # Point-in-time copy via the sqlite3 backup API. Uploading the live
-            # file (the old approach) races SQLite's automatic checkpoints —
-            # a concurrent commit can rewrite the main file mid-upload, giving
-            # the HF copy torn pages or missing the newest WAL-only commits.
-            src = _connect()
-            try:
-                dst = sqlite3.connect(snapshot)
-                try:
-                    src.backup(dst)
-                finally:
-                    dst.close()
-            finally:
-                src.close()
-            from huggingface_hub import HfApi
-            HfApi(token=_HF_TOKEN).upload_file(
-                path_or_fileobj=snapshot,
-                path_in_repo="annotations.db",
-                repo_id=HF_DATASET_REPO,
-                repo_type="dataset",
-            )
-        except Exception as e:
-            # Never let a backup failure break the annotator's submit flow.
-            print(f"⚠️ HF backup failed: {e}")
-        finally:
-            for suffix in ("", "-wal", "-shm"):
-                try:
-                    os.remove(snapshot + suffix)
-                except OSError:
-                    pass
-
-
-def backup_db_to_hf_async():
-    """Fire-and-forget wrapper: run the HF upload on a daemon thread so the
-    ~seconds-long network commit never blocks the Gradio event handler.
-
-    Called synchronously, the upload froze the UI (Gradio's 'processing | Ns'
-    spinner) on every turn/verdict/survey save. The local SQLite write has
-    already committed by the time this runs, so the annotation is durable
-    regardless — only the off-site HF mirror is deferred. _backup_lock still
-    serializes the actual uploads, so overlapping saves queue instead of
-    racing. Daemon so it never keeps the process alive at shutdown (the
-    accepted tradeoff: a mirror still in flight when the process dies is lost,
-    but the data remains in the local DB and every prior save already pushed)."""
-    threading.Thread(target=backup_db_to_hf, daemon=True).start()
-
-
-def _restore_db_from_hf():
-    """If no local DB exists, pull the last backup from the HF dataset repo."""
-    if os.path.exists(DB_PATH):
-        return
-    if not HF_DATASET_REPO:
-        print("⚠️ HF restore DISABLED: HF_DATASET_REPO is not set — starting "
-              "with an empty local DB.")
-        return
-    if not _HF_TOKEN:
-        print("⚠️ HF restore SKIPPED: HF_TOKEN is not set — starting with an empty DB "
-              "and annotations will NOT be backed up. Set HF_TOKEN in the Space's "
-              "Repository secrets.")
-        return
+    """Create the schema if this DB role has CREATE privilege on schema
+    public (e.g. a fresh local/dev database); otherwise studyuser-style
+    deployments only have DML privileges, so fall back to verifying the
+    schema already exists (created via the one-time postgres_schema.sql
+    step) and fail loudly if it doesn't."""
     try:
-        from huggingface_hub import hf_hub_download
-        downloaded = hf_hub_download(
-            repo_id=HF_DATASET_REPO,
-            filename="annotations.db",
-            repo_type="dataset",
-            token=_HF_TOKEN,
-        )
-        shutil.copy(downloaded, DB_PATH)
-        print("✅ Restored annotations.db from HF dataset backup")
-    except Exception as e:
-        print(f"No existing HF backup found, starting fresh: {e}")
+        with _connect() as conn:
+            cur = conn.cursor()
+            cur.execute(_SCHEMA)
+    except pg_errors.InsufficientPrivilege:
+        _check_schema_exists()
+
+
+# A fixed key: serializes assignment.py's read-decide-write claim sequence
+# the same way SQLite's BEGIN IMMEDIATE did (see write_transaction below).
+_ASSIGNMENT_LOCK_KEY = 1
+
+
+@contextlib.contextmanager
+def write_transaction():
+    """Yield a connection holding a session-scoped advisory lock, for callers
+    needing an atomic read-decide-write sequence across multiple statements —
+    e.g. assignment.py's coverage-balanced reservation: read current per-game
+    coverage counts, decide what to reserve, insert the reservation, all
+    atomically. Without this, two concurrent callers could both read the same
+    under-target count and both reserve past the coverage target (a Prolific
+    study "release" moment is exactly this kind of thundering-herd scenario).
+
+    pg_advisory_xact_lock blocks a second concurrent write_transaction() until
+    this one commits or rolls back, at which point Postgres releases the lock
+    automatically — no separate unlock call needed. Scoped to just this claim
+    path: unlike SQLite's BEGIN IMMEDIATE (which serialized every write in the
+    whole database, a side effect of SQLite's single-writer limitation, not a
+    deliberate choice), plain writes elsewhere (save_turns, save_verdict,
+    record_consent) are not blocked by or against this lock."""
+    conn = _open()
+    try:
+        cur = conn.cursor()
+        cur.execute("SELECT pg_advisory_xact_lock(%s)", (_ASSIGNMENT_LOCK_KEY,))
+        yield conn
+        conn.commit()
+    except Exception:
+        conn.rollback()
+        raise
+    finally:
+        conn.close()
 
 
 def save_turns(game_slug, meta, source_path, has_reasoning, annotator_id, condition,
@@ -250,7 +220,7 @@ def save_turns(game_slug, meta, source_path, has_reasoning, annotator_id, condit
                 (game_slug, game_id, game_name, source_path, has_reasoning,
                  annotator_id, condition, session_day, session_started_at,
                  started_at, annotated_at, updated_at)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
             ON CONFLICT(game_slug, annotator_id, condition) DO UPDATE SET
                 game_id=excluded.game_id,
                 game_name=excluded.game_name,
@@ -268,7 +238,7 @@ def save_turns(game_slug, meta, source_path, has_reasoning, annotator_id, condit
                 meta.get("game_id"),
                 meta.get("game_name"),
                 source_path,
-                1 if has_reasoning else 0,
+                bool(has_reasoning),
                 annotator_id,
                 condition,
                 session_day,
@@ -279,19 +249,19 @@ def save_turns(game_slug, meta, source_path, has_reasoning, annotator_id, condit
             ),
         )
         cur.execute(
-            "SELECT id FROM annotations WHERE game_slug=? AND annotator_id=? AND condition=?",
+            "SELECT id FROM annotations WHERE game_slug=%s AND annotator_id=%s AND condition=%s",
             (game_slug, annotator_id, condition),
         )
         annotation_id = cur.fetchone()[0]
 
-        cur.execute("DELETE FROM turn_ratings WHERE annotation_id=?", (annotation_id,))
+        cur.execute("DELETE FROM turn_ratings WHERE annotation_id=%s", (annotation_id,))
         cur.executemany(
             """
             INSERT INTO turn_ratings
                 (annotation_id, turn_index, from_player, role, content,
                  prior_information_use, strategic_logic, reasoning_clarity,
                  flags, comment, extra_responses)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
             """,
             [
                 (
@@ -310,9 +280,6 @@ def save_turns(game_slug, meta, source_path, has_reasoning, annotator_id, condit
                 for t in turns_out
             ],
         )
-    # Pilot: back up on every turn submission (not just the final verdict), so
-    # a session abandoned mid-way is still captured within the shortened window.
-    backup_db_to_hf_async()
     return annotation_id
 
 
@@ -321,11 +288,13 @@ def completed_pairs(annotator_id):
     submitted). Drives the welcome form's resume logic — a game with turns
     saved but no verdict counts as not done and will be redone."""
     with _connect() as conn:
-        rows = conn.execute(
+        cur = conn.cursor()
+        cur.execute(
             "SELECT game_slug, condition FROM annotations "
-            "WHERE annotator_id=? AND verdict_at IS NOT NULL",
+            "WHERE annotator_id=%s AND verdict_at IS NOT NULL",
             (annotator_id or "",),
-        ).fetchall()
+        )
+        rows = cur.fetchall()
     return {(r[0], r[1]) for r in rows}
 
 
@@ -337,9 +306,9 @@ def has_consented(annotator_id):
     if not annotator_id:
         return False
     with _connect() as conn:
-        row = conn.execute(
-            "SELECT 1 FROM consents WHERE annotator_id=?", (annotator_id,)
-        ).fetchone()
+        cur = conn.cursor()
+        cur.execute("SELECT 1 FROM consents WHERE annotator_id=%s", (annotator_id,))
+        row = cur.fetchone()
     return row is not None
 
 
@@ -352,43 +321,12 @@ def record_consent(annotator_id):
         return
     now = datetime.now().isoformat()
     with _connect() as conn:
-        conn.execute(
-            "INSERT INTO consents (annotator_id, consented_at) VALUES (?, ?) "
+        cur = conn.cursor()
+        cur.execute(
+            "INSERT INTO consents (annotator_id, consented_at) VALUES (%s, %s) "
             "ON CONFLICT(annotator_id) DO NOTHING",
             (annotator_id, now),
         )
-    backup_db_to_hf_async()
-
-
-@contextlib.contextmanager
-def write_transaction():
-    """Yield a connection holding an immediate write lock (BEGIN IMMEDIATE),
-    for callers needing an atomic read-decide-write sequence across multiple
-    statements — e.g. assignment.py's coverage-balanced reservation: read
-    current per-game coverage counts, decide what to reserve, insert the
-    reservation, all atomically. Without this, two concurrent callers could
-    both read the same under-target count and both reserve past the
-    coverage target (a Prolific study "release" moment is exactly this kind
-    of thundering-herd scenario). BEGIN IMMEDIATE acquires SQLite's write
-    lock up front rather than lazily at the first write, so a second
-    concurrent write_transaction() blocks (subject to busy_timeout=10000)
-    instead of interleaving with this one. Safe to issue right after
-    _connect(): no DML has run yet on that connection, so it can't collide
-    with sqlite3's own implicit-transaction handling (which only triggers
-    before the first INSERT/UPDATE/DELETE, never on PRAGMA/SELECT). WAL mode
-    still lets other participants' reads (people actively annotating)
-    proceed unaffected. Commits on clean exit, rolls back and re-raises on
-    exception."""
-    conn = _connect()
-    conn.execute("BEGIN IMMEDIATE")
-    try:
-        yield conn
-        conn.commit()
-    except Exception:
-        conn.rollback()
-        raise
-    finally:
-        conn.close()
 
 
 def assigned_games(annotator_id, condition=None, session_index=None, conn=None):
@@ -405,22 +343,26 @@ def assigned_games(annotator_id, condition=None, session_index=None, conn=None):
     sessions' worth of reservations on file, and handing back all of them
     would replay games they already finished. Omit it only for
     whole-participant questions (e.g. the no-repeat exclusion set).
-    NULL session_index rows (reserved before multi-session support — see
-    _migrate_session_index) are treated as session 1."""
-    q = "SELECT game_slug, condition FROM annotations WHERE annotator_id=?"
+    NULL session_index rows (reserved before multi-session support existed)
+    are treated as session 1."""
+    q = "SELECT game_slug, condition FROM annotations WHERE annotator_id=%s"
     params = [annotator_id or ""]
     if condition is not None:
-        q += " AND condition=?"
+        q += " AND condition=%s"
         params.append(condition)
     if session_index is not None:
-        q += " AND COALESCE(session_index, 1)=?"
+        q += " AND COALESCE(session_index, 1)=%s"
         params.append(session_index)
     q += " ORDER BY id"
     if conn is not None:
-        rows = conn.execute(q, params).fetchall()
+        cur = conn.cursor()
+        cur.execute(q, params)
+        rows = cur.fetchall()
     else:
         with _connect() as c:
-            rows = c.execute(q, params).fetchall()
+            cur = c.cursor()
+            cur.execute(q, params)
+            rows = cur.fetchall()
     return [{"game": r[0], "condition": r[1]} for r in rows]
 
 
@@ -431,13 +373,17 @@ def reserved_slugs(annotator_id, conn=None):
     sitting. Deliberately not filtered by condition — seeing the same
     transcript again under a different question set would still be a repeat
     viewing, and the second rating could not be treated as independent."""
-    q = "SELECT DISTINCT game_slug FROM annotations WHERE annotator_id=?"
+    q = "SELECT DISTINCT game_slug FROM annotations WHERE annotator_id=%s"
     params = [annotator_id or ""]
     if conn is not None:
-        rows = conn.execute(q, params).fetchall()
+        cur = conn.cursor()
+        cur.execute(q, params)
+        rows = cur.fetchall()
     else:
         with _connect() as c:
-            rows = c.execute(q, params).fetchall()
+            cur = c.cursor()
+            cur.execute(q, params)
+            rows = cur.fetchall()
     return {r[0] for r in rows}
 
 
@@ -451,17 +397,21 @@ def session_summary(annotator_id, condition=None, conn=None):
     allowed sessions."""
     q = ("SELECT COALESCE(session_index, 1) AS s, COUNT(*), "
          "       COUNT(verdict_at) "
-         "FROM annotations WHERE annotator_id=?")
+         "FROM annotations WHERE annotator_id=%s")
     params = [annotator_id or ""]
     if condition is not None:
-        q += " AND condition=?"
+        q += " AND condition=%s"
         params.append(condition)
     q += " GROUP BY s ORDER BY s"
     if conn is not None:
-        rows = conn.execute(q, params).fetchall()
+        cur = conn.cursor()
+        cur.execute(q, params)
+        rows = cur.fetchall()
     else:
         with _connect() as c:
-            rows = c.execute(q, params).fetchall()
+            cur = c.cursor()
+            cur.execute(q, params)
+            rows = cur.fetchall()
     return [(int(r[0]), int(r[1]), int(r[2])) for r in rows]
 
 
@@ -473,30 +423,31 @@ def coverage_counts(condition, stale_before=None, conn=None):
 
     `stale_before` MUST be an ISO string produced the same way every other
     timestamp in this module is (datetime.now().isoformat() — naive local
-    time, 'T'-separated), e.g. via assignment._stale_cutoff(). Do NOT
-    compute it with SQLite's datetime('now', ...): that's UTC and
-    space-separated, and comparing the two formats as raw strings is wrong
-    two ways — a timezone offset, and a lexicographic bug where 'T' (0x54)
-    always sorts after ' ' (0x20), so a same-day Python timestamp would
-    always compare "greater than" a SQLite-generated cutoff regardless of
-    actual time-of-day. Keeping both sides of the comparison Python-generated
-    avoids this entirely.
+    time), e.g. via assignment._stale_cutoff(). Postgres casts both sides of
+    the comparison to a real TIMESTAMP, so this is a genuine temporal
+    comparison (not the lexicographic string comparison SQLite required care
+    around) — it just still needs both sides to be naive-local, consistently,
+    since the column type has no time zone attached.
 
     Omit `stale_before` for a pure "verdicted only" count (e.g. a final
     coverage report, where in-flight reservations shouldn't count)."""
-    sql = "SELECT game_slug, COUNT(DISTINCT annotator_id) FROM annotations WHERE condition=?"
+    sql = "SELECT game_slug, COUNT(DISTINCT annotator_id) FROM annotations WHERE condition=%s"
     params = [condition]
     if stale_before is not None:
-        sql += " AND (verdict_at IS NOT NULL OR updated_at > ?)"
+        sql += " AND (verdict_at IS NOT NULL OR updated_at > %s)"
         params.append(stale_before)
     else:
         sql += " AND verdict_at IS NOT NULL"
     sql += " GROUP BY game_slug"
     if conn is not None:
-        rows = conn.execute(sql, params).fetchall()
+        cur = conn.cursor()
+        cur.execute(sql, params)
+        rows = cur.fetchall()
     else:
         with _connect() as c:
-            rows = c.execute(sql, params).fetchall()
+            cur = c.cursor()
+            cur.execute(sql, params)
+            rows = cur.fetchall()
     return dict(rows)
 
 
@@ -520,12 +471,7 @@ def reserve_games(annotator_id, condition, game_slugs, session_index=1, conn=Non
     immediately count as "claimed" in coverage_counts' staleness check.
     Without it, a fresh reservation with a NULL updated_at would look
     abandoned to a concurrently-arriving participant's coverage read and get
-    double-assigned.
-
-    Does NOT call backup_db_to_hf_async() itself when `conn` is supplied
-    (mid-transaction — backing up before commit could snapshot a state that
-    then rolls back). Callers using write_transaction() must trigger the
-    backup themselves after the `with` block exits successfully."""
+    double-assigned."""
     game_slugs = list(game_slugs)
     if not game_slugs:
         return
@@ -534,14 +480,15 @@ def reserve_games(annotator_id, condition, game_slugs, session_index=1, conn=Non
             for slug in game_slugs]
     sql = ("INSERT INTO annotations "
            "    (game_slug, annotator_id, condition, session_index, updated_at) "
-           "VALUES (?, ?, ?, ?, ?) "
+           "VALUES (%s, %s, %s, %s, %s) "
            "ON CONFLICT(game_slug, annotator_id, condition) DO NOTHING")
     if conn is not None:
-        conn.executemany(sql, rows)
+        cur = conn.cursor()
+        cur.executemany(sql, rows)
         return
     with _connect() as c:
-        c.executemany(sql, rows)
-    backup_db_to_hf_async()
+        cur = c.cursor()
+        cur.executemany(sql, rows)
 
 
 def save_verdict(game_slug, annotator_id, condition, coherence, overall, comment,
@@ -557,29 +504,26 @@ def save_verdict(game_slug, annotator_id, condition, coherence, overall, comment
     annotator_id = annotator_id or ""
     condition = condition or ""
     with _connect() as conn:
-        cur = conn.execute(
+        cur = conn.cursor()
+        cur.execute(
             """
             UPDATE annotations SET
-                strategic_coherence=?,
-                overall_rating=?,
-                verdict_comment=?,
-                verdict_at=?,
-                verdict_specific=?,
-                updated_at=?
-            WHERE game_slug=? AND annotator_id=? AND condition=?
+                strategic_coherence=%s,
+                overall_rating=%s,
+                verdict_comment=%s,
+                verdict_at=%s,
+                verdict_specific=%s,
+                updated_at=%s
+            WHERE game_slug=%s AND annotator_id=%s AND condition=%s
             """,
             (coherence, overall, comment, now, verdict_specific, now,
              game_slug, annotator_id, condition),
         )
         ok = cur.rowcount > 0
-    # save_turns already backs up; back up again here so the verdict fields
-    # (submitted after turns, in a separate step) are captured too.
-    if ok:
-        backup_db_to_hf_async()
     return ok
 
 
-print(f"🗄️  DB config: HF_TOKEN={'set' if _HF_TOKEN else 'MISSING'}, "
-      f"HF_DATASET_REPO={HF_DATASET_REPO or 'UNSET — cloud backup/restore disabled'}")
-_restore_db_from_hf()   # pull backup first (no-op if local DB present)
-init_db()               # then ensure schema exists (CREATE TABLE IF NOT EXISTS)
+print(f"🗄️  DB config: host={DB_HOST or 'MISSING'} dbname={DB_NAME or 'MISSING'} "
+      f"user={DB_USER or 'MISSING'} sslmode={DB_SSLMODE}")
+_require_db_config()
+init_db()
