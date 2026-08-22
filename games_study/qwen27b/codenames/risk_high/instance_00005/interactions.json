@@ -1,0 +1,1628 @@
+{
+  "meta": {
+    "game_name": "codenames",
+    "experiment_name": "risk_high",
+    "game_id": 5,
+    "results_folder": "qwen3.5-27b",
+    "clem_version": "3.7.2",
+    "round_count": 8,
+    "completed": true
+  },
+  "player_models": {
+    "0": {
+      "model_spec": {
+        "model_name": "qwen3.5-27b",
+        "backend": "huggingface_local",
+        "context_size": "262k",
+        "huggingface_id": "Qwen/Qwen3.5-27B",
+        "languages": [
+          "en",
+          "zh"
+        ],
+        "license": {
+          "name": "Apache 2.0",
+          "url": "https://www.apache.org/licenses/LICENSE-2.0"
+        },
+        "lookup_source": "/project/mmanina/lm-playschool-test-set/playpen/model_registry.json",
+        "model_config": {
+          "premade_chat_template": true,
+          "eos_to_cull": "<\\|im_end\\|>|<\\|endoftext\\|>",
+          "chat_template_kwargs": {
+            "enable_thinking": false
+          },
+          "multimodality": {
+            "single_image": true,
+            "multiple_images": true,
+            "audio": false,
+            "video": true
+          }
+        },
+        "open_weight": true,
+        "parameters": "27B",
+        "release_date": "2026-02-24"
+      },
+      "gen_args": {
+        "temperature": 0.0,
+        "max_tokens": 5000
+      }
+    }
+  },
+  "players": {
+    "GM": {
+      "game_role": "Game Master",
+      "model_name": "programmatic"
+    },
+    "Player 1": {
+      "game_role": "ClueGiver",
+      "model_name": "qwen3.5-27b"
+    },
+    "Player 2": {
+      "game_role": "Guesser",
+      "model_name": "qwen3.5-27b"
+    }
+  },
+  "turns": [
+    [
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T12:35:48.811120",
+        "action": {
+          "type": "board status",
+          "content": {
+            "hidden": {
+              "team": [
+                "opera",
+                "play",
+                "slug",
+                "vacuum",
+                "nail",
+                "mug",
+                "rome",
+                "ketchup",
+                "pumpkin"
+              ],
+              "innocent": [
+                "ship",
+                "smuggler",
+                "spring"
+              ],
+              "opponent": [
+                "leprechaun",
+                "carrot",
+                "beach",
+                "pie",
+                "star",
+                "wind",
+                "whip",
+                "limousine"
+              ],
+              "assassin": [
+                "canada",
+                "pass",
+                "heart",
+                "turkey",
+                "state"
+              ]
+            },
+            "revealed": {
+              "team": {
+                "team": [],
+                "innocent": [],
+                "opponent": [],
+                "assassin": []
+              },
+              "opponent": {
+                "team": [],
+                "innocent": [],
+                "opponent": [],
+                "assassin": []
+              }
+            }
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 1",
+        "timestamp": "2026-07-01T12:36:03.878030",
+        "action": {
+          "type": "send message",
+          "content": "Provide one single-word clue that relates to some of your team's words from the list below. You can choose to how many and to which words your clue relates to.\nThe goal is to have your partner guess all of your team's words based on the clues you give them, before the other team has uncovered all of theirs. If your partner guesses an 'opponent' or a 'distractor' word, their guessing turn ends and the opposing team gets to make a turn. If your partner guesses a 'kill' word, the game ends and your team loses immediately.\nThe more words your clue relates to, the quicker you can win the game, but the harder the associations may be to guess for your partner, so choose your clue word wisely. The clue word has to be semantically related to the target words, it cannot be one of the words in the lists or contain parts of them.\n\nAlways give your single-word clue and your comma-separated list of related target words in the following format and make your answers as short as possible, never include any other text than is required in this form:\n\nCLUE: <WORD>\nTARGETS: <TARGETS>\n\nYour team words are: opera, play, slug, vacuum, nail, mug, rome, ketchup, pumpkin.\nYour opponent's team words are: leprechaun, carrot, beach, pie, star, wind, whip, limousine.\nDistractor words are: ship, smuggler, spring.\nThe kill words are: canada, pass, heart, turkey, state.",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 1",
+        "to": "GM",
+        "timestamp": "2026-07-01T12:36:03.878047",
+        "action": {
+          "type": "get message",
+          "content": "CLUE: stage\nTARGETS: opera, play",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T12:36:03.878254",
+        "action": {
+          "type": "clue",
+          "content": "stage"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T12:36:03.878276",
+        "action": {
+          "type": "targets",
+          "content": [
+            "opera",
+            "play"
+          ]
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T12:36:03.878296",
+        "action": {
+          "type": "word targeted",
+          "content": {
+            "word": "opera",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T12:36:03.878314",
+        "action": {
+          "type": "word targeted",
+          "content": {
+            "word": "play",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 2",
+        "timestamp": "2026-07-01T12:45:23.303405",
+        "action": {
+          "type": "send message",
+          "content": "Provide a comma-separated list of up to 2 words from the following list that best relate or are most closely associated with the word 'stage'. Always start your list of guess(es) with 'GUESS: ' and do not include any other text in your answer.\n\nplay, whip, canada, spring, opera, wind, beach, rome, pumpkin, slug, ship, pass, vacuum, mug, smuggler, state, ketchup, pie, heart, turkey, leprechaun, limousine, star, carrot, nail",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 2",
+        "to": "GM",
+        "timestamp": "2026-07-01T12:45:23.303421",
+        "action": {
+          "type": "get message",
+          "content": "GUESS: play, opera",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T12:45:23.303470",
+        "action": {
+          "type": "guesses",
+          "content": [
+            "play",
+            "opera"
+          ]
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T12:45:23.303494",
+        "action": {
+          "type": "team revealed",
+          "content": {
+            "word": "play",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T12:45:23.303514",
+        "action": {
+          "type": "target revealed",
+          "content": {
+            "word": "play",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T12:45:23.303533",
+        "action": {
+          "type": "team revealed",
+          "content": {
+            "word": "opera",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T12:45:23.303550",
+        "action": {
+          "type": "target revealed",
+          "content": {
+            "word": "opera",
+            "assignment": "team"
+          }
+        }
+      }
+    ],
+    [
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T12:45:23.303671",
+        "action": {
+          "type": "opponent revealed",
+          "content": {
+            "word": "leprechaun",
+            "assignment": "opponent"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T12:45:23.303697",
+        "action": {
+          "type": "board status",
+          "content": {
+            "hidden": {
+              "team": [
+                "slug",
+                "vacuum",
+                "nail",
+                "mug",
+                "rome",
+                "ketchup",
+                "pumpkin"
+              ],
+              "innocent": [
+                "ship",
+                "smuggler",
+                "spring"
+              ],
+              "opponent": [
+                "carrot",
+                "beach",
+                "pie",
+                "star",
+                "wind",
+                "whip",
+                "limousine"
+              ],
+              "assassin": [
+                "canada",
+                "pass",
+                "heart",
+                "turkey",
+                "state"
+              ]
+            },
+            "revealed": {
+              "team": {
+                "team": [
+                  "play",
+                  "opera"
+                ],
+                "innocent": [],
+                "opponent": [],
+                "assassin": []
+              },
+              "opponent": {
+                "team": [],
+                "innocent": [],
+                "opponent": [
+                  "leprechaun"
+                ],
+                "assassin": []
+              }
+            }
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 1",
+        "timestamp": "2026-07-01T12:46:29.752868",
+        "action": {
+          "type": "send message",
+          "content": "The words play, opera were guessed correctly. Your teammate's turn ended there.\nNow provide another clue relating to some of your remaining team words and a list of the related target words. Remember to start your clue with 'CLUE: ', put a new line, and start your comma-separated list of target words with 'TARGETS: '. Notice: some words have been removed from the lists compared to previous requests.\n\nYour remaining team words are: slug, vacuum, nail, mug, rome, ketchup, pumpkin.\nRemaining words for your opponent are: leprechaun, carrot, beach, pie, star, wind, whip, limousine.\nRemaining distractor words are: ship, smuggler, spring.\nRemaining kill words are: canada, pass, heart, turkey, state.",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 1",
+        "to": "GM",
+        "timestamp": "2026-07-01T12:46:29.752889",
+        "action": {
+          "type": "get message",
+          "content": "CLUE: tomato\nTARGETS: ketchup, pumpkin",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T12:46:29.753086",
+        "action": {
+          "type": "clue",
+          "content": "tomato"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T12:46:29.753111",
+        "action": {
+          "type": "targets",
+          "content": [
+            "ketchup",
+            "pumpkin"
+          ]
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T12:46:29.753132",
+        "action": {
+          "type": "word targeted",
+          "content": {
+            "word": "ketchup",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T12:46:29.753153",
+        "action": {
+          "type": "word targeted",
+          "content": {
+            "word": "pumpkin",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 2",
+        "timestamp": "2026-07-01T12:47:27.629061",
+        "action": {
+          "type": "send message",
+          "content": "The words play, opera were guessed correctly. Your turn ended there.\nNow provide another comma-separated list of at least 1 and up to 2 words from the following list of words that best relate or are most closely associated with the word 'tomato'. Remember to start your answer with 'GUESS: '. Notice: some words have been removed from the list compared to previous requests.\n\nwhip, canada, spring, wind, beach, rome, pumpkin, slug, ship, pass, vacuum, mug, smuggler, state, ketchup, pie, heart, turkey, limousine, star, carrot, nail",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 2",
+        "to": "GM",
+        "timestamp": "2026-07-01T12:47:27.629079",
+        "action": {
+          "type": "get message",
+          "content": "GUESS: ketchup, carrot",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T12:47:27.629139",
+        "action": {
+          "type": "guesses",
+          "content": [
+            "ketchup",
+            "carrot"
+          ]
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T12:47:27.629165",
+        "action": {
+          "type": "team revealed",
+          "content": {
+            "word": "ketchup",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T12:47:27.629186",
+        "action": {
+          "type": "target revealed",
+          "content": {
+            "word": "ketchup",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T12:47:27.629206",
+        "action": {
+          "type": "team revealed",
+          "content": {
+            "word": "carrot",
+            "assignment": "opponent"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T12:47:27.629224",
+        "action": {
+          "type": "turn end after",
+          "content": "carrot"
+        }
+      }
+    ],
+    [
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T12:47:27.629356",
+        "action": {
+          "type": "opponent revealed",
+          "content": {
+            "word": "pie",
+            "assignment": "opponent"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T12:47:27.629383",
+        "action": {
+          "type": "board status",
+          "content": {
+            "hidden": {
+              "team": [
+                "slug",
+                "vacuum",
+                "nail",
+                "mug",
+                "rome",
+                "pumpkin"
+              ],
+              "innocent": [
+                "ship",
+                "smuggler",
+                "spring"
+              ],
+              "opponent": [
+                "beach",
+                "star",
+                "wind",
+                "whip",
+                "limousine"
+              ],
+              "assassin": [
+                "canada",
+                "pass",
+                "heart",
+                "turkey",
+                "state"
+              ]
+            },
+            "revealed": {
+              "team": {
+                "team": [
+                  "play",
+                  "opera",
+                  "ketchup"
+                ],
+                "innocent": [],
+                "opponent": [
+                  "carrot"
+                ],
+                "assassin": []
+              },
+              "opponent": {
+                "team": [],
+                "innocent": [],
+                "opponent": [
+                  "leprechaun",
+                  "pie"
+                ],
+                "assassin": []
+              }
+            }
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 1",
+        "timestamp": "2026-07-01T12:48:11.231791",
+        "action": {
+          "type": "send message",
+          "content": "The word ketchup was guessed correctly. The word carrot was guessed but is an opponent word. Your teammate's turn ended there.\nNow provide another clue relating to some of your remaining team words and a list of the related target words. Remember to start your clue with 'CLUE: ', put a new line, and start your comma-separated list of target words with 'TARGETS: '. Notice: some words have been removed from the lists compared to previous requests.\n\nYour remaining team words are: slug, vacuum, nail, mug, rome, pumpkin.\nRemaining words for your opponent are: beach, pie, star, wind, whip, limousine.\nRemaining distractor words are: ship, smuggler, spring.\nRemaining kill words are: canada, pass, heart, turkey, state.",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 1",
+        "to": "GM",
+        "timestamp": "2026-07-01T12:48:11.231811",
+        "action": {
+          "type": "get message",
+          "content": "CLUE: drink\nTARGETS: mug",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T12:48:11.231992",
+        "action": {
+          "type": "clue",
+          "content": "drink"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T12:48:11.232016",
+        "action": {
+          "type": "targets",
+          "content": [
+            "mug"
+          ]
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T12:48:11.232036",
+        "action": {
+          "type": "word targeted",
+          "content": {
+            "word": "mug",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 2",
+        "timestamp": "2026-07-01T12:48:59.594574",
+        "action": {
+          "type": "send message",
+          "content": "The word ketchup was guessed correctly. The word carrot was guessed but is an opponent word. Your turn ended there.\nNow provide another comma-separated list of at least 1 and up to 1 words from the following list of words that best relate or are most closely associated with the word 'drink'. Remember to start your answer with 'GUESS: '. Notice: some words have been removed from the list compared to previous requests.\n\nwhip, canada, spring, wind, beach, rome, pumpkin, slug, ship, pass, vacuum, mug, smuggler, state, heart, turkey, limousine, star, nail",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 2",
+        "to": "GM",
+        "timestamp": "2026-07-01T12:48:59.594589",
+        "action": {
+          "type": "get message",
+          "content": "GUESS: mug",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T12:48:59.594634",
+        "action": {
+          "type": "guesses",
+          "content": [
+            "mug"
+          ]
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T12:48:59.594658",
+        "action": {
+          "type": "team revealed",
+          "content": {
+            "word": "mug",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T12:48:59.594678",
+        "action": {
+          "type": "target revealed",
+          "content": {
+            "word": "mug",
+            "assignment": "team"
+          }
+        }
+      }
+    ],
+    [
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T12:48:59.594792",
+        "action": {
+          "type": "opponent revealed",
+          "content": {
+            "word": "star",
+            "assignment": "opponent"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T12:48:59.594818",
+        "action": {
+          "type": "board status",
+          "content": {
+            "hidden": {
+              "team": [
+                "slug",
+                "vacuum",
+                "nail",
+                "rome",
+                "pumpkin"
+              ],
+              "innocent": [
+                "ship",
+                "smuggler",
+                "spring"
+              ],
+              "opponent": [
+                "beach",
+                "wind",
+                "whip",
+                "limousine"
+              ],
+              "assassin": [
+                "canada",
+                "pass",
+                "heart",
+                "turkey",
+                "state"
+              ]
+            },
+            "revealed": {
+              "team": {
+                "team": [
+                  "play",
+                  "opera",
+                  "ketchup",
+                  "mug"
+                ],
+                "innocent": [],
+                "opponent": [
+                  "carrot"
+                ],
+                "assassin": []
+              },
+              "opponent": {
+                "team": [],
+                "innocent": [],
+                "opponent": [
+                  "leprechaun",
+                  "pie",
+                  "star"
+                ],
+                "assassin": []
+              }
+            }
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 1",
+        "timestamp": "2026-07-01T12:49:37.381101",
+        "action": {
+          "type": "send message",
+          "content": "The word mug was guessed correctly. Your teammate's turn ended there.\nNow provide another clue relating to some of your remaining team words and a list of the related target words. Remember to start your clue with 'CLUE: ', put a new line, and start your comma-separated list of target words with 'TARGETS: '. Notice: some words have been removed from the lists compared to previous requests.\n\nYour remaining team words are: slug, vacuum, nail, rome, pumpkin.\nRemaining words for your opponent are: beach, star, wind, whip, limousine.\nRemaining distractor words are: ship, smuggler, spring.\nRemaining kill words are: canada, pass, heart, turkey, state.",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 1",
+        "to": "GM",
+        "timestamp": "2026-07-01T12:49:37.381121",
+        "action": {
+          "type": "get message",
+          "content": "CLUE: city\nTARGETS: rome",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T12:49:37.381280",
+        "action": {
+          "type": "clue",
+          "content": "city"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T12:49:37.381303",
+        "action": {
+          "type": "targets",
+          "content": [
+            "rome"
+          ]
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T12:49:37.381324",
+        "action": {
+          "type": "word targeted",
+          "content": {
+            "word": "rome",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 2",
+        "timestamp": "2026-07-01T12:50:22.616784",
+        "action": {
+          "type": "send message",
+          "content": "The word mug was guessed correctly. Your turn ended there.\nNow provide another comma-separated list of at least 1 and up to 1 words from the following list of words that best relate or are most closely associated with the word 'city'. Remember to start your answer with 'GUESS: '. Notice: some words have been removed from the list compared to previous requests.\n\nwhip, canada, spring, wind, beach, rome, pumpkin, slug, ship, pass, vacuum, smuggler, state, heart, turkey, limousine, nail",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 2",
+        "to": "GM",
+        "timestamp": "2026-07-01T12:50:22.616804",
+        "action": {
+          "type": "get message",
+          "content": "GUESS: rome",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T12:50:22.616856",
+        "action": {
+          "type": "guesses",
+          "content": [
+            "rome"
+          ]
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T12:50:22.616883",
+        "action": {
+          "type": "team revealed",
+          "content": {
+            "word": "rome",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T12:50:22.616904",
+        "action": {
+          "type": "target revealed",
+          "content": {
+            "word": "rome",
+            "assignment": "team"
+          }
+        }
+      }
+    ],
+    [
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T12:50:22.617039",
+        "action": {
+          "type": "opponent revealed",
+          "content": {
+            "word": "limousine",
+            "assignment": "opponent"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T12:50:22.617068",
+        "action": {
+          "type": "board status",
+          "content": {
+            "hidden": {
+              "team": [
+                "slug",
+                "vacuum",
+                "nail",
+                "pumpkin"
+              ],
+              "innocent": [
+                "ship",
+                "smuggler",
+                "spring"
+              ],
+              "opponent": [
+                "beach",
+                "wind",
+                "whip"
+              ],
+              "assassin": [
+                "canada",
+                "pass",
+                "heart",
+                "turkey",
+                "state"
+              ]
+            },
+            "revealed": {
+              "team": {
+                "team": [
+                  "play",
+                  "opera",
+                  "ketchup",
+                  "mug",
+                  "rome"
+                ],
+                "innocent": [],
+                "opponent": [
+                  "carrot"
+                ],
+                "assassin": []
+              },
+              "opponent": {
+                "team": [],
+                "innocent": [],
+                "opponent": [
+                  "leprechaun",
+                  "pie",
+                  "star",
+                  "limousine"
+                ],
+                "assassin": []
+              }
+            }
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 1",
+        "timestamp": "2026-07-01T12:50:53.276831",
+        "action": {
+          "type": "send message",
+          "content": "The word rome was guessed correctly. Your teammate's turn ended there.\nNow provide another clue relating to some of your remaining team words and a list of the related target words. Remember to start your clue with 'CLUE: ', put a new line, and start your comma-separated list of target words with 'TARGETS: '. Notice: some words have been removed from the lists compared to previous requests.\n\nYour remaining team words are: slug, vacuum, nail, pumpkin.\nRemaining words for your opponent are: beach, wind, whip, limousine.\nRemaining distractor words are: ship, smuggler, spring.\nRemaining kill words are: canada, pass, heart, turkey, state.",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 1",
+        "to": "GM",
+        "timestamp": "2026-07-01T12:50:53.276849",
+        "action": {
+          "type": "get message",
+          "content": "CLUE: clean\nTARGETS: vacuum",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T12:50:53.276995",
+        "action": {
+          "type": "clue",
+          "content": "clean"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T12:50:53.277018",
+        "action": {
+          "type": "targets",
+          "content": [
+            "vacuum"
+          ]
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T12:50:53.277039",
+        "action": {
+          "type": "word targeted",
+          "content": {
+            "word": "vacuum",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 2",
+        "timestamp": "2026-07-01T12:51:35.303824",
+        "action": {
+          "type": "send message",
+          "content": "The word rome was guessed correctly. Your turn ended there.\nNow provide another comma-separated list of at least 1 and up to 1 words from the following list of words that best relate or are most closely associated with the word 'clean'. Remember to start your answer with 'GUESS: '. Notice: some words have been removed from the list compared to previous requests.\n\nwhip, canada, spring, wind, beach, pumpkin, slug, ship, pass, vacuum, smuggler, state, heart, turkey, nail",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 2",
+        "to": "GM",
+        "timestamp": "2026-07-01T12:51:35.303841",
+        "action": {
+          "type": "get message",
+          "content": "GUESS: vacuum",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T12:51:35.303899",
+        "action": {
+          "type": "guesses",
+          "content": [
+            "vacuum"
+          ]
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T12:51:35.303922",
+        "action": {
+          "type": "team revealed",
+          "content": {
+            "word": "vacuum",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T12:51:35.303945",
+        "action": {
+          "type": "target revealed",
+          "content": {
+            "word": "vacuum",
+            "assignment": "team"
+          }
+        }
+      }
+    ],
+    [
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T12:51:35.304427",
+        "action": {
+          "type": "opponent revealed",
+          "content": {
+            "word": "whip",
+            "assignment": "opponent"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T12:51:35.304453",
+        "action": {
+          "type": "board status",
+          "content": {
+            "hidden": {
+              "team": [
+                "slug",
+                "nail",
+                "pumpkin"
+              ],
+              "innocent": [
+                "ship",
+                "smuggler",
+                "spring"
+              ],
+              "opponent": [
+                "beach",
+                "wind"
+              ],
+              "assassin": [
+                "canada",
+                "pass",
+                "heart",
+                "turkey",
+                "state"
+              ]
+            },
+            "revealed": {
+              "team": {
+                "team": [
+                  "play",
+                  "opera",
+                  "ketchup",
+                  "mug",
+                  "rome",
+                  "vacuum"
+                ],
+                "innocent": [],
+                "opponent": [
+                  "carrot"
+                ],
+                "assassin": []
+              },
+              "opponent": {
+                "team": [],
+                "innocent": [],
+                "opponent": [
+                  "leprechaun",
+                  "pie",
+                  "star",
+                  "limousine",
+                  "whip"
+                ],
+                "assassin": []
+              }
+            }
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 1",
+        "timestamp": "2026-07-01T12:52:05.577571",
+        "action": {
+          "type": "send message",
+          "content": "The word vacuum was guessed correctly. Your teammate's turn ended there.\nNow provide another clue relating to some of your remaining team words and a list of the related target words. Remember to start your clue with 'CLUE: ', put a new line, and start your comma-separated list of target words with 'TARGETS: '. Notice: some words have been removed from the lists compared to previous requests.\n\nYour remaining team words are: slug, nail, pumpkin.\nRemaining words for your opponent are: beach, wind, whip.\nRemaining distractor words are: ship, smuggler, spring.\nRemaining kill words are: canada, pass, heart, turkey, state.",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 1",
+        "to": "GM",
+        "timestamp": "2026-07-01T12:52:05.577590",
+        "action": {
+          "type": "get message",
+          "content": "CLUE: garden\nTARGETS: slug, pumpkin",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T12:52:05.577743",
+        "action": {
+          "type": "clue",
+          "content": "garden"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T12:52:05.577765",
+        "action": {
+          "type": "targets",
+          "content": [
+            "slug",
+            "pumpkin"
+          ]
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T12:52:05.577785",
+        "action": {
+          "type": "word targeted",
+          "content": {
+            "word": "slug",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T12:52:05.577805",
+        "action": {
+          "type": "word targeted",
+          "content": {
+            "word": "pumpkin",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 2",
+        "timestamp": "2026-07-01T12:52:42.657445",
+        "action": {
+          "type": "send message",
+          "content": "The word vacuum was guessed correctly. Your turn ended there.\nNow provide another comma-separated list of at least 1 and up to 2 words from the following list of words that best relate or are most closely associated with the word 'garden'. Remember to start your answer with 'GUESS: '. Notice: some words have been removed from the list compared to previous requests.\n\ncanada, spring, wind, beach, pumpkin, slug, ship, pass, smuggler, state, heart, turkey, nail",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 2",
+        "to": "GM",
+        "timestamp": "2026-07-01T12:52:42.657487",
+        "action": {
+          "type": "get message",
+          "content": "GUESS: spring, slug",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T12:52:42.657589",
+        "action": {
+          "type": "guesses",
+          "content": [
+            "spring",
+            "slug"
+          ]
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T12:52:42.657645",
+        "action": {
+          "type": "team revealed",
+          "content": {
+            "word": "spring",
+            "assignment": "innocent"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T12:52:42.657683",
+        "action": {
+          "type": "turn end after",
+          "content": "spring"
+        }
+      }
+    ],
+    [
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T12:52:42.657833",
+        "action": {
+          "type": "opponent revealed",
+          "content": {
+            "word": "wind",
+            "assignment": "opponent"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T12:52:42.657862",
+        "action": {
+          "type": "board status",
+          "content": {
+            "hidden": {
+              "team": [
+                "slug",
+                "nail",
+                "pumpkin"
+              ],
+              "innocent": [
+                "ship",
+                "smuggler"
+              ],
+              "opponent": [
+                "beach"
+              ],
+              "assassin": [
+                "canada",
+                "pass",
+                "heart",
+                "turkey",
+                "state"
+              ]
+            },
+            "revealed": {
+              "team": {
+                "team": [
+                  "play",
+                  "opera",
+                  "ketchup",
+                  "mug",
+                  "rome",
+                  "vacuum"
+                ],
+                "innocent": [
+                  "spring"
+                ],
+                "opponent": [
+                  "carrot"
+                ],
+                "assassin": []
+              },
+              "opponent": {
+                "team": [],
+                "innocent": [],
+                "opponent": [
+                  "leprechaun",
+                  "pie",
+                  "star",
+                  "limousine",
+                  "whip",
+                  "wind"
+                ],
+                "assassin": []
+              }
+            }
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 1",
+        "timestamp": "2026-07-01T12:53:07.781655",
+        "action": {
+          "type": "send message",
+          "content": "The word spring was guessed but is an innocent word. Your teammate's turn ended there.\nNow provide another clue relating to some of your remaining team words and a list of the related target words. Remember to start your clue with 'CLUE: ', put a new line, and start your comma-separated list of target words with 'TARGETS: '. Notice: some words have been removed from the lists compared to previous requests.\n\nYour remaining team words are: slug, nail, pumpkin.\nRemaining words for your opponent are: beach, wind.\nRemaining distractor words are: ship, smuggler.\nRemaining kill words are: canada, pass, heart, turkey, state.",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 1",
+        "to": "GM",
+        "timestamp": "2026-07-01T12:53:07.781675",
+        "action": {
+          "type": "get message",
+          "content": "CLUE: slow\nTARGETS: slug",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T12:53:07.781827",
+        "action": {
+          "type": "clue",
+          "content": "slow"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T12:53:07.781849",
+        "action": {
+          "type": "targets",
+          "content": [
+            "slug"
+          ]
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T12:53:07.781869",
+        "action": {
+          "type": "word targeted",
+          "content": {
+            "word": "slug",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 2",
+        "timestamp": "2026-07-01T12:53:33.899343",
+        "action": {
+          "type": "send message",
+          "content": "The word spring was guessed but is an innocent word. Your turn ended there.\nNow provide another comma-separated list of at least 1 and up to 1 words from the following list of words that best relate or are most closely associated with the word 'slow'. Remember to start your answer with 'GUESS: '. Notice: some words have been removed from the list compared to previous requests.\n\ncanada, beach, pumpkin, slug, ship, pass, smuggler, state, heart, turkey, nail",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 2",
+        "to": "GM",
+        "timestamp": "2026-07-01T12:53:33.899364",
+        "action": {
+          "type": "get message",
+          "content": "GUESS: slug",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T12:53:33.899423",
+        "action": {
+          "type": "guesses",
+          "content": [
+            "slug"
+          ]
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T12:53:33.899451",
+        "action": {
+          "type": "team revealed",
+          "content": {
+            "word": "slug",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T12:53:33.899473",
+        "action": {
+          "type": "target revealed",
+          "content": {
+            "word": "slug",
+            "assignment": "team"
+          }
+        }
+      }
+    ],
+    [
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T12:53:33.899624",
+        "action": {
+          "type": "opponent revealed",
+          "content": {
+            "word": "beach",
+            "assignment": "opponent"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T12:53:33.899653",
+        "action": {
+          "type": "board status",
+          "content": {
+            "hidden": {
+              "team": [
+                "nail",
+                "pumpkin"
+              ],
+              "innocent": [
+                "ship",
+                "smuggler"
+              ],
+              "opponent": [],
+              "assassin": [
+                "canada",
+                "pass",
+                "heart",
+                "turkey",
+                "state"
+              ]
+            },
+            "revealed": {
+              "team": {
+                "team": [
+                  "play",
+                  "opera",
+                  "ketchup",
+                  "mug",
+                  "rome",
+                  "vacuum",
+                  "slug"
+                ],
+                "innocent": [
+                  "spring"
+                ],
+                "opponent": [
+                  "carrot"
+                ],
+                "assassin": []
+              },
+              "opponent": {
+                "team": [],
+                "innocent": [],
+                "opponent": [
+                  "leprechaun",
+                  "pie",
+                  "star",
+                  "limousine",
+                  "whip",
+                  "wind",
+                  "beach"
+                ],
+                "assassin": []
+              }
+            }
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 1",
+        "timestamp": "2026-07-01T12:53:48.962486",
+        "action": {
+          "type": "send message",
+          "content": "The word slug was guessed correctly. Your teammate's turn ended there.\nNow provide another clue relating to some of your remaining team words and a list of the related target words. Remember to start your clue with 'CLUE: ', put a new line, and start your comma-separated list of target words with 'TARGETS: '. Notice: some words have been removed from the lists compared to previous requests.\n\nYour remaining team words are: nail, pumpkin.\nRemaining words for your opponent are: beach.\nRemaining distractor words are: ship, smuggler.\nRemaining kill words are: canada, pass, heart, turkey, state.",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 1",
+        "to": "GM",
+        "timestamp": "2026-07-01T12:53:48.962502",
+        "action": {
+          "type": "get message",
+          "content": "CLUE: jack\nTARGETS: pumpkin",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T12:53:48.962708",
+        "action": {
+          "type": "clue",
+          "content": "jack"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T12:53:48.962747",
+        "action": {
+          "type": "targets",
+          "content": [
+            "pumpkin"
+          ]
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T12:53:48.962774",
+        "action": {
+          "type": "word targeted",
+          "content": {
+            "word": "pumpkin",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T12:53:48.963904",
+        "action": {
+          "type": "game end",
+          "content": "opponent has won"
+        }
+      }
+    ]
+  ],
+  "board end status": {
+    "hidden": {
+      "team": [
+        "nail",
+        "pumpkin"
+      ],
+      "innocent": [
+        "ship",
+        "smuggler"
+      ],
+      "opponent": [],
+      "assassin": [
+        "canada",
+        "pass",
+        "heart",
+        "turkey",
+        "state"
+      ]
+    },
+    "revealed": {
+      "team": {
+        "team": [
+          "play",
+          "opera",
+          "ketchup",
+          "mug",
+          "rome",
+          "vacuum",
+          "slug"
+        ],
+        "innocent": [
+          "spring"
+        ],
+        "opponent": [
+          "carrot"
+        ],
+        "assassin": []
+      },
+      "opponent": {
+        "team": [],
+        "innocent": [],
+        "opponent": [
+          "leprechaun",
+          "pie",
+          "star",
+          "limousine",
+          "whip",
+          "wind",
+          "beach"
+        ],
+        "assassin": []
+      }
+    }
+  },
+  "Number of turns": 8,
+  "Aborted": false,
+  "Lose": true,
+  "Game ended through assassin": false,
+  "Request Count": 15,
+  "Parsed Request Count": 15,
+  "Violated Request Count": 0,
+  "Cluegiver engaged flags": {
+    "IGNORE RAMBLING": 0,
+    "IGNORE FALSE TARGETS OR GUESSES": 0,
+    "REPROMPT ON ERROR": 0,
+    "STRIP WORDS": 0,
+    "IGNORE NUMBER OF TARGETS": 0
+  },
+  "Guesser engaged flags": {
+    "IGNORE RAMBLING": 0,
+    "IGNORE FALSE TARGETS OR GUESSES": 0,
+    "REPROMPT ON ERROR": 0,
+    "STRIP WORDS": 0,
+    "IGNORE NUMBER OF TARGETS": 0
+  }
+}

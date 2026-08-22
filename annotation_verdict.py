@@ -6,6 +6,7 @@ import gradio as gr
 
 import db
 from annotation import (DEFAULT_GAME, load_game, game_slug, slug_to_path,
+                        plain_label, question_spec, question_spec_hash,
                         whole_game_questions, whole_game_only)
 
 # TODO: placeholder completion code — swap for the real one before going live.
@@ -73,12 +74,13 @@ def _verdict_save_and_clear(game_path, annotator_id, condition, playlist, playli
     A slider is never falsy, so overall_touched (set only by .release()) is
     the sole signal for whether G2 was actually answered."""
     # Hybrid-only game-specific whole-game question(s): mandatory when shown.
-    # `specific` is the accumulated {str(index): value} dict from specific_state.
+    # `specific` is the accumulated {question_id: value} dict from specific_state.
+    # Keyed by id, not position — see annotation.normalise_whole_game.
     wg = whole_game_questions(game_path or DEFAULT_GAME, condition)
     wg_only = whole_game_only(game_path or DEFAULT_GAME, condition)
     specific = specific or {}
     specific_incomplete = bool(wg) and any(
-        not specific.get(str(i)) for i in range(len(wg)))
+        not specific.get(qid) for qid, _md, _ch in wg)
     # whole_game_only games hide G1/G2, so only the specific sliders are required there.
     if wg_only:
         err = specific_incomplete
@@ -103,10 +105,32 @@ def _verdict_save_and_clear(game_path, annotator_id, condition, playlist, playli
     # their (untouched) defaults — store NULL; the answers live in verdict_specific.
     save_coherence = None if wg_only else coherence
     save_overall = None if wg_only else int(overall)
-    ok = db.save_verdict(
-        slug, annotator_id, condition, save_coherence, save_overall, comment or "",
-        verdict_specific=json.dumps(specific) if (wg and specific) else None,
-    )
+    # Recompute the fingerprint and let db.save_verdict refuse if it moved since
+    # the turns were saved — see db.QuestionSetChanged.
+    try:
+        _g = load_game(game_path or DEFAULT_GAME)
+        _spec = question_spec(_g, condition, bool(_g.has_reasoning))
+        _qs_hash = question_spec_hash(_spec)
+    except Exception:
+        _qs_hash = None
+    try:
+        ok = db.save_verdict(
+            slug, annotator_id, condition, save_coherence, save_overall, comment or "",
+            verdict_specific=json.dumps(specific) if (wg and specific) else None,
+            question_set_hash=_qs_hash,
+        )
+    except db.QuestionSetChanged:
+        return (
+            "⚠️ The study was updated while you were working on this game. "
+            "Please reload the page and rate this transcript again — your "
+            "earlier games are safe.",
+            gr.skip(), gr.skip(),
+            *_col_updates(_COHERENCE, coherence),
+            *([gr.skip()] * 4),
+            _overall_update(err=False),
+            gr.skip(), gr.skip(), gr.skip(),
+            False,
+        )
     if not ok:
         return (
             "⚠️ Turn annotations not found. Please complete Step 1 first.",
@@ -164,9 +188,14 @@ def _verdict_finish(ok, playlist, playlist_idx):
     if playlist_idx + 1 >= len(playlist):
         return (
             gr.skip(),                   # clearing_state — irrelevant from here on
-            "🎉 Thank you — you've completed all games in this session! "
-            "You'll be redirected to Prolific to confirm completion. If "
-            f"nothing happens, [click here to return to Prolific]({PROLIFIC_COMPLETION_URL}).",
+            # The link is the action, not a fallback. There used to be a 3s
+            # auto-redirect here; it was an uncontrollable time limit (WCAG
+            # 2.2.1) and a screen-reader user would not have finished reading
+            # this before the page vanished.
+            "🎉 Thank you — you've completed all games in this session!\n\n"
+            f"### [Return to Prolific to confirm completion]({PROLIFIC_COMPLETION_URL})\n\n"
+            "Your work is already saved. You must follow this link for your "
+            "participation to be recorded on Prolific.",
             gr.skip(), gr.skip(), gr.skip(), gr.skip(),
             gr.skip(),                   # annotation_page — never shown again
             gr.skip(),                   # verdict_page — STAYS visible, showing the message
@@ -192,6 +221,11 @@ def build(welcome_page, annotation_page, verdict_page,
           game_state, annotator_state, block_state, playlist_state,
           playlist_idx_state, started_at_state, session_day_state, clearing_state):
     with verdict_page:
+        # This screen started at h2 with no h1 above it. sr-only rather than
+        # promoting the visible "## Overall Verdict", which would resize it.
+        # Also the a11y module's focus target on screen change.
+        gr.HTML('<h1 class="a11y-sr-only" tabindex="-1">'
+                'Overall verdict — step 2 of 2</h1>')
 
         # Re-renders whenever game_state changes, to reflect whichever game
         # was selected for annotation.
@@ -228,7 +262,11 @@ def build(welcome_page, annotation_page, verdict_page,
             with gr.Row(equal_height=True):
                 for v, name, desc in _COHERENCE:
                     with gr.Column(scale=1, min_width=0, elem_classes=["coh-col"]) as col:
-                        gr.Markdown(f"## {v}", elem_classes=["coh-num-md"])
+                        # A div, not "## {v}" — as markdown these rendered as
+                        # four <h2>s whose entire text was a bare digit, which
+                        # wrecked heading navigation. The number is decorative;
+                        # the JS radiogroup names each option from it instead.
+                        gr.HTML(f'<div class="coh-num">{v}</div>')
                         gr.Markdown(f"**{name}**", elem_classes=["coh-lbl-md"])
                         gr.Markdown(desc, elem_classes=["coh-desc-md"])
                         btn = gr.Button("Select", size="sm", variant="secondary",
@@ -254,8 +292,12 @@ def build(welcome_page, annotation_page, verdict_page,
             )
             # overall_touched tracks whether this was actually moved (see the
             # docstring on _verdict_save_and_clear for why the value alone can't tell).
+            # Gradio hard-codes aria-label="range slider for {label}" on the
+            # input, so the label reads best as a noun phrase. Without it the
+            # control literally announces "range slider for null".
             overall = gr.Slider(
                 minimum=1, maximum=7, step=1, value=4,
+                label="G2 — Overall Game Quality, 1 to 7",
                 show_label=False, elem_classes=["ovr-slider"],
             )
             overall_touched = gr.State(False)
@@ -275,7 +317,7 @@ def build(welcome_page, annotation_page, verdict_page,
             with gr.Group(elem_classes=cls):
                 gr.Markdown("### This game specifically" if slider_mode
                             else "### G3 — This game specifically")
-                for idx, (q_md, choices) in enumerate(questions):
+                for qid, q_md, choices in questions:
                     gr.Markdown(q_md)
                     if slider_mode:
                         # 1-7 slider like G2, with the end anchors from the choices.
@@ -292,28 +334,31 @@ def build(welcome_page, annotation_page, verdict_page,
                             f'<span class="ovr-end-desc">{hi_lbl}</span></div></div>'
                         )
                         s = gr.Slider(minimum=1, maximum=n, step=1, value=(1 + n) // 2,
+                                      label=f"{plain_label(q_md)}, 1 to {n}",
                                       show_label=False, elem_classes=["ovr-slider"])
                         # .release only (a user gesture) — an untouched slider stays
                         # OUT of specific_state, so validation still catches "unanswered".
                         s.release(
-                            fn=lambda val, cur, i=idx: {**(cur or {}), str(i): str(int(val))},
+                            fn=lambda val, cur, k=qid: {**(cur or {}), k: str(int(val))},
                             inputs=[s, specific_state], outputs=[specific_state],
                         )
                     else:
-                        r = gr.Radio(choices=choices, show_label=False,
+                        r = gr.Radio(choices=choices, label=plain_label(q_md),
+                                     show_label=False,
                                      elem_classes=["scale-radio"])
                         r.change(
-                            fn=lambda val, cur, i=idx: {**(cur or {}), str(i): val},
+                            fn=lambda val, cur, k=qid: {**(cur or {}), k: val},
                             inputs=[r, specific_state], outputs=[specific_state],
                         )
 
         comment = gr.Textbox(
             placeholder="Any overall observations about this game? (optional)",
+            label="Overall comments about this game (optional)",
             lines=4, show_label=False,
             elem_classes=["verdict-comment"],
         )
 
-        status = gr.Markdown("")
+        status = gr.Markdown("", elem_id="verdict-status")
 
         with gr.Row():
             back_btn = gr.Button("← Back to Annotation", variant="secondary")
@@ -347,17 +392,21 @@ def build(welcome_page, annotation_page, verdict_page,
                      block_state, started_at_state, annotation_page, verdict_page,
                      action_btn],
         ).then(
-            # Client-side only — redirects to Prolific after the thank-you message shows.
+            # Move focus to the completion link. Nothing else remains to do on
+            # this page, and for a screen-reader user it's the last action of
+            # the study. (This replaced a 3-second auto-redirect, which was an
+            # uncontrollable time limit under WCAG 2.2.1 — see _verdict_finish.)
             fn=None,
             inputs=[status],
             outputs=None,
             js="""(status) => {
                 if (status && status.includes("completed all games")) {
                     setTimeout(() => {
-                        window.location.href = "%s";
-                    }, 3000);
+                        var link = document.querySelector('#verdict-status a');
+                        if (link) { link.setAttribute('tabindex', '0'); link.focus(); }
+                    }, 150);
                 }
-            }""" % PROLIFIC_COMPLETION_URL,
+            }""",
         )
 
         # Syncs the label for the first view only — _verdict_finish's own

@@ -1,0 +1,152 @@
+{
+  "meta": {
+    "game_name": "wordle-crazy_withclue",
+    "experiment_name": "high_frequency_words_clue_no_critic",
+    "game_id": 10,
+    "results_folder": "DAIR__qwen3.5-2b__sft-dpo-v2",
+    "clem_version": "3.7.2",
+    "round_count": 2,
+    "completed": true
+  },
+  "player_models": {
+    "0": {
+      "model_spec": {
+        "model_name": "DAIR__qwen3.5-2b__sft-dpo-v2",
+        "_team": "DAIR",
+        "_version": "sft-dpo-v2",
+        "backend": "huggingface_local",
+        "context_size": "32k",
+        "huggingface_id": "varadsrivastava/lm-playschool-qwen3.5-2b-sft-dpo",
+        "languages": [
+          "en"
+        ],
+        "license": {
+          "name": "apache-2.0",
+          "url": "https://www.apache.org/licenses/LICENSE-2.0"
+        },
+        "lookup_source": "/project/mmanina/lm-playschool-test-set/playpen/model_registry.json",
+        "model_config": {
+          "premade_chat_template": true,
+          "eos_to_cull": "<\\|im_end\\|>|<\\|endoftext\\|>",
+          "chat_template_kwargs": {
+            "enable_thinking": false
+          },
+          "multimodality": {
+            "single_image": true,
+            "multiple_images": true,
+            "audio": false,
+            "video": true
+          }
+        },
+        "open_weight": true,
+        "parameters": "2B",
+        "release_date": "2026-07-06"
+      },
+      "gen_args": {
+        "temperature": 0.0,
+        "max_tokens": 5000
+      }
+    }
+  },
+  "players": {
+    "GM": {
+      "game_role": "Game Master",
+      "model_name": "programmatic"
+    },
+    "Player 1": {
+      "game_role": "WordGuesser",
+      "model_name": "DAIR__qwen3.5-2b__sft-dpo-v2"
+    }
+  },
+  "turns": [
+    [
+      {
+        "from": "GM",
+        "to": "Player 1",
+        "timestamp": "2026-07-09T13:25:20.967615",
+        "action": {
+          "type": "send message",
+          "content": "You are a language wizard who likes to guess words by using the given rules.\n\nWelcome to Wordle! You have six attempts to guess the target word, a valid English word of five lowercase letters (a-z). Please use the tags \"explanation:\" and \"guess:\" to provide a concise explanation for each guess.\n\nTo help you make an informed guess, you will receive a clue for the word, such as\nclue: snowy white.\n\nHere is an example guess based on the clue:\nexplanation: In the fairy tail Snow White, the girl is killed because she eats a poisoned apple. And the word apple has 5 letters.\nguess: apple\n\nAfter each guess, your answer will be validated, and you will receive feedback indicating which letters are correct (yellow), which letters are correct but in the wrong position (black), and which letters are incorrect (purple). This feedback can be useful in determining which letters to include or exclude in your next guess.\n\nFor example, the feedback for \"apple\" might be:\nguess_feedback: a<black> p<black> p<yellow> l<black> e<purple>\n\nThe explanation should contain details about how both the guess_feedback and clue work together in tandem to formulate a new guess.\n\nDo not generate any other text.\n\nLet's begin with your first guess.\n\nclue: stand in (for)",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 1",
+        "to": "GM",
+        "timestamp": "2026-07-09T13:25:20.967633",
+        "action": {
+          "type": "get message",
+          "content": "explanation: The clue “stand in (for)” suggests a synonym for “proxy” or “agent,” and “proxy” is a five-letter word meaning someone who stands in for another.\nguess: proxy",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T13:25:20.967836",
+        "action": {
+          "type": "metadata",
+          "content": "attempts = 1\ntarget_word = cover\ntarget_word_clue = stand in (for)\nguess = proxy\nguess_feedback = p<purple> r<black> o<black> x<purple> y<purple>"
+        }
+      }
+    ],
+    [
+      {
+        "from": "GM",
+        "to": "Player 1",
+        "timestamp": "2026-07-09T13:25:52.931409",
+        "action": {
+          "type": "send message",
+          "content": "guess_feedback: p<purple> r<black> o<black> x<purple> y<purple>\n\nProvide your response only in this format.\nexplanation: details\nguess: word",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 1",
+        "to": "GM",
+        "timestamp": "2026-07-09T13:25:52.931425",
+        "action": {
+          "type": "get message",
+          "content": "explanation: The feedback shows r, o, p, x, y are not in the target word (r and o are black; p, x, y are purple). The clue “stand in (for)” still points to a proxy/agent, but we must avoid r/o/p/x/y. “cover” fits as a synonym for standing in for someone and uses only allowed letters (c, v, e, a, r is excluded, so better use “cover” without r).\nguess: cover",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T13:25:52.931624",
+        "action": {
+          "type": "metadata",
+          "content": "attempts = 2\ntarget_word = cover\ntarget_word_clue = stand in (for)\nguess = cover\nguess_feedback = c<yellow> o<yellow> v<yellow> e<yellow> r<yellow>"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T13:25:52.931640",
+        "action": {
+          "type": "correct guess",
+          "content": "game_result = WIN"
+        }
+      }
+    ]
+  ],
+  "Aborted": 0,
+  "Lose": 0,
+  "Success": 1,
+  "Request Count": 2,
+  "Parsed Request Count": 2,
+  "Violated Request Count": 0,
+  "Guesser Guesses": [
+    "proxy",
+    "cover"
+  ],
+  "Guesser Feedbacks": [
+    "p<purple> r<black> o<black> x<purple> y<purple>",
+    "c<yellow> o<yellow> v<yellow> e<yellow> r<yellow>"
+  ],
+  "Guesser Explanations": [
+    "The clue “stand in (for)” suggests a synonym for “proxy” or “agent,” and “proxy” is a five-letter word meaning someone who stands in for another.",
+    "The feedback shows r, o, p, x, y are not in the target word (r and o are black; p, x, y are purple). The clue “stand in (for)” still points to a proxy/agent, but we must avoid r/o/p/x/y. “cover” fits as a synonym for standing in for someone and uses only allowed letters (c, v, e, a, r is excluded, so better use “cover” without r)."
+  ]
+}

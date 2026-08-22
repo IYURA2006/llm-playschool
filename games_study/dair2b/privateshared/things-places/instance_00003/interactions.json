@@ -1,0 +1,1329 @@
+{
+  "meta": {
+    "game_name": "privateshared",
+    "experiment_name": "things-places",
+    "game_id": 3,
+    "results_folder": "DAIR__qwen3.5-2b__sft-dpo-v2",
+    "clem_version": "3.7.2",
+    "round_count": 15,
+    "completed": true
+  },
+  "player_models": {
+    "0": {
+      "model_spec": {
+        "model_name": "DAIR__qwen3.5-2b__sft-dpo-v2",
+        "_team": "DAIR",
+        "_version": "sft-dpo-v2",
+        "backend": "huggingface_local",
+        "context_size": "32k",
+        "huggingface_id": "varadsrivastava/lm-playschool-qwen3.5-2b-sft-dpo",
+        "languages": [
+          "en"
+        ],
+        "license": {
+          "name": "apache-2.0",
+          "url": "https://www.apache.org/licenses/LICENSE-2.0"
+        },
+        "lookup_source": "/project/mmanina/lm-playschool-test-set/playpen/model_registry.json",
+        "model_config": {
+          "premade_chat_template": true,
+          "eos_to_cull": "<\\|im_end\\|>|<\\|endoftext\\|>",
+          "chat_template_kwargs": {
+            "enable_thinking": false
+          },
+          "multimodality": {
+            "single_image": true,
+            "multiple_images": true,
+            "audio": false,
+            "video": true
+          }
+        },
+        "open_weight": true,
+        "parameters": "2B",
+        "release_date": "2026-07-06"
+      },
+      "gen_args": {
+        "temperature": 0.0,
+        "max_tokens": 5000
+      }
+    }
+  },
+  "players": {
+    "GM": {
+      "game_role": "Game Master",
+      "model_name": "programmatic"
+    },
+    "Player 1": {
+      "game_role": "Answerer",
+      "model_name": "DAIR__qwen3.5-2b__sft-dpo-v2"
+    },
+    "Player 2": {
+      "game_role": "Questioner",
+      "model_name": "programmatic"
+    }
+  },
+  "turns": [
+    [
+      {
+        "from": "GM",
+        "to": "Player 1",
+        "timestamp": "2026-07-13T11:08:39.902694",
+        "action": {
+          "type": "send message",
+          "content": "Things are in different places, but the questioner does not know about it yet. Here is the situation:\n\nWHAT: Things at places\nLEFT: nail polish\nRIGHT: hand saw\nTOP: knife\nBOTTOM: flute\nCENTER: toner\nNORTHWEST: dress\nNORTHEAST: hammer\nSOUTHWEST: mug\nSOUTHEAST: bikini\nHERE: napkin\nTHERE: pencil sharpener\nNOWHERE: shark\nEVERYWHERE: pencil case\nINSIDE: trivet\nOUTSIDE: tennis shoes\n\nQuestions from the questioner will start with QUESTIONER. Please reply in the form: ANSWER: <one sentence>\n\nI will also ask you questions. These questions will start with ME: . Please answer these questions with: ASIDE: <one sentence>\n\nImportant: Give short, direct answers!\n\nLet us start.",
+          "label": "pseudo"
+        }
+      },
+      {
+        "from": "Player 1",
+        "to": "GM",
+        "timestamp": "2026-07-13T11:08:39.902720",
+        "action": {
+          "type": "get message",
+          "content": "Ok.",
+          "label": "pseudo"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-13T11:08:40.149849",
+        "action": {
+          "type": "parse",
+          "content": "no"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-13T11:08:40.149885",
+        "action": {
+          "type": "metadata",
+          "content": "Answer for LEFT valid after 1 tries."
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-13T11:08:40.149899",
+        "action": {
+          "type": "check",
+          "content": "Answer is correct."
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-13T11:08:40.388841",
+        "action": {
+          "type": "parse",
+          "content": "no"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-13T11:08:40.388873",
+        "action": {
+          "type": "metadata",
+          "content": "Answer for RIGHT valid after 1 tries."
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-13T11:08:40.388886",
+        "action": {
+          "type": "check",
+          "content": "Answer is correct."
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-13T11:08:40.632583",
+        "action": {
+          "type": "parse",
+          "content": "no"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-13T11:08:40.632611",
+        "action": {
+          "type": "metadata",
+          "content": "Answer for TOP valid after 1 tries."
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-13T11:08:40.632624",
+        "action": {
+          "type": "check",
+          "content": "Answer is correct."
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-13T11:08:40.858872",
+        "action": {
+          "type": "parse",
+          "content": "no"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-13T11:08:40.858898",
+        "action": {
+          "type": "metadata",
+          "content": "Answer for BOTTOM valid after 1 tries."
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-13T11:08:40.858910",
+        "action": {
+          "type": "check",
+          "content": "Answer is correct."
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-13T11:08:41.092757",
+        "action": {
+          "type": "parse",
+          "content": "no"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-13T11:08:41.092783",
+        "action": {
+          "type": "metadata",
+          "content": "Answer for CENTER valid after 1 tries."
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-13T11:08:41.092796",
+        "action": {
+          "type": "check",
+          "content": "Answer is correct."
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-13T11:08:41.322537",
+        "action": {
+          "type": "parse",
+          "content": "no"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-13T11:08:41.322562",
+        "action": {
+          "type": "metadata",
+          "content": "Answer for NORTHWEST valid after 1 tries."
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-13T11:08:41.322575",
+        "action": {
+          "type": "check",
+          "content": "Answer is correct."
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-13T11:08:41.545443",
+        "action": {
+          "type": "parse",
+          "content": "no"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-13T11:08:41.545467",
+        "action": {
+          "type": "metadata",
+          "content": "Answer for NORTHEAST valid after 1 tries."
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-13T11:08:41.545480",
+        "action": {
+          "type": "check",
+          "content": "Answer is correct."
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-13T11:08:41.773982",
+        "action": {
+          "type": "parse",
+          "content": "no"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-13T11:08:41.774006",
+        "action": {
+          "type": "metadata",
+          "content": "Answer for SOUTHWEST valid after 1 tries."
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-13T11:08:41.774020",
+        "action": {
+          "type": "check",
+          "content": "Answer is correct."
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-13T11:08:42.019253",
+        "action": {
+          "type": "parse",
+          "content": "no"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-13T11:08:42.019278",
+        "action": {
+          "type": "metadata",
+          "content": "Answer for SOUTHEAST valid after 1 tries."
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-13T11:08:42.019290",
+        "action": {
+          "type": "check",
+          "content": "Answer is correct."
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-13T11:08:42.246463",
+        "action": {
+          "type": "parse",
+          "content": "no"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-13T11:08:42.246489",
+        "action": {
+          "type": "metadata",
+          "content": "Answer for HERE valid after 1 tries."
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-13T11:08:42.246501",
+        "action": {
+          "type": "check",
+          "content": "Answer is correct."
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-13T11:08:42.477646",
+        "action": {
+          "type": "parse",
+          "content": "no"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-13T11:08:42.477670",
+        "action": {
+          "type": "metadata",
+          "content": "Answer for THERE valid after 1 tries."
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-13T11:08:42.477683",
+        "action": {
+          "type": "check",
+          "content": "Answer is correct."
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-13T11:08:42.721178",
+        "action": {
+          "type": "parse",
+          "content": "no"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-13T11:08:42.721203",
+        "action": {
+          "type": "metadata",
+          "content": "Answer for NOWHERE valid after 1 tries."
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-13T11:08:42.721216",
+        "action": {
+          "type": "check",
+          "content": "Answer is correct."
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-13T11:08:42.948708",
+        "action": {
+          "type": "parse",
+          "content": "no"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-13T11:08:42.948733",
+        "action": {
+          "type": "metadata",
+          "content": "Answer for EVERYWHERE valid after 1 tries."
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-13T11:08:42.948746",
+        "action": {
+          "type": "check",
+          "content": "Answer is correct."
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-13T11:08:43.188124",
+        "action": {
+          "type": "parse",
+          "content": "no"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-13T11:08:43.188148",
+        "action": {
+          "type": "metadata",
+          "content": "Answer for INSIDE valid after 1 tries."
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-13T11:08:43.188161",
+        "action": {
+          "type": "check",
+          "content": "Answer is correct."
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-13T11:08:43.418981",
+        "action": {
+          "type": "parse",
+          "content": "no"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-13T11:08:43.419005",
+        "action": {
+          "type": "metadata",
+          "content": "Answer for OUTSIDE valid after 1 tries."
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-13T11:08:43.419018",
+        "action": {
+          "type": "check",
+          "content": "Answer is correct."
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 2",
+        "timestamp": "2026-07-13T11:09:27.158145",
+        "action": {
+          "type": "send message",
+          "content": "What is the next request?",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 2",
+        "to": "GM",
+        "timestamp": "2026-07-13T11:09:27.158160",
+        "action": {
+          "type": "get message",
+          "content": "What is at the center?",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 1",
+        "timestamp": "2026-07-13T11:10:01.256177",
+        "action": {
+          "type": "send message",
+          "content": "QUESTIONER: What is at the center?",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 1",
+        "to": "GM",
+        "timestamp": "2026-07-13T11:10:01.256196",
+        "action": {
+          "type": "get message",
+          "content": "ASIDE: The toner is at the center.",
+          "label": "response"
+        }
+      }
+    ],
+    [
+      {
+        "from": "GM",
+        "to": "Player 2",
+        "timestamp": "2026-07-13T11:10:03.332362",
+        "action": {
+          "type": "send message",
+          "content": "What is the next request?",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 2",
+        "to": "GM",
+        "timestamp": "2026-07-13T11:10:03.332376",
+        "action": {
+          "type": "get message",
+          "content": "What is in the northwest?",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 1",
+        "timestamp": "2026-07-13T11:10:20.036941",
+        "action": {
+          "type": "send message",
+          "content": "QUESTIONER: What is in the northwest?",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 1",
+        "to": "GM",
+        "timestamp": "2026-07-13T11:10:20.036964",
+        "action": {
+          "type": "get message",
+          "content": "ASIDE: A dress is in the northwest.",
+          "label": "response"
+        }
+      }
+    ],
+    [
+      {
+        "from": "GM",
+        "to": "Player 2",
+        "timestamp": "2026-07-13T11:10:44.848686",
+        "action": {
+          "type": "send message",
+          "content": "What is the next request?",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 2",
+        "to": "GM",
+        "timestamp": "2026-07-13T11:10:44.848701",
+        "action": {
+          "type": "get message",
+          "content": "What is in the southwest?",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 1",
+        "timestamp": "2026-07-13T11:11:15.194766",
+        "action": {
+          "type": "send message",
+          "content": "QUESTIONER: What is in the southwest?",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 1",
+        "to": "GM",
+        "timestamp": "2026-07-13T11:11:15.194786",
+        "action": {
+          "type": "get message",
+          "content": "ASIDE: A mug is in the southwest.",
+          "label": "response"
+        }
+      }
+    ],
+    [
+      {
+        "from": "GM",
+        "to": "Player 2",
+        "timestamp": "2026-07-13T11:11:35.524076",
+        "action": {
+          "type": "send message",
+          "content": "What is the next request?",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 2",
+        "to": "GM",
+        "timestamp": "2026-07-13T11:11:35.524091",
+        "action": {
+          "type": "get message",
+          "content": "What is in the northeast?",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 1",
+        "timestamp": "2026-07-13T11:12:12.454890",
+        "action": {
+          "type": "send message",
+          "content": "QUESTIONER: What is in the northeast?",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 1",
+        "to": "GM",
+        "timestamp": "2026-07-13T11:12:12.454911",
+        "action": {
+          "type": "get message",
+          "content": "ASIDE: A hammer is in the northeast.",
+          "label": "response"
+        }
+      }
+    ],
+    [
+      {
+        "from": "GM",
+        "to": "Player 2",
+        "timestamp": "2026-07-13T11:12:38.152755",
+        "action": {
+          "type": "send message",
+          "content": "What is the next request?",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 2",
+        "to": "GM",
+        "timestamp": "2026-07-13T11:12:38.152770",
+        "action": {
+          "type": "get message",
+          "content": "What is at the top?",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 1",
+        "timestamp": "2026-07-13T11:13:12.519127",
+        "action": {
+          "type": "send message",
+          "content": "QUESTIONER: What is at the top?",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 1",
+        "to": "GM",
+        "timestamp": "2026-07-13T11:13:12.519149",
+        "action": {
+          "type": "get message",
+          "content": "ASIDE: A knife is at the top.",
+          "label": "response"
+        }
+      }
+    ],
+    [
+      {
+        "from": "GM",
+        "to": "Player 2",
+        "timestamp": "2026-07-13T11:13:37.062968",
+        "action": {
+          "type": "send message",
+          "content": "What is the next request?",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 2",
+        "to": "GM",
+        "timestamp": "2026-07-13T11:13:37.062982",
+        "action": {
+          "type": "get message",
+          "content": "What is on your left?",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 1",
+        "timestamp": "2026-07-13T11:13:37.517450",
+        "action": {
+          "type": "send message",
+          "content": "QUESTIONER: What is on your left?",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 1",
+        "to": "GM",
+        "timestamp": "2026-07-13T11:13:37.517465",
+        "action": {
+          "type": "get message",
+          "content": "ASIDE: Nail polish is on my left.",
+          "label": "response"
+        }
+      }
+    ],
+    [
+      {
+        "from": "GM",
+        "to": "Player 2",
+        "timestamp": "2026-07-13T11:14:00.365520",
+        "action": {
+          "type": "send message",
+          "content": "What is the next request?",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 2",
+        "to": "GM",
+        "timestamp": "2026-07-13T11:14:00.365534",
+        "action": {
+          "type": "get message",
+          "content": "What is in the southeast?",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 1",
+        "timestamp": "2026-07-13T11:14:00.823188",
+        "action": {
+          "type": "send message",
+          "content": "QUESTIONER: What is in the southeast?",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 1",
+        "to": "GM",
+        "timestamp": "2026-07-13T11:14:00.823204",
+        "action": {
+          "type": "get message",
+          "content": "ASIDE: A bikini is in the southeast.",
+          "label": "response"
+        }
+      }
+    ],
+    [
+      {
+        "from": "GM",
+        "to": "Player 2",
+        "timestamp": "2026-07-13T11:14:25.185098",
+        "action": {
+          "type": "send message",
+          "content": "What is the next request?",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 2",
+        "to": "GM",
+        "timestamp": "2026-07-13T11:14:25.185113",
+        "action": {
+          "type": "get message",
+          "content": "What is everywhere?",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 1",
+        "timestamp": "2026-07-13T11:14:25.614207",
+        "action": {
+          "type": "send message",
+          "content": "QUESTIONER: What is everywhere?",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 1",
+        "to": "GM",
+        "timestamp": "2026-07-13T11:14:25.614223",
+        "action": {
+          "type": "get message",
+          "content": "ASIDE: The pencil case is everywhere.",
+          "label": "response"
+        }
+      }
+    ],
+    [
+      {
+        "from": "GM",
+        "to": "Player 2",
+        "timestamp": "2026-07-13T11:14:47.950797",
+        "action": {
+          "type": "send message",
+          "content": "What is the next request?",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 2",
+        "to": "GM",
+        "timestamp": "2026-07-13T11:14:47.950811",
+        "action": {
+          "type": "get message",
+          "content": "What is there?",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 1",
+        "timestamp": "2026-07-13T11:14:48.430585",
+        "action": {
+          "type": "send message",
+          "content": "QUESTIONER: What is there?",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 1",
+        "to": "GM",
+        "timestamp": "2026-07-13T11:14:48.430601",
+        "action": {
+          "type": "get message",
+          "content": "ASIDE: A pencil sharpener is there.",
+          "label": "response"
+        }
+      }
+    ],
+    [
+      {
+        "from": "GM",
+        "to": "Player 2",
+        "timestamp": "2026-07-13T11:15:13.906082",
+        "action": {
+          "type": "send message",
+          "content": "What is the next request?",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 2",
+        "to": "GM",
+        "timestamp": "2026-07-13T11:15:13.906096",
+        "action": {
+          "type": "get message",
+          "content": "What is at the bottom?",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 1",
+        "timestamp": "2026-07-13T11:15:14.429606",
+        "action": {
+          "type": "send message",
+          "content": "QUESTIONER: What is at the bottom?",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 1",
+        "to": "GM",
+        "timestamp": "2026-07-13T11:15:14.429621",
+        "action": {
+          "type": "get message",
+          "content": "ASIDE: A flute is at the bottom.",
+          "label": "response"
+        }
+      }
+    ],
+    [
+      {
+        "from": "GM",
+        "to": "Player 2",
+        "timestamp": "2026-07-13T11:15:40.788974",
+        "action": {
+          "type": "send message",
+          "content": "What is the next request?",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 2",
+        "to": "GM",
+        "timestamp": "2026-07-13T11:15:40.788988",
+        "action": {
+          "type": "get message",
+          "content": "What is outside?",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 1",
+        "timestamp": "2026-07-13T11:15:41.306888",
+        "action": {
+          "type": "send message",
+          "content": "QUESTIONER: What is outside?",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 1",
+        "to": "GM",
+        "timestamp": "2026-07-13T11:15:41.306902",
+        "action": {
+          "type": "get message",
+          "content": "ASIDE: Tennis shoes are outside.",
+          "label": "response"
+        }
+      }
+    ],
+    [
+      {
+        "from": "GM",
+        "to": "Player 2",
+        "timestamp": "2026-07-13T11:15:43.127729",
+        "action": {
+          "type": "send message",
+          "content": "What is the next request?",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 2",
+        "to": "GM",
+        "timestamp": "2026-07-13T11:15:43.127744",
+        "action": {
+          "type": "get message",
+          "content": "What is inside?",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 1",
+        "timestamp": "2026-07-13T11:15:43.576095",
+        "action": {
+          "type": "send message",
+          "content": "QUESTIONER: What is inside?",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 1",
+        "to": "GM",
+        "timestamp": "2026-07-13T11:15:43.576112",
+        "action": {
+          "type": "get message",
+          "content": "ASIDE: A trivet is inside.",
+          "label": "response"
+        }
+      }
+    ],
+    [
+      {
+        "from": "GM",
+        "to": "Player 2",
+        "timestamp": "2026-07-13T11:15:45.085035",
+        "action": {
+          "type": "send message",
+          "content": "What is the next request?",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 2",
+        "to": "GM",
+        "timestamp": "2026-07-13T11:15:45.085049",
+        "action": {
+          "type": "get message",
+          "content": "What is here?",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 1",
+        "timestamp": "2026-07-13T11:15:45.618229",
+        "action": {
+          "type": "send message",
+          "content": "QUESTIONER: What is here?",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 1",
+        "to": "GM",
+        "timestamp": "2026-07-13T11:15:45.618244",
+        "action": {
+          "type": "get message",
+          "content": "ASIDE: A napkin is here.",
+          "label": "response"
+        }
+      }
+    ],
+    [
+      {
+        "from": "GM",
+        "to": "Player 2",
+        "timestamp": "2026-07-13T11:15:46.579329",
+        "action": {
+          "type": "send message",
+          "content": "What is the next request?",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 2",
+        "to": "GM",
+        "timestamp": "2026-07-13T11:15:46.579346",
+        "action": {
+          "type": "get message",
+          "content": "What is on your right?",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 1",
+        "timestamp": "2026-07-13T11:15:47.116880",
+        "action": {
+          "type": "send message",
+          "content": "QUESTIONER: What is on your right?",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 1",
+        "to": "GM",
+        "timestamp": "2026-07-13T11:15:47.116895",
+        "action": {
+          "type": "get message",
+          "content": "ASIDE: A hand saw is on my right.",
+          "label": "response"
+        }
+      }
+    ],
+    [
+      {
+        "from": "GM",
+        "to": "Player 2",
+        "timestamp": "2026-07-13T11:15:48.125864",
+        "action": {
+          "type": "send message",
+          "content": "What is the next request?",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 2",
+        "to": "GM",
+        "timestamp": "2026-07-13T11:15:48.125886",
+        "action": {
+          "type": "get message",
+          "content": "What is nowhere?",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 1",
+        "timestamp": "2026-07-13T11:15:48.904434",
+        "action": {
+          "type": "send message",
+          "content": "QUESTIONER: What is nowhere?",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 1",
+        "to": "GM",
+        "timestamp": "2026-07-13T11:15:48.904466",
+        "action": {
+          "type": "get message",
+          "content": "ASIDE: A shark is nowhere.",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-13T11:15:48.904625",
+        "action": {
+          "type": "end",
+          "content": "Game finished."
+        }
+      }
+    ]
+  ],
+  "probes": [
+    [
+      {
+        "target": "LEFT",
+        "question": "ME: Does the questioner know what is on your left? Answer this question with yes or no and then stop.",
+        "gt": 0,
+        "answer": "ASIDE: No.",
+        "value": 0,
+        "tries": 1
+      },
+      {
+        "target": "RIGHT",
+        "question": "ME: Does the questioner know what is on your right? Answer this question with yes or no and then stop.",
+        "gt": 0,
+        "answer": "ASIDE: No.",
+        "value": 0,
+        "tries": 1
+      },
+      {
+        "target": "TOP",
+        "question": "ME: Does the questioner know what is at the top? Answer this question with yes or no and then stop.",
+        "gt": 0,
+        "answer": "ASIDE: No.",
+        "value": 0,
+        "tries": 1
+      },
+      {
+        "target": "BOTTOM",
+        "question": "ME: Does the questioner know what is at the bottom? Answer this question with yes or no and then stop.",
+        "gt": 0,
+        "answer": "ASIDE: No.",
+        "value": 0,
+        "tries": 1
+      },
+      {
+        "target": "CENTER",
+        "question": "ME: Does the questioner know what is at the center? Answer this question with yes or no and then stop.",
+        "gt": 0,
+        "answer": "ASIDE: No.",
+        "value": 0,
+        "tries": 1
+      },
+      {
+        "target": "NORTHWEST",
+        "question": "ME: Does the questioner know what is in the northwest? Answer this question with yes or no and then stop.",
+        "gt": 0,
+        "answer": "ASIDE: No.",
+        "value": 0,
+        "tries": 1
+      },
+      {
+        "target": "NORTHEAST",
+        "question": "ME: Does the questioner know what is in the northeast? Answer this question with yes or no and then stop.",
+        "gt": 0,
+        "answer": "ASIDE: No.",
+        "value": 0,
+        "tries": 1
+      },
+      {
+        "target": "SOUTHWEST",
+        "question": "ME: Does the questioner know what is in the southwest? Answer this question with yes or no and then stop.",
+        "gt": 0,
+        "answer": "ASIDE: No.",
+        "value": 0,
+        "tries": 1
+      },
+      {
+        "target": "SOUTHEAST",
+        "question": "ME: Does the questioner know what is in the southeast? Answer this question with yes or no and then stop.",
+        "gt": 0,
+        "answer": "ASIDE: No.",
+        "value": 0,
+        "tries": 1
+      },
+      {
+        "target": "HERE",
+        "question": "ME: Does the questioner know what is here? Answer this question with yes or no and then stop.",
+        "gt": 0,
+        "answer": "ASIDE: No.",
+        "value": 0,
+        "tries": 1
+      },
+      {
+        "target": "THERE",
+        "question": "ME: Does the questioner know what is there? Answer this question with yes or no and then stop.",
+        "gt": 0,
+        "answer": "ASIDE: No.",
+        "value": 0,
+        "tries": 1
+      },
+      {
+        "target": "NOWHERE",
+        "question": "ME: Does the questioner know what is nowhere? Answer this question with yes or no and then stop.",
+        "gt": 0,
+        "answer": "ASIDE: No.",
+        "value": 0,
+        "tries": 1
+      },
+      {
+        "target": "EVERYWHERE",
+        "question": "ME: Does the questioner know what is everywhere? Answer this question with yes or no and then stop.",
+        "gt": 0,
+        "answer": "ASIDE: No.",
+        "value": 0,
+        "tries": 1
+      },
+      {
+        "target": "INSIDE",
+        "question": "ME: Does the questioner know what is inside? Answer this question with yes or no and then stop.",
+        "gt": 0,
+        "answer": "ASIDE: No.",
+        "value": 0,
+        "tries": 1
+      },
+      {
+        "target": "OUTSIDE",
+        "question": "ME: Does the questioner know what is outside? Answer this question with yes or no and then stop.",
+        "gt": 0,
+        "answer": "ASIDE: No.",
+        "value": 0,
+        "tries": 1
+      }
+    ]
+  ],
+  "realised_slots": {
+    "center": 0,
+    "northwest": 1,
+    "southwest": 2,
+    "northeast": 3,
+    "top": 4,
+    "left": 5,
+    "southeast": 6,
+    "everywhere": 7,
+    "there": 8,
+    "bottom": 9,
+    "outside": 10,
+    "inside": 11,
+    "here": 12,
+    "right": 13,
+    "nowhere": 14
+  },
+  "Request Count": [
+    15,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+  ],
+  "Parsed Request Count": [
+    15,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+  ],
+  "Violated Request Count": [
+    0,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1
+  ],
+  "Filled Slots": [],
+  "Aborted": false,
+  "Played Probe Rounds": 1
+}

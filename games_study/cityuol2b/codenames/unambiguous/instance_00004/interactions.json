@@ -1,0 +1,1485 @@
+{
+  "meta": {
+    "game_name": "codenames",
+    "experiment_name": "unambiguous",
+    "game_id": 4,
+    "results_folder": "CityUoL__qwen3.5-2b__Qwen-GuidePlay-2B-v1",
+    "clem_version": "3.7.2",
+    "round_count": 7,
+    "completed": true
+  },
+  "player_models": {
+    "0": {
+      "model_spec": {
+        "model_name": "CityUoL__qwen3.5-2b__Qwen-GuidePlay-2B-v1",
+        "_team": "CityUoL",
+        "_version": "Qwen-GuidePlay-2B-v1",
+        "backend": "huggingface_local",
+        "context_size": "262k",
+        "huggingface_id": "syedhuq/qwen-guideplay-2b",
+        "languages": [
+          "en"
+        ],
+        "license": {
+          "name": "Apache-2.0",
+          "url": "https://www.apache.org/licenses/LICENSE-2.0"
+        },
+        "lookup_source": "/project/mmanina/lm-playschool-test-set/playpen/model_registry.json",
+        "model_config": {
+          "premade_chat_template": true,
+          "eos_to_cull": "<\\|im_end\\|>|<\\|endoftext\\|>",
+          "chat_template_kwargs": {
+            "enable_thinking": false
+          },
+          "multimodality": {
+            "single_image": true,
+            "multiple_images": true,
+            "audio": false,
+            "video": true
+          }
+        },
+        "open_weight": true,
+        "parameters": "2B",
+        "release_date": "2026-07-06"
+      },
+      "gen_args": {
+        "temperature": 0.0,
+        "max_tokens": 5000
+      }
+    }
+  },
+  "players": {
+    "GM": {
+      "game_role": "Game Master",
+      "model_name": "programmatic"
+    },
+    "Player 1": {
+      "game_role": "ClueGiver",
+      "model_name": "CityUoL__qwen3.5-2b__Qwen-GuidePlay-2B-v1"
+    },
+    "Player 2": {
+      "game_role": "Guesser",
+      "model_name": "CityUoL__qwen3.5-2b__Qwen-GuidePlay-2B-v1"
+    }
+  },
+  "turns": [
+    [
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:51:18.952167",
+        "action": {
+          "type": "board status",
+          "content": {
+            "hidden": {
+              "team": [
+                "timetable",
+                "wildlife",
+                "sofa",
+                "ointment",
+                "amulet",
+                "cleaver",
+                "instructor",
+                "ammo",
+                "pizza"
+              ],
+              "innocent": [
+                "cynic",
+                "stairway",
+                "toothpick",
+                "fuzz",
+                "ordinance",
+                "lawsuit",
+                "skillet"
+              ],
+              "opponent": [
+                "godmother",
+                "cocaine",
+                "prom",
+                "bedroom",
+                "doorstep",
+                "hen",
+                "sauerkraut",
+                "laser"
+              ],
+              "assassin": [
+                "allegiance"
+              ]
+            },
+            "revealed": {
+              "team": {
+                "team": [],
+                "innocent": [],
+                "opponent": [],
+                "assassin": []
+              },
+              "opponent": {
+                "team": [],
+                "innocent": [],
+                "opponent": [],
+                "assassin": []
+              }
+            }
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 1",
+        "timestamp": "2026-07-09T07:51:38.399659",
+        "action": {
+          "type": "send message",
+          "content": "Provide one single-word clue that relates to some of your team's words from the list below. You can choose to how many and to which words your clue relates to.\nThe goal is to have your partner guess all of your team's words based on the clues you give them, before the other team has uncovered all of theirs. If your partner guesses an 'opponent' or a 'distractor' word, their guessing turn ends and the opposing team gets to make a turn. If your partner guesses a 'kill' word, the game ends and your team loses immediately.\nThe more words your clue relates to, the quicker you can win the game, but the harder the associations may be to guess for your partner, so choose your clue word wisely. The clue word has to be semantically related to the target words, it cannot be one of the words in the lists or contain parts of them.\n\nAlways give your single-word clue and your comma-separated list of related target words in the following format and make your answers as short as possible, never include any other text than is required in this form:\n\nCLUE: <WORD>\nTARGETS: <TARGETS>\n\nYour team words are: timetable, wildlife, sofa, ointment, amulet, cleaver, instructor, ammo, pizza.\nYour opponent's team words are: godmother, cocaine, prom, bedroom, doorstep, hen, sauerkraut, laser.\nDistractor words are: cynic, stairway, toothpick, fuzz, ordinance, lawsuit, skillet.\nThe kill words are: allegiance.",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 1",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:51:38.399676",
+        "action": {
+          "type": "get message",
+          "content": "CLUE: school\nTARGETS: timetable, instructor",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:51:38.399847",
+        "action": {
+          "type": "clue",
+          "content": "school"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:51:38.399869",
+        "action": {
+          "type": "targets",
+          "content": [
+            "timetable",
+            "instructor"
+          ]
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:51:38.399889",
+        "action": {
+          "type": "word targeted",
+          "content": {
+            "word": "timetable",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:51:38.399909",
+        "action": {
+          "type": "word targeted",
+          "content": {
+            "word": "instructor",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 2",
+        "timestamp": "2026-07-09T07:51:56.717492",
+        "action": {
+          "type": "send message",
+          "content": "Provide a comma-separated list of up to 2 words from the following list that best relate or are most closely associated with the word 'school'. Always start your list of guess(es) with 'GUESS: ' and do not include any other text in your answer.\n\ntoothpick, prom, sofa, doorstep, laser, sauerkraut, lawsuit, godmother, bedroom, timetable, instructor, ordinance, allegiance, cocaine, hen, skillet, stairway, cleaver, amulet, ointment, wildlife, fuzz, pizza, cynic, ammo",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 2",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:51:56.717507",
+        "action": {
+          "type": "get message",
+          "content": "GUESS: timetable, instructor",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:51:56.717557",
+        "action": {
+          "type": "guesses",
+          "content": [
+            "timetable",
+            "instructor"
+          ]
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:51:56.717581",
+        "action": {
+          "type": "team revealed",
+          "content": {
+            "word": "timetable",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:51:56.717600",
+        "action": {
+          "type": "target revealed",
+          "content": {
+            "word": "timetable",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:51:56.717620",
+        "action": {
+          "type": "team revealed",
+          "content": {
+            "word": "instructor",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:51:56.717638",
+        "action": {
+          "type": "target revealed",
+          "content": {
+            "word": "instructor",
+            "assignment": "team"
+          }
+        }
+      }
+    ],
+    [
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:51:56.717753",
+        "action": {
+          "type": "opponent revealed",
+          "content": {
+            "word": "doorstep",
+            "assignment": "opponent"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:51:56.717780",
+        "action": {
+          "type": "board status",
+          "content": {
+            "hidden": {
+              "team": [
+                "wildlife",
+                "sofa",
+                "ointment",
+                "amulet",
+                "cleaver",
+                "ammo",
+                "pizza"
+              ],
+              "innocent": [
+                "cynic",
+                "stairway",
+                "toothpick",
+                "fuzz",
+                "ordinance",
+                "lawsuit",
+                "skillet"
+              ],
+              "opponent": [
+                "godmother",
+                "cocaine",
+                "prom",
+                "bedroom",
+                "hen",
+                "sauerkraut",
+                "laser"
+              ],
+              "assassin": [
+                "allegiance"
+              ]
+            },
+            "revealed": {
+              "team": {
+                "team": [
+                  "timetable",
+                  "instructor"
+                ],
+                "innocent": [],
+                "opponent": [],
+                "assassin": []
+              },
+              "opponent": {
+                "team": [],
+                "innocent": [],
+                "opponent": [
+                  "doorstep"
+                ],
+                "assassin": []
+              }
+            }
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 1",
+        "timestamp": "2026-07-09T07:52:15.883033",
+        "action": {
+          "type": "send message",
+          "content": "The words timetable, instructor were guessed correctly. Your teammate's turn ended there.\nNow provide another clue relating to some of your remaining team words and a list of the related target words. Remember to start your clue with 'CLUE: ', put a new line, and start your comma-separated list of target words with 'TARGETS: '. Notice: some words have been removed from the lists compared to previous requests.\n\nYour remaining team words are: wildlife, sofa, ointment, amulet, cleaver, ammo, pizza.\nRemaining words for your opponent are: godmother, cocaine, prom, bedroom, doorstep, hen, sauerkraut, laser.\nRemaining distractor words are: cynic, stairway, toothpick, fuzz, ordinance, lawsuit, skillet.\nRemaining kill words are: allegiance.",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 1",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:52:15.883053",
+        "action": {
+          "type": "get message",
+          "content": "CLUE: weapon\nTARGETS: cleaver, ammo",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:52:15.883261",
+        "action": {
+          "type": "clue",
+          "content": "weapon"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:52:15.883285",
+        "action": {
+          "type": "targets",
+          "content": [
+            "cleaver",
+            "ammo"
+          ]
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:52:15.883306",
+        "action": {
+          "type": "word targeted",
+          "content": {
+            "word": "cleaver",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:52:15.883325",
+        "action": {
+          "type": "word targeted",
+          "content": {
+            "word": "ammo",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 2",
+        "timestamp": "2026-07-09T07:52:29.881947",
+        "action": {
+          "type": "send message",
+          "content": "The words timetable, instructor were guessed correctly. Your turn ended there.\nNow provide another comma-separated list of at least 1 and up to 2 words from the following list of words that best relate or are most closely associated with the word 'weapon'. Remember to start your answer with 'GUESS: '. Notice: some words have been removed from the list compared to previous requests.\n\ntoothpick, prom, sofa, laser, sauerkraut, lawsuit, godmother, bedroom, ordinance, allegiance, cocaine, hen, skillet, stairway, cleaver, amulet, ointment, wildlife, fuzz, pizza, cynic, ammo",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 2",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:52:29.881963",
+        "action": {
+          "type": "get message",
+          "content": "GUESS: ammo, cleaver",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:52:29.882013",
+        "action": {
+          "type": "guesses",
+          "content": [
+            "ammo",
+            "cleaver"
+          ]
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:52:29.882038",
+        "action": {
+          "type": "team revealed",
+          "content": {
+            "word": "ammo",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:52:29.882058",
+        "action": {
+          "type": "target revealed",
+          "content": {
+            "word": "ammo",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:52:29.882077",
+        "action": {
+          "type": "team revealed",
+          "content": {
+            "word": "cleaver",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:52:29.882095",
+        "action": {
+          "type": "target revealed",
+          "content": {
+            "word": "cleaver",
+            "assignment": "team"
+          }
+        }
+      }
+    ],
+    [
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:52:29.882238",
+        "action": {
+          "type": "opponent revealed",
+          "content": {
+            "word": "hen",
+            "assignment": "opponent"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:52:29.882264",
+        "action": {
+          "type": "board status",
+          "content": {
+            "hidden": {
+              "team": [
+                "wildlife",
+                "sofa",
+                "ointment",
+                "amulet",
+                "pizza"
+              ],
+              "innocent": [
+                "cynic",
+                "stairway",
+                "toothpick",
+                "fuzz",
+                "ordinance",
+                "lawsuit",
+                "skillet"
+              ],
+              "opponent": [
+                "godmother",
+                "cocaine",
+                "prom",
+                "bedroom",
+                "sauerkraut",
+                "laser"
+              ],
+              "assassin": [
+                "allegiance"
+              ]
+            },
+            "revealed": {
+              "team": {
+                "team": [
+                  "timetable",
+                  "instructor",
+                  "ammo",
+                  "cleaver"
+                ],
+                "innocent": [],
+                "opponent": [],
+                "assassin": []
+              },
+              "opponent": {
+                "team": [],
+                "innocent": [],
+                "opponent": [
+                  "doorstep",
+                  "hen"
+                ],
+                "assassin": []
+              }
+            }
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 1",
+        "timestamp": "2026-07-09T07:52:45.593412",
+        "action": {
+          "type": "send message",
+          "content": "The words ammo, cleaver were guessed correctly. Your teammate's turn ended there.\nNow provide another clue relating to some of your remaining team words and a list of the related target words. Remember to start your clue with 'CLUE: ', put a new line, and start your comma-separated list of target words with 'TARGETS: '. Notice: some words have been removed from the lists compared to previous requests.\n\nYour remaining team words are: wildlife, sofa, ointment, amulet, pizza.\nRemaining words for your opponent are: godmother, cocaine, prom, bedroom, hen, sauerkraut, laser.\nRemaining distractor words are: cynic, stairway, toothpick, fuzz, ordinance, lawsuit, skillet.\nRemaining kill words are: allegiance.",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 1",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:52:45.593430",
+        "action": {
+          "type": "get message",
+          "content": "CLUE: food\nTARGETS: pizza",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:52:45.593570",
+        "action": {
+          "type": "clue",
+          "content": "food"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:52:45.593591",
+        "action": {
+          "type": "targets",
+          "content": [
+            "pizza"
+          ]
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:52:45.593611",
+        "action": {
+          "type": "word targeted",
+          "content": {
+            "word": "pizza",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 2",
+        "timestamp": "2026-07-09T07:52:57.541528",
+        "action": {
+          "type": "send message",
+          "content": "The words ammo, cleaver were guessed correctly. Your turn ended there.\nNow provide another comma-separated list of at least 1 and up to 1 words from the following list of words that best relate or are most closely associated with the word 'food'. Remember to start your answer with 'GUESS: '. Notice: some words have been removed from the list compared to previous requests.\n\ntoothpick, prom, sofa, laser, sauerkraut, lawsuit, godmother, bedroom, ordinance, allegiance, cocaine, skillet, stairway, amulet, ointment, wildlife, fuzz, pizza, cynic",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 2",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:52:57.541544",
+        "action": {
+          "type": "get message",
+          "content": "GUESS: pizza",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:52:57.541589",
+        "action": {
+          "type": "guesses",
+          "content": [
+            "pizza"
+          ]
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:52:57.541613",
+        "action": {
+          "type": "team revealed",
+          "content": {
+            "word": "pizza",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:52:57.541633",
+        "action": {
+          "type": "target revealed",
+          "content": {
+            "word": "pizza",
+            "assignment": "team"
+          }
+        }
+      }
+    ],
+    [
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:52:57.541747",
+        "action": {
+          "type": "opponent revealed",
+          "content": {
+            "word": "godmother",
+            "assignment": "opponent"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:52:57.541774",
+        "action": {
+          "type": "board status",
+          "content": {
+            "hidden": {
+              "team": [
+                "wildlife",
+                "sofa",
+                "ointment",
+                "amulet"
+              ],
+              "innocent": [
+                "cynic",
+                "stairway",
+                "toothpick",
+                "fuzz",
+                "ordinance",
+                "lawsuit",
+                "skillet"
+              ],
+              "opponent": [
+                "cocaine",
+                "prom",
+                "bedroom",
+                "sauerkraut",
+                "laser"
+              ],
+              "assassin": [
+                "allegiance"
+              ]
+            },
+            "revealed": {
+              "team": {
+                "team": [
+                  "timetable",
+                  "instructor",
+                  "ammo",
+                  "cleaver",
+                  "pizza"
+                ],
+                "innocent": [],
+                "opponent": [],
+                "assassin": []
+              },
+              "opponent": {
+                "team": [],
+                "innocent": [],
+                "opponent": [
+                  "doorstep",
+                  "hen",
+                  "godmother"
+                ],
+                "assassin": []
+              }
+            }
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 1",
+        "timestamp": "2026-07-09T07:53:09.524138",
+        "action": {
+          "type": "send message",
+          "content": "The word pizza was guessed correctly. Your teammate's turn ended there.\nNow provide another clue relating to some of your remaining team words and a list of the related target words. Remember to start your clue with 'CLUE: ', put a new line, and start your comma-separated list of target words with 'TARGETS: '. Notice: some words have been removed from the lists compared to previous requests.\n\nYour remaining team words are: wildlife, sofa, ointment, amulet.\nRemaining words for your opponent are: godmother, cocaine, prom, bedroom, sauerkraut, laser.\nRemaining distractor words are: cynic, stairway, toothpick, fuzz, ordinance, lawsuit, skillet.\nRemaining kill words are: allegiance.",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 1",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:53:09.524158",
+        "action": {
+          "type": "get message",
+          "content": "CLUE: medicine\nTARGETS: ointment",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:53:09.524312",
+        "action": {
+          "type": "clue",
+          "content": "medicine"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:53:09.524336",
+        "action": {
+          "type": "targets",
+          "content": [
+            "ointment"
+          ]
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:53:09.524358",
+        "action": {
+          "type": "word targeted",
+          "content": {
+            "word": "ointment",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 2",
+        "timestamp": "2026-07-09T07:53:19.994518",
+        "action": {
+          "type": "send message",
+          "content": "The word pizza was guessed correctly. Your turn ended there.\nNow provide another comma-separated list of at least 1 and up to 1 words from the following list of words that best relate or are most closely associated with the word 'medicine'. Remember to start your answer with 'GUESS: '. Notice: some words have been removed from the list compared to previous requests.\n\ntoothpick, prom, sofa, laser, sauerkraut, lawsuit, bedroom, ordinance, allegiance, cocaine, skillet, stairway, amulet, ointment, wildlife, fuzz, cynic",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 2",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:53:19.994533",
+        "action": {
+          "type": "get message",
+          "content": "GUESS: ointment",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:53:19.994606",
+        "action": {
+          "type": "guesses",
+          "content": [
+            "ointment"
+          ]
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:53:19.994646",
+        "action": {
+          "type": "team revealed",
+          "content": {
+            "word": "ointment",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:53:19.994668",
+        "action": {
+          "type": "target revealed",
+          "content": {
+            "word": "ointment",
+            "assignment": "team"
+          }
+        }
+      }
+    ],
+    [
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:53:19.994965",
+        "action": {
+          "type": "opponent revealed",
+          "content": {
+            "word": "cocaine",
+            "assignment": "opponent"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:53:19.994995",
+        "action": {
+          "type": "board status",
+          "content": {
+            "hidden": {
+              "team": [
+                "wildlife",
+                "sofa",
+                "amulet"
+              ],
+              "innocent": [
+                "cynic",
+                "stairway",
+                "toothpick",
+                "fuzz",
+                "ordinance",
+                "lawsuit",
+                "skillet"
+              ],
+              "opponent": [
+                "prom",
+                "bedroom",
+                "sauerkraut",
+                "laser"
+              ],
+              "assassin": [
+                "allegiance"
+              ]
+            },
+            "revealed": {
+              "team": {
+                "team": [
+                  "timetable",
+                  "instructor",
+                  "ammo",
+                  "cleaver",
+                  "pizza",
+                  "ointment"
+                ],
+                "innocent": [],
+                "opponent": [],
+                "assassin": []
+              },
+              "opponent": {
+                "team": [],
+                "innocent": [],
+                "opponent": [
+                  "doorstep",
+                  "hen",
+                  "godmother",
+                  "cocaine"
+                ],
+                "assassin": []
+              }
+            }
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 1",
+        "timestamp": "2026-07-09T07:53:29.410163",
+        "action": {
+          "type": "send message",
+          "content": "The word ointment was guessed correctly. Your teammate's turn ended there.\nNow provide another clue relating to some of your remaining team words and a list of the related target words. Remember to start your clue with 'CLUE: ', put a new line, and start your comma-separated list of target words with 'TARGETS: '. Notice: some words have been removed from the lists compared to previous requests.\n\nYour remaining team words are: wildlife, sofa, amulet.\nRemaining words for your opponent are: cocaine, prom, bedroom, sauerkraut, laser.\nRemaining distractor words are: cynic, stairway, toothpick, fuzz, ordinance, lawsuit, skillet.\nRemaining kill words are: allegiance.",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 1",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:53:29.410180",
+        "action": {
+          "type": "get message",
+          "content": "CLUE: animal\nTARGETS: wildlife",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:53:29.410328",
+        "action": {
+          "type": "clue",
+          "content": "animal"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:53:29.410350",
+        "action": {
+          "type": "targets",
+          "content": [
+            "wildlife"
+          ]
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:53:29.410369",
+        "action": {
+          "type": "word targeted",
+          "content": {
+            "word": "wildlife",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 2",
+        "timestamp": "2026-07-09T07:53:37.698513",
+        "action": {
+          "type": "send message",
+          "content": "The word ointment was guessed correctly. Your turn ended there.\nNow provide another comma-separated list of at least 1 and up to 1 words from the following list of words that best relate or are most closely associated with the word 'animal'. Remember to start your answer with 'GUESS: '. Notice: some words have been removed from the list compared to previous requests.\n\ntoothpick, prom, sofa, laser, sauerkraut, lawsuit, bedroom, ordinance, allegiance, skillet, stairway, amulet, wildlife, fuzz, cynic",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 2",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:53:37.698531",
+        "action": {
+          "type": "get message",
+          "content": "GUESS: wildlife",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:53:37.698604",
+        "action": {
+          "type": "guesses",
+          "content": [
+            "wildlife"
+          ]
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:53:37.698651",
+        "action": {
+          "type": "team revealed",
+          "content": {
+            "word": "wildlife",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:53:37.698674",
+        "action": {
+          "type": "target revealed",
+          "content": {
+            "word": "wildlife",
+            "assignment": "team"
+          }
+        }
+      }
+    ],
+    [
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:53:37.699007",
+        "action": {
+          "type": "opponent revealed",
+          "content": {
+            "word": "prom",
+            "assignment": "opponent"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:53:37.699037",
+        "action": {
+          "type": "board status",
+          "content": {
+            "hidden": {
+              "team": [
+                "sofa",
+                "amulet"
+              ],
+              "innocent": [
+                "cynic",
+                "stairway",
+                "toothpick",
+                "fuzz",
+                "ordinance",
+                "lawsuit",
+                "skillet"
+              ],
+              "opponent": [
+                "bedroom",
+                "sauerkraut",
+                "laser"
+              ],
+              "assassin": [
+                "allegiance"
+              ]
+            },
+            "revealed": {
+              "team": {
+                "team": [
+                  "timetable",
+                  "instructor",
+                  "ammo",
+                  "cleaver",
+                  "pizza",
+                  "ointment",
+                  "wildlife"
+                ],
+                "innocent": [],
+                "opponent": [],
+                "assassin": []
+              },
+              "opponent": {
+                "team": [],
+                "innocent": [],
+                "opponent": [
+                  "doorstep",
+                  "hen",
+                  "godmother",
+                  "cocaine",
+                  "prom"
+                ],
+                "assassin": []
+              }
+            }
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 1",
+        "timestamp": "2026-07-09T07:53:45.425301",
+        "action": {
+          "type": "send message",
+          "content": "The word wildlife was guessed correctly. Your teammate's turn ended there.\nNow provide another clue relating to some of your remaining team words and a list of the related target words. Remember to start your clue with 'CLUE: ', put a new line, and start your comma-separated list of target words with 'TARGETS: '. Notice: some words have been removed from the lists compared to previous requests.\n\nYour remaining team words are: sofa, amulet.\nRemaining words for your opponent are: prom, bedroom, sauerkraut, laser.\nRemaining distractor words are: cynic, stairway, toothpick, fuzz, ordinance, lawsuit, skillet.\nRemaining kill words are: allegiance.",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 1",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:53:45.425321",
+        "action": {
+          "type": "get message",
+          "content": "CLUE: cushion\nTARGETS: sofa",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:53:45.425465",
+        "action": {
+          "type": "clue",
+          "content": "cushion"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:53:45.425489",
+        "action": {
+          "type": "targets",
+          "content": [
+            "sofa"
+          ]
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:53:45.425509",
+        "action": {
+          "type": "word targeted",
+          "content": {
+            "word": "sofa",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 2",
+        "timestamp": "2026-07-09T07:53:52.191318",
+        "action": {
+          "type": "send message",
+          "content": "The word wildlife was guessed correctly. Your turn ended there.\nNow provide another comma-separated list of at least 1 and up to 1 words from the following list of words that best relate or are most closely associated with the word 'cushion'. Remember to start your answer with 'GUESS: '. Notice: some words have been removed from the list compared to previous requests.\n\ntoothpick, sofa, laser, sauerkraut, lawsuit, bedroom, ordinance, allegiance, skillet, stairway, amulet, fuzz, cynic",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 2",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:53:52.191334",
+        "action": {
+          "type": "get message",
+          "content": "GUESS: sofa",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:53:52.191381",
+        "action": {
+          "type": "guesses",
+          "content": [
+            "sofa"
+          ]
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:53:52.191405",
+        "action": {
+          "type": "team revealed",
+          "content": {
+            "word": "sofa",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:53:52.191425",
+        "action": {
+          "type": "target revealed",
+          "content": {
+            "word": "sofa",
+            "assignment": "team"
+          }
+        }
+      }
+    ],
+    [
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:53:52.191540",
+        "action": {
+          "type": "opponent revealed",
+          "content": {
+            "word": "bedroom",
+            "assignment": "opponent"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:53:52.191566",
+        "action": {
+          "type": "board status",
+          "content": {
+            "hidden": {
+              "team": [
+                "amulet"
+              ],
+              "innocent": [
+                "cynic",
+                "stairway",
+                "toothpick",
+                "fuzz",
+                "ordinance",
+                "lawsuit",
+                "skillet"
+              ],
+              "opponent": [
+                "sauerkraut",
+                "laser"
+              ],
+              "assassin": [
+                "allegiance"
+              ]
+            },
+            "revealed": {
+              "team": {
+                "team": [
+                  "timetable",
+                  "instructor",
+                  "ammo",
+                  "cleaver",
+                  "pizza",
+                  "ointment",
+                  "wildlife",
+                  "sofa"
+                ],
+                "innocent": [],
+                "opponent": [],
+                "assassin": []
+              },
+              "opponent": {
+                "team": [],
+                "innocent": [],
+                "opponent": [
+                  "doorstep",
+                  "hen",
+                  "godmother",
+                  "cocaine",
+                  "prom",
+                  "bedroom"
+                ],
+                "assassin": []
+              }
+            }
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 1",
+        "timestamp": "2026-07-09T07:53:58.407689",
+        "action": {
+          "type": "send message",
+          "content": "The word sofa was guessed correctly. Your teammate's turn ended there.\nNow provide another clue relating to some of your remaining team words and a list of the related target words. Remember to start your clue with 'CLUE: ', put a new line, and start your comma-separated list of target words with 'TARGETS: '. Notice: some words have been removed from the lists compared to previous requests.\n\nYour remaining team words are: amulet.\nRemaining words for your opponent are: bedroom, sauerkraut, laser.\nRemaining distractor words are: cynic, stairway, toothpick, fuzz, ordinance, lawsuit, skillet.\nRemaining kill words are: allegiance.",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 1",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:53:58.407709",
+        "action": {
+          "type": "get message",
+          "content": "CLUE: magic\nTARGETS: amulet",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:53:58.407832",
+        "action": {
+          "type": "clue",
+          "content": "magic"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:53:58.407855",
+        "action": {
+          "type": "targets",
+          "content": [
+            "amulet"
+          ]
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:53:58.407875",
+        "action": {
+          "type": "word targeted",
+          "content": {
+            "word": "amulet",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 2",
+        "timestamp": "2026-07-09T07:54:03.200376",
+        "action": {
+          "type": "send message",
+          "content": "The word sofa was guessed correctly. Your turn ended there.\nNow provide another comma-separated list of at least 1 and up to 1 words from the following list of words that best relate or are most closely associated with the word 'magic'. Remember to start your answer with 'GUESS: '. Notice: some words have been removed from the list compared to previous requests.\n\ntoothpick, laser, sauerkraut, lawsuit, ordinance, allegiance, skillet, stairway, amulet, fuzz, cynic",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 2",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:54:03.200392",
+        "action": {
+          "type": "get message",
+          "content": "GUESS: amulet",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:54:03.200461",
+        "action": {
+          "type": "guesses",
+          "content": [
+            "amulet"
+          ]
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:54:03.200502",
+        "action": {
+          "type": "team revealed",
+          "content": {
+            "word": "amulet",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:54:03.200524",
+        "action": {
+          "type": "target revealed",
+          "content": {
+            "word": "amulet",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:54:03.200794",
+        "action": {
+          "type": "game end",
+          "content": "team has won"
+        }
+      }
+    ]
+  ],
+  "board end status": {
+    "hidden": {
+      "team": [],
+      "innocent": [
+        "cynic",
+        "stairway",
+        "toothpick",
+        "fuzz",
+        "ordinance",
+        "lawsuit",
+        "skillet"
+      ],
+      "opponent": [
+        "sauerkraut",
+        "laser"
+      ],
+      "assassin": [
+        "allegiance"
+      ]
+    },
+    "revealed": {
+      "team": {
+        "team": [
+          "timetable",
+          "instructor",
+          "ammo",
+          "cleaver",
+          "pizza",
+          "ointment",
+          "wildlife",
+          "sofa",
+          "amulet"
+        ],
+        "innocent": [],
+        "opponent": [],
+        "assassin": []
+      },
+      "opponent": {
+        "team": [],
+        "innocent": [],
+        "opponent": [
+          "doorstep",
+          "hen",
+          "godmother",
+          "cocaine",
+          "prom",
+          "bedroom"
+        ],
+        "assassin": []
+      }
+    }
+  },
+  "Number of turns": 8,
+  "Aborted": false,
+  "Lose": false,
+  "Game ended through assassin": false,
+  "Request Count": 14,
+  "Parsed Request Count": 14,
+  "Violated Request Count": 0,
+  "Cluegiver engaged flags": {
+    "IGNORE RAMBLING": 0,
+    "IGNORE FALSE TARGETS OR GUESSES": 0,
+    "REPROMPT ON ERROR": 0,
+    "STRIP WORDS": 0,
+    "IGNORE NUMBER OF TARGETS": 0
+  },
+  "Guesser engaged flags": {
+    "IGNORE RAMBLING": 0,
+    "IGNORE FALSE TARGETS OR GUESSES": 0,
+    "REPROMPT ON ERROR": 0,
+    "STRIP WORDS": 0,
+    "IGNORE NUMBER OF TARGETS": 0
+  }
+}

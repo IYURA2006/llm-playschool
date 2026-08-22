@@ -1,0 +1,607 @@
+{
+  "meta": {
+    "game_name": "dond",
+    "experiment_name": "coop_en",
+    "game_id": 17,
+    "results_folder": "CityUoL__qwen3.5-2b__Qwen-GuidePlay-2B-v1",
+    "clem_version": "3.7.2",
+    "round_count": 6,
+    "completed": true
+  },
+  "player_models": {
+    "0": {
+      "model_spec": {
+        "model_name": "CityUoL__qwen3.5-2b__Qwen-GuidePlay-2B-v1",
+        "_team": "CityUoL",
+        "_version": "Qwen-GuidePlay-2B-v1",
+        "backend": "huggingface_local",
+        "context_size": "262k",
+        "huggingface_id": "syedhuq/qwen-guideplay-2b",
+        "languages": [
+          "en"
+        ],
+        "license": {
+          "name": "Apache-2.0",
+          "url": "https://www.apache.org/licenses/LICENSE-2.0"
+        },
+        "lookup_source": "/project/mmanina/lm-playschool-test-set/playpen/model_registry.json",
+        "model_config": {
+          "premade_chat_template": true,
+          "eos_to_cull": "<\\|im_end\\|>|<\\|endoftext\\|>",
+          "chat_template_kwargs": {
+            "enable_thinking": false
+          },
+          "multimodality": {
+            "single_image": true,
+            "multiple_images": true,
+            "audio": false,
+            "video": true
+          }
+        },
+        "open_weight": true,
+        "parameters": "2B",
+        "release_date": "2026-07-06"
+      },
+      "gen_args": {
+        "temperature": 0.0,
+        "max_tokens": 5000
+      }
+    }
+  },
+  "players": {
+    "GM": {
+      "game_role": "Game Master",
+      "model_name": "programmatic"
+    },
+    "Player 1": {
+      "game_role": "DealOrNoDealPlayer",
+      "model_name": "CityUoL__qwen3.5-2b__Qwen-GuidePlay-2B-v1"
+    },
+    "Player 2": {
+      "game_role": "DealOrNoDealPlayer",
+      "model_name": "CityUoL__qwen3.5-2b__Qwen-GuidePlay-2B-v1"
+    }
+  },
+  "turns": [
+    [
+      {
+        "from": "GM",
+        "to": "Player 1",
+        "timestamp": "2026-07-09T07:49:43.871015",
+        "action": {
+          "type": "send message",
+          "content": "You are playing a cooperative negotiation game in which you have to agree on how to divide a set of items among you and another player.\n\nRules:\n(a) You and the other player are given a set of items. Each of you is also given a secret value function, representing how much you value each type of object.\n(b) You exchange messages with the other player to agree on who gets which items. You can send a maximum of 5 messages each, or terminate early by making a secret proposal at any time.\n(c) You are each asked to submit a secret proposal indicating the items you want formatted in square brackets as follows: \"[Proposal: <number> <object name>, <number> <object name>, <...>]\"\n(d) If your proposals are complementary, i.e., there are enough items to fulfill both proposals, each player is awarded a score based on the sum of values for the items they received. Otherwise, both of you get zero points.\n(e) Your goal is to maximize the sum of your score and the score of the other player.\n\nLet us start.\n\nThe set of available items is:\n\n1 key, 1 carrot, 3 shells\n\nYour secret value function is:\n\nkey: 5, carrot: 5, shell: 0\n\nIMPORTANT: Your messages, unless it is the secret proposal, are directly transmitted to the other player, so do not include any response to the rules or text announcing your message. To make a secret proposal, use the indicated format. Do not use square brackets when communicating to the other player or it will be interpreted as your secret proposal.\n",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 1",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:49:43.871033",
+        "action": {
+          "type": "get message",
+          "content": "I value the key and carrot highly, but I don’t value shells at all. What are your values for key, carrot, and shells?",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:49:43.871058",
+        "action": {
+          "type": "valid response",
+          "content": "continue"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:49:43.871072",
+        "action": {
+          "type": "valid message",
+          "content": "I value the key and carrot highly, but I don’t value shells at all. What are your values for key, carrot, and shells?"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 2",
+        "timestamp": "2026-07-09T07:50:00.198438",
+        "action": {
+          "type": "send message",
+          "content": "You are playing a cooperative negotiation game in which you have to agree on how to divide a set of items among you and another player.\n\nRules:\n(a) You and the other player are given a set of items. Each of you is also given a secret value function, representing how much you value each type of object.\n(b) You exchange messages with the other player to agree on who gets which items. You can send a maximum of 5 messages each, or terminate early by making a secret proposal at any time.\n(c) You are each asked to submit a secret proposal indicating the items you want formatted in square brackets as follows: \"[Proposal: <number> <object name>, <number> <object name>, <...>]\"\n(d) If your proposals are complementary, i.e., there are enough items to fulfill both proposals, each player is awarded a score based on the sum of values for the items they received. Otherwise, both of you get zero points.\n(e) Your goal is to maximize the sum of your score and the score of the other player.\n\nLet us start.\n\nThe set of available items is:\n\n1 key, 1 carrot, 3 shells\n\nYour secret value function is:\n\nkey: 3, carrot: 4, shell: 1\n\nIMPORTANT: Your messages, unless it is the secret proposal, are directly transmitted to the other player, so do not include any response to the rules or text announcing your message. To make a secret proposal, use the indicated format. Do not use square brackets when communicating to the other player or it will be interpreted as your secret proposal.\n\n\nI value the key and carrot highly, but I don’t value shells at all. What are your values for key, carrot, and shells?",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 2",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:50:00.198456",
+        "action": {
+          "type": "get message",
+          "content": "I value the key and carrot highly, but I don’t value shells at all. What are your values for key, carrot, and shells?",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:50:00.198482",
+        "action": {
+          "type": "valid response",
+          "content": "continue"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:50:00.198496",
+        "action": {
+          "type": "valid message",
+          "content": "I value the key and carrot highly, but I don’t value shells at all. What are your values for key, carrot, and shells?"
+        }
+      }
+    ],
+    [
+      {
+        "from": "GM",
+        "to": "Player 1",
+        "timestamp": "2026-07-09T07:50:19.202062",
+        "action": {
+          "type": "send message",
+          "content": "I value the key and carrot highly, but I don’t value shells at all. What are your values for key, carrot, and shells?",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 1",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:50:19.202080",
+        "action": {
+          "type": "get message",
+          "content": "I value the key and carrot highly, but I don’t value shells at all. What are your values for key, carrot, and shells?",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:50:19.202104",
+        "action": {
+          "type": "valid response",
+          "content": "continue"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:50:19.202118",
+        "action": {
+          "type": "valid message",
+          "content": "I value the key and carrot highly, but I don’t value shells at all. What are your values for key, carrot, and shells?"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 2",
+        "timestamp": "2026-07-09T07:50:36.595666",
+        "action": {
+          "type": "send message",
+          "content": "I value the key and carrot highly, but I don’t value shells at all. What are your values for key, carrot, and shells?",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 2",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:50:36.595688",
+        "action": {
+          "type": "get message",
+          "content": "I value the key and carrot highly, but I don’t value shells at all. What are your values for key, carrot, and shells?",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:50:36.595709",
+        "action": {
+          "type": "valid response",
+          "content": "continue"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:50:36.595723",
+        "action": {
+          "type": "valid message",
+          "content": "I value the key and carrot highly, but I don’t value shells at all. What are your values for key, carrot, and shells?"
+        }
+      }
+    ],
+    [
+      {
+        "from": "GM",
+        "to": "Player 1",
+        "timestamp": "2026-07-09T07:50:54.474118",
+        "action": {
+          "type": "send message",
+          "content": "I value the key and carrot highly, but I don’t value shells at all. What are your values for key, carrot, and shells?",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 1",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:50:54.474136",
+        "action": {
+          "type": "get message",
+          "content": "I value the key and carrot highly, but I don’t value shells at all. What are your values for key, carrot, and shells?",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:50:54.474162",
+        "action": {
+          "type": "valid response",
+          "content": "continue"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:50:54.474177",
+        "action": {
+          "type": "valid message",
+          "content": "I value the key and carrot highly, but I don’t value shells at all. What are your values for key, carrot, and shells?"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 2",
+        "timestamp": "2026-07-09T07:51:04.003624",
+        "action": {
+          "type": "send message",
+          "content": "I value the key and carrot highly, but I don’t value shells at all. What are your values for key, carrot, and shells?",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 2",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:51:04.003638",
+        "action": {
+          "type": "get message",
+          "content": "I value the key and carrot highly, but I don’t value shells at all. What are your values for key, carrot, and shells?",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:51:04.003656",
+        "action": {
+          "type": "valid response",
+          "content": "continue"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:51:04.003668",
+        "action": {
+          "type": "valid message",
+          "content": "I value the key and carrot highly, but I don’t value shells at all. What are your values for key, carrot, and shells?"
+        }
+      }
+    ],
+    [
+      {
+        "from": "GM",
+        "to": "Player 1",
+        "timestamp": "2026-07-09T07:51:09.468975",
+        "action": {
+          "type": "send message",
+          "content": "I value the key and carrot highly, but I don’t value shells at all. What are your values for key, carrot, and shells?",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 1",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:51:09.468990",
+        "action": {
+          "type": "get message",
+          "content": "I value the key and carrot highly, but I don’t value shells at all. What are your values for key, carrot, and shells?",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:51:09.469009",
+        "action": {
+          "type": "valid response",
+          "content": "continue"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:51:09.469022",
+        "action": {
+          "type": "valid message",
+          "content": "I value the key and carrot highly, but I don’t value shells at all. What are your values for key, carrot, and shells?"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 2",
+        "timestamp": "2026-07-09T07:51:12.195624",
+        "action": {
+          "type": "send message",
+          "content": "I value the key and carrot highly, but I don’t value shells at all. What are your values for key, carrot, and shells?",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 2",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:51:12.195639",
+        "action": {
+          "type": "get message",
+          "content": "I value the key and carrot highly, but I don’t value shells at all. What are your values for key, carrot, and shells?",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:51:12.195657",
+        "action": {
+          "type": "valid response",
+          "content": "continue"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:51:12.195669",
+        "action": {
+          "type": "valid message",
+          "content": "I value the key and carrot highly, but I don’t value shells at all. What are your values for key, carrot, and shells?"
+        }
+      }
+    ],
+    [
+      {
+        "from": "GM",
+        "to": "Player 1",
+        "timestamp": "2026-07-09T07:51:14.354928",
+        "action": {
+          "type": "send message",
+          "content": "I value the key and carrot highly, but I don’t value shells at all. What are your values for key, carrot, and shells?",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 1",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:51:14.354946",
+        "action": {
+          "type": "get message",
+          "content": "I value the key and carrot highly, but I don’t value shells at all. What are your values for key, carrot, and shells?",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:51:14.354970",
+        "action": {
+          "type": "valid response",
+          "content": "continue"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:51:14.354985",
+        "action": {
+          "type": "valid message",
+          "content": "I value the key and carrot highly, but I don’t value shells at all. What are your values for key, carrot, and shells?"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 2",
+        "timestamp": "2026-07-09T07:51:15.927230",
+        "action": {
+          "type": "send message",
+          "content": "I value the key and carrot highly, but I don’t value shells at all. What are your values for key, carrot, and shells?",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 2",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:51:15.927248",
+        "action": {
+          "type": "get message",
+          "content": "I value the key and carrot highly, but I don’t value shells at all. What are your values for key, carrot, and shells?",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:51:15.927271",
+        "action": {
+          "type": "valid response",
+          "content": "continue"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:51:15.927284",
+        "action": {
+          "type": "valid message",
+          "content": "I value the key and carrot highly, but I don’t value shells at all. What are your values for key, carrot, and shells?"
+        }
+      }
+    ],
+    [
+      {
+        "from": "GM",
+        "to": "Player 1",
+        "timestamp": "2026-07-09T07:51:16.408658",
+        "action": {
+          "type": "send message",
+          "content": "I value the key and carrot highly, but I don’t value shells at all. What are your values for key, carrot, and shells?\n\n\nThe time is up. It is now your turn to submit a secret proposal.\n",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 1",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:51:16.408677",
+        "action": {
+          "type": "get message",
+          "content": "[Proposal: 1 key, 1 carrot]",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:51:16.408724",
+        "action": {
+          "type": "valid response",
+          "content": "proposal"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:51:16.408740",
+        "action": {
+          "type": "valid proposal",
+          "content": [
+            1,
+            1,
+            0
+          ]
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 2",
+        "timestamp": "2026-07-09T07:51:16.991296",
+        "action": {
+          "type": "send message",
+          "content": "The other player has submitted a secret proposal. It is now your turn to submit a proposal of your own.\n",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 2",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:51:16.991317",
+        "action": {
+          "type": "get message",
+          "content": "[Proposal: 1 key, 1 carrot]",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:51:16.991354",
+        "action": {
+          "type": "valid response",
+          "content": "proposal"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:51:16.991374",
+        "action": {
+          "type": "valid proposal",
+          "content": [
+            1,
+            1,
+            0
+          ]
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:51:16.991393",
+        "action": {
+          "type": "failed agreement",
+          "content": [
+            [
+              1,
+              1,
+              0
+            ],
+            [
+              1,
+              1,
+              0
+            ]
+          ]
+        }
+      }
+    ]
+  ],
+  "Aborted": 0,
+  "Lose": 1,
+  "Success": 0,
+  "player_a_proposal": [
+    1,
+    1,
+    0
+  ],
+  "player_b_proposal": [
+    1,
+    1,
+    0
+  ],
+  "sum_of_scores": 0,
+  "max_sum_of_scores": 13,
+  "max_player_scores": 10,
+  "max_pareto_improvement": 13,
+  "pareto_improvement": 13,
+  "pareto_optimal": 0,
+  "episode_score": 0.0,
+  "Request Count": [
+    2,
+    2,
+    2,
+    2,
+    2,
+    2
+  ],
+  "Violated Request Count": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+  ],
+  "Parsed Request Count": [
+    2,
+    2,
+    2,
+    2,
+    2,
+    2
+  ]
+}

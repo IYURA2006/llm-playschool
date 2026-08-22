@@ -1,0 +1,1319 @@
+{
+  "meta": {
+    "game_name": "codenames",
+    "experiment_name": "opponent_difficult",
+    "game_id": 8,
+    "results_folder": "qwen3.5-27b",
+    "clem_version": "3.7.2",
+    "round_count": 5,
+    "completed": true
+  },
+  "player_models": {
+    "0": {
+      "model_spec": {
+        "model_name": "qwen3.5-27b",
+        "backend": "huggingface_local",
+        "context_size": "262k",
+        "huggingface_id": "Qwen/Qwen3.5-27B",
+        "languages": [
+          "en",
+          "zh"
+        ],
+        "license": {
+          "name": "Apache 2.0",
+          "url": "https://www.apache.org/licenses/LICENSE-2.0"
+        },
+        "lookup_source": "/project/mmanina/lm-playschool-test-set/playpen/model_registry.json",
+        "model_config": {
+          "premade_chat_template": true,
+          "eos_to_cull": "<\\|im_end\\|>|<\\|endoftext\\|>",
+          "chat_template_kwargs": {
+            "enable_thinking": false
+          },
+          "multimodality": {
+            "single_image": true,
+            "multiple_images": true,
+            "audio": false,
+            "video": true
+          }
+        },
+        "open_weight": true,
+        "parameters": "27B",
+        "release_date": "2026-02-24"
+      },
+      "gen_args": {
+        "temperature": 0.0,
+        "max_tokens": 5000
+      }
+    }
+  },
+  "players": {
+    "GM": {
+      "game_role": "Game Master",
+      "model_name": "programmatic"
+    },
+    "Player 1": {
+      "game_role": "ClueGiver",
+      "model_name": "qwen3.5-27b"
+    },
+    "Player 2": {
+      "game_role": "Guesser",
+      "model_name": "qwen3.5-27b"
+    }
+  },
+  "turns": [
+    [
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T12:35:50.170738",
+        "action": {
+          "type": "board status",
+          "content": {
+            "hidden": {
+              "team": [
+                "angel",
+                "box",
+                "chest",
+                "band",
+                "fire",
+                "press",
+                "nurse",
+                "plane",
+                "crown"
+              ],
+              "innocent": [
+                "beach",
+                "iron",
+                "fighter",
+                "cycle",
+                "millionaire",
+                "trip",
+                "thumb"
+              ],
+              "opponent": [
+                "bolt",
+                "olive",
+                "pit",
+                "port",
+                "bed",
+                "check",
+                "ball",
+                "rome"
+              ],
+              "assassin": [
+                "ghost"
+              ]
+            },
+            "revealed": {
+              "team": {
+                "team": [],
+                "innocent": [],
+                "opponent": [],
+                "assassin": []
+              },
+              "opponent": {
+                "team": [],
+                "innocent": [],
+                "opponent": [],
+                "assassin": []
+              }
+            }
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 1",
+        "timestamp": "2026-07-01T12:36:38.091714",
+        "action": {
+          "type": "send message",
+          "content": "Provide one single-word clue that relates to some of your team's words from the list below. You can choose to how many and to which words your clue relates to.\nThe goal is to have your partner guess all of your team's words based on the clues you give them, before the other team has uncovered all of theirs. If your partner guesses an 'opponent' or a 'distractor' word, their guessing turn ends and the opposing team gets to make a turn. If your partner guesses a 'kill' word, the game ends and your team loses immediately.\nThe more words your clue relates to, the quicker you can win the game, but the harder the associations may be to guess for your partner, so choose your clue word wisely. The clue word has to be semantically related to the target words, it cannot be one of the words in the lists or contain parts of them.\n\nAlways give your single-word clue and your comma-separated list of related target words in the following format and make your answers as short as possible, never include any other text than is required in this form:\n\nCLUE: <WORD>\nTARGETS: <TARGETS>\n\nYour team words are: angel, box, chest, band, fire, press, nurse, plane, crown.\nYour opponent's team words are: bolt, olive, pit, port, bed, check, ball, rome.\nDistractor words are: beach, iron, fighter, cycle, millionaire, trip, thumb.\nThe kill words are: ghost.",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 1",
+        "to": "GM",
+        "timestamp": "2026-07-01T12:36:38.091729",
+        "action": {
+          "type": "get message",
+          "content": "CLUE: first\nTARGETS: angel, box, chest, band, fire, press, nurse, plane, crown",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T12:36:38.092023",
+        "action": {
+          "type": "clue",
+          "content": "first"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T12:36:38.092061",
+        "action": {
+          "type": "targets",
+          "content": [
+            "angel",
+            "box",
+            "chest",
+            "band",
+            "fire",
+            "press",
+            "nurse",
+            "plane",
+            "crown"
+          ]
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T12:36:38.092088",
+        "action": {
+          "type": "word targeted",
+          "content": {
+            "word": "angel",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T12:36:38.092108",
+        "action": {
+          "type": "word targeted",
+          "content": {
+            "word": "box",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T12:36:38.092126",
+        "action": {
+          "type": "word targeted",
+          "content": {
+            "word": "chest",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T12:36:38.092143",
+        "action": {
+          "type": "word targeted",
+          "content": {
+            "word": "band",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T12:36:38.092160",
+        "action": {
+          "type": "word targeted",
+          "content": {
+            "word": "fire",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T12:36:38.092177",
+        "action": {
+          "type": "word targeted",
+          "content": {
+            "word": "press",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T12:36:38.092194",
+        "action": {
+          "type": "word targeted",
+          "content": {
+            "word": "nurse",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T12:36:38.092211",
+        "action": {
+          "type": "word targeted",
+          "content": {
+            "word": "plane",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T12:36:38.092227",
+        "action": {
+          "type": "word targeted",
+          "content": {
+            "word": "crown",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 2",
+        "timestamp": "2026-07-01T12:45:46.857696",
+        "action": {
+          "type": "send message",
+          "content": "Provide a comma-separated list of up to 9 words from the following list that best relate or are most closely associated with the word 'first'. Always start your list of guess(es) with 'GUESS: ' and do not include any other text in your answer.\n\nfighter, band, bed, check, trip, beach, cycle, iron, press, ghost, plane, fire, angel, millionaire, olive, port, nurse, ball, box, bolt, thumb, rome, chest, pit, crown",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 2",
+        "to": "GM",
+        "timestamp": "2026-07-01T12:45:46.857712",
+        "action": {
+          "type": "get message",
+          "content": "GUESS: fighter, band, bed, check, trip, beach, cycle, iron, press",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T12:45:46.857774",
+        "action": {
+          "type": "guesses",
+          "content": [
+            "fighter",
+            "band",
+            "bed",
+            "check",
+            "trip",
+            "beach",
+            "cycle",
+            "iron",
+            "press"
+          ]
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T12:45:46.857802",
+        "action": {
+          "type": "team revealed",
+          "content": {
+            "word": "fighter",
+            "assignment": "innocent"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T12:45:46.857823",
+        "action": {
+          "type": "turn end after",
+          "content": "fighter"
+        }
+      }
+    ],
+    [
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T12:45:46.857967",
+        "action": {
+          "type": "opponent revealed",
+          "content": {
+            "word": "check",
+            "assignment": "opponent"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T12:45:46.857995",
+        "action": {
+          "type": "opponent revealed",
+          "content": {
+            "word": "bed",
+            "assignment": "opponent"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T12:45:46.858015",
+        "action": {
+          "type": "board status",
+          "content": {
+            "hidden": {
+              "team": [
+                "angel",
+                "box",
+                "chest",
+                "band",
+                "fire",
+                "press",
+                "nurse",
+                "plane",
+                "crown"
+              ],
+              "innocent": [
+                "beach",
+                "iron",
+                "cycle",
+                "millionaire",
+                "trip",
+                "thumb"
+              ],
+              "opponent": [
+                "bolt",
+                "olive",
+                "pit",
+                "port",
+                "ball",
+                "rome"
+              ],
+              "assassin": [
+                "ghost"
+              ]
+            },
+            "revealed": {
+              "team": {
+                "team": [],
+                "innocent": [
+                  "fighter"
+                ],
+                "opponent": [],
+                "assassin": []
+              },
+              "opponent": {
+                "team": [],
+                "innocent": [],
+                "opponent": [
+                  "check",
+                  "bed"
+                ],
+                "assassin": []
+              }
+            }
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 1",
+        "timestamp": "2026-07-01T12:46:51.906422",
+        "action": {
+          "type": "send message",
+          "content": "The word fighter was guessed but is an innocent word. Your teammate's turn ended there.\nNow provide another clue relating to some of your remaining team words and a list of the related target words. Remember to start your clue with 'CLUE: ', put a new line, and start your comma-separated list of target words with 'TARGETS: '. Notice: some words have been removed from the lists compared to previous requests.\n\nYour remaining team words are: angel, box, chest, band, fire, press, nurse, plane, crown.\nRemaining words for your opponent are: bolt, olive, pit, port, bed, check, ball, rome.\nRemaining distractor words are: beach, iron, cycle, millionaire, trip, thumb.\nRemaining kill words are: ghost.",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 1",
+        "to": "GM",
+        "timestamp": "2026-07-01T12:46:51.906442",
+        "action": {
+          "type": "get message",
+          "content": "CLUE: aid\nTARGETS: fire, nurse, press",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T12:46:51.906635",
+        "action": {
+          "type": "clue",
+          "content": "aid"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T12:46:51.906657",
+        "action": {
+          "type": "targets",
+          "content": [
+            "fire",
+            "nurse",
+            "press"
+          ]
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T12:46:51.906678",
+        "action": {
+          "type": "word targeted",
+          "content": {
+            "word": "fire",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T12:46:51.906697",
+        "action": {
+          "type": "word targeted",
+          "content": {
+            "word": "nurse",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T12:46:51.906715",
+        "action": {
+          "type": "word targeted",
+          "content": {
+            "word": "press",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 2",
+        "timestamp": "2026-07-01T12:47:40.667708",
+        "action": {
+          "type": "send message",
+          "content": "The word fighter was guessed but is an innocent word. Your turn ended there.\nNow provide another comma-separated list of at least 1 and up to 3 words from the following list of words that best relate or are most closely associated with the word 'aid'. Remember to start your answer with 'GUESS: '. Notice: some words have been removed from the list compared to previous requests.\n\nband, trip, beach, cycle, iron, press, ghost, plane, fire, angel, millionaire, olive, port, nurse, ball, box, bolt, thumb, rome, chest, pit, crown",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 2",
+        "to": "GM",
+        "timestamp": "2026-07-01T12:47:40.667723",
+        "action": {
+          "type": "get message",
+          "content": "GUESS: nurse, angel, band",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T12:47:40.667775",
+        "action": {
+          "type": "guesses",
+          "content": [
+            "nurse",
+            "angel",
+            "band"
+          ]
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T12:47:40.667799",
+        "action": {
+          "type": "team revealed",
+          "content": {
+            "word": "nurse",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T12:47:40.667819",
+        "action": {
+          "type": "target revealed",
+          "content": {
+            "word": "nurse",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T12:47:40.667839",
+        "action": {
+          "type": "team revealed",
+          "content": {
+            "word": "angel",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T12:47:40.667858",
+        "action": {
+          "type": "team revealed",
+          "content": {
+            "word": "band",
+            "assignment": "team"
+          }
+        }
+      }
+    ],
+    [
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T12:47:40.667976",
+        "action": {
+          "type": "opponent revealed",
+          "content": {
+            "word": "ball",
+            "assignment": "opponent"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T12:47:40.668003",
+        "action": {
+          "type": "opponent revealed",
+          "content": {
+            "word": "olive",
+            "assignment": "opponent"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T12:47:40.668022",
+        "action": {
+          "type": "board status",
+          "content": {
+            "hidden": {
+              "team": [
+                "box",
+                "chest",
+                "fire",
+                "press",
+                "plane",
+                "crown"
+              ],
+              "innocent": [
+                "beach",
+                "iron",
+                "cycle",
+                "millionaire",
+                "trip",
+                "thumb"
+              ],
+              "opponent": [
+                "bolt",
+                "pit",
+                "port",
+                "rome"
+              ],
+              "assassin": [
+                "ghost"
+              ]
+            },
+            "revealed": {
+              "team": {
+                "team": [
+                  "nurse",
+                  "angel",
+                  "band"
+                ],
+                "innocent": [
+                  "fighter"
+                ],
+                "opponent": [],
+                "assassin": []
+              },
+              "opponent": {
+                "team": [],
+                "innocent": [],
+                "opponent": [
+                  "check",
+                  "bed",
+                  "ball",
+                  "olive"
+                ],
+                "assassin": []
+              }
+            }
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 1",
+        "timestamp": "2026-07-01T12:48:29.053933",
+        "action": {
+          "type": "send message",
+          "content": "The words nurse, angel, band were guessed correctly. Your teammate's turn ended there.\nNow provide another clue relating to some of your remaining team words and a list of the related target words. Remember to start your clue with 'CLUE: ', put a new line, and start your comma-separated list of target words with 'TARGETS: '. Notice: some words have been removed from the lists compared to previous requests.\n\nYour remaining team words are: box, chest, fire, press, plane, crown.\nRemaining words for your opponent are: bolt, olive, pit, port, ball, rome.\nRemaining distractor words are: beach, iron, cycle, millionaire, trip, thumb.\nRemaining kill words are: ghost.",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 1",
+        "to": "GM",
+        "timestamp": "2026-07-01T12:48:29.053953",
+        "action": {
+          "type": "get message",
+          "content": "CLUE: royal\nTARGETS: crown, plane, box, chest",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T12:48:29.054115",
+        "action": {
+          "type": "clue",
+          "content": "royal"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T12:48:29.054137",
+        "action": {
+          "type": "targets",
+          "content": [
+            "crown",
+            "plane",
+            "box",
+            "chest"
+          ]
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T12:48:29.054159",
+        "action": {
+          "type": "word targeted",
+          "content": {
+            "word": "crown",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T12:48:29.054178",
+        "action": {
+          "type": "word targeted",
+          "content": {
+            "word": "plane",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T12:48:29.054196",
+        "action": {
+          "type": "word targeted",
+          "content": {
+            "word": "box",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T12:48:29.054213",
+        "action": {
+          "type": "word targeted",
+          "content": {
+            "word": "chest",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 2",
+        "timestamp": "2026-07-01T12:49:14.239017",
+        "action": {
+          "type": "send message",
+          "content": "The words nurse, angel, band were guessed correctly. Your turn ended there.\nNow provide another comma-separated list of at least 1 and up to 4 words from the following list of words that best relate or are most closely associated with the word 'royal'. Remember to start your answer with 'GUESS: '. Notice: some words have been removed from the list compared to previous requests.\n\ntrip, beach, cycle, iron, press, ghost, plane, fire, millionaire, port, box, bolt, thumb, rome, chest, pit, crown",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 2",
+        "to": "GM",
+        "timestamp": "2026-07-01T12:49:14.239034",
+        "action": {
+          "type": "get message",
+          "content": "GUESS: crown, port, rome, millionaire",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T12:49:14.239139",
+        "action": {
+          "type": "guesses",
+          "content": [
+            "crown",
+            "port",
+            "rome",
+            "millionaire"
+          ]
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T12:49:14.239184",
+        "action": {
+          "type": "team revealed",
+          "content": {
+            "word": "crown",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T12:49:14.239207",
+        "action": {
+          "type": "target revealed",
+          "content": {
+            "word": "crown",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T12:49:14.239228",
+        "action": {
+          "type": "team revealed",
+          "content": {
+            "word": "port",
+            "assignment": "opponent"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T12:49:14.239246",
+        "action": {
+          "type": "turn end after",
+          "content": "port"
+        }
+      }
+    ],
+    [
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T12:49:14.240500",
+        "action": {
+          "type": "opponent revealed",
+          "content": {
+            "word": "bolt",
+            "assignment": "opponent"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T12:49:14.240531",
+        "action": {
+          "type": "opponent revealed",
+          "content": {
+            "word": "pit",
+            "assignment": "opponent"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T12:49:14.240553",
+        "action": {
+          "type": "board status",
+          "content": {
+            "hidden": {
+              "team": [
+                "box",
+                "chest",
+                "fire",
+                "press",
+                "plane"
+              ],
+              "innocent": [
+                "beach",
+                "iron",
+                "cycle",
+                "millionaire",
+                "trip",
+                "thumb"
+              ],
+              "opponent": [
+                "rome"
+              ],
+              "assassin": [
+                "ghost"
+              ]
+            },
+            "revealed": {
+              "team": {
+                "team": [
+                  "nurse",
+                  "angel",
+                  "band",
+                  "crown"
+                ],
+                "innocent": [
+                  "fighter"
+                ],
+                "opponent": [
+                  "port"
+                ],
+                "assassin": []
+              },
+              "opponent": {
+                "team": [],
+                "innocent": [],
+                "opponent": [
+                  "check",
+                  "bed",
+                  "ball",
+                  "olive",
+                  "bolt",
+                  "pit"
+                ],
+                "assassin": []
+              }
+            }
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 1",
+        "timestamp": "2026-07-01T12:49:54.340055",
+        "action": {
+          "type": "send message",
+          "content": "The word crown was guessed correctly. The word port was guessed but is an opponent word. Your teammate's turn ended there.\nNow provide another clue relating to some of your remaining team words and a list of the related target words. Remember to start your clue with 'CLUE: ', put a new line, and start your comma-separated list of target words with 'TARGETS: '. Notice: some words have been removed from the lists compared to previous requests.\n\nYour remaining team words are: box, chest, fire, press, plane.\nRemaining words for your opponent are: bolt, pit, rome.\nRemaining distractor words are: beach, iron, cycle, millionaire, trip, thumb.\nRemaining kill words are: ghost.",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 1",
+        "to": "GM",
+        "timestamp": "2026-07-01T12:49:54.340075",
+        "action": {
+          "type": "get message",
+          "content": "CLUE: container\nTARGETS: box, chest",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T12:49:54.340240",
+        "action": {
+          "type": "clue",
+          "content": "container"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T12:49:54.340266",
+        "action": {
+          "type": "targets",
+          "content": [
+            "box",
+            "chest"
+          ]
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T12:49:54.340287",
+        "action": {
+          "type": "word targeted",
+          "content": {
+            "word": "box",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T12:49:54.340306",
+        "action": {
+          "type": "word targeted",
+          "content": {
+            "word": "chest",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 2",
+        "timestamp": "2026-07-01T12:50:32.220480",
+        "action": {
+          "type": "send message",
+          "content": "The word crown was guessed correctly. The word port was guessed but is an opponent word. Your turn ended there.\nNow provide another comma-separated list of at least 1 and up to 2 words from the following list of words that best relate or are most closely associated with the word 'container'. Remember to start your answer with 'GUESS: '. Notice: some words have been removed from the list compared to previous requests.\n\ntrip, beach, cycle, iron, press, ghost, plane, fire, millionaire, box, thumb, rome, chest",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 2",
+        "to": "GM",
+        "timestamp": "2026-07-01T12:50:32.220499",
+        "action": {
+          "type": "get message",
+          "content": "GUESS: box, chest",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T12:50:32.220559",
+        "action": {
+          "type": "guesses",
+          "content": [
+            "box",
+            "chest"
+          ]
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T12:50:32.220585",
+        "action": {
+          "type": "team revealed",
+          "content": {
+            "word": "box",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T12:50:32.220607",
+        "action": {
+          "type": "target revealed",
+          "content": {
+            "word": "box",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T12:50:32.220627",
+        "action": {
+          "type": "team revealed",
+          "content": {
+            "word": "chest",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T12:50:32.220644",
+        "action": {
+          "type": "target revealed",
+          "content": {
+            "word": "chest",
+            "assignment": "team"
+          }
+        }
+      }
+    ],
+    [
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T12:50:32.221243",
+        "action": {
+          "type": "opponent revealed",
+          "content": {
+            "word": "rome",
+            "assignment": "opponent"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T12:50:32.221271",
+        "action": {
+          "type": "board status",
+          "content": {
+            "hidden": {
+              "team": [
+                "fire",
+                "press",
+                "plane"
+              ],
+              "innocent": [
+                "beach",
+                "iron",
+                "cycle",
+                "millionaire",
+                "trip",
+                "thumb"
+              ],
+              "opponent": [],
+              "assassin": [
+                "ghost"
+              ]
+            },
+            "revealed": {
+              "team": {
+                "team": [
+                  "nurse",
+                  "angel",
+                  "band",
+                  "crown",
+                  "box",
+                  "chest"
+                ],
+                "innocent": [
+                  "fighter"
+                ],
+                "opponent": [
+                  "port"
+                ],
+                "assassin": []
+              },
+              "opponent": {
+                "team": [],
+                "innocent": [],
+                "opponent": [
+                  "check",
+                  "bed",
+                  "ball",
+                  "olive",
+                  "bolt",
+                  "pit",
+                  "rome"
+                ],
+                "assassin": []
+              }
+            }
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 1",
+        "timestamp": "2026-07-01T12:51:05.654715",
+        "action": {
+          "type": "send message",
+          "content": "The words box, chest were guessed correctly. Your teammate's turn ended there.\nNow provide another clue relating to some of your remaining team words and a list of the related target words. Remember to start your clue with 'CLUE: ', put a new line, and start your comma-separated list of target words with 'TARGETS: '. Notice: some words have been removed from the lists compared to previous requests.\n\nYour remaining team words are: fire, press, plane.\nRemaining words for your opponent are: rome.\nRemaining distractor words are: beach, iron, cycle, millionaire, trip, thumb.\nRemaining kill words are: ghost.",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 1",
+        "to": "GM",
+        "timestamp": "2026-07-01T12:51:05.654736",
+        "action": {
+          "type": "get message",
+          "content": "CLUE: fly\nTARGETS: plane, fire, press",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T12:51:05.654858",
+        "action": {
+          "type": "clue",
+          "content": "fly"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T12:51:05.654884",
+        "action": {
+          "type": "targets",
+          "content": [
+            "plane",
+            "fire",
+            "press"
+          ]
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T12:51:05.654909",
+        "action": {
+          "type": "word targeted",
+          "content": {
+            "word": "plane",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T12:51:05.654930",
+        "action": {
+          "type": "word targeted",
+          "content": {
+            "word": "fire",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T12:51:05.654949",
+        "action": {
+          "type": "word targeted",
+          "content": {
+            "word": "press",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T12:51:05.655603",
+        "action": {
+          "type": "game end",
+          "content": "opponent has won"
+        }
+      }
+    ]
+  ],
+  "board end status": {
+    "hidden": {
+      "team": [
+        "fire",
+        "press",
+        "plane"
+      ],
+      "innocent": [
+        "beach",
+        "iron",
+        "cycle",
+        "millionaire",
+        "trip",
+        "thumb"
+      ],
+      "opponent": [],
+      "assassin": [
+        "ghost"
+      ]
+    },
+    "revealed": {
+      "team": {
+        "team": [
+          "nurse",
+          "angel",
+          "band",
+          "crown",
+          "box",
+          "chest"
+        ],
+        "innocent": [
+          "fighter"
+        ],
+        "opponent": [
+          "port"
+        ],
+        "assassin": []
+      },
+      "opponent": {
+        "team": [],
+        "innocent": [],
+        "opponent": [
+          "check",
+          "bed",
+          "ball",
+          "olive",
+          "bolt",
+          "pit",
+          "rome"
+        ],
+        "assassin": []
+      }
+    }
+  },
+  "Number of turns": 5,
+  "Aborted": false,
+  "Lose": true,
+  "Game ended through assassin": false,
+  "Request Count": 9,
+  "Parsed Request Count": 9,
+  "Violated Request Count": 0,
+  "Cluegiver engaged flags": {
+    "IGNORE RAMBLING": 0,
+    "IGNORE FALSE TARGETS OR GUESSES": 0,
+    "REPROMPT ON ERROR": 0,
+    "STRIP WORDS": 0,
+    "IGNORE NUMBER OF TARGETS": 0
+  },
+  "Guesser engaged flags": {
+    "IGNORE RAMBLING": 0,
+    "IGNORE FALSE TARGETS OR GUESSES": 0,
+    "REPROMPT ON ERROR": 0,
+    "STRIP WORDS": 0,
+    "IGNORE NUMBER OF TARGETS": 0
+  }
+}

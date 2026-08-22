@@ -1,0 +1,165 @@
+{
+  "meta": {
+    "game_name": "ta_frozen_lake",
+    "experiment_name": "FrozenLake-v0-random",
+    "game_id": 2,
+    "results_folder": "DAIR__qwen3.5-2b__sft-dpo-v2",
+    "clem_version": "3.7.2",
+    "round_count": 2,
+    "completed": true,
+    "ta_version": "0.7.3"
+  },
+  "player_models": {
+    "0": {
+      "model_spec": {
+        "model_name": "DAIR__qwen3.5-2b__sft-dpo-v2",
+        "_team": "DAIR",
+        "_version": "sft-dpo-v2",
+        "backend": "huggingface_local",
+        "context_size": "32k",
+        "huggingface_id": "varadsrivastava/lm-playschool-qwen3.5-2b-sft-dpo",
+        "languages": [
+          "en"
+        ],
+        "license": {
+          "name": "apache-2.0",
+          "url": "https://www.apache.org/licenses/LICENSE-2.0"
+        },
+        "lookup_source": "/project/mmanina/lm-playschool-test-set/playpen/model_registry.json",
+        "model_config": {
+          "premade_chat_template": true,
+          "eos_to_cull": "<\\|im_end\\|>|<\\|endoftext\\|>",
+          "chat_template_kwargs": {
+            "enable_thinking": false
+          },
+          "multimodality": {
+            "single_image": true,
+            "multiple_images": true,
+            "audio": false,
+            "video": true
+          }
+        },
+        "open_weight": true,
+        "parameters": "2B",
+        "release_date": "2026-07-06"
+      },
+      "gen_args": {
+        "temperature": 0.0,
+        "max_tokens": 5000
+      }
+    }
+  },
+  "players": {
+    "GM": {
+      "game_role": "Game Master",
+      "model_name": "programmatic"
+    },
+    "Player 0": {
+      "game_role": "Player 0",
+      "model_name": "DAIR__qwen3.5-2b__sft-dpo-v2"
+    }
+  },
+  "turns": [
+    [
+      {
+        "from": "GM",
+        "to": "Player 0",
+        "timestamp": "2026-07-09T10:58:39.216920",
+        "action": {
+          "type": "send message",
+          "content": "You are a competitive game player. Make sure you read the game instructions carefully, and always follow the required format.\n\n[GAME] Welcome to Frozen Lake!\n\nYou are represented by 'P' on the grid.\nGrid symbols:\n  ' ' = Frozen surface (safe to walk on)\n  'H' = Hole (fall in and lose!)\n  'G' = Goal (reach this to win!)\n  'P' = Your current position\n\nAvailable actions: up, down, left, right (or w, a, s, d)\nType your action as: [up], [down], [left], [right] or [w], [a], [s], [d]\n\nObjective: Navigate from the start (top-left) to the goal (bottom-right) without falling into any holes!\n\n[GAME] Current Board:\n\n+-----+-----+-----+-----+\n|     |     |     |  P  |\n+-----+-----+-----+-----+\n|     |     |  H  |     |\n+-----+-----+-----+-----+\n|     |     |     |  H  |\n+-----+-----+-----+-----+\n|  G  |     |     |  H  |\n+-----+-----+-----+-----+\n\nAvailable Actions: [up], [down], [left], [right], [w], [a], [s], [d]\n",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 0",
+        "to": "GM",
+        "timestamp": "2026-07-09T10:58:39.390124",
+        "action": {
+          "type": "get message",
+          "content": "[up]",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 0",
+        "timestamp": "2026-07-09T10:58:41.162035",
+        "action": {
+          "type": "send message",
+          "content": "[GAME] You attempted an invalid move. Reason: You tried to move up but hit a wall! Please resubmit a valid move and remember to follow the game rules to avoid penalties.\n[GAME] Current Board:\n\n+-----+-----+-----+-----+\n|     |     |     |  P  |\n+-----+-----+-----+-----+\n|     |     |  H  |     |\n+-----+-----+-----+-----+\n|     |     |     |  H  |\n+-----+-----+-----+-----+\n|  G  |     |     |  H  |\n+-----+-----+-----+-----+\n\nAvailable Actions: [up], [down], [left], [right], [w], [a], [s], [d]\n",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 0",
+        "to": "GM",
+        "timestamp": "2026-07-09T10:58:41.342810",
+        "action": {
+          "type": "get message",
+          "content": "[down]",
+          "label": "response"
+        }
+      }
+    ],
+    [
+      {
+        "from": "GM",
+        "to": "Player 0",
+        "timestamp": "2026-07-09T10:58:42.811837",
+        "action": {
+          "type": "send message",
+          "content": "[GAME] You moved down to position (1, 3).\n[GAME] Current Board:\n\n+-----+-----+-----+-----+\n|     |     |     |     |\n+-----+-----+-----+-----+\n|     |     |  H  |  P  |\n+-----+-----+-----+-----+\n|     |     |     |  H  |\n+-----+-----+-----+-----+\n|  G  |     |     |  H  |\n+-----+-----+-----+-----+\n\nAvailable Actions: [up], [down], [left], [right], [w], [a], [s], [d]\n",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 0",
+        "to": "GM",
+        "timestamp": "2026-07-09T10:58:43.008836",
+        "action": {
+          "type": "get message",
+          "content": "[down]",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T10:58:43.009026",
+        "action": {
+          "type": "rewards",
+          "content": "role: Player 0\ninvalid_move: False\nturn_count: 2\nreason: You fell into a hole! Game over. You completed 33% of the journey to the goal.\nreward: 0.3333333333333333"
+        }
+      }
+    ]
+  ],
+  "ta_reward": {
+    "0": 0.3333333333333333
+  },
+  "ta_reward_details": {
+    "0": {
+      "role": "Player 0",
+      "invalid_move": false,
+      "turn_count": 2,
+      "reason": "You fell into a hole! Game over. You completed 33% of the journey to the goal.",
+      "reward": 0.3333333333333333
+    }
+  },
+  "numeric_reward": 0.3333333333333333,
+  "Aborted": 0,
+  "Success": 0,
+  "Lose": 0,
+  "Request Count": [
+    2,
+    1
+  ],
+  "Violated Request Count": [
+    1,
+    0
+  ],
+  "Parsed Request Count": [
+    1,
+    1
+  ]
+}

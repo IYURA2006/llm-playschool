@@ -1,0 +1,197 @@
+{
+  "meta": {
+    "game_name": "dond",
+    "experiment_name": "coop_en",
+    "game_id": 8,
+    "results_folder": "LLP: Large Language Problems__qwen3.5-9b__llp-final",
+    "clem_version": "3.7.2",
+    "round_count": 1,
+    "completed": true
+  },
+  "player_models": {
+    "0": {
+      "model_spec": {
+        "model_name": "LLP: Large Language Problems__qwen3.5-9b__llp-final",
+        "_team": "LLP: Large Language Problems",
+        "_version": "llp-final",
+        "backend": "huggingface_local",
+        "context_size": "262k",
+        "huggingface_id": "Makaco/lmps-challenge-qwen3.5-9b-dpo",
+        "languages": [
+          "en",
+          "zh"
+        ],
+        "license": {
+          "name": "Apache 2.0",
+          "url": "https://www.apache.org/licenses/LICENSE-2.0"
+        },
+        "lookup_source": "/project/mmanina/lm-playschool-test-set/playpen/model_registry.json",
+        "model_config": {
+          "premade_chat_template": true,
+          "eos_to_cull": "<\\|im_end\\|>|<\\|endoftext\\|>",
+          "chat_template_kwargs": {
+            "enable_thinking": false
+          }
+        },
+        "open_weight": true,
+        "parameters": "9B",
+        "release_date": "2026-06-22"
+      },
+      "gen_args": {
+        "temperature": 0.0,
+        "max_tokens": 5000
+      }
+    }
+  },
+  "players": {
+    "GM": {
+      "game_role": "Game Master",
+      "model_name": "programmatic"
+    },
+    "Player 1": {
+      "game_role": "DealOrNoDealPlayer",
+      "model_name": "LLP: Large Language Problems__qwen3.5-9b__llp-final"
+    },
+    "Player 2": {
+      "game_role": "DealOrNoDealPlayer",
+      "model_name": "LLP: Large Language Problems__qwen3.5-9b__llp-final"
+    }
+  },
+  "turns": [
+    [
+      {
+        "from": "GM",
+        "to": "Player 1",
+        "timestamp": "2026-07-08T10:48:41.656100",
+        "action": {
+          "type": "send message",
+          "content": "You are playing a cooperative negotiation game in which you have to agree on how to divide a set of items among you and another player.\n\nRules:\n(a) You and the other player are given a set of items. Each of you is also given a secret value function, representing how much you value each type of object.\n(b) You exchange messages with the other player to agree on who gets which items. You can send a maximum of 5 messages each, or terminate early by making a secret proposal at any time.\n(c) You are each asked to submit a secret proposal indicating the items you want formatted in square brackets as follows: \"[Proposal: <number> <object name>, <number> <object name>, <...>]\"\n(d) If your proposals are complementary, i.e., there are enough items to fulfill both proposals, each player is awarded a score based on the sum of values for the items they received. Otherwise, both of you get zero points.\n(e) Your goal is to maximize the sum of your score and the score of the other player.\n\nLet us start.\n\nThe set of available items is:\n\n2 vases, 2 towels, 2 fruits\n\nYour secret value function is:\n\nvase: 0, towel: 1, fruit: 4\n\nIMPORTANT: Your messages, unless it is the secret proposal, are directly transmitted to the other player, so do not include any response to the rules or text announcing your message. To make a secret proposal, use the indicated format. Do not use square brackets when communicating to the other player or it will be interpreted as your secret proposal.\n",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 1",
+        "to": "GM",
+        "timestamp": "2026-07-08T10:48:41.656117",
+        "action": {
+          "type": "get message",
+          "content": "I value fruits the most (4 each), towels moderately (1 each), and vases not at all (0). To maximize total value, I should take both fruits, and you should take both vases and both towels. That way I get 8 points and you get 4 points, totaling 12. If we split differently, total value would be lower.\n\nLet me propose: I take 2 fruits, you take 2 vases and 2 towels.\n\n[Proposal: 2 fruit]",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-08T10:48:41.656175",
+        "action": {
+          "type": "valid response",
+          "content": "proposal"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-08T10:48:41.656193",
+        "action": {
+          "type": "valid proposal",
+          "content": [
+            0,
+            0,
+            2
+          ]
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 2",
+        "timestamp": "2026-07-08T10:49:14.108215",
+        "action": {
+          "type": "send message",
+          "content": "You are playing a cooperative negotiation game in which you have to agree on how to divide a set of items among you and another player.\n\nRules:\n(a) You and the other player are given a set of items. Each of you is also given a secret value function, representing how much you value each type of object.\n(b) You exchange messages with the other player to agree on who gets which items. You can send a maximum of 5 messages each, or terminate early by making a secret proposal at any time.\n(c) You are each asked to submit a secret proposal indicating the items you want formatted in square brackets as follows: \"[Proposal: <number> <object name>, <number> <object name>, <...>]\"\n(d) If your proposals are complementary, i.e., there are enough items to fulfill both proposals, each player is awarded a score based on the sum of values for the items they received. Otherwise, both of you get zero points.\n(e) Your goal is to maximize the sum of your score and the score of the other player.\n\nLet us start.\n\nThe set of available items is:\n\n2 vases, 2 towels, 2 fruits\n\nYour secret value function is:\n\nvase: 3, towel: 0, fruit: 2\n\nIMPORTANT: Your messages, unless it is the secret proposal, are directly transmitted to the other player, so do not include any response to the rules or text announcing your message. To make a secret proposal, use the indicated format. Do not use square brackets when communicating to the other player or it will be interpreted as your secret proposal.\n\n\nThe other player has submitted a secret proposal. It is now your turn to submit a proposal of your own.\n",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 2",
+        "to": "GM",
+        "timestamp": "2026-07-08T10:49:14.108232",
+        "action": {
+          "type": "get message",
+          "content": "[Proposal: 2 vases, 2 fruits]",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-08T10:49:14.108281",
+        "action": {
+          "type": "valid response",
+          "content": "proposal"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-08T10:49:14.108299",
+        "action": {
+          "type": "valid proposal",
+          "content": [
+            2,
+            0,
+            2
+          ]
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-08T10:49:14.108321",
+        "action": {
+          "type": "failed agreement",
+          "content": [
+            [
+              0,
+              0,
+              2
+            ],
+            [
+              2,
+              0,
+              2
+            ]
+          ]
+        }
+      }
+    ]
+  ],
+  "Aborted": 0,
+  "Lose": 1,
+  "Success": 0,
+  "player_a_proposal": [
+    0,
+    0,
+    2
+  ],
+  "player_b_proposal": [
+    2,
+    0,
+    2
+  ],
+  "sum_of_scores": 0,
+  "max_sum_of_scores": 16,
+  "max_player_scores": 10,
+  "max_pareto_improvement": 16,
+  "pareto_improvement": 16,
+  "pareto_optimal": 0,
+  "episode_score": 0.0,
+  "Request Count": [
+    2
+  ],
+  "Violated Request Count": [
+    0
+  ],
+  "Parsed Request Count": [
+    2
+  ]
+}

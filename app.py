@@ -21,21 +21,54 @@ css = """
 }
 .info-box strong { color: #dbeafe !important; }
 .info-box p { color: #9fb0c9 !important; font-size: 13px !important; line-height: 1.6 !important; }
-* { outline: none !important; }
-*:focus, *:focus-visible, *:focus-within { outline: none !important; box-shadow: none !important; }
+
+/* Visible to assistive tech only. Gradio ships its own .sr-only but it's
+   Svelte-scoped (.sr-only.svelte-xxxx), so it can't be reused from here. */
+.a11y-sr-only {
+    position: absolute !important;
+    width: 1px !important; height: 1px !important;
+    margin: -1px !important; padding: 0 !important;
+    overflow: hidden !important; clip: rect(0, 0, 0, 0) !important;
+    white-space: nowrap !important; border: 0 !important;
+}
+/* What this block suppresses is Gradio's focus *chrome* — the block-border
+   recolour and box-shadow it puts on wrappers. It used to kill outlines too,
+   which left the whole app with no visible keyboard focus. Outlines are now
+   restored below; everything else here is unchanged on purpose. */
+*:focus, *:focus-visible, *:focus-within { box-shadow: none !important; }
 input:focus, textarea:focus, button:focus, [tabindex]:focus { box-shadow: none !important; border-color: inherit !important; }
 :root {
     --block-border-color-focus: transparent !important;
     --input-border-color-focus: transparent !important;
 }
-.block:focus, .block:focus-visible,
-.wrap:focus, .wrap:focus-visible,
-.col:focus, .col:focus-visible,
-div:focus, div:focus-visible {
-    outline: none !important;
+/* :focus only, not :focus-visible — containers we focus programmatically
+   (screen headings, the dialog card) must not draw a ring, but real keyboard
+   focus on a control must. */
+.block:focus,
+.wrap:focus,
+.col:focus,
+div:focus {
     box-shadow: none !important;
     border-color: inherit !important;
 }
+
+/* The single focus indicator for the whole app. #93c5fd clears 3:1 against
+   every surface a control actually sits on (6.4–10.7; worst is the selected
+   coherence blue at 3.7). It would fail on the light transcript panel, but
+   that panel contains only static markup — no focusable controls. */
+:is(a, button, summary, input, select, textarea, [tabindex]:not([tabindex="-1"])):focus-visible {
+    outline: 3px solid #93c5fd !important;
+    outline-offset: 2px !important;
+}
+/* Scale options sit 5–6px apart, so a 3px/2px ring on adjacent labels would
+   collide. Tighter ring here only. */
+.scale-radio label:focus-visible,
+.scale-radio label:has(input[type=radio]:focus-visible) {
+    outline: 2px solid #93c5fd !important;
+    outline-offset: 1px !important;
+}
+/* The radio input itself is the 1px sr-only box — draw on the label, not it. */
+.scale-radio input[type=radio]:focus-visible { outline: none !important; }
 
 .annot-topnav {
     background: #0f172a !important;
@@ -47,7 +80,7 @@ div:focus, div:focus-visible {
     flex-wrap: nowrap !important;
 }
 .nav-left { display: flex; align-items: center; gap: 8px; }
-.game-id-tag  { color: #64748b; font-size: 12px; font-family: monospace; }
+.game-id-tag  { color: #94a3b8; font-size: 12px; font-family: monospace; }
 .game-name-tag {
     background: #3b82f6; color: #fff;
     padding: 3px 10px; border-radius: 5px;
@@ -64,13 +97,6 @@ div:focus, div:focus-visible {
 #verdict-page .annot-progress,
 #verdict-page .annot-progress span { color: #ffffff !important; }
 .nav-timer { color: #cbd5e1; font-family: monospace; font-size: 15px; font-weight: 500; padding: 0 8px; }
-.rules-nav-btn {
-    background: transparent !important;
-    border: 1px solid #334155 !important;
-    color: #94a3b8 !important;
-    font-size: 12px !important;
-    min-width: 56px !important;
-}
 /* Red, not the default muted grey — Quit abandons unsaved ratings with no confirmation. */
 .quit-btn {
     background: #7f1d1d !important;
@@ -101,22 +127,24 @@ div:focus, div:focus-visible {
     padding: 12px 16px;
     margin-bottom: 16px;
 }
+/* An <h2> so the transcript has an entry point for heading navigation;
+   margin-top zeroed since it was a <div> before. */
 .goal-label {
     font-size: 10px; font-weight: 700;
-    color: #3b82f6; letter-spacing: .08em;
-    margin-bottom: 6px;
+    color: #1d4ed8; letter-spacing: .08em;
+    margin-top: 0; margin-bottom: 6px;
 }
 /* !important keeps these dark on the light .tx-col panel even under the app's own forced dark theme. */
 .goal-text { font-size: 13px; color: #374151 !important; line-height: 1.5; margin: 0; white-space: pre-line; overflow-wrap: anywhere; }
 .gm-msg {
-    font-size: 12px; color: #6b7280 !important;
+    font-size: 12px; color: #4b5563 !important;
     padding: 5px 10px; margin: 6px 0;
     border-left: 2px solid #cbd5e1;
     line-height: 1.5;
     white-space: pre-line;
     overflow-wrap: anywhere;
 }
-.gm-tag { font-weight: 700; color: #94a3b8 !important; font-size: 10px; letter-spacing: .06em; margin-right: 4px; }
+.gm-tag { font-weight: 700; color: #475569 !important; font-size: 10px; letter-spacing: .06em; margin-right: 4px; }
 .turn-card {
     background: #1e3a5f;
     border: 2px solid transparent;
@@ -130,6 +158,12 @@ div:focus, div:focus-visible {
     background: #1e3f70 !important;
     border-color: #3b82f6 !important;
     box-shadow: 0 0 0 4px rgba(59,130,246,.25);
+}
+/* Which transcript turn you're rating was signalled by background colour
+   alone. refresh() also sets aria-current on this card. */
+.turn-card.active-turn .card-header::after {
+    content: " · NOW RATING";
+    color: #93c5fd; font-weight: 700; letter-spacing: .06em;
 }
 /* Player 2 — purple */
 .turn-card.p2 { background: #1e1b4b; }
@@ -158,7 +192,7 @@ div:focus, div:focus-visible {
     padding: 8px 12px; border-radius: 6px;
     font-size: 13px; margin: 8px 0;
 }
-.game-end-msg { text-align: center; color: #9ca3af !important; font-size: 13px; padding: 10px 0; }
+.game-end-msg { text-align: center; color: #4b5563 !important; font-size: 13px; padding: 10px 0; }
 .game-win-msg {
     text-align: center;
     background: #052e16; border: 1px solid #166534; border-radius: 8px;
@@ -238,7 +272,9 @@ div:focus, div:focus-visible {
     font-size: 13px; font-weight: 700;
 }
 .turn-anno-card.is-rated .ta-badge { background: #22c55e !important; }
-.ta-title { font-size: 15px; font-weight: 600; color: #f1f5f9; }
+/* An <h3>, not a span, so the turn cards are reachable by heading navigation.
+   Margins must be zeroed — it sits in a flex row that assumed an inline span. */
+.ta-title { font-size: 15px; font-weight: 600; color: #f1f5f9; margin: 0 !important; }
 .ta-sender {
     background: rgba(59,130,246,.18);
     color: #93c5fd;
@@ -300,12 +336,53 @@ div:focus, div:focus-visible {
     font-family: ui-monospace, SFMono-Regular, monospace;
     font-weight: 700; font-size: 13px; text-transform: uppercase;
 }
+/* Every tile paints the colour the transcript literally names — never the
+   colour that would mean the same thing in standard Wordle. wordle-crazy
+   scrambles the key (yellow=correct, black=wrong-position, purple=absent), and
+   silently normalising it would hide the very thing the variant tests. The
+   meaning travels as text on each tile and in .wd-legend, not as hue. */
 .wd-green  { background: #22c55e; color: #052e16; }
 .wd-yellow { background: #eab308; color: #3b2a03; }
-.wd-red    { background: #64748b; color: #0b1220; }
-/* wordle-crazy scrambles the key, so these tiles use the literal named colour. */
-.wd-purple { background: #a855f7; color: #faf5ff; }
+.wd-red    { background: #b91c1c; color: #fff1f2; }
+.wd-purple { background: #7e22ce; color: #faf5ff; }
 .wd-black  { background: #1f2937; color: #f3f4f6; }
+
+/* ImageGame before/after grids. Cells carry the change as a ring AND a bold
+   weight change, never colour alone. */
+.ig-pair { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; margin-bottom: 6px; }
+.ig-grid { display: inline-block; }
+.ig-cap {
+    font-size: 9px; font-weight: 700; letter-spacing: .08em;
+    color: #94a3b8; margin-bottom: 3px; text-transform: uppercase;
+}
+.ig-row { display: flex; gap: 2px; margin-bottom: 2px; }
+.ig-cell {
+    width: 20px; height: 20px; border-radius: 3px;
+    display: inline-flex; align-items: center; justify-content: center;
+    font-family: ui-monospace, SFMono-Regular, monospace;
+    font-size: 12px; font-weight: 700;
+    background: #1e293b; color: #e2e8f0; border: 1px solid #334155;
+}
+.ig-cell.ig-empty { color: #94a3b8; background: #0f172a; }
+.ig-cell.ig-changed {
+    background: #1d4ed8; color: #fff; border-color: #93c5fd;
+    box-shadow: 0 0 0 2px rgba(147,197,253,.45);
+}
+.ig-arrow { color: #64748b; font-size: 16px; }
+.ig-note { font-size: 11px; color: #94a3b8; margin-bottom: 8px; }
+
+/* Colour key, shown once under the goal box for wordle-family transcripts. */
+.wd-legend {
+    display: flex; flex-wrap: wrap; align-items: center; gap: 10px;
+    margin-top: 10px; padding-top: 8px; border-top: 1px solid #bfdbfe;
+}
+.wd-legend-lbl {
+    font-size: 10px; font-weight: 700; color: #1d4ed8; letter-spacing: .08em;
+}
+.wd-legend-item {
+    display: inline-flex; align-items: center; gap: 4px;
+    font-size: 12px; color: #374151 !important;
+}
 
 /* !important keeps this readable on the light panel under the app's own forced dark theme. */
 .ref-answer {
@@ -381,7 +458,16 @@ div:focus, div:focus-visible {
 /* Solid green fill, not just an outline, so "done" stays obvious after navigating away. */
 .tn-chip.is-rated {
     background: #166534 !important; border-color: #22c55e !important; color: #dcfce7 !important;
+    padding: 0 5px;   /* claw back the width the ✓ adds */
 }
+/* Green fill alone made "rated" a colour-only cue. The tick is the non-colour
+   half; refresh() adds ", rated" to the chip's accessible name for the rest. */
+.tn-chip.is-rated::after { content: "✓"; margin-left: 3px; font-size: 11px; }
+/* Unanswered turn after a failed submit — again, not colour alone. */
+.tn-chip[data-a11y-err] {
+    border-color: #f87171 !important; border-width: 2px !important;
+}
+.tn-chip[data-a11y-err]::after { content: "!"; margin-left: 3px; font-weight: 700; }
 .tn-chip.is-current { background: #1d4ed8 !important; border-color: #60a5fa !important; color: #fff !important; }
 .tn-chip.is-current.is-rated { background: #16a34a !important; border-color: #4ade80 !important; color: #fff !important; }
 .tn-arrow {
@@ -411,14 +497,13 @@ div:focus, div:focus-visible {
 }
 .turn-title { font-size: 14px; }
 #annot-col .prose strong, #annot-col p strong { color: #e2e8f0 !important; }
-#annot-col .prose p, #annot-col p { color: #64748b !important; font-size: 12px !important; margin: 1px 0 3px !important; }
+#annot-col .prose p, #annot-col p { color: #94a3b8 !important; font-size: 12px !important; margin: 1px 0 3px !important; }
 .cond-tag {
     color: #94a3b8; font-size: 10px; font-style: italic;
     background: #1e293b; padding: 1px 6px; border-radius: 3px; margin-left: 6px;
 }
-.qd { color: #64748b; font-size: 12px; margin-bottom: 4px; }
 .flags-lbl { color: #cbd5e1; font-size: 13px; font-weight: 600; margin-top: 3px; margin-bottom: 2px; }
-.flags-sub { color: #64748b; font-weight: 400; font-size: 11px; }
+.flags-sub { color: #94a3b8; font-weight: 400; font-size: 11px; }
 
 .scale-radio fieldset { border: none !important; padding: 0 !important; }
 /* Visually hide the radio but keep it keyboard-focusable (a11y) */
@@ -471,10 +556,14 @@ div:focus, div:focus-visible {
     font-size: 12px !important;
 }
 .scale-radio label:hover { border-color: #3b82f6 !important; color: #93c5fd !important; }
-/* Red error state on the wrap container */
-.scale-radio.radio-error .wrap {
+/* Unanswered-question state. Keyed off aria-invalid, which the a11y module
+   sets on submit — so the visual cue and the announced one can't drift apart.
+   (The old .radio-error class was never applied by any code path, which is
+   why a failed submit used to highlight nothing at all.) */
+fieldset[aria-invalid="true"] {
     border-color: #ef4444 !important;
     box-shadow: 0 0 0 3px rgba(239,68,68,.18) !important;
+    border-radius: 8px !important;
 }
 .scale-radio label:has(input[type=radio]:checked) {
     background: #1d4ed8 !important;
@@ -524,7 +613,7 @@ div:focus, div:focus-visible {
     background: #0d1828 !important;
     border: 1px solid #1e3a5f !important;
 }
-.turn-comment textarea::placeholder { color: #64748b !important; }
+.turn-comment textarea::placeholder { color: #94a3b8 !important; }
 
 .verdict-comment { background: transparent !important; border: none !important; padding: 0 !important; box-shadow: none !important; }
 .verdict-comment textarea {
@@ -535,19 +624,18 @@ div:focus, div:focus-visible {
 }
 .verdict-comment textarea::placeholder { color: #94a3b8 !important; }
 
-#annot-page, #annot-page:focus, #annot-page:focus-visible,
+/* Page containers only — :focus, never :focus-visible, so the a11y module can
+   focus a page/heading on screen change without painting a ring on it. */
+#annot-page, #annot-page:focus,
 #annot-page > *, #annot-page > *:focus,
-#verdict-page, #verdict-page:focus, #verdict-page:focus-visible,
+#verdict-page, #verdict-page:focus,
 #verdict-page > *, #verdict-page > *:focus,
-#train-page, #train-page:focus, #train-page:focus-visible,
+#train-page, #train-page:focus,
 #train-page > *, #train-page > *:focus {
-    outline: none !important;
     box-shadow: none !important;
     border-color: transparent !important;
 }
 
-.option-desc p { font-size: 12px !important; color: #64748b !important; line-height: 1.6 !important; margin: 4px 0 !important; }
-.option-desc strong { color: #374151 !important; }
 
 .question-card {
     background: #1a2236 !important;
@@ -582,11 +670,11 @@ div:focus, div:focus-visible {
     border-color: #3b82f6 !important;
     box-shadow: 0 0 0 3px rgba(59,130,246,.2) !important;
 }
-.coh-num-md h2 {
+.coh-num {
     font-size: 26px !important; font-weight: 700 !important;
     color: #94a3b8 !important; margin: 0 0 4px !important; text-align: center !important;
 }
-.coh-col.coh-col-sel .coh-num-md h2 { color: rgba(255,255,255,.9) !important; }
+.coh-col.coh-col-sel .coh-num { color: rgba(255,255,255,.9) !important; }
 .coh-lbl-md p, .coh-lbl-md strong {
     font-size: 13px !important; font-weight: 600 !important;
     color: #e2e8f0 !important; margin: 0 0 6px !important;
@@ -594,14 +682,15 @@ div:focus, div:focus-visible {
 .coh-col.coh-col-sel .coh-lbl-md p,
 .coh-col.coh-col-sel .coh-lbl-md strong { color: #fff !important; }
 .coh-desc-md p {
-    font-size: 10px !important; color: #64748b !important;
+    font-size: 12px !important; color: #94a3b8 !important;
     line-height: 1.5 !important; margin: 0 !important;
 }
 .coh-col.coh-col-sel .coh-desc-md p { color: rgba(255,255,255,.6) !important; }
-.coh-sel-btn button {
-    width: 100% !important; font-size: 10px !important;
-    margin-top: 8px !important; padding: 4px 8px !important;
-}
+/* elem_classes lands on the <button> itself, so the old ".coh-sel-btn button"
+   selector matched nothing and was never applied. Target the button directly;
+   sizing intentionally left to Gradio's size="sm" as that's what has been
+   rendering all along. */
+.coh-sel-btn { margin-top: 8px !important; }
 .coh-col.coh-col-err {
     border-color: #ef4444 !important;
     box-shadow: 0 0 0 3px rgba(239,68,68,.15) !important;
@@ -628,7 +717,7 @@ div:focus, div:focus-visible {
     color: #93c5fd !important; margin-top: 2px !important;
 }
 .ovr-end-desc {
-    font-size: 12px !important; color: #64748b !important;
+    font-size: 12px !important; color: #94a3b8 !important;
     line-height: 1.45 !important; margin-top: 3px !important;
 }
 /* Applied to the outer block only — bordering inner wraps too drew a double ring. */
@@ -665,7 +754,7 @@ div:focus, div:focus-visible {
 }
 .ovr-desc { flex: 1 1 0 !important; min-width: 0 !important; }
 .ovr-desc p {
-    font-size: 13px !important; color: #64748b !important;
+    font-size: 13px !important; color: #94a3b8 !important;
     line-height: 1.5 !important; margin: 0 !important;
 }
 /* Strip block backgrounds inside rows */
@@ -691,6 +780,14 @@ div:focus, div:focus-visible {
     padding: 4px 10px; border-radius: 6px;
     font-size: 11px; font-weight: 700; letter-spacing: .03em;
 }
+/* Was "**Rating scale** - applies…" as body markdown; now a real <h2> styled
+   to match what that rendered as, so the outline gains a level and the page
+   looks identical. */
+.rating-scale-h {
+    font-size: 16px !important; font-weight: 700 !important;
+    color: #e2e8f0 !important; margin: 10px 0 2px !important;
+}
+.rating-scale-h span { font-weight: 400 !important; color: #94a3b8 !important; }
 /* Step cards: equal height, compact heading */
 .step-card { height: 100%; }
 .step-card h3 { font-size: 15px !important; margin: 2px 0 4px !important; }
@@ -727,18 +824,30 @@ div:focus, div:focus-visible {
 .consent-sheet p, .consent-sheet li { color: #9fb0c9 !important; font-size: 13.5px !important; line-height: 1.6 !important; }
 .consent-sheet strong { color: #dbeafe !important; }
 .consent-sheet a { color: #7dd3fc !important; }
+/* The completion link is now the only way back to Prolific (the auto-redirect
+   was removed), so it gets button-sized affordance rather than inline-link. */
+#verdict-status a {
+    display: inline-block;
+    background: #1d4ed8; color: #fff !important;
+    padding: 10px 18px; border-radius: 8px;
+    font-weight: 700; text-decoration: none !important;
+    min-height: 24px;
+}
+#verdict-status a:hover { background: #2563eb; }
+
+/* Secondary to "I agree" but must stay visibly available — it's the dialog's
+   only other way out. */
+.consent-decline-btn {
+    background: transparent !important;
+    border: 1px solid #334155 !important;
+    color: #94a3b8 !important;
+    margin-top: 8px !important;
+}
+.consent-decline-btn:hover { border-color: #64748b !important; color: #cbd5e1 !important; }
 .consent-todo {
     background: #7c2d12; color: #fed7aa; border: 1px solid #c2410c;
     padding: 1px 8px; border-radius: 5px; font-weight: 700; font-size: 12.5px;
     white-space: nowrap;
-}
-
-.rules-panel {
-    background: #f8fafc !important;
-    border: 1px solid #e2e8f0 !important;
-    border-radius: 10px !important;
-    padding: 20px !important;
-    margin-top: 10px !important;
 }
 
 .game-select-row { margin-bottom: 10px !important; }
@@ -761,7 +870,7 @@ div:focus, div:focus-visible {
     height: auto !important; align-self: flex-start !important; }
 #train-col label { color: #cbd5e1 !important; }
 #train-col .prose strong, #train-col p strong { color: #e2e8f0 !important; }
-#train-col .prose p, #train-col p { color: #64748b !important; font-size: 12px !important; margin: 2px 0 6px !important; }
+#train-col .prose p, #train-col p { color: #94a3b8 !important; font-size: 12px !important; margin: 2px 0 6px !important; }
 /* Same pre-JS fallback rule as .txscroll, styled separately for the training page. */
 .train-txscroll { padding: 16px 18px; overflow-y: auto !important; height: 600px; }
 /* Practice card — same wrapper+inner doubling handling as .turn-anno-card */
@@ -853,6 +962,7 @@ force_dark = """
     }
 
     var current = 0;
+    var _progTimer = null;   // debounces the aria-live rated counter
 
     // Real annotation cards use id="tc-N", practice cards "ttc-N" — try both,
     // but only accept a match on the currently-visible page (the other
@@ -905,15 +1015,33 @@ force_dark = """
                 chip.classList.toggle('is-rated', r);
                 chip.setAttribute('aria-selected', i === current ? 'true' : 'false');
                 chip.setAttribute('tabindex', i === current ? '0' : '-1');
+                // Rated state is a green fill visually; carry it in the name too,
+                // or it's colour-only. Safe here — chips are our own HTML, not a
+                // Gradio Block root (Svelte would strip aria-label from those).
+                chip.setAttribute('aria-label',
+                    'Turn ' + (i + 1) + (r ? ', rated' : ', not rated'));
             }
         });
         document.querySelectorAll('.turn-card').forEach(function (t) {
             t.classList.remove('active-turn');
+            t.removeAttribute('aria-current');
         });
         var active = transcriptCardEl(current);
-        if (active) active.classList.add('active-turn');
+        if (active) {
+            active.classList.add('active-turn');
+            active.setAttribute('aria-current', 'true');
+        }
+        // .prog-rated is an aria-live region, so writing it on every radio
+        // click would narrate the counter continuously. Debounce to one
+        // announcement per burst.
         var el = document.querySelector('#annot-page .prog-rated');
-        if (el) el.textContent = rated + ' of ' + cards.length + ' turns rated';
+        if (el) {
+            var next = rated + ' of ' + cards.length + ' turns rated';
+            if (el.textContent !== next) {
+                clearTimeout(_progTimer);
+                _progTimer = setTimeout(function () { el.textContent = next; }, 750);
+            }
+        }
         syncHeights();
     }
 
@@ -961,6 +1089,11 @@ force_dark = """
         if (!ready()) return false;
         wireAria();
         observeCols();
+        // The a11y module's validation handler needs to reveal a hidden turn
+        // card before it can focus a control inside it.
+        window.__a11y = window.__a11y || {};
+        window.__a11y.goTo = goTo;
+        window.__a11y.turnCount = function () { return panes().length; };
         document.addEventListener('click', onClick);
         document.addEventListener('keydown', onKey);
         document.addEventListener('change', refresh);
@@ -1031,6 +1164,384 @@ force_dark = """
     toggleGeneric();
 })();
 </script>
+<script>
+/* Accessibility module. Deliberately a separate IIFE from the turn-nav script
+   above so a failure in one can't take out the other.
+
+   Two hard rules, both from how Gradio's Svelte build re-renders:
+     1. Never set aria-label on a Gradio Block root — Svelte's attribute spread
+        includes aria-label and deletes ours on the next re-render. Use
+        aria-labelledby / aria-describedby / aria-invalid / role, which it
+        doesn't touch. (aria-label IS fine on HTML we author ourselves.)
+     2. Never add a class to a node whose elem_classes or variant can change —
+        Svelte assigns className wholesale and wipes it. Attributes only. */
+(function () {
+    'use strict';
+
+    var uid = 0;
+    function ensureId(el, prefix) {
+        if (el && !el.id) el.id = prefix + '-' + (++uid);
+        return el ? el.id : '';
+    }
+    function text(el) { return (el && el.textContent || '').trim(); }
+
+    /* ---------- live regions (C) ----------------------------------------
+       Appended to document.body, outside <gradio-app>, so no Gradio re-render
+       can destroy them. Everything else mirrors INTO these. */
+    var polite = null, assertive = null;
+
+    function ensureRegions() {
+        if (polite || !document.body) return;
+        polite = document.createElement('div');
+        polite.id = 'a11y-polite';
+        polite.className = 'a11y-sr-only';
+        polite.setAttribute('aria-live', 'polite');
+        polite.setAttribute('aria-atomic', 'true');
+        assertive = document.createElement('div');
+        assertive.id = 'a11y-assertive';
+        assertive.className = 'a11y-sr-only';
+        assertive.setAttribute('role', 'alert');
+        assertive.setAttribute('aria-live', 'assertive');
+        assertive.setAttribute('aria-atomic', 'true');
+        document.body.appendChild(polite);
+        document.body.appendChild(assertive);
+    }
+
+    function announce(msg, opts) {
+        ensureRegions();
+        var region = (opts && opts.assertive) ? assertive : polite;
+        if (!region || !msg) return;
+        // Clear first, then set on the next frame — without this, submitting
+        // twice with the same error produces no second announcement.
+        region.textContent = '';
+        requestAnimationFrame(function () { region.textContent = msg; });
+    }
+
+    /* ---------- accessible names for Radio / CheckboxGroup (A) ----------
+       Gradio renders these as <fieldset> whose title is a <span>, not a
+       <legend>, and wires no aria-labelledby — so label= alone leaves the
+       group unnamed. Point the fieldset at its own (sr-only) title span.
+       Textbox and Slider need none of this; label= is enough for them. */
+    function nameFieldsets() {
+        document.querySelectorAll('fieldset').forEach(function (fs) {
+            if (fs.getAttribute('aria-labelledby')) return;
+            var span = fs.querySelector('span[data-testid="block-info"]');
+            // Guard on non-empty: an unlabelled control would otherwise pick up
+            // Gradio's i18n fallback and get named "Radio".
+            if (span && text(span)) {
+                fs.setAttribute('aria-labelledby', ensureId(span, 'a11y-lbl'));
+                return;
+            }
+            // CheckboxGroup renders that span empty no matter what label= says,
+            // so fall back to the visible "Flags — tick all that apply" heading
+            // in the same turn card. Scoped to the card rather than walking
+            // siblings, because Gradio's wrapper nesting varies. One flags
+            // group per card, so this is unambiguous — and it means the name
+            // and the on-screen text can't diverge.
+            if (!fs.classList.contains('flags-check')) return;
+            var card = fs.closest('.turn-anno-card, .train-card');
+            var vis = card && card.querySelector('.flags-lbl');
+            if (vis && text(vis)) fs.setAttribute('aria-labelledby', ensureId(vis, 'a11y-lbl'));
+        });
+    }
+
+    /* ---------- coherence widget as a real radiogroup (B) --------------- */
+    function wireCoherence() {
+        var cols = document.querySelectorAll('#verdict-page .coh-col');
+        if (!cols.length) return;
+        var row = cols[0].parentElement;
+        if (!row) return;
+
+        if (row.getAttribute('role') !== 'radiogroup') {
+            row.setAttribute('role', 'radiogroup');
+            var heading = document.querySelector('#verdict-page .g1-card h3, #verdict-page .coh-group-label');
+            if (heading) row.setAttribute('aria-labelledby', ensureId(heading, 'a11y-coh'));
+        }
+
+        var btns = [];
+        cols.forEach(function (col) {
+            var btn = col.querySelector('.coh-sel-btn');
+            if (!btn) return;
+            btns.push(btn);
+            if (btn.getAttribute('role') !== 'radio') {
+                btn.setAttribute('role', 'radio');
+                // Name it from the number + label + description already on
+                // screen, so it announces "2, Rigid, Had a plan but…" instead
+                // of the visible word "Select" (which stays unchanged).
+                var ids = ['.coh-num', '.coh-lbl-md', '.coh-desc-md'].map(function (sel) {
+                    var n = col.querySelector(sel);
+                    return n ? ensureId(n, 'a11y-coh') : '';
+                }).filter(Boolean);
+                if (ids.length) btn.setAttribute('aria-labelledby', ids.join(' '));
+            }
+            // .coh-col-sel is authoritative — it's what the server sets.
+            var sel = col.classList.contains('coh-col-sel');
+            btn.setAttribute('aria-checked', sel ? 'true' : 'false');
+        });
+
+        // Roving tabindex: the group is one tab stop, arrows move within it.
+        var selIdx = btns.findIndex(function (b) {
+            return b.getAttribute('aria-checked') === 'true';
+        });
+        if (selIdx < 0) selIdx = 0;
+        btns.forEach(function (b, i) {
+            b.setAttribute('tabindex', i === selIdx ? '0' : '-1');
+        });
+    }
+
+    function onCoherenceKey(e) {
+        var btn = e.target.closest && e.target.closest('.coh-sel-btn');
+        if (!btn) return;
+        var btns = Array.prototype.slice.call(
+            document.querySelectorAll('#verdict-page .coh-sel-btn'));
+        var i = btns.indexOf(btn);
+        if (i < 0) return;
+        var next = null;
+        if (e.key === 'ArrowRight' || e.key === 'ArrowDown') next = btns[(i + 1) % btns.length];
+        else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') next = btns[(i - 1 + btns.length) % btns.length];
+        else if (e.key === 'Home') next = btns[0];
+        else if (e.key === 'End') next = btns[btns.length - 1];
+        if (!next) return;
+        e.preventDefault();
+        // Optimistic: _coh_select is a server round-trip, and waiting for it
+        // would delay the announcement past the point it's useful.
+        btns.forEach(function (b) { b.setAttribute('aria-checked', 'false'); b.setAttribute('tabindex', '-1'); });
+        next.setAttribute('aria-checked', 'true');
+        next.setAttribute('tabindex', '0');
+        next.focus();
+        next.click();
+    }
+
+    /* ---------- screen transitions (G + H) ------------------------------ */
+    var SCREENS = [
+        ['welcome-page',  'Welcome',         'Welcome'],
+        ['train-page',    'Practice round',  'Practice round'],
+        ['annot-page',    'Rate turns',      'Rate turns'],
+        ['verdict-page',  'Overall verdict', 'Overall verdict']
+    ];
+    var TITLE_SUFFIX = ' — LM Playschool Annotation Study';
+    var currentScreen = null;
+
+    function visibleScreen() {
+        for (var i = 0; i < SCREENS.length; i++) {
+            var el = document.getElementById(SCREENS[i][0]);
+            if (el && getComputedStyle(el).display !== 'none') return SCREENS[i];
+        }
+        return null;
+    }
+
+    function syncScreen() {
+        var s = visibleScreen();
+        if (!s || (currentScreen && s[0] === currentScreen[0])) return;
+        var first = currentScreen === null;
+        currentScreen = s;
+        document.title = s[1] + TITLE_SUFFIX;
+        if (first || dialogOpen) return;   // don't steal focus on first paint
+        var el = document.getElementById(s[0]);
+        var h = el && el.querySelector('h1, h2');
+        var target = h || el;
+        if (target) {
+            target.setAttribute('tabindex', '-1');
+            target.focus({ preventScroll: false });
+        }
+        announce(s[2]);
+    }
+
+    /* ---------- consent dialog (E) -------------------------------------- */
+    var dialogOpen = false, dialogReturn = null;
+    var PAGE_IDS = ['welcome-page', 'train-page', 'annot-page', 'verdict-page'];
+
+    function focusablesIn(root) {
+        return Array.prototype.slice.call(root.querySelectorAll(
+            'a[href], button:not([disabled]), input:not([disabled]), select, textarea, [tabindex]:not([tabindex="-1"])'
+        )).filter(function (el) { return el.offsetParent !== null; });
+    }
+
+    function openDialog(modal) {
+        dialogOpen = true;
+        dialogReturn = document.activeElement;
+        modal.setAttribute('role', 'dialog');
+        modal.setAttribute('aria-modal', 'true');
+        var h = modal.querySelector('h2');
+        if (h) modal.setAttribute('aria-labelledby', ensureId(h, 'a11y-dlg'));
+        PAGE_IDS.forEach(function (id) {
+            var p = document.getElementById(id);
+            if (p) { p.setAttribute('inert', ''); p.setAttribute('aria-hidden', 'true'); }
+        });
+        var card = modal.querySelector('.consent-modal-card') || modal;
+        card.setAttribute('tabindex', '-1');
+        // Focus the card, not the checkbox — the sheet should be read from the
+        // top, not from 130 lines past the text being consented to.
+        requestAnimationFrame(function () { card.focus(); });
+    }
+
+    function closeDialog(modal) {
+        dialogOpen = false;
+        modal.removeAttribute('role');
+        modal.removeAttribute('aria-modal');
+        PAGE_IDS.forEach(function (id) {
+            var p = document.getElementById(id);
+            if (p) { p.removeAttribute('inert'); p.removeAttribute('aria-hidden'); }
+        });
+        var ret = dialogReturn;
+        dialogReturn = null;
+        // Consent may or may not navigate (_confirm_consent chains into _start).
+        // Wait a frame: if the screen changed, syncScreen owns focus; if not,
+        // put it back where it was. One owner either way, so they can't race.
+        requestAnimationFrame(function () {
+            var before = currentScreen;
+            syncScreen();
+            if (before === currentScreen && ret && document.contains(ret)) ret.focus();
+        });
+    }
+
+    function onDialogKey(e) {
+        if (!dialogOpen) return;
+        var modal = document.getElementById('consent-modal');
+        if (!modal) return;
+        if (e.key === 'Escape') {
+            var decline = modal.querySelector('.consent-decline-btn');
+            if (decline) { e.preventDefault(); decline.click(); }
+            return;
+        }
+        if (e.key !== 'Tab') return;
+        // Trap Tab inside the dialog. Safe only because there's a decline path
+        // (the "I do not agree" button + Escape) — a trap without one would be
+        // a WCAG 2.1.2 keyboard trap for anyone who reads the sheet and says no.
+        var f = focusablesIn(modal);
+        if (!f.length) return;
+        var first = f[0], last = f[f.length - 1];
+        if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+        else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+    }
+
+    function syncDialog() {
+        var modal = document.getElementById('consent-modal');
+        if (!modal) return;
+        var open = getComputedStyle(modal).display !== 'none';
+        if (open && !dialogOpen) openDialog(modal);
+        else if (!open && dialogOpen) closeDialog(modal);
+    }
+
+    /* ---------- status mirrors + validation errors (C + D) -------------- */
+    var MIRRORS = [
+        ['annot-status',   true],
+        ['verdict-status', true],
+        ['welcome-error',  true],
+        ['consent-note',   true],
+        ['welcome-status', false],
+        ['train-summary',  false]
+    ];
+    var lastSaid = {};
+
+    function readStatus(el) {
+        // The bad-turns marker is hidden metadata, not part of the message.
+        var clone = el.cloneNode(true);
+        clone.querySelectorAll('.a11y-bad-turns').forEach(function (n) { n.remove(); });
+        return (clone.textContent || '').trim();
+    }
+
+    function handleStatus(id, isAssertive) {
+        var el = document.getElementById(id);
+        if (!el) return;
+        var msg = readStatus(el);
+        if (!msg || lastSaid[id] === msg) return;
+        lastSaid[id] = msg;
+        announce(msg, { assertive: isAssertive });
+        if (id === 'annot-status') applyTurnErrors(el);
+    }
+
+    function clearTurnErrors() {
+        document.querySelectorAll('#annot-page fieldset[aria-invalid]').forEach(function (fs) {
+            fs.removeAttribute('aria-invalid');
+            fs.removeAttribute('aria-describedby');
+        });
+        document.querySelectorAll('.tn-chip[data-a11y-err]').forEach(function (c) {
+            c.removeAttribute('data-a11y-err');
+        });
+    }
+
+    // annotation.py's _submit emits an empty <span class="a11y-bad-turns"> as
+    // the "this was a validation failure" flag, and names the turns in the
+    // message itself. We parse the numbers back out of that sentence because
+    // Gradio's markdown sanitiser strips data-* attributes, extra classes and
+    // element text — the visible text is the only channel left. Kept in step
+    // with the f-string in _submit.
+    // The offending card is display:none at this point, so mark it, then
+    // reveal it via the turn-nav module before focusing anything.
+    function applyTurnErrors(statusEl) {
+        clearTurnErrors();
+        if (!statusEl.querySelector('.a11y-bad-turns')) return;
+        var m = /on turns?\\s+([\\d,\\s]+)/.exec(statusEl.textContent || '');
+        if (!m) return;
+        var idx = m[1].split(/[,\\s]+/)
+            .map(function (s) { return parseInt(s, 10); })
+            .filter(function (n) { return !isNaN(n); })
+            .map(function (n) { return n - 1; })    // message is 1-based
+            .sort(function (a, b) { return a - b; });
+        if (!idx.length) return;
+
+        var chips = document.querySelectorAll('#annot-page .tn-chip');
+        idx.forEach(function (i) {
+            if (chips[i]) chips[i].setAttribute('data-a11y-err', 'true');
+        });
+
+        var first = idx[0];
+        if (window.__a11y && window.__a11y.goTo) window.__a11y.goTo(first, false);
+        requestAnimationFrame(function () {
+            var cards = document.querySelectorAll('#annot-page .turn-anno-card');
+            var card = cards[first];
+            if (!card) return;
+            card.querySelectorAll('fieldset').forEach(function (fs) {
+                if (fs.querySelector('input:checked')) return;
+                fs.setAttribute('aria-invalid', 'true');
+                fs.setAttribute('aria-describedby', 'annot-status');
+            });
+            var bad = card.querySelector('fieldset[aria-invalid] label');
+            if (bad) bad.focus();
+        });
+    }
+
+    function syncStatuses() {
+        MIRRORS.forEach(function (m) { handleStatus(m[0], m[1]); });
+    }
+
+    /* ---------- boot ---------------------------------------------------- */
+    function sync() {
+        ensureRegions();
+        nameFieldsets();
+        wireCoherence();
+        syncScreen();
+        syncDialog();
+        syncStatuses();
+    }
+
+    function boot() {
+        sync();
+        document.addEventListener('keydown', onDialogKey, true);
+        document.addEventListener('keydown', onCoherenceKey);
+        document.addEventListener('change', function () {
+            clearTurnErrors();
+            setTimeout(wireCoherence, 0);
+        });
+        if (window.MutationObserver) {
+            var pending = null;
+            new MutationObserver(function () {
+                clearTimeout(pending);
+                pending = setTimeout(sync, 60);
+            }).observe(document.documentElement,
+                { childList: true, subtree: true, attributes: true,
+                  attributeFilter: ['class', 'style'] });
+        }
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', boot);
+    } else {
+        boot();
+    }
+})();
+</script>
 """
 
 def _session_error(msg):
@@ -1048,11 +1559,10 @@ def _capture_session_params(request: gr.Request):
         "",
     )
     if prolific_pid:
-        if len(prolific_pid) > 100:  # sanity bound, not a strict format check
+        # The only bound on what reaches annotator_id, now that the PID is
+        # stored as Prolific sends it — a sanity check, not a format check.
+        if len(prolific_pid) > 100:
             return _session_error("⚠️ Malformed participant link.")
-        # The raw Prolific PID is never stored — everything downstream (and
-        # the DB) only ever sees this pseudonym. See db.pseudonymize_pid.
-        prolific_pid = db.pseudonymize_pid(prolific_pid)
         playlist, err_msg = assignment.build_playlist_for(prolific_pid)
         if err_msg:
             return _session_error(err_msg)
@@ -1100,7 +1610,20 @@ def _capture_session_params(request: gr.Request):
     )
 
 
-with gr.Blocks() as app:
+# Refuse to serve a misconfigured study. games/ (the 234-transcript pilot pool)
+# and games_study/ (the curated 416) share zero slugs, so pointing GAMES_DIR at
+# the wrong one would recruit real participants onto the wrong corpus — and the
+# symptom would be an "unknown game" error shown AFTER their rows were reserved.
+_preflight = assignment.preflight()
+if _preflight:
+    raise SystemExit(
+        "Refusing to start — the study inventory does not check out:\n  "
+        + "\n  ".join(f"- {p}" for p in _preflight)
+        + "\n\nFix the above (usually: GAMES_DIR=games_study in .env, or "
+          "re-run build_study_set.py / build_batches.py), then restart."
+    )
+
+with gr.Blocks(title="LM Playschool — Annotation Study") as app:
     # Shared selected-game path; annotation and verdict screens render off it.
     game_state = gr.State(annotation.DEFAULT_GAME)
     annotator_state = gr.State("")  # captured from the URL's annotator param
@@ -1125,7 +1648,7 @@ with gr.Blocks() as app:
     # annotation page is blanked so no stale widget value survives.
     clearing_state = gr.State(False)
 
-    welcome_page = gr.Column(visible=True)
+    welcome_page = gr.Column(visible=True, elem_id="welcome-page")
     training_page = gr.Column(visible=False, elem_id="train-page")
     annotation_page = gr.Column(visible=False, elem_id="annot-page")
     verdict_page = gr.Column(visible=False, elem_id="verdict-page")
@@ -1137,7 +1660,8 @@ with gr.Blocks() as app:
                   annotator_state, block_state,
                   game_state, playlist_idx_state, session_day_state,
                   clearing_state, consent_popup)
-    training.build(welcome_page, training_page, annotation_page, started_at_state)
+    training.build(welcome_page, training_page, annotation_page, started_at_state,
+                   annotator_state)
     annotation.build(welcome_page, annotation_page, verdict_page, game_state,
                      annotator_state, block_state, playlist_state,
                      playlist_idx_state, started_at_state, session_day_state,

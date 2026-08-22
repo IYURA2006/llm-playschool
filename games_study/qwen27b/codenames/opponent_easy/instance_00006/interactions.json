@@ -1,0 +1,1504 @@
+{
+  "meta": {
+    "game_name": "codenames",
+    "experiment_name": "opponent_easy",
+    "game_id": 6,
+    "results_folder": "qwen3.5-27b",
+    "clem_version": "3.7.2",
+    "round_count": 7,
+    "completed": true
+  },
+  "player_models": {
+    "0": {
+      "model_spec": {
+        "model_name": "qwen3.5-27b",
+        "backend": "huggingface_local",
+        "context_size": "262k",
+        "huggingface_id": "Qwen/Qwen3.5-27B",
+        "languages": [
+          "en",
+          "zh"
+        ],
+        "license": {
+          "name": "Apache 2.0",
+          "url": "https://www.apache.org/licenses/LICENSE-2.0"
+        },
+        "lookup_source": "/project/mmanina/lm-playschool-test-set/playpen/model_registry.json",
+        "model_config": {
+          "premade_chat_template": true,
+          "eos_to_cull": "<\\|im_end\\|>|<\\|endoftext\\|>",
+          "chat_template_kwargs": {
+            "enable_thinking": false
+          },
+          "multimodality": {
+            "single_image": true,
+            "multiple_images": true,
+            "audio": false,
+            "video": true
+          }
+        },
+        "open_weight": true,
+        "parameters": "27B",
+        "release_date": "2026-02-24"
+      },
+      "gen_args": {
+        "temperature": 0.0,
+        "max_tokens": 5000
+      }
+    }
+  },
+  "players": {
+    "GM": {
+      "game_role": "Game Master",
+      "model_name": "programmatic"
+    },
+    "Player 1": {
+      "game_role": "ClueGiver",
+      "model_name": "qwen3.5-27b"
+    },
+    "Player 2": {
+      "game_role": "Guesser",
+      "model_name": "qwen3.5-27b"
+    }
+  },
+  "turns": [
+    [
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T12:35:49.848491",
+        "action": {
+          "type": "board status",
+          "content": {
+            "hidden": {
+              "team": [
+                "ray",
+                "cap",
+                "rose",
+                "hood",
+                "moscow",
+                "club",
+                "whale",
+                "pants",
+                "circle"
+              ],
+              "innocent": [
+                "fair",
+                "ninja",
+                "roulette",
+                "mount",
+                "box",
+                "lion",
+                "pie"
+              ],
+              "opponent": [
+                "alps",
+                "bugle",
+                "whip",
+                "point",
+                "fish",
+                "phoenix",
+                "tick",
+                "scale"
+              ],
+              "assassin": [
+                "calf"
+              ]
+            },
+            "revealed": {
+              "team": {
+                "team": [],
+                "innocent": [],
+                "opponent": [],
+                "assassin": []
+              },
+              "opponent": {
+                "team": [],
+                "innocent": [],
+                "opponent": [],
+                "assassin": []
+              }
+            }
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 1",
+        "timestamp": "2026-07-01T12:36:27.502607",
+        "action": {
+          "type": "send message",
+          "content": "Provide one single-word clue that relates to some of your team's words from the list below. You can choose to how many and to which words your clue relates to.\nThe goal is to have your partner guess all of your team's words based on the clues you give them, before the other team has uncovered all of theirs. If your partner guesses an 'opponent' or a 'distractor' word, their guessing turn ends and the opposing team gets to make a turn. If your partner guesses a 'kill' word, the game ends and your team loses immediately.\nThe more words your clue relates to, the quicker you can win the game, but the harder the associations may be to guess for your partner, so choose your clue word wisely. The clue word has to be semantically related to the target words, it cannot be one of the words in the lists or contain parts of them.\n\nAlways give your single-word clue and your comma-separated list of related target words in the following format and make your answers as short as possible, never include any other text than is required in this form:\n\nCLUE: <WORD>\nTARGETS: <TARGETS>\n\nYour team words are: ray, cap, rose, hood, moscow, club, whale, pants, circle.\nYour opponent's team words are: alps, bugle, whip, point, fish, phoenix, tick, scale.\nDistractor words are: fair, ninja, roulette, mount, box, lion, pie.\nThe kill words are: calf.",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 1",
+        "to": "GM",
+        "timestamp": "2026-07-01T12:36:27.502626",
+        "action": {
+          "type": "get message",
+          "content": "CLUE: hat\nTARGETS: cap, hood",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T12:36:27.502979",
+        "action": {
+          "type": "clue",
+          "content": "hat"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T12:36:27.503034",
+        "action": {
+          "type": "targets",
+          "content": [
+            "cap",
+            "hood"
+          ]
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T12:36:27.503064",
+        "action": {
+          "type": "word targeted",
+          "content": {
+            "word": "cap",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T12:36:27.503084",
+        "action": {
+          "type": "word targeted",
+          "content": {
+            "word": "hood",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 2",
+        "timestamp": "2026-07-01T12:45:39.643266",
+        "action": {
+          "type": "send message",
+          "content": "Provide a comma-separated list of up to 2 words from the following list that best relate or are most closely associated with the word 'hat'. Always start your list of guess(es) with 'GUESS: ' and do not include any other text in your answer.\n\nmoscow, rose, club, ray, roulette, pie, whale, pants, point, calf, whip, cap, hood, circle, lion, box, fish, phoenix, alps, tick, mount, ninja, bugle, fair, scale",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 2",
+        "to": "GM",
+        "timestamp": "2026-07-01T12:45:39.643281",
+        "action": {
+          "type": "get message",
+          "content": "GUESS: cap, hood",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T12:45:39.643330",
+        "action": {
+          "type": "guesses",
+          "content": [
+            "cap",
+            "hood"
+          ]
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T12:45:39.643354",
+        "action": {
+          "type": "team revealed",
+          "content": {
+            "word": "cap",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T12:45:39.643375",
+        "action": {
+          "type": "target revealed",
+          "content": {
+            "word": "cap",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T12:45:39.643394",
+        "action": {
+          "type": "team revealed",
+          "content": {
+            "word": "hood",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T12:45:39.643411",
+        "action": {
+          "type": "target revealed",
+          "content": {
+            "word": "hood",
+            "assignment": "team"
+          }
+        }
+      }
+    ],
+    [
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T12:45:39.643522",
+        "action": {
+          "type": "opponent revealed",
+          "content": {
+            "word": "bugle",
+            "assignment": "opponent"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T12:45:39.643548",
+        "action": {
+          "type": "board status",
+          "content": {
+            "hidden": {
+              "team": [
+                "ray",
+                "rose",
+                "moscow",
+                "club",
+                "whale",
+                "pants",
+                "circle"
+              ],
+              "innocent": [
+                "fair",
+                "ninja",
+                "roulette",
+                "mount",
+                "box",
+                "lion",
+                "pie"
+              ],
+              "opponent": [
+                "alps",
+                "whip",
+                "point",
+                "fish",
+                "phoenix",
+                "tick",
+                "scale"
+              ],
+              "assassin": [
+                "calf"
+              ]
+            },
+            "revealed": {
+              "team": {
+                "team": [
+                  "cap",
+                  "hood"
+                ],
+                "innocent": [],
+                "opponent": [],
+                "assassin": []
+              },
+              "opponent": {
+                "team": [],
+                "innocent": [],
+                "opponent": [
+                  "bugle"
+                ],
+                "assassin": []
+              }
+            }
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 1",
+        "timestamp": "2026-07-01T12:46:47.601041",
+        "action": {
+          "type": "send message",
+          "content": "The words cap, hood were guessed correctly. Your teammate's turn ended there.\nNow provide another clue relating to some of your remaining team words and a list of the related target words. Remember to start your clue with 'CLUE: ', put a new line, and start your comma-separated list of target words with 'TARGETS: '. Notice: some words have been removed from the lists compared to previous requests.\n\nYour remaining team words are: ray, rose, moscow, club, whale, pants, circle.\nRemaining words for your opponent are: alps, bugle, whip, point, fish, phoenix, tick, scale.\nRemaining distractor words are: fair, ninja, roulette, mount, box, lion, pie.\nRemaining kill words are: calf.",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 1",
+        "to": "GM",
+        "timestamp": "2026-07-01T12:46:47.601059",
+        "action": {
+          "type": "get message",
+          "content": "CLUE: sun\nTARGETS: ray, rose, circle",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T12:46:47.601262",
+        "action": {
+          "type": "clue",
+          "content": "sun"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T12:46:47.601285",
+        "action": {
+          "type": "targets",
+          "content": [
+            "ray",
+            "rose",
+            "circle"
+          ]
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T12:46:47.601306",
+        "action": {
+          "type": "word targeted",
+          "content": {
+            "word": "ray",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T12:46:47.601325",
+        "action": {
+          "type": "word targeted",
+          "content": {
+            "word": "rose",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T12:46:47.601343",
+        "action": {
+          "type": "word targeted",
+          "content": {
+            "word": "circle",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 2",
+        "timestamp": "2026-07-01T12:47:37.714372",
+        "action": {
+          "type": "send message",
+          "content": "The words cap, hood were guessed correctly. Your turn ended there.\nNow provide another comma-separated list of at least 1 and up to 3 words from the following list of words that best relate or are most closely associated with the word 'sun'. Remember to start your answer with 'GUESS: '. Notice: some words have been removed from the list compared to previous requests.\n\nmoscow, rose, club, ray, roulette, pie, whale, pants, point, calf, whip, circle, lion, box, fish, phoenix, alps, tick, mount, ninja, fair, scale",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 2",
+        "to": "GM",
+        "timestamp": "2026-07-01T12:47:37.714387",
+        "action": {
+          "type": "get message",
+          "content": "GUESS: ray, circle, phoenix",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T12:47:37.714439",
+        "action": {
+          "type": "guesses",
+          "content": [
+            "ray",
+            "circle",
+            "phoenix"
+          ]
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T12:47:37.714463",
+        "action": {
+          "type": "team revealed",
+          "content": {
+            "word": "ray",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T12:47:37.714483",
+        "action": {
+          "type": "target revealed",
+          "content": {
+            "word": "ray",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T12:47:37.714503",
+        "action": {
+          "type": "team revealed",
+          "content": {
+            "word": "circle",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T12:47:37.714520",
+        "action": {
+          "type": "target revealed",
+          "content": {
+            "word": "circle",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T12:47:37.714539",
+        "action": {
+          "type": "team revealed",
+          "content": {
+            "word": "phoenix",
+            "assignment": "opponent"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T12:47:37.714556",
+        "action": {
+          "type": "turn end after",
+          "content": "phoenix"
+        }
+      }
+    ],
+    [
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T12:47:37.714702",
+        "action": {
+          "type": "opponent revealed",
+          "content": {
+            "word": "tick",
+            "assignment": "opponent"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T12:47:37.714728",
+        "action": {
+          "type": "board status",
+          "content": {
+            "hidden": {
+              "team": [
+                "rose",
+                "moscow",
+                "club",
+                "whale",
+                "pants"
+              ],
+              "innocent": [
+                "fair",
+                "ninja",
+                "roulette",
+                "mount",
+                "box",
+                "lion",
+                "pie"
+              ],
+              "opponent": [
+                "alps",
+                "whip",
+                "point",
+                "fish",
+                "scale"
+              ],
+              "assassin": [
+                "calf"
+              ]
+            },
+            "revealed": {
+              "team": {
+                "team": [
+                  "cap",
+                  "hood",
+                  "ray",
+                  "circle"
+                ],
+                "innocent": [],
+                "opponent": [
+                  "phoenix"
+                ],
+                "assassin": []
+              },
+              "opponent": {
+                "team": [],
+                "innocent": [],
+                "opponent": [
+                  "bugle",
+                  "tick"
+                ],
+                "assassin": []
+              }
+            }
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 1",
+        "timestamp": "2026-07-01T12:48:24.385454",
+        "action": {
+          "type": "send message",
+          "content": "The words ray, circle were guessed correctly. The word phoenix was guessed but is an opponent word. Your teammate's turn ended there.\nNow provide another clue relating to some of your remaining team words and a list of the related target words. Remember to start your clue with 'CLUE: ', put a new line, and start your comma-separated list of target words with 'TARGETS: '. Notice: some words have been removed from the lists compared to previous requests.\n\nYour remaining team words are: rose, moscow, club, whale, pants.\nRemaining words for your opponent are: alps, whip, point, fish, tick, scale.\nRemaining distractor words are: fair, ninja, roulette, mount, box, lion, pie.\nRemaining kill words are: calf.",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 1",
+        "to": "GM",
+        "timestamp": "2026-07-01T12:48:24.385472",
+        "action": {
+          "type": "get message",
+          "content": "CLUE: city\nTARGETS: moscow",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T12:48:24.385636",
+        "action": {
+          "type": "clue",
+          "content": "city"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T12:48:24.385659",
+        "action": {
+          "type": "targets",
+          "content": [
+            "moscow"
+          ]
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T12:48:24.385679",
+        "action": {
+          "type": "word targeted",
+          "content": {
+            "word": "moscow",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 2",
+        "timestamp": "2026-07-01T12:49:10.499409",
+        "action": {
+          "type": "send message",
+          "content": "The words ray, circle were guessed correctly. The word phoenix was guessed but is an opponent word. Your turn ended there.\nNow provide another comma-separated list of at least 1 and up to 1 words from the following list of words that best relate or are most closely associated with the word 'city'. Remember to start your answer with 'GUESS: '. Notice: some words have been removed from the list compared to previous requests.\n\nmoscow, rose, club, roulette, pie, whale, pants, point, calf, whip, lion, box, fish, alps, mount, ninja, fair, scale",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 2",
+        "to": "GM",
+        "timestamp": "2026-07-01T12:49:10.499424",
+        "action": {
+          "type": "get message",
+          "content": "GUESS: moscow",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T12:49:10.499499",
+        "action": {
+          "type": "guesses",
+          "content": [
+            "moscow"
+          ]
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T12:49:10.499540",
+        "action": {
+          "type": "team revealed",
+          "content": {
+            "word": "moscow",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T12:49:10.499563",
+        "action": {
+          "type": "target revealed",
+          "content": {
+            "word": "moscow",
+            "assignment": "team"
+          }
+        }
+      }
+    ],
+    [
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T12:49:10.499919",
+        "action": {
+          "type": "opponent revealed",
+          "content": {
+            "word": "alps",
+            "assignment": "opponent"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T12:49:10.499948",
+        "action": {
+          "type": "board status",
+          "content": {
+            "hidden": {
+              "team": [
+                "rose",
+                "club",
+                "whale",
+                "pants"
+              ],
+              "innocent": [
+                "fair",
+                "ninja",
+                "roulette",
+                "mount",
+                "box",
+                "lion",
+                "pie"
+              ],
+              "opponent": [
+                "whip",
+                "point",
+                "fish",
+                "scale"
+              ],
+              "assassin": [
+                "calf"
+              ]
+            },
+            "revealed": {
+              "team": {
+                "team": [
+                  "cap",
+                  "hood",
+                  "ray",
+                  "circle",
+                  "moscow"
+                ],
+                "innocent": [],
+                "opponent": [
+                  "phoenix"
+                ],
+                "assassin": []
+              },
+              "opponent": {
+                "team": [],
+                "innocent": [],
+                "opponent": [
+                  "bugle",
+                  "tick",
+                  "alps"
+                ],
+                "assassin": []
+              }
+            }
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 1",
+        "timestamp": "2026-07-01T12:49:49.435496",
+        "action": {
+          "type": "send message",
+          "content": "The word moscow was guessed correctly. Your teammate's turn ended there.\nNow provide another clue relating to some of your remaining team words and a list of the related target words. Remember to start your clue with 'CLUE: ', put a new line, and start your comma-separated list of target words with 'TARGETS: '. Notice: some words have been removed from the lists compared to previous requests.\n\nYour remaining team words are: rose, club, whale, pants.\nRemaining words for your opponent are: alps, whip, point, fish, scale.\nRemaining distractor words are: fair, ninja, roulette, mount, box, lion, pie.\nRemaining kill words are: calf.",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 1",
+        "to": "GM",
+        "timestamp": "2026-07-01T12:49:49.435515",
+        "action": {
+          "type": "get message",
+          "content": "CLUE: flower\nTARGETS: rose",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T12:49:49.435670",
+        "action": {
+          "type": "clue",
+          "content": "flower"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T12:49:49.435692",
+        "action": {
+          "type": "targets",
+          "content": [
+            "rose"
+          ]
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T12:49:49.435713",
+        "action": {
+          "type": "word targeted",
+          "content": {
+            "word": "rose",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 2",
+        "timestamp": "2026-07-01T12:50:30.391783",
+        "action": {
+          "type": "send message",
+          "content": "The word moscow was guessed correctly. Your turn ended there.\nNow provide another comma-separated list of at least 1 and up to 1 words from the following list of words that best relate or are most closely associated with the word 'flower'. Remember to start your answer with 'GUESS: '. Notice: some words have been removed from the list compared to previous requests.\n\nrose, club, roulette, pie, whale, pants, point, calf, whip, lion, box, fish, mount, ninja, fair, scale",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 2",
+        "to": "GM",
+        "timestamp": "2026-07-01T12:50:30.391798",
+        "action": {
+          "type": "get message",
+          "content": "GUESS: rose",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T12:50:30.391869",
+        "action": {
+          "type": "guesses",
+          "content": [
+            "rose"
+          ]
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T12:50:30.391909",
+        "action": {
+          "type": "team revealed",
+          "content": {
+            "word": "rose",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T12:50:30.391931",
+        "action": {
+          "type": "target revealed",
+          "content": {
+            "word": "rose",
+            "assignment": "team"
+          }
+        }
+      }
+    ],
+    [
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T12:50:30.392302",
+        "action": {
+          "type": "opponent revealed",
+          "content": {
+            "word": "fish",
+            "assignment": "opponent"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T12:50:30.392332",
+        "action": {
+          "type": "board status",
+          "content": {
+            "hidden": {
+              "team": [
+                "club",
+                "whale",
+                "pants"
+              ],
+              "innocent": [
+                "fair",
+                "ninja",
+                "roulette",
+                "mount",
+                "box",
+                "lion",
+                "pie"
+              ],
+              "opponent": [
+                "whip",
+                "point",
+                "scale"
+              ],
+              "assassin": [
+                "calf"
+              ]
+            },
+            "revealed": {
+              "team": {
+                "team": [
+                  "cap",
+                  "hood",
+                  "ray",
+                  "circle",
+                  "moscow",
+                  "rose"
+                ],
+                "innocent": [],
+                "opponent": [
+                  "phoenix"
+                ],
+                "assassin": []
+              },
+              "opponent": {
+                "team": [],
+                "innocent": [],
+                "opponent": [
+                  "bugle",
+                  "tick",
+                  "alps",
+                  "fish"
+                ],
+                "assassin": []
+              }
+            }
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 1",
+        "timestamp": "2026-07-01T12:51:03.059716",
+        "action": {
+          "type": "send message",
+          "content": "The word rose was guessed correctly. Your teammate's turn ended there.\nNow provide another clue relating to some of your remaining team words and a list of the related target words. Remember to start your clue with 'CLUE: ', put a new line, and start your comma-separated list of target words with 'TARGETS: '. Notice: some words have been removed from the lists compared to previous requests.\n\nYour remaining team words are: club, whale, pants.\nRemaining words for your opponent are: whip, point, fish, scale.\nRemaining distractor words are: fair, ninja, roulette, mount, box, lion, pie.\nRemaining kill words are: calf.",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 1",
+        "to": "GM",
+        "timestamp": "2026-07-01T12:51:03.059734",
+        "action": {
+          "type": "get message",
+          "content": "CLUE: ocean\nTARGETS: whale, club",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T12:51:03.059868",
+        "action": {
+          "type": "clue",
+          "content": "ocean"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T12:51:03.059890",
+        "action": {
+          "type": "targets",
+          "content": [
+            "whale",
+            "club"
+          ]
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T12:51:03.059911",
+        "action": {
+          "type": "word targeted",
+          "content": {
+            "word": "whale",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T12:51:03.059930",
+        "action": {
+          "type": "word targeted",
+          "content": {
+            "word": "club",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 2",
+        "timestamp": "2026-07-01T12:51:41.937222",
+        "action": {
+          "type": "send message",
+          "content": "The word rose was guessed correctly. Your turn ended there.\nNow provide another comma-separated list of at least 1 and up to 2 words from the following list of words that best relate or are most closely associated with the word 'ocean'. Remember to start your answer with 'GUESS: '. Notice: some words have been removed from the list compared to previous requests.\n\nclub, roulette, pie, whale, pants, point, calf, whip, lion, box, mount, ninja, fair, scale",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 2",
+        "to": "GM",
+        "timestamp": "2026-07-01T12:51:41.937238",
+        "action": {
+          "type": "get message",
+          "content": "GUESS: whale, scale",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T12:51:41.937291",
+        "action": {
+          "type": "guesses",
+          "content": [
+            "whale",
+            "scale"
+          ]
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T12:51:41.937315",
+        "action": {
+          "type": "team revealed",
+          "content": {
+            "word": "whale",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T12:51:41.937336",
+        "action": {
+          "type": "target revealed",
+          "content": {
+            "word": "whale",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T12:51:41.937356",
+        "action": {
+          "type": "team revealed",
+          "content": {
+            "word": "scale",
+            "assignment": "opponent"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T12:51:41.937375",
+        "action": {
+          "type": "turn end after",
+          "content": "scale"
+        }
+      }
+    ],
+    [
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T12:51:41.937481",
+        "action": {
+          "type": "opponent revealed",
+          "content": {
+            "word": "point",
+            "assignment": "opponent"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T12:51:41.937507",
+        "action": {
+          "type": "board status",
+          "content": {
+            "hidden": {
+              "team": [
+                "club",
+                "pants"
+              ],
+              "innocent": [
+                "fair",
+                "ninja",
+                "roulette",
+                "mount",
+                "box",
+                "lion",
+                "pie"
+              ],
+              "opponent": [
+                "whip"
+              ],
+              "assassin": [
+                "calf"
+              ]
+            },
+            "revealed": {
+              "team": {
+                "team": [
+                  "cap",
+                  "hood",
+                  "ray",
+                  "circle",
+                  "moscow",
+                  "rose",
+                  "whale"
+                ],
+                "innocent": [],
+                "opponent": [
+                  "phoenix",
+                  "scale"
+                ],
+                "assassin": []
+              },
+              "opponent": {
+                "team": [],
+                "innocent": [],
+                "opponent": [
+                  "bugle",
+                  "tick",
+                  "alps",
+                  "fish",
+                  "point"
+                ],
+                "assassin": []
+              }
+            }
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 1",
+        "timestamp": "2026-07-01T12:52:16.480929",
+        "action": {
+          "type": "send message",
+          "content": "The word whale was guessed correctly. The word scale was guessed but is an opponent word. Your teammate's turn ended there.\nNow provide another clue relating to some of your remaining team words and a list of the related target words. Remember to start your clue with 'CLUE: ', put a new line, and start your comma-separated list of target words with 'TARGETS: '. Notice: some words have been removed from the lists compared to previous requests.\n\nYour remaining team words are: club, pants.\nRemaining words for your opponent are: whip, point.\nRemaining distractor words are: fair, ninja, roulette, mount, box, lion, pie.\nRemaining kill words are: calf.",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 1",
+        "to": "GM",
+        "timestamp": "2026-07-01T12:52:16.480949",
+        "action": {
+          "type": "get message",
+          "content": "CLUE: golf\nTARGETS: club",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T12:52:16.481095",
+        "action": {
+          "type": "clue",
+          "content": "golf"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T12:52:16.481119",
+        "action": {
+          "type": "targets",
+          "content": [
+            "club"
+          ]
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T12:52:16.481139",
+        "action": {
+          "type": "word targeted",
+          "content": {
+            "word": "club",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 2",
+        "timestamp": "2026-07-01T12:52:50.255884",
+        "action": {
+          "type": "send message",
+          "content": "The word whale was guessed correctly. The word scale was guessed but is an opponent word. Your turn ended there.\nNow provide another comma-separated list of at least 1 and up to 1 words from the following list of words that best relate or are most closely associated with the word 'golf'. Remember to start your answer with 'GUESS: '. Notice: some words have been removed from the list compared to previous requests.\n\nclub, roulette, pie, pants, calf, whip, lion, box, mount, ninja, fair",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 2",
+        "to": "GM",
+        "timestamp": "2026-07-01T12:52:50.255900",
+        "action": {
+          "type": "get message",
+          "content": "GUESS: club",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T12:52:50.255971",
+        "action": {
+          "type": "guesses",
+          "content": [
+            "club"
+          ]
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T12:52:50.256013",
+        "action": {
+          "type": "team revealed",
+          "content": {
+            "word": "club",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T12:52:50.256036",
+        "action": {
+          "type": "target revealed",
+          "content": {
+            "word": "club",
+            "assignment": "team"
+          }
+        }
+      }
+    ],
+    [
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T12:52:50.256409",
+        "action": {
+          "type": "opponent revealed",
+          "content": {
+            "word": "whip",
+            "assignment": "opponent"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T12:52:50.256439",
+        "action": {
+          "type": "board status",
+          "content": {
+            "hidden": {
+              "team": [
+                "pants"
+              ],
+              "innocent": [
+                "fair",
+                "ninja",
+                "roulette",
+                "mount",
+                "box",
+                "lion",
+                "pie"
+              ],
+              "opponent": [],
+              "assassin": [
+                "calf"
+              ]
+            },
+            "revealed": {
+              "team": {
+                "team": [
+                  "cap",
+                  "hood",
+                  "ray",
+                  "circle",
+                  "moscow",
+                  "rose",
+                  "whale",
+                  "club"
+                ],
+                "innocent": [],
+                "opponent": [
+                  "phoenix",
+                  "scale"
+                ],
+                "assassin": []
+              },
+              "opponent": {
+                "team": [],
+                "innocent": [],
+                "opponent": [
+                  "bugle",
+                  "tick",
+                  "alps",
+                  "fish",
+                  "point",
+                  "whip"
+                ],
+                "assassin": []
+              }
+            }
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 1",
+        "timestamp": "2026-07-01T12:53:17.019454",
+        "action": {
+          "type": "send message",
+          "content": "The word club was guessed correctly. Your teammate's turn ended there.\nNow provide another clue relating to some of your remaining team words and a list of the related target words. Remember to start your clue with 'CLUE: ', put a new line, and start your comma-separated list of target words with 'TARGETS: '. Notice: some words have been removed from the lists compared to previous requests.\n\nYour remaining team words are: pants.\nRemaining words for your opponent are: whip.\nRemaining distractor words are: fair, ninja, roulette, mount, box, lion, pie.\nRemaining kill words are: calf.",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 1",
+        "to": "GM",
+        "timestamp": "2026-07-01T12:53:17.019477",
+        "action": {
+          "type": "get message",
+          "content": "CLUE: jeans\nTARGETS: pants",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T12:53:17.019628",
+        "action": {
+          "type": "clue",
+          "content": "jeans"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T12:53:17.019652",
+        "action": {
+          "type": "targets",
+          "content": [
+            "pants"
+          ]
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T12:53:17.019671",
+        "action": {
+          "type": "word targeted",
+          "content": {
+            "word": "pants",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T12:53:17.019805",
+        "action": {
+          "type": "game end",
+          "content": "opponent has won"
+        }
+      }
+    ]
+  ],
+  "board end status": {
+    "hidden": {
+      "team": [
+        "pants"
+      ],
+      "innocent": [
+        "fair",
+        "ninja",
+        "roulette",
+        "mount",
+        "box",
+        "lion",
+        "pie"
+      ],
+      "opponent": [],
+      "assassin": [
+        "calf"
+      ]
+    },
+    "revealed": {
+      "team": {
+        "team": [
+          "cap",
+          "hood",
+          "ray",
+          "circle",
+          "moscow",
+          "rose",
+          "whale",
+          "club"
+        ],
+        "innocent": [],
+        "opponent": [
+          "phoenix",
+          "scale"
+        ],
+        "assassin": []
+      },
+      "opponent": {
+        "team": [],
+        "innocent": [],
+        "opponent": [
+          "bugle",
+          "tick",
+          "alps",
+          "fish",
+          "point",
+          "whip"
+        ],
+        "assassin": []
+      }
+    }
+  },
+  "Number of turns": 7,
+  "Aborted": false,
+  "Lose": true,
+  "Game ended through assassin": false,
+  "Request Count": 13,
+  "Parsed Request Count": 13,
+  "Violated Request Count": 0,
+  "Cluegiver engaged flags": {
+    "IGNORE RAMBLING": 0,
+    "IGNORE FALSE TARGETS OR GUESSES": 0,
+    "REPROMPT ON ERROR": 0,
+    "STRIP WORDS": 0,
+    "IGNORE NUMBER OF TARGETS": 0
+  },
+  "Guesser engaged flags": {
+    "IGNORE RAMBLING": 0,
+    "IGNORE FALSE TARGETS OR GUESSES": 0,
+    "REPROMPT ON ERROR": 0,
+    "STRIP WORDS": 0,
+    "IGNORE NUMBER OF TARGETS": 0
+  }
+}

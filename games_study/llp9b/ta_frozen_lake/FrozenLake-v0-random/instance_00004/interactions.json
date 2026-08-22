@@ -1,0 +1,115 @@
+{
+  "meta": {
+    "game_name": "ta_frozen_lake",
+    "experiment_name": "FrozenLake-v0-random",
+    "game_id": 4,
+    "results_folder": "LLP: Large Language Problems__qwen3.5-9b__llp-final",
+    "clem_version": "3.7.2",
+    "round_count": 1,
+    "completed": true,
+    "ta_version": "0.7.3"
+  },
+  "player_models": {
+    "0": {
+      "model_spec": {
+        "model_name": "LLP: Large Language Problems__qwen3.5-9b__llp-final",
+        "_team": "LLP: Large Language Problems",
+        "_version": "llp-final",
+        "backend": "huggingface_local",
+        "context_size": "262k",
+        "huggingface_id": "Makaco/lmps-challenge-qwen3.5-9b-dpo",
+        "languages": [
+          "en",
+          "zh"
+        ],
+        "license": {
+          "name": "Apache 2.0",
+          "url": "https://www.apache.org/licenses/LICENSE-2.0"
+        },
+        "lookup_source": "/project/mmanina/lm-playschool-test-set/playpen/model_registry.json",
+        "model_config": {
+          "premade_chat_template": true,
+          "eos_to_cull": "<\\|im_end\\|>|<\\|endoftext\\|>",
+          "chat_template_kwargs": {
+            "enable_thinking": false
+          }
+        },
+        "open_weight": true,
+        "parameters": "9B",
+        "release_date": "2026-06-22"
+      },
+      "gen_args": {
+        "temperature": 0.0,
+        "max_tokens": 5000
+      }
+    }
+  },
+  "players": {
+    "GM": {
+      "game_role": "Game Master",
+      "model_name": "programmatic"
+    },
+    "Player 0": {
+      "game_role": "Player 0",
+      "model_name": "LLP: Large Language Problems__qwen3.5-9b__llp-final"
+    }
+  },
+  "turns": [
+    [
+      {
+        "from": "GM",
+        "to": "Player 0",
+        "timestamp": "2026-07-08T17:55:28.928403",
+        "action": {
+          "type": "send message",
+          "content": "You are a competitive game player. Make sure you read the game instructions carefully, and always follow the required format.\n\n[GAME] Welcome to Frozen Lake!\n\nYou are represented by 'P' on the grid.\nGrid symbols:\n  ' ' = Frozen surface (safe to walk on)\n  'H' = Hole (fall in and lose!)\n  'G' = Goal (reach this to win!)\n  'P' = Your current position\n\nAvailable actions: up, down, left, right (or w, a, s, d)\nType your action as: [up], [down], [left], [right] or [w], [a], [s], [d]\n\nObjective: Navigate from the start (top-left) to the goal (bottom-right) without falling into any holes!\n\n[GAME] Current Board:\n\n+-----+-----+-----+-----+\n|  H  |     |     |  P  |\n+-----+-----+-----+-----+\n|     |     |     |  H  |\n+-----+-----+-----+-----+\n|     |     |     |     |\n+-----+-----+-----+-----+\n|  G  |     |     |  H  |\n+-----+-----+-----+-----+\n\nAvailable Actions: [up], [down], [left], [right], [w], [a], [s], [d]\n",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 0",
+        "to": "GM",
+        "timestamp": "2026-07-08T17:55:29.196078",
+        "action": {
+          "type": "get message",
+          "content": "[down]",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-08T17:55:29.196211",
+        "action": {
+          "type": "rewards",
+          "content": "role: Player 0\ninvalid_move: False\nturn_count: 1\nreason: You fell into a hole! Game over. You completed 17% of the journey to the goal.\nreward: 0.16666666666666666"
+        }
+      }
+    ]
+  ],
+  "ta_reward": {
+    "0": 0.16666666666666666
+  },
+  "ta_reward_details": {
+    "0": {
+      "role": "Player 0",
+      "invalid_move": false,
+      "turn_count": 1,
+      "reason": "You fell into a hole! Game over. You completed 17% of the journey to the goal.",
+      "reward": 0.16666666666666666
+    }
+  },
+  "numeric_reward": 0.16666666666666666,
+  "Aborted": 0,
+  "Success": 0,
+  "Lose": 0,
+  "Request Count": [
+    1
+  ],
+  "Violated Request Count": [
+    0
+  ],
+  "Parsed Request Count": [
+    1
+  ]
+}

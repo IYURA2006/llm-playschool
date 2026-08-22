@@ -1,0 +1,250 @@
+{
+  "meta": {
+    "game_name": "dond",
+    "experiment_name": "coop_en",
+    "game_id": 4,
+    "results_folder": "qwen3.5-27b",
+    "clem_version": "3.7.2",
+    "round_count": 2,
+    "completed": true
+  },
+  "player_models": {
+    "0": {
+      "model_spec": {
+        "model_name": "qwen3.5-27b",
+        "backend": "huggingface_local",
+        "context_size": "262k",
+        "huggingface_id": "Qwen/Qwen3.5-27B",
+        "languages": [
+          "en",
+          "zh"
+        ],
+        "license": {
+          "name": "Apache 2.0",
+          "url": "https://www.apache.org/licenses/LICENSE-2.0"
+        },
+        "lookup_source": "/project/mmanina/lm-playschool-test-set/playpen/model_registry.json",
+        "model_config": {
+          "premade_chat_template": true,
+          "eos_to_cull": "<\\|im_end\\|>|<\\|endoftext\\|>",
+          "chat_template_kwargs": {
+            "enable_thinking": false
+          },
+          "multimodality": {
+            "single_image": true,
+            "multiple_images": true,
+            "audio": false,
+            "video": true
+          }
+        },
+        "open_weight": true,
+        "parameters": "27B",
+        "release_date": "2026-02-24"
+      },
+      "gen_args": {
+        "temperature": 0.0,
+        "max_tokens": 5000
+      }
+    }
+  },
+  "players": {
+    "GM": {
+      "game_role": "Game Master",
+      "model_name": "programmatic"
+    },
+    "Player 1": {
+      "game_role": "DealOrNoDealPlayer",
+      "model_name": "qwen3.5-27b"
+    },
+    "Player 2": {
+      "game_role": "DealOrNoDealPlayer",
+      "model_name": "qwen3.5-27b"
+    }
+  },
+  "turns": [
+    [
+      {
+        "from": "GM",
+        "to": "Player 1",
+        "timestamp": "2026-07-01T14:44:57.214084",
+        "action": {
+          "type": "send message",
+          "content": "You are playing a cooperative negotiation game in which you have to agree on how to divide a set of items among you and another player.\n\nRules:\n(a) You and the other player are given a set of items. Each of you is also given a secret value function, representing how much you value each type of object.\n(b) You exchange messages with the other player to agree on who gets which items. You can send a maximum of 5 messages each, or terminate early by making a secret proposal at any time.\n(c) You are each asked to submit a secret proposal indicating the items you want formatted in square brackets as follows: \"[Proposal: <number> <object name>, <number> <object name>, <...>]\"\n(d) If your proposals are complementary, i.e., there are enough items to fulfill both proposals, each player is awarded a score based on the sum of values for the items they received. Otherwise, both of you get zero points.\n(e) Your goal is to maximize the sum of your score and the score of the other player.\n\nLet us start.\n\nThe set of available items is:\n\n2 nuts, 1 plate, 1 remote, 1 glue\n\nYour secret value function is:\n\nnut: 1, plate: 0, remote: 7, glue: 1\n\nIMPORTANT: Your messages, unless it is the secret proposal, are directly transmitted to the other player, so do not include any response to the rules or text announcing your message. To make a secret proposal, use the indicated format. Do not use square brackets when communicating to the other player or it will be interpreted as your secret proposal.\n",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 1",
+        "to": "GM",
+        "timestamp": "2026-07-01T14:44:57.214111",
+        "action": {
+          "type": "get message",
+          "content": "I value the remote the most (7 points), while the nuts and glue are worth 1 point each, and the plate is worth 0 to me. I'd like to propose that I take the remote, and you take the plate, the two nuts, and the glue. This way, I get my highest value item, and you get the rest. Does that work for you?",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T14:44:57.214150",
+        "action": {
+          "type": "valid response",
+          "content": "continue"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T14:44:57.214175",
+        "action": {
+          "type": "valid message",
+          "content": "I value the remote the most (7 points), while the nuts and glue are worth 1 point each, and the plate is worth 0 to me. I'd like to propose that I take the remote, and you take the plate, the two nuts, and the glue. This way, I get my highest value item, and you get the rest. Does that work for you?"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 2",
+        "timestamp": "2026-07-01T14:47:04.768225",
+        "action": {
+          "type": "send message",
+          "content": "You are playing a cooperative negotiation game in which you have to agree on how to divide a set of items among you and another player.\n\nRules:\n(a) You and the other player are given a set of items. Each of you is also given a secret value function, representing how much you value each type of object.\n(b) You exchange messages with the other player to agree on who gets which items. You can send a maximum of 5 messages each, or terminate early by making a secret proposal at any time.\n(c) You are each asked to submit a secret proposal indicating the items you want formatted in square brackets as follows: \"[Proposal: <number> <object name>, <number> <object name>, <...>]\"\n(d) If your proposals are complementary, i.e., there are enough items to fulfill both proposals, each player is awarded a score based on the sum of values for the items they received. Otherwise, both of you get zero points.\n(e) Your goal is to maximize the sum of your score and the score of the other player.\n\nLet us start.\n\nThe set of available items is:\n\n2 nuts, 1 plate, 1 remote, 1 glue\n\nYour secret value function is:\n\nnut: 0, plate: 6, remote: 3, glue: 1\n\nIMPORTANT: Your messages, unless it is the secret proposal, are directly transmitted to the other player, so do not include any response to the rules or text announcing your message. To make a secret proposal, use the indicated format. Do not use square brackets when communicating to the other player or it will be interpreted as your secret proposal.\n\n\nI value the remote the most (7 points), while the nuts and glue are worth 1 point each, and the plate is worth 0 to me. I'd like to propose that I take the remote, and you take the plate, the two nuts, and the glue. This way, I get my highest value item, and you get the rest. Does that work for you?",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 2",
+        "to": "GM",
+        "timestamp": "2026-07-01T14:47:04.768254",
+        "action": {
+          "type": "get message",
+          "content": "That sounds like a perfect plan! Since I value the plate the most (6 points) and the remote is worth 3 to me, while you value the remote highly (7 points) and the plate is worthless to you, this split maximizes our combined score.\n\nI agree to take the plate, the two nuts, and the glue, while you take the remote.\n\n[Proposal: 1 plate, 2 nuts, 1 glue]",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T14:47:04.768353",
+        "action": {
+          "type": "valid response",
+          "content": "proposal"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T14:47:04.768378",
+        "action": {
+          "type": "valid proposal",
+          "content": [
+            2,
+            1,
+            0,
+            1
+          ]
+        }
+      }
+    ],
+    [
+      {
+        "from": "GM",
+        "to": "Player 1",
+        "timestamp": "2026-07-01T14:51:11.999389",
+        "action": {
+          "type": "send message",
+          "content": "The other player has submitted a secret proposal. It is now your turn to submit a proposal of your own.\n",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 1",
+        "to": "GM",
+        "timestamp": "2026-07-01T14:51:11.999413",
+        "action": {
+          "type": "get message",
+          "content": "[Proposal: 1 remote]",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T14:51:11.999483",
+        "action": {
+          "type": "valid response",
+          "content": "proposal"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T14:51:11.999502",
+        "action": {
+          "type": "valid proposal",
+          "content": [
+            0,
+            0,
+            1,
+            0
+          ]
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T14:51:11.999527",
+        "action": {
+          "type": "successful agreement",
+          "content": [
+            [
+              0,
+              0,
+              1,
+              0
+            ],
+            [
+              2,
+              1,
+              0,
+              1
+            ]
+          ]
+        }
+      }
+    ]
+  ],
+  "Aborted": 0,
+  "Lose": 0,
+  "Success": 1,
+  "player_a_proposal": [
+    0,
+    0,
+    1,
+    0
+  ],
+  "player_b_proposal": [
+    2,
+    1,
+    0,
+    1
+  ],
+  "sum_of_scores": 14,
+  "max_sum_of_scores": 16,
+  "max_player_scores": 10,
+  "max_pareto_improvement": 16,
+  "pareto_improvement": 2,
+  "pareto_optimal": 0,
+  "episode_score": 0.875,
+  "Request Count": [
+    2,
+    1
+  ],
+  "Violated Request Count": [
+    0,
+    0
+  ],
+  "Parsed Request Count": [
+    2,
+    1
+  ]
+}

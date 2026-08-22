@@ -1,0 +1,1636 @@
+{
+  "meta": {
+    "game_name": "codenames",
+    "experiment_name": "abstract",
+    "game_id": 3,
+    "results_folder": "CityUoL__qwen3.5-2b__Qwen-GuidePlay-2B-v1",
+    "clem_version": "3.7.2",
+    "round_count": 7,
+    "completed": true
+  },
+  "player_models": {
+    "0": {
+      "model_spec": {
+        "model_name": "CityUoL__qwen3.5-2b__Qwen-GuidePlay-2B-v1",
+        "_team": "CityUoL",
+        "_version": "Qwen-GuidePlay-2B-v1",
+        "backend": "huggingface_local",
+        "context_size": "262k",
+        "huggingface_id": "syedhuq/qwen-guideplay-2b",
+        "languages": [
+          "en"
+        ],
+        "license": {
+          "name": "Apache-2.0",
+          "url": "https://www.apache.org/licenses/LICENSE-2.0"
+        },
+        "lookup_source": "/project/mmanina/lm-playschool-test-set/playpen/model_registry.json",
+        "model_config": {
+          "premade_chat_template": true,
+          "eos_to_cull": "<\\|im_end\\|>|<\\|endoftext\\|>",
+          "chat_template_kwargs": {
+            "enable_thinking": false
+          },
+          "multimodality": {
+            "single_image": true,
+            "multiple_images": true,
+            "audio": false,
+            "video": true
+          }
+        },
+        "open_weight": true,
+        "parameters": "2B",
+        "release_date": "2026-07-06"
+      },
+      "gen_args": {
+        "temperature": 0.0,
+        "max_tokens": 5000
+      }
+    }
+  },
+  "players": {
+    "GM": {
+      "game_role": "Game Master",
+      "model_name": "programmatic"
+    },
+    "Player 1": {
+      "game_role": "ClueGiver",
+      "model_name": "CityUoL__qwen3.5-2b__Qwen-GuidePlay-2B-v1"
+    },
+    "Player 2": {
+      "game_role": "Guesser",
+      "model_name": "CityUoL__qwen3.5-2b__Qwen-GuidePlay-2B-v1"
+    }
+  },
+  "turns": [
+    [
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:51:19.541132",
+        "action": {
+          "type": "board status",
+          "content": {
+            "hidden": {
+              "team": [
+                "theatricality",
+                "coercion",
+                "invariance",
+                "socialization",
+                "involvement",
+                "desirability",
+                "contrary",
+                "generality",
+                "damnation"
+              ],
+              "innocent": [
+                "disloyalty",
+                "purposefulness",
+                "malice",
+                "lenience",
+                "symbolism",
+                "politeness",
+                "predominance"
+              ],
+              "opponent": [
+                "faithlessness",
+                "reluctance",
+                "viciousness",
+                "passivism",
+                "infallibility",
+                "tradition",
+                "integrity",
+                "version"
+              ],
+              "assassin": [
+                "intangibility"
+              ]
+            },
+            "revealed": {
+              "team": {
+                "team": [],
+                "innocent": [],
+                "opponent": [],
+                "assassin": []
+              },
+              "opponent": {
+                "team": [],
+                "innocent": [],
+                "opponent": [],
+                "assassin": []
+              }
+            }
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 1",
+        "timestamp": "2026-07-09T07:51:43.551035",
+        "action": {
+          "type": "send message",
+          "content": "Provide one single-word clue that relates to some of your team's words from the list below. You can choose to how many and to which words your clue relates to.\nThe goal is to have your partner guess all of your team's words based on the clues you give them, before the other team has uncovered all of theirs. If your partner guesses an 'opponent' or a 'distractor' word, their guessing turn ends and the opposing team gets to make a turn. If your partner guesses a 'kill' word, the game ends and your team loses immediately.\nThe more words your clue relates to, the quicker you can win the game, but the harder the associations may be to guess for your partner, so choose your clue word wisely. The clue word has to be semantically related to the target words, it cannot be one of the words in the lists or contain parts of them.\n\nAlways give your single-word clue and your comma-separated list of related target words in the following format and make your answers as short as possible, never include any other text than is required in this form:\n\nCLUE: <WORD>\nTARGETS: <TARGETS>\n\nYour team words are: theatricality, coercion, invariance, socialization, involvement, desirability, contrary, generality, damnation.\nYour opponent's team words are: faithlessness, reluctance, viciousness, passivism, infallibility, tradition, integrity, version.\nDistractor words are: disloyalty, purposefulness, malice, lenience, symbolism, politeness, predominance.\nThe kill words are: intangibility.",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 1",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:51:43.551052",
+        "action": {
+          "type": "get message",
+          "content": "CLUE: drama\nTARGETS: theatricality, invariance, desirability",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:51:43.551232",
+        "action": {
+          "type": "clue",
+          "content": "drama"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:51:43.551254",
+        "action": {
+          "type": "targets",
+          "content": [
+            "theatricality",
+            "invariance",
+            "desirability"
+          ]
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:51:43.551275",
+        "action": {
+          "type": "word targeted",
+          "content": {
+            "word": "theatricality",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:51:43.551294",
+        "action": {
+          "type": "word targeted",
+          "content": {
+            "word": "invariance",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:51:43.551312",
+        "action": {
+          "type": "word targeted",
+          "content": {
+            "word": "desirability",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 2",
+        "timestamp": "2026-07-09T07:52:00.755024",
+        "action": {
+          "type": "send message",
+          "content": "Provide a comma-separated list of up to 3 words from the following list that best relate or are most closely associated with the word 'drama'. Always start your list of guess(es) with 'GUESS: ' and do not include any other text in your answer.\n\npoliteness, desirability, generality, coercion, passivism, tradition, viciousness, involvement, predominance, lenience, contrary, theatricality, version, disloyalty, faithlessness, malice, reluctance, purposefulness, intangibility, socialization, damnation, infallibility, invariance, symbolism, integrity",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 2",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:52:00.755040",
+        "action": {
+          "type": "get message",
+          "content": "GUESS: theatricality, symbolism, intangibility",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:52:00.755091",
+        "action": {
+          "type": "guesses",
+          "content": [
+            "theatricality",
+            "symbolism",
+            "intangibility"
+          ]
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:52:00.755116",
+        "action": {
+          "type": "team revealed",
+          "content": {
+            "word": "theatricality",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:52:00.755137",
+        "action": {
+          "type": "target revealed",
+          "content": {
+            "word": "theatricality",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:52:00.755157",
+        "action": {
+          "type": "team revealed",
+          "content": {
+            "word": "symbolism",
+            "assignment": "innocent"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:52:00.755175",
+        "action": {
+          "type": "turn end after",
+          "content": "symbolism"
+        }
+      }
+    ],
+    [
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:52:00.755307",
+        "action": {
+          "type": "opponent revealed",
+          "content": {
+            "word": "reluctance",
+            "assignment": "opponent"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:52:00.755334",
+        "action": {
+          "type": "board status",
+          "content": {
+            "hidden": {
+              "team": [
+                "coercion",
+                "invariance",
+                "socialization",
+                "involvement",
+                "desirability",
+                "contrary",
+                "generality",
+                "damnation"
+              ],
+              "innocent": [
+                "disloyalty",
+                "purposefulness",
+                "malice",
+                "lenience",
+                "politeness",
+                "predominance"
+              ],
+              "opponent": [
+                "faithlessness",
+                "viciousness",
+                "passivism",
+                "infallibility",
+                "tradition",
+                "integrity",
+                "version"
+              ],
+              "assassin": [
+                "intangibility"
+              ]
+            },
+            "revealed": {
+              "team": {
+                "team": [
+                  "theatricality"
+                ],
+                "innocent": [
+                  "symbolism"
+                ],
+                "opponent": [],
+                "assassin": []
+              },
+              "opponent": {
+                "team": [],
+                "innocent": [],
+                "opponent": [
+                  "reluctance"
+                ],
+                "assassin": []
+              }
+            }
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 1",
+        "timestamp": "2026-07-09T07:52:20.011230",
+        "action": {
+          "type": "send message",
+          "content": "The word theatricality was guessed correctly. The word symbolism was guessed but is an innocent word. Your teammate's turn ended there.\nNow provide another clue relating to some of your remaining team words and a list of the related target words. Remember to start your clue with 'CLUE: ', put a new line, and start your comma-separated list of target words with 'TARGETS: '. Notice: some words have been removed from the lists compared to previous requests.\n\nYour remaining team words are: coercion, invariance, socialization, involvement, desirability, contrary, generality, damnation.\nRemaining words for your opponent are: faithlessness, reluctance, viciousness, passivism, infallibility, tradition, integrity, version.\nRemaining distractor words are: disloyalty, purposefulness, malice, lenience, politeness, predominance.\nRemaining kill words are: intangibility.",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 1",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:52:20.011248",
+        "action": {
+          "type": "get message",
+          "content": "CLUE: law\nTARGETS: coercion, invariance, generality",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:52:20.011450",
+        "action": {
+          "type": "clue",
+          "content": "law"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:52:20.011472",
+        "action": {
+          "type": "targets",
+          "content": [
+            "coercion",
+            "invariance",
+            "generality"
+          ]
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:52:20.011493",
+        "action": {
+          "type": "word targeted",
+          "content": {
+            "word": "coercion",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:52:20.011512",
+        "action": {
+          "type": "word targeted",
+          "content": {
+            "word": "invariance",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:52:20.011530",
+        "action": {
+          "type": "word targeted",
+          "content": {
+            "word": "generality",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 2",
+        "timestamp": "2026-07-09T07:52:32.974238",
+        "action": {
+          "type": "send message",
+          "content": "The word theatricality was guessed correctly. The word symbolism was guessed but is an innocent word. Your turn ended there.\nNow provide another comma-separated list of at least 1 and up to 3 words from the following list of words that best relate or are most closely associated with the word 'law'. Remember to start your answer with 'GUESS: '. Notice: some words have been removed from the list compared to previous requests.\n\npoliteness, desirability, generality, coercion, passivism, tradition, viciousness, involvement, predominance, lenience, contrary, version, disloyalty, faithlessness, malice, purposefulness, intangibility, socialization, damnation, infallibility, invariance, integrity",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 2",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:52:32.974254",
+        "action": {
+          "type": "get message",
+          "content": "GUESS: coercion, integrity, tradition",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:52:32.974313",
+        "action": {
+          "type": "guesses",
+          "content": [
+            "coercion",
+            "integrity",
+            "tradition"
+          ]
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:52:32.974338",
+        "action": {
+          "type": "team revealed",
+          "content": {
+            "word": "coercion",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:52:32.974358",
+        "action": {
+          "type": "target revealed",
+          "content": {
+            "word": "coercion",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:52:32.974378",
+        "action": {
+          "type": "team revealed",
+          "content": {
+            "word": "integrity",
+            "assignment": "opponent"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:52:32.974397",
+        "action": {
+          "type": "turn end after",
+          "content": "integrity"
+        }
+      }
+    ],
+    [
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:52:32.974525",
+        "action": {
+          "type": "opponent revealed",
+          "content": {
+            "word": "tradition",
+            "assignment": "opponent"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:52:32.974552",
+        "action": {
+          "type": "board status",
+          "content": {
+            "hidden": {
+              "team": [
+                "invariance",
+                "socialization",
+                "involvement",
+                "desirability",
+                "contrary",
+                "generality",
+                "damnation"
+              ],
+              "innocent": [
+                "disloyalty",
+                "purposefulness",
+                "malice",
+                "lenience",
+                "politeness",
+                "predominance"
+              ],
+              "opponent": [
+                "faithlessness",
+                "viciousness",
+                "passivism",
+                "infallibility",
+                "version"
+              ],
+              "assassin": [
+                "intangibility"
+              ]
+            },
+            "revealed": {
+              "team": {
+                "team": [
+                  "theatricality",
+                  "coercion"
+                ],
+                "innocent": [
+                  "symbolism"
+                ],
+                "opponent": [
+                  "integrity"
+                ],
+                "assassin": []
+              },
+              "opponent": {
+                "team": [],
+                "innocent": [],
+                "opponent": [
+                  "reluctance",
+                  "tradition"
+                ],
+                "assassin": []
+              }
+            }
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 1",
+        "timestamp": "2026-07-09T07:52:49.774272",
+        "action": {
+          "type": "send message",
+          "content": "The word coercion was guessed correctly. The word integrity was guessed but is an opponent word. Your teammate's turn ended there.\nNow provide another clue relating to some of your remaining team words and a list of the related target words. Remember to start your clue with 'CLUE: ', put a new line, and start your comma-separated list of target words with 'TARGETS: '. Notice: some words have been removed from the lists compared to previous requests.\n\nYour remaining team words are: invariance, socialization, involvement, desirability, contrary, generality, damnation.\nRemaining words for your opponent are: faithlessness, viciousness, passivism, infallibility, tradition, version.\nRemaining distractor words are: disloyalty, purposefulness, malice, lenience, politeness, predominance.\nRemaining kill words are: intangibility.",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 1",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:52:49.774290",
+        "action": {
+          "type": "get message",
+          "content": "CLUE: change\nTARGETS: invariance, contrary, desirability",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:52:49.774465",
+        "action": {
+          "type": "clue",
+          "content": "change"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:52:49.774488",
+        "action": {
+          "type": "targets",
+          "content": [
+            "invariance",
+            "contrary",
+            "desirability"
+          ]
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:52:49.774508",
+        "action": {
+          "type": "word targeted",
+          "content": {
+            "word": "invariance",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:52:49.774527",
+        "action": {
+          "type": "word targeted",
+          "content": {
+            "word": "contrary",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:52:49.774545",
+        "action": {
+          "type": "word targeted",
+          "content": {
+            "word": "desirability",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 2",
+        "timestamp": "2026-07-09T07:53:00.316329",
+        "action": {
+          "type": "send message",
+          "content": "The word coercion was guessed correctly. The word integrity was guessed but is an opponent word. Your turn ended there.\nNow provide another comma-separated list of at least 1 and up to 3 words from the following list of words that best relate or are most closely associated with the word 'change'. Remember to start your answer with 'GUESS: '. Notice: some words have been removed from the list compared to previous requests.\n\npoliteness, desirability, generality, passivism, viciousness, involvement, predominance, lenience, contrary, version, disloyalty, faithlessness, malice, purposefulness, intangibility, socialization, damnation, infallibility, invariance",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 2",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:53:00.316348",
+        "action": {
+          "type": "get message",
+          "content": "GUESS: version, contrary, invariance",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:53:00.316411",
+        "action": {
+          "type": "guesses",
+          "content": [
+            "version",
+            "contrary",
+            "invariance"
+          ]
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:53:00.316438",
+        "action": {
+          "type": "team revealed",
+          "content": {
+            "word": "version",
+            "assignment": "opponent"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:53:00.316458",
+        "action": {
+          "type": "turn end after",
+          "content": "version"
+        }
+      }
+    ],
+    [
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:53:00.316604",
+        "action": {
+          "type": "opponent revealed",
+          "content": {
+            "word": "infallibility",
+            "assignment": "opponent"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:53:00.316632",
+        "action": {
+          "type": "board status",
+          "content": {
+            "hidden": {
+              "team": [
+                "invariance",
+                "socialization",
+                "involvement",
+                "desirability",
+                "contrary",
+                "generality",
+                "damnation"
+              ],
+              "innocent": [
+                "disloyalty",
+                "purposefulness",
+                "malice",
+                "lenience",
+                "politeness",
+                "predominance"
+              ],
+              "opponent": [
+                "faithlessness",
+                "viciousness",
+                "passivism"
+              ],
+              "assassin": [
+                "intangibility"
+              ]
+            },
+            "revealed": {
+              "team": {
+                "team": [
+                  "theatricality",
+                  "coercion"
+                ],
+                "innocent": [
+                  "symbolism"
+                ],
+                "opponent": [
+                  "integrity",
+                  "version"
+                ],
+                "assassin": []
+              },
+              "opponent": {
+                "team": [],
+                "innocent": [],
+                "opponent": [
+                  "reluctance",
+                  "tradition",
+                  "infallibility"
+                ],
+                "assassin": []
+              }
+            }
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 1",
+        "timestamp": "2026-07-09T07:53:12.185536",
+        "action": {
+          "type": "send message",
+          "content": "The word version was guessed but is an opponent word. Your teammate's turn ended there.\nNow provide another clue relating to some of your remaining team words and a list of the related target words. Remember to start your clue with 'CLUE: ', put a new line, and start your comma-separated list of target words with 'TARGETS: '. Notice: some words have been removed from the lists compared to previous requests.\n\nYour remaining team words are: invariance, socialization, involvement, desirability, contrary, generality, damnation.\nRemaining words for your opponent are: faithlessness, viciousness, passivism, infallibility.\nRemaining distractor words are: disloyalty, purposefulness, malice, lenience, politeness, predominance.\nRemaining kill words are: intangibility.",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 1",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:53:12.185554",
+        "action": {
+          "type": "get message",
+          "content": "CLUE: society\nTARGETS: socialization, desirability, generality",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:53:12.185700",
+        "action": {
+          "type": "clue",
+          "content": "society"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:53:12.185723",
+        "action": {
+          "type": "targets",
+          "content": [
+            "socialization",
+            "desirability",
+            "generality"
+          ]
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:53:12.185744",
+        "action": {
+          "type": "word targeted",
+          "content": {
+            "word": "socialization",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:53:12.185764",
+        "action": {
+          "type": "word targeted",
+          "content": {
+            "word": "desirability",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:53:12.185782",
+        "action": {
+          "type": "word targeted",
+          "content": {
+            "word": "generality",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 2",
+        "timestamp": "2026-07-09T07:53:21.798202",
+        "action": {
+          "type": "send message",
+          "content": "The word version was guessed but is an opponent word. Your turn ended there.\nNow provide another comma-separated list of at least 1 and up to 3 words from the following list of words that best relate or are most closely associated with the word 'society'. Remember to start your answer with 'GUESS: '. Notice: some words have been removed from the list compared to previous requests.\n\npoliteness, desirability, generality, passivism, viciousness, involvement, predominance, lenience, contrary, disloyalty, faithlessness, malice, purposefulness, intangibility, socialization, damnation, invariance",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 2",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:53:21.798220",
+        "action": {
+          "type": "get message",
+          "content": "GUESS: socialization, involvement, predominance",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:53:21.798309",
+        "action": {
+          "type": "guesses",
+          "content": [
+            "socialization",
+            "involvement",
+            "predominance"
+          ]
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:53:21.798349",
+        "action": {
+          "type": "team revealed",
+          "content": {
+            "word": "socialization",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:53:21.798372",
+        "action": {
+          "type": "target revealed",
+          "content": {
+            "word": "socialization",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:53:21.798393",
+        "action": {
+          "type": "team revealed",
+          "content": {
+            "word": "involvement",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:53:21.798413",
+        "action": {
+          "type": "team revealed",
+          "content": {
+            "word": "predominance",
+            "assignment": "innocent"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:53:21.798431",
+        "action": {
+          "type": "turn end after",
+          "content": "predominance"
+        }
+      }
+    ],
+    [
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:53:21.798715",
+        "action": {
+          "type": "opponent revealed",
+          "content": {
+            "word": "passivism",
+            "assignment": "opponent"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:53:21.798744",
+        "action": {
+          "type": "board status",
+          "content": {
+            "hidden": {
+              "team": [
+                "invariance",
+                "desirability",
+                "contrary",
+                "generality",
+                "damnation"
+              ],
+              "innocent": [
+                "disloyalty",
+                "purposefulness",
+                "malice",
+                "lenience",
+                "politeness"
+              ],
+              "opponent": [
+                "faithlessness",
+                "viciousness"
+              ],
+              "assassin": [
+                "intangibility"
+              ]
+            },
+            "revealed": {
+              "team": {
+                "team": [
+                  "theatricality",
+                  "coercion",
+                  "socialization",
+                  "involvement"
+                ],
+                "innocent": [
+                  "symbolism",
+                  "predominance"
+                ],
+                "opponent": [
+                  "integrity",
+                  "version"
+                ],
+                "assassin": []
+              },
+              "opponent": {
+                "team": [],
+                "innocent": [],
+                "opponent": [
+                  "reluctance",
+                  "tradition",
+                  "infallibility",
+                  "passivism"
+                ],
+                "assassin": []
+              }
+            }
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 1",
+        "timestamp": "2026-07-09T07:53:31.929141",
+        "action": {
+          "type": "send message",
+          "content": "The words socialization, involvement were guessed correctly. The word predominance was guessed but is an innocent word. Your teammate's turn ended there.\nNow provide another clue relating to some of your remaining team words and a list of the related target words. Remember to start your clue with 'CLUE: ', put a new line, and start your comma-separated list of target words with 'TARGETS: '. Notice: some words have been removed from the lists compared to previous requests.\n\nYour remaining team words are: invariance, desirability, contrary, generality, damnation.\nRemaining words for your opponent are: faithlessness, viciousness, passivism.\nRemaining distractor words are: disloyalty, purposefulness, malice, lenience, politeness.\nRemaining kill words are: intangibility.",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 1",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:53:31.929161",
+        "action": {
+          "type": "get message",
+          "content": "CLUE: opposite\nTARGETS: contrary, invariance",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:53:31.929343",
+        "action": {
+          "type": "clue",
+          "content": "opposite"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:53:31.929372",
+        "action": {
+          "type": "targets",
+          "content": [
+            "contrary",
+            "invariance"
+          ]
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:53:31.929395",
+        "action": {
+          "type": "word targeted",
+          "content": {
+            "word": "contrary",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:53:31.929415",
+        "action": {
+          "type": "word targeted",
+          "content": {
+            "word": "invariance",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 2",
+        "timestamp": "2026-07-09T07:53:39.038701",
+        "action": {
+          "type": "send message",
+          "content": "The words socialization, involvement were guessed correctly. The word predominance was guessed but is an innocent word. Your turn ended there.\nNow provide another comma-separated list of at least 1 and up to 2 words from the following list of words that best relate or are most closely associated with the word 'opposite'. Remember to start your answer with 'GUESS: '. Notice: some words have been removed from the list compared to previous requests.\n\npoliteness, desirability, generality, viciousness, lenience, contrary, disloyalty, faithlessness, malice, purposefulness, intangibility, damnation, invariance",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 2",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:53:39.038717",
+        "action": {
+          "type": "get message",
+          "content": "GUESS: contrary, malice",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:53:39.038766",
+        "action": {
+          "type": "guesses",
+          "content": [
+            "contrary",
+            "malice"
+          ]
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:53:39.038792",
+        "action": {
+          "type": "team revealed",
+          "content": {
+            "word": "contrary",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:53:39.038813",
+        "action": {
+          "type": "target revealed",
+          "content": {
+            "word": "contrary",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:53:39.038833",
+        "action": {
+          "type": "team revealed",
+          "content": {
+            "word": "malice",
+            "assignment": "innocent"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:53:39.038851",
+        "action": {
+          "type": "turn end after",
+          "content": "malice"
+        }
+      }
+    ],
+    [
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:53:39.038986",
+        "action": {
+          "type": "opponent revealed",
+          "content": {
+            "word": "faithlessness",
+            "assignment": "opponent"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:53:39.039013",
+        "action": {
+          "type": "board status",
+          "content": {
+            "hidden": {
+              "team": [
+                "invariance",
+                "desirability",
+                "generality",
+                "damnation"
+              ],
+              "innocent": [
+                "disloyalty",
+                "purposefulness",
+                "lenience",
+                "politeness"
+              ],
+              "opponent": [
+                "viciousness"
+              ],
+              "assassin": [
+                "intangibility"
+              ]
+            },
+            "revealed": {
+              "team": {
+                "team": [
+                  "theatricality",
+                  "coercion",
+                  "socialization",
+                  "involvement",
+                  "contrary"
+                ],
+                "innocent": [
+                  "symbolism",
+                  "predominance",
+                  "malice"
+                ],
+                "opponent": [
+                  "integrity",
+                  "version"
+                ],
+                "assassin": []
+              },
+              "opponent": {
+                "team": [],
+                "innocent": [],
+                "opponent": [
+                  "reluctance",
+                  "tradition",
+                  "infallibility",
+                  "passivism",
+                  "faithlessness"
+                ],
+                "assassin": []
+              }
+            }
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 1",
+        "timestamp": "2026-07-09T07:53:47.575990",
+        "action": {
+          "type": "send message",
+          "content": "The word contrary was guessed correctly. The word malice was guessed but is an innocent word. Your teammate's turn ended there.\nNow provide another clue relating to some of your remaining team words and a list of the related target words. Remember to start your clue with 'CLUE: ', put a new line, and start your comma-separated list of target words with 'TARGETS: '. Notice: some words have been removed from the lists compared to previous requests.\n\nYour remaining team words are: invariance, desirability, generality, damnation.\nRemaining words for your opponent are: faithlessness, viciousness.\nRemaining distractor words are: disloyalty, purposefulness, lenience, politeness.\nRemaining kill words are: intangibility.",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 1",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:53:47.576011",
+        "action": {
+          "type": "get message",
+          "content": "CLUE: fate\nTARGETS: invariance, damnation",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:53:47.576136",
+        "action": {
+          "type": "clue",
+          "content": "fate"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:53:47.576160",
+        "action": {
+          "type": "targets",
+          "content": [
+            "invariance",
+            "damnation"
+          ]
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:53:47.576182",
+        "action": {
+          "type": "word targeted",
+          "content": {
+            "word": "invariance",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:53:47.576201",
+        "action": {
+          "type": "word targeted",
+          "content": {
+            "word": "damnation",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 2",
+        "timestamp": "2026-07-09T07:53:53.717084",
+        "action": {
+          "type": "send message",
+          "content": "The word contrary was guessed correctly. The word malice was guessed but is an innocent word. Your turn ended there.\nNow provide another comma-separated list of at least 1 and up to 2 words from the following list of words that best relate or are most closely associated with the word 'fate'. Remember to start your answer with 'GUESS: '. Notice: some words have been removed from the list compared to previous requests.\n\npoliteness, desirability, generality, viciousness, lenience, disloyalty, purposefulness, intangibility, damnation, invariance",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 2",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:53:53.717117",
+        "action": {
+          "type": "get message",
+          "content": "GUESS: damnation, invariance",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:53:53.717207",
+        "action": {
+          "type": "guesses",
+          "content": [
+            "damnation",
+            "invariance"
+          ]
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:53:53.717253",
+        "action": {
+          "type": "team revealed",
+          "content": {
+            "word": "damnation",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:53:53.717288",
+        "action": {
+          "type": "target revealed",
+          "content": {
+            "word": "damnation",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:53:53.717321",
+        "action": {
+          "type": "team revealed",
+          "content": {
+            "word": "invariance",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:53:53.717350",
+        "action": {
+          "type": "target revealed",
+          "content": {
+            "word": "invariance",
+            "assignment": "team"
+          }
+        }
+      }
+    ],
+    [
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:53:53.717528",
+        "action": {
+          "type": "opponent revealed",
+          "content": {
+            "word": "viciousness",
+            "assignment": "opponent"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:53:53.717555",
+        "action": {
+          "type": "board status",
+          "content": {
+            "hidden": {
+              "team": [
+                "desirability",
+                "generality"
+              ],
+              "innocent": [
+                "disloyalty",
+                "purposefulness",
+                "lenience",
+                "politeness"
+              ],
+              "opponent": [],
+              "assassin": [
+                "intangibility"
+              ]
+            },
+            "revealed": {
+              "team": {
+                "team": [
+                  "theatricality",
+                  "coercion",
+                  "socialization",
+                  "involvement",
+                  "contrary",
+                  "damnation",
+                  "invariance"
+                ],
+                "innocent": [
+                  "symbolism",
+                  "predominance",
+                  "malice"
+                ],
+                "opponent": [
+                  "integrity",
+                  "version"
+                ],
+                "assassin": []
+              },
+              "opponent": {
+                "team": [],
+                "innocent": [],
+                "opponent": [
+                  "reluctance",
+                  "tradition",
+                  "infallibility",
+                  "passivism",
+                  "faithlessness",
+                  "viciousness"
+                ],
+                "assassin": []
+              }
+            }
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 1",
+        "timestamp": "2026-07-09T07:53:59.799315",
+        "action": {
+          "type": "send message",
+          "content": "The words damnation, invariance were guessed correctly. Your teammate's turn ended there.\nNow provide another clue relating to some of your remaining team words and a list of the related target words. Remember to start your clue with 'CLUE: ', put a new line, and start your comma-separated list of target words with 'TARGETS: '. Notice: some words have been removed from the lists compared to previous requests.\n\nYour remaining team words are: desirability, generality.\nRemaining words for your opponent are: viciousness.\nRemaining distractor words are: disloyalty, purposefulness, lenience, politeness.\nRemaining kill words are: intangibility.",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 1",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:53:59.799333",
+        "action": {
+          "type": "get message",
+          "content": "CLUE: broad\nTARGETS: generality, desirability",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:53:59.799437",
+        "action": {
+          "type": "clue",
+          "content": "broad"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:53:59.799459",
+        "action": {
+          "type": "targets",
+          "content": [
+            "generality",
+            "desirability"
+          ]
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:53:59.799480",
+        "action": {
+          "type": "word targeted",
+          "content": {
+            "word": "generality",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:53:59.799499",
+        "action": {
+          "type": "word targeted",
+          "content": {
+            "word": "desirability",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:53:59.799592",
+        "action": {
+          "type": "game end",
+          "content": "opponent has won"
+        }
+      }
+    ]
+  ],
+  "board end status": {
+    "hidden": {
+      "team": [
+        "desirability",
+        "generality"
+      ],
+      "innocent": [
+        "disloyalty",
+        "purposefulness",
+        "lenience",
+        "politeness"
+      ],
+      "opponent": [],
+      "assassin": [
+        "intangibility"
+      ]
+    },
+    "revealed": {
+      "team": {
+        "team": [
+          "theatricality",
+          "coercion",
+          "socialization",
+          "involvement",
+          "contrary",
+          "damnation",
+          "invariance"
+        ],
+        "innocent": [
+          "symbolism",
+          "predominance",
+          "malice"
+        ],
+        "opponent": [
+          "integrity",
+          "version"
+        ],
+        "assassin": []
+      },
+      "opponent": {
+        "team": [],
+        "innocent": [],
+        "opponent": [
+          "reluctance",
+          "tradition",
+          "infallibility",
+          "passivism",
+          "faithlessness",
+          "viciousness"
+        ],
+        "assassin": []
+      }
+    }
+  },
+  "Number of turns": 7,
+  "Aborted": false,
+  "Lose": true,
+  "Game ended through assassin": false,
+  "Request Count": 13,
+  "Parsed Request Count": 13,
+  "Violated Request Count": 0,
+  "Cluegiver engaged flags": {
+    "IGNORE RAMBLING": 0,
+    "IGNORE FALSE TARGETS OR GUESSES": 0,
+    "REPROMPT ON ERROR": 0,
+    "STRIP WORDS": 0,
+    "IGNORE NUMBER OF TARGETS": 0
+  },
+  "Guesser engaged flags": {
+    "IGNORE RAMBLING": 0,
+    "IGNORE FALSE TARGETS OR GUESSES": 0,
+    "REPROMPT ON ERROR": 0,
+    "STRIP WORDS": 0,
+    "IGNORE NUMBER OF TARGETS": 0
+  }
+}

@@ -1,0 +1,1792 @@
+{
+  "meta": {
+    "game_name": "codenames",
+    "experiment_name": "association_difficult",
+    "game_id": 0,
+    "results_folder": "CityUoL__qwen3.5-2b__Qwen-GuidePlay-2B-v1",
+    "clem_version": "3.7.2",
+    "round_count": 9,
+    "completed": true
+  },
+  "player_models": {
+    "0": {
+      "model_spec": {
+        "model_name": "CityUoL__qwen3.5-2b__Qwen-GuidePlay-2B-v1",
+        "_team": "CityUoL",
+        "_version": "Qwen-GuidePlay-2B-v1",
+        "backend": "huggingface_local",
+        "context_size": "262k",
+        "huggingface_id": "syedhuq/qwen-guideplay-2b",
+        "languages": [
+          "en"
+        ],
+        "license": {
+          "name": "Apache-2.0",
+          "url": "https://www.apache.org/licenses/LICENSE-2.0"
+        },
+        "lookup_source": "/project/mmanina/lm-playschool-test-set/playpen/model_registry.json",
+        "model_config": {
+          "premade_chat_template": true,
+          "eos_to_cull": "<\\|im_end\\|>|<\\|endoftext\\|>",
+          "chat_template_kwargs": {
+            "enable_thinking": false
+          },
+          "multimodality": {
+            "single_image": true,
+            "multiple_images": true,
+            "audio": false,
+            "video": true
+          }
+        },
+        "open_weight": true,
+        "parameters": "2B",
+        "release_date": "2026-07-06"
+      },
+      "gen_args": {
+        "temperature": 0.0,
+        "max_tokens": 5000
+      }
+    }
+  },
+  "players": {
+    "GM": {
+      "game_role": "Game Master",
+      "model_name": "programmatic"
+    },
+    "Player 1": {
+      "game_role": "ClueGiver",
+      "model_name": "CityUoL__qwen3.5-2b__Qwen-GuidePlay-2B-v1"
+    },
+    "Player 2": {
+      "game_role": "Guesser",
+      "model_name": "CityUoL__qwen3.5-2b__Qwen-GuidePlay-2B-v1"
+    }
+  },
+  "turns": [
+    [
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:51:17.581846",
+        "action": {
+          "type": "board status",
+          "content": {
+            "hidden": {
+              "team": [
+                "elephant",
+                "martini",
+                "day",
+                "gin",
+                "private",
+                "bluegrass",
+                "car",
+                "hippopotamus",
+                "tongs"
+              ],
+              "innocent": [
+                "nanosecond",
+                "legos",
+                "grater",
+                "football",
+                "corporal",
+                "rap",
+                "alternative"
+              ],
+              "opponent": [
+                "gun",
+                "week",
+                "running",
+                "blues",
+                "month",
+                "pot",
+                "major",
+                "whisk"
+              ],
+              "assassin": [
+                "hockey"
+              ]
+            },
+            "revealed": {
+              "team": {
+                "team": [],
+                "innocent": [],
+                "opponent": [],
+                "assassin": []
+              },
+              "opponent": {
+                "team": [],
+                "innocent": [],
+                "opponent": [],
+                "assassin": []
+              }
+            }
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 1",
+        "timestamp": "2026-07-09T07:51:27.956923",
+        "action": {
+          "type": "send message",
+          "content": "Provide one single-word clue that relates to some of your team's words from the list below. You can choose to how many and to which words your clue relates to.\nThe goal is to have your partner guess all of your team's words based on the clues you give them, before the other team has uncovered all of theirs. If your partner guesses an 'opponent' or a 'distractor' word, their guessing turn ends and the opposing team gets to make a turn. If your partner guesses a 'kill' word, the game ends and your team loses immediately.\nThe more words your clue relates to, the quicker you can win the game, but the harder the associations may be to guess for your partner, so choose your clue word wisely. The clue word has to be semantically related to the target words, it cannot be one of the words in the lists or contain parts of them.\n\nAlways give your single-word clue and your comma-separated list of related target words in the following format and make your answers as short as possible, never include any other text than is required in this form:\n\nCLUE: <WORD>\nTARGETS: <TARGETS>\n\nYour team words are: elephant, martini, day, gin, private, bluegrass, car, hippopotamus, tongs.\nYour opponent's team words are: gun, week, running, blues, month, pot, major, whisk.\nDistractor words are: nanosecond, legos, grater, football, corporal, rap, alternative.\nThe kill words are: hockey.",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 1",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:51:27.956940",
+        "action": {
+          "type": "get message",
+          "content": "CLUE: drink\nTARGETS: martini, gin",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:51:27.957124",
+        "action": {
+          "type": "clue",
+          "content": "drink"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:51:27.957147",
+        "action": {
+          "type": "targets",
+          "content": [
+            "martini",
+            "gin"
+          ]
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:51:27.957167",
+        "action": {
+          "type": "word targeted",
+          "content": {
+            "word": "martini",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:51:27.957187",
+        "action": {
+          "type": "word targeted",
+          "content": {
+            "word": "gin",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 2",
+        "timestamp": "2026-07-09T07:51:49.206073",
+        "action": {
+          "type": "send message",
+          "content": "Provide a comma-separated list of up to 2 words from the following list that best relate or are most closely associated with the word 'drink'. Always start your list of guess(es) with 'GUESS: ' and do not include any other text in your answer.\n\nmartini, rap, elephant, month, major, gun, hippopotamus, hockey, grater, gin, car, running, private, tongs, corporal, whisk, blues, day, alternative, week, bluegrass, pot, football, nanosecond, legos",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 2",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:51:49.206089",
+        "action": {
+          "type": "get message",
+          "content": "GUESS: martini, gin",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:51:49.206140",
+        "action": {
+          "type": "guesses",
+          "content": [
+            "martini",
+            "gin"
+          ]
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:51:49.206165",
+        "action": {
+          "type": "team revealed",
+          "content": {
+            "word": "martini",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:51:49.206186",
+        "action": {
+          "type": "target revealed",
+          "content": {
+            "word": "martini",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:51:49.206206",
+        "action": {
+          "type": "team revealed",
+          "content": {
+            "word": "gin",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:51:49.206225",
+        "action": {
+          "type": "target revealed",
+          "content": {
+            "word": "gin",
+            "assignment": "team"
+          }
+        }
+      }
+    ],
+    [
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:51:49.206340",
+        "action": {
+          "type": "opponent revealed",
+          "content": {
+            "word": "running",
+            "assignment": "opponent"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:51:49.206367",
+        "action": {
+          "type": "board status",
+          "content": {
+            "hidden": {
+              "team": [
+                "elephant",
+                "day",
+                "private",
+                "bluegrass",
+                "car",
+                "hippopotamus",
+                "tongs"
+              ],
+              "innocent": [
+                "nanosecond",
+                "legos",
+                "grater",
+                "football",
+                "corporal",
+                "rap",
+                "alternative"
+              ],
+              "opponent": [
+                "gun",
+                "week",
+                "blues",
+                "month",
+                "pot",
+                "major",
+                "whisk"
+              ],
+              "assassin": [
+                "hockey"
+              ]
+            },
+            "revealed": {
+              "team": {
+                "team": [
+                  "martini",
+                  "gin"
+                ],
+                "innocent": [],
+                "opponent": [],
+                "assassin": []
+              },
+              "opponent": {
+                "team": [],
+                "innocent": [],
+                "opponent": [
+                  "running"
+                ],
+                "assassin": []
+              }
+            }
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 1",
+        "timestamp": "2026-07-09T07:52:06.832875",
+        "action": {
+          "type": "send message",
+          "content": "The words martini, gin were guessed correctly. Your teammate's turn ended there.\nNow provide another clue relating to some of your remaining team words and a list of the related target words. Remember to start your clue with 'CLUE: ', put a new line, and start your comma-separated list of target words with 'TARGETS: '. Notice: some words have been removed from the lists compared to previous requests.\n\nYour remaining team words are: elephant, day, private, bluegrass, car, hippopotamus, tongs.\nRemaining words for your opponent are: gun, week, running, blues, month, pot, major, whisk.\nRemaining distractor words are: nanosecond, legos, grater, football, corporal, rap, alternative.\nRemaining kill words are: hockey.",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 1",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:52:06.832893",
+        "action": {
+          "type": "get message",
+          "content": "CLUE: vehicle\nTARGETS: car",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:52:06.833192",
+        "action": {
+          "type": "clue",
+          "content": "vehicle"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:52:06.833228",
+        "action": {
+          "type": "targets",
+          "content": [
+            "car"
+          ]
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:52:06.833254",
+        "action": {
+          "type": "word targeted",
+          "content": {
+            "word": "car",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 2",
+        "timestamp": "2026-07-09T07:52:23.883665",
+        "action": {
+          "type": "send message",
+          "content": "The words martini, gin were guessed correctly. Your turn ended there.\nNow provide another comma-separated list of at least 1 and up to 1 words from the following list of words that best relate or are most closely associated with the word 'vehicle'. Remember to start your answer with 'GUESS: '. Notice: some words have been removed from the list compared to previous requests.\n\nrap, elephant, month, major, gun, hippopotamus, hockey, grater, car, private, tongs, corporal, whisk, blues, day, alternative, week, bluegrass, pot, football, nanosecond, legos",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 2",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:52:23.883681",
+        "action": {
+          "type": "get message",
+          "content": "GUESS: car",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:52:23.883730",
+        "action": {
+          "type": "guesses",
+          "content": [
+            "car"
+          ]
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:52:23.883753",
+        "action": {
+          "type": "team revealed",
+          "content": {
+            "word": "car",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:52:23.883773",
+        "action": {
+          "type": "target revealed",
+          "content": {
+            "word": "car",
+            "assignment": "team"
+          }
+        }
+      }
+    ],
+    [
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:52:23.883914",
+        "action": {
+          "type": "opponent revealed",
+          "content": {
+            "word": "gun",
+            "assignment": "opponent"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:52:23.883941",
+        "action": {
+          "type": "board status",
+          "content": {
+            "hidden": {
+              "team": [
+                "elephant",
+                "day",
+                "private",
+                "bluegrass",
+                "hippopotamus",
+                "tongs"
+              ],
+              "innocent": [
+                "nanosecond",
+                "legos",
+                "grater",
+                "football",
+                "corporal",
+                "rap",
+                "alternative"
+              ],
+              "opponent": [
+                "week",
+                "blues",
+                "month",
+                "pot",
+                "major",
+                "whisk"
+              ],
+              "assassin": [
+                "hockey"
+              ]
+            },
+            "revealed": {
+              "team": {
+                "team": [
+                  "martini",
+                  "gin",
+                  "car"
+                ],
+                "innocent": [],
+                "opponent": [],
+                "assassin": []
+              },
+              "opponent": {
+                "team": [],
+                "innocent": [],
+                "opponent": [
+                  "running",
+                  "gun"
+                ],
+                "assassin": []
+              }
+            }
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 1",
+        "timestamp": "2026-07-09T07:52:36.977597",
+        "action": {
+          "type": "send message",
+          "content": "The word car was guessed correctly. Your teammate's turn ended there.\nNow provide another clue relating to some of your remaining team words and a list of the related target words. Remember to start your clue with 'CLUE: ', put a new line, and start your comma-separated list of target words with 'TARGETS: '. Notice: some words have been removed from the lists compared to previous requests.\n\nYour remaining team words are: elephant, day, private, bluegrass, hippopotamus, tongs.\nRemaining words for your opponent are: gun, week, blues, month, pot, major, whisk.\nRemaining distractor words are: nanosecond, legos, grater, football, corporal, rap, alternative.\nRemaining kill words are: hockey.",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 1",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:52:36.977615",
+        "action": {
+          "type": "get message",
+          "content": "CLUE: animal\nTARGETS: elephant, hippopotamus",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:52:36.977792",
+        "action": {
+          "type": "clue",
+          "content": "animal"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:52:36.977815",
+        "action": {
+          "type": "targets",
+          "content": [
+            "elephant",
+            "hippopotamus"
+          ]
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:52:36.977836",
+        "action": {
+          "type": "word targeted",
+          "content": {
+            "word": "elephant",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:52:36.977856",
+        "action": {
+          "type": "word targeted",
+          "content": {
+            "word": "hippopotamus",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 2",
+        "timestamp": "2026-07-09T07:52:52.535900",
+        "action": {
+          "type": "send message",
+          "content": "The word car was guessed correctly. Your turn ended there.\nNow provide another comma-separated list of at least 1 and up to 2 words from the following list of words that best relate or are most closely associated with the word 'animal'. Remember to start your answer with 'GUESS: '. Notice: some words have been removed from the list compared to previous requests.\n\nrap, elephant, month, major, hippopotamus, hockey, grater, private, tongs, corporal, whisk, blues, day, alternative, week, bluegrass, pot, football, nanosecond, legos",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 2",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:52:52.535916",
+        "action": {
+          "type": "get message",
+          "content": "GUESS: elephant, hippopotamus",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:52:52.535967",
+        "action": {
+          "type": "guesses",
+          "content": [
+            "elephant",
+            "hippopotamus"
+          ]
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:52:52.535990",
+        "action": {
+          "type": "team revealed",
+          "content": {
+            "word": "elephant",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:52:52.536011",
+        "action": {
+          "type": "target revealed",
+          "content": {
+            "word": "elephant",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:52:52.536031",
+        "action": {
+          "type": "team revealed",
+          "content": {
+            "word": "hippopotamus",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:52:52.536049",
+        "action": {
+          "type": "target revealed",
+          "content": {
+            "word": "hippopotamus",
+            "assignment": "team"
+          }
+        }
+      }
+    ],
+    [
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:52:52.536163",
+        "action": {
+          "type": "opponent revealed",
+          "content": {
+            "word": "major",
+            "assignment": "opponent"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:52:52.536190",
+        "action": {
+          "type": "board status",
+          "content": {
+            "hidden": {
+              "team": [
+                "day",
+                "private",
+                "bluegrass",
+                "tongs"
+              ],
+              "innocent": [
+                "nanosecond",
+                "legos",
+                "grater",
+                "football",
+                "corporal",
+                "rap",
+                "alternative"
+              ],
+              "opponent": [
+                "week",
+                "blues",
+                "month",
+                "pot",
+                "whisk"
+              ],
+              "assassin": [
+                "hockey"
+              ]
+            },
+            "revealed": {
+              "team": {
+                "team": [
+                  "martini",
+                  "gin",
+                  "car",
+                  "elephant",
+                  "hippopotamus"
+                ],
+                "innocent": [],
+                "opponent": [],
+                "assassin": []
+              },
+              "opponent": {
+                "team": [],
+                "innocent": [],
+                "opponent": [
+                  "running",
+                  "gun",
+                  "major"
+                ],
+                "assassin": []
+              }
+            }
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 1",
+        "timestamp": "2026-07-09T07:53:02.980806",
+        "action": {
+          "type": "send message",
+          "content": "The words elephant, hippopotamus were guessed correctly. Your teammate's turn ended there.\nNow provide another clue relating to some of your remaining team words and a list of the related target words. Remember to start your clue with 'CLUE: ', put a new line, and start your comma-separated list of target words with 'TARGETS: '. Notice: some words have been removed from the lists compared to previous requests.\n\nYour remaining team words are: day, private, bluegrass, tongs.\nRemaining words for your opponent are: week, blues, month, pot, major, whisk.\nRemaining distractor words are: nanosecond, legos, grater, football, corporal, rap, alternative.\nRemaining kill words are: hockey.",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 1",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:53:02.980826",
+        "action": {
+          "type": "get message",
+          "content": "CLUE: time\nTARGETS: day",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:53:02.980980",
+        "action": {
+          "type": "clue",
+          "content": "time"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:53:02.981003",
+        "action": {
+          "type": "targets",
+          "content": [
+            "day"
+          ]
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:53:02.981024",
+        "action": {
+          "type": "word targeted",
+          "content": {
+            "word": "day",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 2",
+        "timestamp": "2026-07-09T07:53:15.019372",
+        "action": {
+          "type": "send message",
+          "content": "The words elephant, hippopotamus were guessed correctly. Your turn ended there.\nNow provide another comma-separated list of at least 1 and up to 1 words from the following list of words that best relate or are most closely associated with the word 'time'. Remember to start your answer with 'GUESS: '. Notice: some words have been removed from the list compared to previous requests.\n\nrap, month, hockey, grater, private, tongs, corporal, whisk, blues, day, alternative, week, bluegrass, pot, football, nanosecond, legos",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 2",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:53:15.019389",
+        "action": {
+          "type": "get message",
+          "content": "GUESS: day",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:53:15.019460",
+        "action": {
+          "type": "guesses",
+          "content": [
+            "day"
+          ]
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:53:15.019499",
+        "action": {
+          "type": "team revealed",
+          "content": {
+            "word": "day",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:53:15.019521",
+        "action": {
+          "type": "target revealed",
+          "content": {
+            "word": "day",
+            "assignment": "team"
+          }
+        }
+      }
+    ],
+    [
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:53:15.019823",
+        "action": {
+          "type": "opponent revealed",
+          "content": {
+            "word": "whisk",
+            "assignment": "opponent"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:53:15.019853",
+        "action": {
+          "type": "board status",
+          "content": {
+            "hidden": {
+              "team": [
+                "private",
+                "bluegrass",
+                "tongs"
+              ],
+              "innocent": [
+                "nanosecond",
+                "legos",
+                "grater",
+                "football",
+                "corporal",
+                "rap",
+                "alternative"
+              ],
+              "opponent": [
+                "week",
+                "blues",
+                "month",
+                "pot"
+              ],
+              "assassin": [
+                "hockey"
+              ]
+            },
+            "revealed": {
+              "team": {
+                "team": [
+                  "martini",
+                  "gin",
+                  "car",
+                  "elephant",
+                  "hippopotamus",
+                  "day"
+                ],
+                "innocent": [],
+                "opponent": [],
+                "assassin": []
+              },
+              "opponent": {
+                "team": [],
+                "innocent": [],
+                "opponent": [
+                  "running",
+                  "gun",
+                  "major",
+                  "whisk"
+                ],
+                "assassin": []
+              }
+            }
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 1",
+        "timestamp": "2026-07-09T07:53:24.116142",
+        "action": {
+          "type": "send message",
+          "content": "The word day was guessed correctly. Your teammate's turn ended there.\nNow provide another clue relating to some of your remaining team words and a list of the related target words. Remember to start your clue with 'CLUE: ', put a new line, and start your comma-separated list of target words with 'TARGETS: '. Notice: some words have been removed from the lists compared to previous requests.\n\nYour remaining team words are: private, bluegrass, tongs.\nRemaining words for your opponent are: week, blues, month, pot, whisk.\nRemaining distractor words are: nanosecond, legos, grater, football, corporal, rap, alternative.\nRemaining kill words are: hockey.",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 1",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:53:24.116164",
+        "action": {
+          "type": "get message",
+          "content": "CLUE: tool\nTARGETS: tongs",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:53:24.116405",
+        "action": {
+          "type": "clue",
+          "content": "tool"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:53:24.116438",
+        "action": {
+          "type": "targets",
+          "content": [
+            "tongs"
+          ]
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:53:24.116462",
+        "action": {
+          "type": "word targeted",
+          "content": {
+            "word": "tongs",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 2",
+        "timestamp": "2026-07-09T07:53:33.380577",
+        "action": {
+          "type": "send message",
+          "content": "The word day was guessed correctly. Your turn ended there.\nNow provide another comma-separated list of at least 1 and up to 1 words from the following list of words that best relate or are most closely associated with the word 'tool'. Remember to start your answer with 'GUESS: '. Notice: some words have been removed from the list compared to previous requests.\n\nrap, month, hockey, grater, private, tongs, corporal, blues, alternative, week, bluegrass, pot, football, nanosecond, legos",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 2",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:53:33.380596",
+        "action": {
+          "type": "get message",
+          "content": "GUESS: grater",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:53:33.380655",
+        "action": {
+          "type": "guesses",
+          "content": [
+            "grater"
+          ]
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:53:33.380684",
+        "action": {
+          "type": "team revealed",
+          "content": {
+            "word": "grater",
+            "assignment": "innocent"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:53:33.380709",
+        "action": {
+          "type": "turn end after",
+          "content": "grater"
+        }
+      }
+    ],
+    [
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:53:33.380840",
+        "action": {
+          "type": "opponent revealed",
+          "content": {
+            "word": "blues",
+            "assignment": "opponent"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:53:33.380872",
+        "action": {
+          "type": "board status",
+          "content": {
+            "hidden": {
+              "team": [
+                "private",
+                "bluegrass",
+                "tongs"
+              ],
+              "innocent": [
+                "nanosecond",
+                "legos",
+                "football",
+                "corporal",
+                "rap",
+                "alternative"
+              ],
+              "opponent": [
+                "week",
+                "month",
+                "pot"
+              ],
+              "assassin": [
+                "hockey"
+              ]
+            },
+            "revealed": {
+              "team": {
+                "team": [
+                  "martini",
+                  "gin",
+                  "car",
+                  "elephant",
+                  "hippopotamus",
+                  "day"
+                ],
+                "innocent": [
+                  "grater"
+                ],
+                "opponent": [],
+                "assassin": []
+              },
+              "opponent": {
+                "team": [],
+                "innocent": [],
+                "opponent": [
+                  "running",
+                  "gun",
+                  "major",
+                  "whisk",
+                  "blues"
+                ],
+                "assassin": []
+              }
+            }
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 1",
+        "timestamp": "2026-07-09T07:53:40.587591",
+        "action": {
+          "type": "send message",
+          "content": "The word grater was guessed but is an innocent word. Your teammate's turn ended there.\nNow provide another clue relating to some of your remaining team words and a list of the related target words. Remember to start your clue with 'CLUE: ', put a new line, and start your comma-separated list of target words with 'TARGETS: '. Notice: some words have been removed from the lists compared to previous requests.\n\nYour remaining team words are: private, bluegrass, tongs.\nRemaining words for your opponent are: week, blues, month, pot.\nRemaining distractor words are: nanosecond, legos, football, corporal, rap, alternative.\nRemaining kill words are: hockey.",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 1",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:53:40.587607",
+        "action": {
+          "type": "get message",
+          "content": "CLUE: music\nTARGETS: bluegrass",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:53:40.587785",
+        "action": {
+          "type": "clue",
+          "content": "music"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:53:40.587819",
+        "action": {
+          "type": "targets",
+          "content": [
+            "bluegrass"
+          ]
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:53:40.587843",
+        "action": {
+          "type": "word targeted",
+          "content": {
+            "word": "bluegrass",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 2",
+        "timestamp": "2026-07-09T07:53:49.279595",
+        "action": {
+          "type": "send message",
+          "content": "The word grater was guessed but is an innocent word. Your turn ended there.\nNow provide another comma-separated list of at least 1 and up to 1 words from the following list of words that best relate or are most closely associated with the word 'music'. Remember to start your answer with 'GUESS: '. Notice: some words have been removed from the list compared to previous requests.\n\nrap, month, hockey, private, tongs, corporal, alternative, week, bluegrass, pot, football, nanosecond, legos",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 2",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:53:49.279612",
+        "action": {
+          "type": "get message",
+          "content": "GUESS: rap",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:53:49.279686",
+        "action": {
+          "type": "guesses",
+          "content": [
+            "rap"
+          ]
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:53:49.279727",
+        "action": {
+          "type": "team revealed",
+          "content": {
+            "word": "rap",
+            "assignment": "innocent"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:53:49.279751",
+        "action": {
+          "type": "turn end after",
+          "content": "rap"
+        }
+      }
+    ],
+    [
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:53:49.280054",
+        "action": {
+          "type": "opponent revealed",
+          "content": {
+            "word": "month",
+            "assignment": "opponent"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:53:49.280084",
+        "action": {
+          "type": "board status",
+          "content": {
+            "hidden": {
+              "team": [
+                "private",
+                "bluegrass",
+                "tongs"
+              ],
+              "innocent": [
+                "nanosecond",
+                "legos",
+                "football",
+                "corporal",
+                "alternative"
+              ],
+              "opponent": [
+                "week",
+                "pot"
+              ],
+              "assassin": [
+                "hockey"
+              ]
+            },
+            "revealed": {
+              "team": {
+                "team": [
+                  "martini",
+                  "gin",
+                  "car",
+                  "elephant",
+                  "hippopotamus",
+                  "day"
+                ],
+                "innocent": [
+                  "grater",
+                  "rap"
+                ],
+                "opponent": [],
+                "assassin": []
+              },
+              "opponent": {
+                "team": [],
+                "innocent": [],
+                "opponent": [
+                  "running",
+                  "gun",
+                  "major",
+                  "whisk",
+                  "blues",
+                  "month"
+                ],
+                "assassin": []
+              }
+            }
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 1",
+        "timestamp": "2026-07-09T07:53:54.812254",
+        "action": {
+          "type": "send message",
+          "content": "The word rap was guessed but is an innocent word. Your teammate's turn ended there.\nNow provide another clue relating to some of your remaining team words and a list of the related target words. Remember to start your clue with 'CLUE: ', put a new line, and start your comma-separated list of target words with 'TARGETS: '. Notice: some words have been removed from the lists compared to previous requests.\n\nYour remaining team words are: private, bluegrass, tongs.\nRemaining words for your opponent are: week, month, pot.\nRemaining distractor words are: nanosecond, legos, football, corporal, alternative.\nRemaining kill words are: hockey.",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 1",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:53:54.812272",
+        "action": {
+          "type": "get message",
+          "content": "CLUE: weapon\nTARGETS: tongs",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:53:54.812393",
+        "action": {
+          "type": "clue",
+          "content": "weapon"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:53:54.812415",
+        "action": {
+          "type": "targets",
+          "content": [
+            "tongs"
+          ]
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:53:54.812436",
+        "action": {
+          "type": "word targeted",
+          "content": {
+            "word": "tongs",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 2",
+        "timestamp": "2026-07-09T07:54:00.732205",
+        "action": {
+          "type": "send message",
+          "content": "The word rap was guessed but is an innocent word. Your turn ended there.\nNow provide another comma-separated list of at least 1 and up to 1 words from the following list of words that best relate or are most closely associated with the word 'weapon'. Remember to start your answer with 'GUESS: '. Notice: some words have been removed from the list compared to previous requests.\n\nhockey, private, tongs, corporal, alternative, week, bluegrass, pot, football, nanosecond, legos",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 2",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:54:00.732221",
+        "action": {
+          "type": "get message",
+          "content": "GUESS: tongs",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:54:00.732269",
+        "action": {
+          "type": "guesses",
+          "content": [
+            "tongs"
+          ]
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:54:00.732293",
+        "action": {
+          "type": "team revealed",
+          "content": {
+            "word": "tongs",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:54:00.732314",
+        "action": {
+          "type": "target revealed",
+          "content": {
+            "word": "tongs",
+            "assignment": "team"
+          }
+        }
+      }
+    ],
+    [
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:54:00.732460",
+        "action": {
+          "type": "opponent revealed",
+          "content": {
+            "word": "pot",
+            "assignment": "opponent"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:54:00.732488",
+        "action": {
+          "type": "board status",
+          "content": {
+            "hidden": {
+              "team": [
+                "private",
+                "bluegrass"
+              ],
+              "innocent": [
+                "nanosecond",
+                "legos",
+                "football",
+                "corporal",
+                "alternative"
+              ],
+              "opponent": [
+                "week"
+              ],
+              "assassin": [
+                "hockey"
+              ]
+            },
+            "revealed": {
+              "team": {
+                "team": [
+                  "martini",
+                  "gin",
+                  "car",
+                  "elephant",
+                  "hippopotamus",
+                  "day",
+                  "tongs"
+                ],
+                "innocent": [
+                  "grater",
+                  "rap"
+                ],
+                "opponent": [],
+                "assassin": []
+              },
+              "opponent": {
+                "team": [],
+                "innocent": [],
+                "opponent": [
+                  "running",
+                  "gun",
+                  "major",
+                  "whisk",
+                  "blues",
+                  "month",
+                  "pot"
+                ],
+                "assassin": []
+              }
+            }
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 1",
+        "timestamp": "2026-07-09T07:54:04.573556",
+        "action": {
+          "type": "send message",
+          "content": "The word tongs was guessed correctly. Your teammate's turn ended there.\nNow provide another clue relating to some of your remaining team words and a list of the related target words. Remember to start your clue with 'CLUE: ', put a new line, and start your comma-separated list of target words with 'TARGETS: '. Notice: some words have been removed from the lists compared to previous requests.\n\nYour remaining team words are: private, bluegrass.\nRemaining words for your opponent are: week, pot.\nRemaining distractor words are: nanosecond, legos, football, corporal, alternative.\nRemaining kill words are: hockey.",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 1",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:54:04.573577",
+        "action": {
+          "type": "get message",
+          "content": "CLUE: rank\nTARGETS: private",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:54:04.573704",
+        "action": {
+          "type": "clue",
+          "content": "rank"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:54:04.573729",
+        "action": {
+          "type": "targets",
+          "content": [
+            "private"
+          ]
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:54:04.573751",
+        "action": {
+          "type": "word targeted",
+          "content": {
+            "word": "private",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 2",
+        "timestamp": "2026-07-09T07:54:06.903078",
+        "action": {
+          "type": "send message",
+          "content": "The word tongs was guessed correctly. Your turn ended there.\nNow provide another comma-separated list of at least 1 and up to 1 words from the following list of words that best relate or are most closely associated with the word 'rank'. Remember to start your answer with 'GUESS: '. Notice: some words have been removed from the list compared to previous requests.\n\nhockey, private, corporal, alternative, week, bluegrass, football, nanosecond, legos",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 2",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:54:06.903099",
+        "action": {
+          "type": "get message",
+          "content": "GUESS: private",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:54:06.903155",
+        "action": {
+          "type": "guesses",
+          "content": [
+            "private"
+          ]
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:54:06.903184",
+        "action": {
+          "type": "team revealed",
+          "content": {
+            "word": "private",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:54:06.903207",
+        "action": {
+          "type": "target revealed",
+          "content": {
+            "word": "private",
+            "assignment": "team"
+          }
+        }
+      }
+    ],
+    [
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:54:06.903353",
+        "action": {
+          "type": "opponent revealed",
+          "content": {
+            "word": "week",
+            "assignment": "opponent"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:54:06.903382",
+        "action": {
+          "type": "board status",
+          "content": {
+            "hidden": {
+              "team": [
+                "bluegrass"
+              ],
+              "innocent": [
+                "nanosecond",
+                "legos",
+                "football",
+                "corporal",
+                "alternative"
+              ],
+              "opponent": [],
+              "assassin": [
+                "hockey"
+              ]
+            },
+            "revealed": {
+              "team": {
+                "team": [
+                  "martini",
+                  "gin",
+                  "car",
+                  "elephant",
+                  "hippopotamus",
+                  "day",
+                  "tongs",
+                  "private"
+                ],
+                "innocent": [
+                  "grater",
+                  "rap"
+                ],
+                "opponent": [],
+                "assassin": []
+              },
+              "opponent": {
+                "team": [],
+                "innocent": [],
+                "opponent": [
+                  "running",
+                  "gun",
+                  "major",
+                  "whisk",
+                  "blues",
+                  "month",
+                  "pot",
+                  "week"
+                ],
+                "assassin": []
+              }
+            }
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 1",
+        "timestamp": "2026-07-09T07:54:07.862506",
+        "action": {
+          "type": "send message",
+          "content": "The word private was guessed correctly. Your teammate's turn ended there.\nNow provide another clue relating to some of your remaining team words and a list of the related target words. Remember to start your clue with 'CLUE: ', put a new line, and start your comma-separated list of target words with 'TARGETS: '. Notice: some words have been removed from the lists compared to previous requests.\n\nYour remaining team words are: bluegrass.\nRemaining words for your opponent are: week.\nRemaining distractor words are: nanosecond, legos, football, corporal, alternative.\nRemaining kill words are: hockey.",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 1",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:54:07.862522",
+        "action": {
+          "type": "get message",
+          "content": "CLUE: music\nTARGETS: bluegrass",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:54:07.862663",
+        "action": {
+          "type": "clue",
+          "content": "music"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:54:07.862698",
+        "action": {
+          "type": "targets",
+          "content": [
+            "bluegrass"
+          ]
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:54:07.862722",
+        "action": {
+          "type": "word targeted",
+          "content": {
+            "word": "bluegrass",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:54:07.862995",
+        "action": {
+          "type": "game end",
+          "content": "opponent has won"
+        }
+      }
+    ]
+  ],
+  "board end status": {
+    "hidden": {
+      "team": [
+        "bluegrass"
+      ],
+      "innocent": [
+        "nanosecond",
+        "legos",
+        "football",
+        "corporal",
+        "alternative"
+      ],
+      "opponent": [],
+      "assassin": [
+        "hockey"
+      ]
+    },
+    "revealed": {
+      "team": {
+        "team": [
+          "martini",
+          "gin",
+          "car",
+          "elephant",
+          "hippopotamus",
+          "day",
+          "tongs",
+          "private"
+        ],
+        "innocent": [
+          "grater",
+          "rap"
+        ],
+        "opponent": [],
+        "assassin": []
+      },
+      "opponent": {
+        "team": [],
+        "innocent": [],
+        "opponent": [
+          "running",
+          "gun",
+          "major",
+          "whisk",
+          "blues",
+          "month",
+          "pot",
+          "week"
+        ],
+        "assassin": []
+      }
+    }
+  },
+  "Number of turns": 9,
+  "Aborted": false,
+  "Lose": true,
+  "Game ended through assassin": false,
+  "Request Count": 17,
+  "Parsed Request Count": 17,
+  "Violated Request Count": 0,
+  "Cluegiver engaged flags": {
+    "IGNORE RAMBLING": 0,
+    "IGNORE FALSE TARGETS OR GUESSES": 0,
+    "REPROMPT ON ERROR": 0,
+    "STRIP WORDS": 0,
+    "IGNORE NUMBER OF TARGETS": 0
+  },
+  "Guesser engaged flags": {
+    "IGNORE RAMBLING": 0,
+    "IGNORE FALSE TARGETS OR GUESSES": 0,
+    "REPROMPT ON ERROR": 0,
+    "STRIP WORDS": 0,
+    "IGNORE NUMBER OF TARGETS": 0
+  }
+}

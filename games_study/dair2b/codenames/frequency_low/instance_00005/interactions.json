@@ -1,0 +1,1671 @@
+{
+  "meta": {
+    "game_name": "codenames",
+    "experiment_name": "frequency_low",
+    "game_id": 5,
+    "results_folder": "DAIR__qwen3.5-2b__sft-dpo-v2",
+    "clem_version": "3.7.2",
+    "round_count": 8,
+    "completed": true
+  },
+  "player_models": {
+    "0": {
+      "model_spec": {
+        "model_name": "DAIR__qwen3.5-2b__sft-dpo-v2",
+        "_team": "DAIR",
+        "_version": "sft-dpo-v2",
+        "backend": "huggingface_local",
+        "context_size": "32k",
+        "huggingface_id": "varadsrivastava/lm-playschool-qwen3.5-2b-sft-dpo",
+        "languages": [
+          "en"
+        ],
+        "license": {
+          "name": "apache-2.0",
+          "url": "https://www.apache.org/licenses/LICENSE-2.0"
+        },
+        "lookup_source": "/project/mmanina/lm-playschool-test-set/playpen/model_registry.json",
+        "model_config": {
+          "premade_chat_template": true,
+          "eos_to_cull": "<\\|im_end\\|>|<\\|endoftext\\|>",
+          "chat_template_kwargs": {
+            "enable_thinking": false
+          },
+          "multimodality": {
+            "single_image": true,
+            "multiple_images": true,
+            "audio": false,
+            "video": true
+          }
+        },
+        "open_weight": true,
+        "parameters": "2B",
+        "release_date": "2026-07-06"
+      },
+      "gen_args": {
+        "temperature": 0.0,
+        "max_tokens": 5000
+      }
+    }
+  },
+  "players": {
+    "GM": {
+      "game_role": "Game Master",
+      "model_name": "programmatic"
+    },
+    "Player 1": {
+      "game_role": "ClueGiver",
+      "model_name": "DAIR__qwen3.5-2b__sft-dpo-v2"
+    },
+    "Player 2": {
+      "game_role": "Guesser",
+      "model_name": "DAIR__qwen3.5-2b__sft-dpo-v2"
+    }
+  },
+  "turns": [
+    [
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T10:52:31.872552",
+        "action": {
+          "type": "board status",
+          "content": {
+            "hidden": {
+              "team": [
+                "lightheadedness",
+                "tonsillitis",
+                "duckweed",
+                "inheritability",
+                "insurgence",
+                "unbefitting",
+                "sleepwear",
+                "dwarfism",
+                "deinstitutionalization"
+              ],
+              "innocent": [
+                "institutionalization",
+                "deactivator",
+                "multiphase",
+                "cataloger",
+                "denseness",
+                "pockmark",
+                "backslapping"
+              ],
+              "opponent": [
+                "awardee",
+                "moviemaker",
+                "emasculation",
+                "girlishness",
+                "backbreaker",
+                "dueler",
+                "underclassman",
+                "decentralization"
+              ],
+              "assassin": [
+                "sextuplet"
+              ]
+            },
+            "revealed": {
+              "team": {
+                "team": [],
+                "innocent": [],
+                "opponent": [],
+                "assassin": []
+              },
+              "opponent": {
+                "team": [],
+                "innocent": [],
+                "opponent": [],
+                "assassin": []
+              }
+            }
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 1",
+        "timestamp": "2026-07-09T10:52:52.653746",
+        "action": {
+          "type": "send message",
+          "content": "Provide one single-word clue that relates to some of your team's words from the list below. You can choose to how many and to which words your clue relates to.\nThe goal is to have your partner guess all of your team's words based on the clues you give them, before the other team has uncovered all of theirs. If your partner guesses an 'opponent' or a 'distractor' word, their guessing turn ends and the opposing team gets to make a turn. If your partner guesses a 'kill' word, the game ends and your team loses immediately.\nThe more words your clue relates to, the quicker you can win the game, but the harder the associations may be to guess for your partner, so choose your clue word wisely. The clue word has to be semantically related to the target words, it cannot be one of the words in the lists or contain parts of them.\n\nAlways give your single-word clue and your comma-separated list of related target words in the following format and make your answers as short as possible, never include any other text than is required in this form:\n\nCLUE: <WORD>\nTARGETS: <TARGETS>\n\nYour team words are: lightheadedness, tonsillitis, duckweed, inheritability, insurgence, unbefitting, sleepwear, dwarfism, deinstitutionalization.\nYour opponent's team words are: awardee, moviemaker, emasculation, girlishness, backbreaker, dueler, underclassman, decentralization.\nDistractor words are: institutionalization, deactivator, multiphase, cataloger, denseness, pockmark, backslapping.\nThe kill words are: sextuplet.",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 1",
+        "to": "GM",
+        "timestamp": "2026-07-09T10:52:52.653763",
+        "action": {
+          "type": "get message",
+          "content": "CLUE: BEDTIME\nTARGETS: sleepwear",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T10:52:52.653944",
+        "action": {
+          "type": "clue",
+          "content": "bedtime"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T10:52:52.653967",
+        "action": {
+          "type": "targets",
+          "content": [
+            "sleepwear"
+          ]
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T10:52:52.653988",
+        "action": {
+          "type": "word targeted",
+          "content": {
+            "word": "sleepwear",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 2",
+        "timestamp": "2026-07-09T10:53:15.163421",
+        "action": {
+          "type": "send message",
+          "content": "Provide a comma-separated list of up to 1 words from the following list that best relate or are most closely associated with the word 'bedtime'. Always start your list of guess(es) with 'GUESS: ' and do not include any other text in your answer.\n\ninstitutionalization, dwarfism, inheritability, unbefitting, cataloger, deactivator, duckweed, denseness, dueler, multiphase, sextuplet, backbreaker, decentralization, insurgence, moviemaker, backslapping, sleepwear, tonsillitis, pockmark, awardee, lightheadedness, girlishness, emasculation, deinstitutionalization, underclassman",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 2",
+        "to": "GM",
+        "timestamp": "2026-07-09T10:53:15.163436",
+        "action": {
+          "type": "get message",
+          "content": "GUESS: sleepwear",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T10:53:15.163484",
+        "action": {
+          "type": "guesses",
+          "content": [
+            "sleepwear"
+          ]
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T10:53:15.163507",
+        "action": {
+          "type": "team revealed",
+          "content": {
+            "word": "sleepwear",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T10:53:15.163527",
+        "action": {
+          "type": "target revealed",
+          "content": {
+            "word": "sleepwear",
+            "assignment": "team"
+          }
+        }
+      }
+    ],
+    [
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T10:53:15.163642",
+        "action": {
+          "type": "opponent revealed",
+          "content": {
+            "word": "emasculation",
+            "assignment": "opponent"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T10:53:15.163669",
+        "action": {
+          "type": "board status",
+          "content": {
+            "hidden": {
+              "team": [
+                "lightheadedness",
+                "tonsillitis",
+                "duckweed",
+                "inheritability",
+                "insurgence",
+                "unbefitting",
+                "dwarfism",
+                "deinstitutionalization"
+              ],
+              "innocent": [
+                "institutionalization",
+                "deactivator",
+                "multiphase",
+                "cataloger",
+                "denseness",
+                "pockmark",
+                "backslapping"
+              ],
+              "opponent": [
+                "awardee",
+                "moviemaker",
+                "girlishness",
+                "backbreaker",
+                "dueler",
+                "underclassman",
+                "decentralization"
+              ],
+              "assassin": [
+                "sextuplet"
+              ]
+            },
+            "revealed": {
+              "team": {
+                "team": [
+                  "sleepwear"
+                ],
+                "innocent": [],
+                "opponent": [],
+                "assassin": []
+              },
+              "opponent": {
+                "team": [],
+                "innocent": [],
+                "opponent": [
+                  "emasculation"
+                ],
+                "assassin": []
+              }
+            }
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 1",
+        "timestamp": "2026-07-09T10:53:39.324672",
+        "action": {
+          "type": "send message",
+          "content": "The word sleepwear was guessed correctly. Your teammate's turn ended there.\nNow provide another clue relating to some of your remaining team words and a list of the related target words. Remember to start your clue with 'CLUE: ', put a new line, and start your comma-separated list of target words with 'TARGETS: '. Notice: some words have been removed from the lists compared to previous requests.\n\nYour remaining team words are: lightheadedness, tonsillitis, duckweed, inheritability, insurgence, unbefitting, dwarfism, deinstitutionalization.\nRemaining words for your opponent are: awardee, moviemaker, emasculation, girlishness, backbreaker, dueler, underclassman, decentralization.\nRemaining distractor words are: institutionalization, deactivator, multiphase, cataloger, denseness, pockmark, backslapping.\nRemaining kill words are: sextuplet.",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 1",
+        "to": "GM",
+        "timestamp": "2026-07-09T10:53:39.324690",
+        "action": {
+          "type": "get message",
+          "content": "CLUE: IMMUNITY\nTARGETS: tonsillitis, inheritability",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T10:53:39.324871",
+        "action": {
+          "type": "clue",
+          "content": "immunity"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T10:53:39.324893",
+        "action": {
+          "type": "targets",
+          "content": [
+            "tonsillitis",
+            "inheritability"
+          ]
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T10:53:39.324913",
+        "action": {
+          "type": "word targeted",
+          "content": {
+            "word": "tonsillitis",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T10:53:39.324933",
+        "action": {
+          "type": "word targeted",
+          "content": {
+            "word": "inheritability",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 2",
+        "timestamp": "2026-07-09T10:53:58.756108",
+        "action": {
+          "type": "send message",
+          "content": "The word sleepwear was guessed correctly. Your turn ended there.\nNow provide another comma-separated list of at least 1 and up to 2 words from the following list of words that best relate or are most closely associated with the word 'immunity'. Remember to start your answer with 'GUESS: '. Notice: some words have been removed from the list compared to previous requests.\n\ninstitutionalization, dwarfism, inheritability, unbefitting, cataloger, deactivator, duckweed, denseness, dueler, multiphase, sextuplet, backbreaker, decentralization, insurgence, moviemaker, backslapping, tonsillitis, pockmark, awardee, lightheadedness, girlishness, deinstitutionalization, underclassman",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 2",
+        "to": "GM",
+        "timestamp": "2026-07-09T10:53:58.756133",
+        "action": {
+          "type": "get message",
+          "content": "GUESS: tonsillitis, pockmark",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T10:53:58.756281",
+        "action": {
+          "type": "guesses",
+          "content": [
+            "tonsillitis",
+            "pockmark"
+          ]
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T10:53:58.756351",
+        "action": {
+          "type": "team revealed",
+          "content": {
+            "word": "tonsillitis",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T10:53:58.756394",
+        "action": {
+          "type": "target revealed",
+          "content": {
+            "word": "tonsillitis",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T10:53:58.756430",
+        "action": {
+          "type": "team revealed",
+          "content": {
+            "word": "pockmark",
+            "assignment": "innocent"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T10:53:58.756466",
+        "action": {
+          "type": "turn end after",
+          "content": "pockmark"
+        }
+      }
+    ],
+    [
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T10:53:58.756824",
+        "action": {
+          "type": "opponent revealed",
+          "content": {
+            "word": "backbreaker",
+            "assignment": "opponent"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T10:53:58.756855",
+        "action": {
+          "type": "board status",
+          "content": {
+            "hidden": {
+              "team": [
+                "lightheadedness",
+                "duckweed",
+                "inheritability",
+                "insurgence",
+                "unbefitting",
+                "dwarfism",
+                "deinstitutionalization"
+              ],
+              "innocent": [
+                "institutionalization",
+                "deactivator",
+                "multiphase",
+                "cataloger",
+                "denseness",
+                "backslapping"
+              ],
+              "opponent": [
+                "awardee",
+                "moviemaker",
+                "girlishness",
+                "dueler",
+                "underclassman",
+                "decentralization"
+              ],
+              "assassin": [
+                "sextuplet"
+              ]
+            },
+            "revealed": {
+              "team": {
+                "team": [
+                  "sleepwear",
+                  "tonsillitis"
+                ],
+                "innocent": [
+                  "pockmark"
+                ],
+                "opponent": [],
+                "assassin": []
+              },
+              "opponent": {
+                "team": [],
+                "innocent": [],
+                "opponent": [
+                  "emasculation",
+                  "backbreaker"
+                ],
+                "assassin": []
+              }
+            }
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 1",
+        "timestamp": "2026-07-09T10:54:16.240497",
+        "action": {
+          "type": "send message",
+          "content": "The word tonsillitis was guessed correctly. The word pockmark was guessed but is an innocent word. Your teammate's turn ended there.\nNow provide another clue relating to some of your remaining team words and a list of the related target words. Remember to start your clue with 'CLUE: ', put a new line, and start your comma-separated list of target words with 'TARGETS: '. Notice: some words have been removed from the lists compared to previous requests.\n\nYour remaining team words are: lightheadedness, duckweed, inheritability, insurgence, unbefitting, dwarfism, deinstitutionalization.\nRemaining words for your opponent are: awardee, moviemaker, girlishness, backbreaker, dueler, underclassman, decentralization.\nRemaining distractor words are: institutionalization, deactivator, multiphase, cataloger, denseness, backslapping.\nRemaining kill words are: sextuplet.",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 1",
+        "to": "GM",
+        "timestamp": "2026-07-09T10:54:16.240517",
+        "action": {
+          "type": "get message",
+          "content": "CLUE: UNFIT\nTARGETS: unbefitting",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T10:54:16.240684",
+        "action": {
+          "type": "clue",
+          "content": "unfit"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T10:54:16.240708",
+        "action": {
+          "type": "targets",
+          "content": [
+            "unbefitting"
+          ]
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T10:54:16.240728",
+        "action": {
+          "type": "word targeted",
+          "content": {
+            "word": "unbefitting",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 2",
+        "timestamp": "2026-07-09T10:54:33.096136",
+        "action": {
+          "type": "send message",
+          "content": "The word tonsillitis was guessed correctly. The word pockmark was guessed but is an innocent word. Your turn ended there.\nNow provide another comma-separated list of at least 1 and up to 1 words from the following list of words that best relate or are most closely associated with the word 'unfit'. Remember to start your answer with 'GUESS: '. Notice: some words have been removed from the list compared to previous requests.\n\ninstitutionalization, dwarfism, inheritability, unbefitting, cataloger, deactivator, duckweed, denseness, dueler, multiphase, sextuplet, decentralization, insurgence, moviemaker, backslapping, awardee, lightheadedness, girlishness, deinstitutionalization, underclassman",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 2",
+        "to": "GM",
+        "timestamp": "2026-07-09T10:54:33.096152",
+        "action": {
+          "type": "get message",
+          "content": "GUESS: unbefitting",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T10:54:33.096200",
+        "action": {
+          "type": "guesses",
+          "content": [
+            "unbefitting"
+          ]
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T10:54:33.096222",
+        "action": {
+          "type": "team revealed",
+          "content": {
+            "word": "unbefitting",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T10:54:33.096241",
+        "action": {
+          "type": "target revealed",
+          "content": {
+            "word": "unbefitting",
+            "assignment": "team"
+          }
+        }
+      }
+    ],
+    [
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T10:54:33.096356",
+        "action": {
+          "type": "opponent revealed",
+          "content": {
+            "word": "girlishness",
+            "assignment": "opponent"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T10:54:33.096383",
+        "action": {
+          "type": "board status",
+          "content": {
+            "hidden": {
+              "team": [
+                "lightheadedness",
+                "duckweed",
+                "inheritability",
+                "insurgence",
+                "dwarfism",
+                "deinstitutionalization"
+              ],
+              "innocent": [
+                "institutionalization",
+                "deactivator",
+                "multiphase",
+                "cataloger",
+                "denseness",
+                "backslapping"
+              ],
+              "opponent": [
+                "awardee",
+                "moviemaker",
+                "dueler",
+                "underclassman",
+                "decentralization"
+              ],
+              "assassin": [
+                "sextuplet"
+              ]
+            },
+            "revealed": {
+              "team": {
+                "team": [
+                  "sleepwear",
+                  "tonsillitis",
+                  "unbefitting"
+                ],
+                "innocent": [
+                  "pockmark"
+                ],
+                "opponent": [],
+                "assassin": []
+              },
+              "opponent": {
+                "team": [],
+                "innocent": [],
+                "opponent": [
+                  "emasculation",
+                  "backbreaker",
+                  "girlishness"
+                ],
+                "assassin": []
+              }
+            }
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 1",
+        "timestamp": "2026-07-09T10:54:48.272961",
+        "action": {
+          "type": "send message",
+          "content": "The word unbefitting was guessed correctly. Your teammate's turn ended there.\nNow provide another clue relating to some of your remaining team words and a list of the related target words. Remember to start your clue with 'CLUE: ', put a new line, and start your comma-separated list of target words with 'TARGETS: '. Notice: some words have been removed from the lists compared to previous requests.\n\nYour remaining team words are: lightheadedness, duckweed, inheritability, insurgence, dwarfism, deinstitutionalization.\nRemaining words for your opponent are: awardee, moviemaker, girlishness, dueler, underclassman, decentralization.\nRemaining distractor words are: institutionalization, deactivator, multiphase, cataloger, denseness, backslapping.\nRemaining kill words are: sextuplet.",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 1",
+        "to": "GM",
+        "timestamp": "2026-07-09T10:54:48.272980",
+        "action": {
+          "type": "get message",
+          "content": "CLUE: HYPO\nTARGETS: lightheadedness, dwarfism",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T10:54:48.273227",
+        "action": {
+          "type": "clue",
+          "content": "hypo"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T10:54:48.273265",
+        "action": {
+          "type": "targets",
+          "content": [
+            "lightheadedness",
+            "dwarfism"
+          ]
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T10:54:48.273291",
+        "action": {
+          "type": "word targeted",
+          "content": {
+            "word": "lightheadedness",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T10:54:48.273311",
+        "action": {
+          "type": "word targeted",
+          "content": {
+            "word": "dwarfism",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 2",
+        "timestamp": "2026-07-09T10:55:06.365519",
+        "action": {
+          "type": "send message",
+          "content": "The word unbefitting was guessed correctly. Your turn ended there.\nNow provide another comma-separated list of at least 1 and up to 2 words from the following list of words that best relate or are most closely associated with the word 'hypo'. Remember to start your answer with 'GUESS: '. Notice: some words have been removed from the list compared to previous requests.\n\ninstitutionalization, dwarfism, inheritability, cataloger, deactivator, duckweed, denseness, dueler, multiphase, sextuplet, decentralization, insurgence, moviemaker, backslapping, awardee, lightheadedness, deinstitutionalization, underclassman",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 2",
+        "to": "GM",
+        "timestamp": "2026-07-09T10:55:06.365535",
+        "action": {
+          "type": "get message",
+          "content": "GUESS: lightheadedness, dwarfism",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T10:55:06.365589",
+        "action": {
+          "type": "guesses",
+          "content": [
+            "lightheadedness",
+            "dwarfism"
+          ]
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T10:55:06.365612",
+        "action": {
+          "type": "team revealed",
+          "content": {
+            "word": "lightheadedness",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T10:55:06.365632",
+        "action": {
+          "type": "target revealed",
+          "content": {
+            "word": "lightheadedness",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T10:55:06.365651",
+        "action": {
+          "type": "team revealed",
+          "content": {
+            "word": "dwarfism",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T10:55:06.365669",
+        "action": {
+          "type": "target revealed",
+          "content": {
+            "word": "dwarfism",
+            "assignment": "team"
+          }
+        }
+      }
+    ],
+    [
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T10:55:06.365791",
+        "action": {
+          "type": "opponent revealed",
+          "content": {
+            "word": "dueler",
+            "assignment": "opponent"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T10:55:06.365819",
+        "action": {
+          "type": "board status",
+          "content": {
+            "hidden": {
+              "team": [
+                "duckweed",
+                "inheritability",
+                "insurgence",
+                "deinstitutionalization"
+              ],
+              "innocent": [
+                "institutionalization",
+                "deactivator",
+                "multiphase",
+                "cataloger",
+                "denseness",
+                "backslapping"
+              ],
+              "opponent": [
+                "awardee",
+                "moviemaker",
+                "underclassman",
+                "decentralization"
+              ],
+              "assassin": [
+                "sextuplet"
+              ]
+            },
+            "revealed": {
+              "team": {
+                "team": [
+                  "sleepwear",
+                  "tonsillitis",
+                  "unbefitting",
+                  "lightheadedness",
+                  "dwarfism"
+                ],
+                "innocent": [
+                  "pockmark"
+                ],
+                "opponent": [],
+                "assassin": []
+              },
+              "opponent": {
+                "team": [],
+                "innocent": [],
+                "opponent": [
+                  "emasculation",
+                  "backbreaker",
+                  "girlishness",
+                  "dueler"
+                ],
+                "assassin": []
+              }
+            }
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 1",
+        "timestamp": "2026-07-09T10:55:23.433529",
+        "action": {
+          "type": "send message",
+          "content": "The words lightheadedness, dwarfism were guessed correctly. Your teammate's turn ended there.\nNow provide another clue relating to some of your remaining team words and a list of the related target words. Remember to start your clue with 'CLUE: ', put a new line, and start your comma-separated list of target words with 'TARGETS: '. Notice: some words have been removed from the lists compared to previous requests.\n\nYour remaining team words are: duckweed, inheritability, insurgence, deinstitutionalization.\nRemaining words for your opponent are: awardee, moviemaker, dueler, underclassman, decentralization.\nRemaining distractor words are: institutionalization, deactivator, multiphase, cataloger, denseness, backslapping.\nRemaining kill words are: sextuplet.",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 1",
+        "to": "GM",
+        "timestamp": "2026-07-09T10:55:23.433549",
+        "action": {
+          "type": "get message",
+          "content": "CLUE: REBELLION\nTARGETS: insurgence",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T10:55:23.433704",
+        "action": {
+          "type": "clue",
+          "content": "rebellion"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T10:55:23.433728",
+        "action": {
+          "type": "targets",
+          "content": [
+            "insurgence"
+          ]
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T10:55:23.433748",
+        "action": {
+          "type": "word targeted",
+          "content": {
+            "word": "insurgence",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 2",
+        "timestamp": "2026-07-09T10:55:35.996547",
+        "action": {
+          "type": "send message",
+          "content": "The words lightheadedness, dwarfism were guessed correctly. Your turn ended there.\nNow provide another comma-separated list of at least 1 and up to 1 words from the following list of words that best relate or are most closely associated with the word 'rebellion'. Remember to start your answer with 'GUESS: '. Notice: some words have been removed from the list compared to previous requests.\n\ninstitutionalization, inheritability, cataloger, deactivator, duckweed, denseness, multiphase, sextuplet, decentralization, insurgence, moviemaker, backslapping, awardee, deinstitutionalization, underclassman",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 2",
+        "to": "GM",
+        "timestamp": "2026-07-09T10:55:35.996562",
+        "action": {
+          "type": "get message",
+          "content": "GUESS: insurgence",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T10:55:35.996610",
+        "action": {
+          "type": "guesses",
+          "content": [
+            "insurgence"
+          ]
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T10:55:35.996633",
+        "action": {
+          "type": "team revealed",
+          "content": {
+            "word": "insurgence",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T10:55:35.996654",
+        "action": {
+          "type": "target revealed",
+          "content": {
+            "word": "insurgence",
+            "assignment": "team"
+          }
+        }
+      }
+    ],
+    [
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T10:55:35.996771",
+        "action": {
+          "type": "opponent revealed",
+          "content": {
+            "word": "decentralization",
+            "assignment": "opponent"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T10:55:35.996797",
+        "action": {
+          "type": "board status",
+          "content": {
+            "hidden": {
+              "team": [
+                "duckweed",
+                "inheritability",
+                "deinstitutionalization"
+              ],
+              "innocent": [
+                "institutionalization",
+                "deactivator",
+                "multiphase",
+                "cataloger",
+                "denseness",
+                "backslapping"
+              ],
+              "opponent": [
+                "awardee",
+                "moviemaker",
+                "underclassman"
+              ],
+              "assassin": [
+                "sextuplet"
+              ]
+            },
+            "revealed": {
+              "team": {
+                "team": [
+                  "sleepwear",
+                  "tonsillitis",
+                  "unbefitting",
+                  "lightheadedness",
+                  "dwarfism",
+                  "insurgence"
+                ],
+                "innocent": [
+                  "pockmark"
+                ],
+                "opponent": [],
+                "assassin": []
+              },
+              "opponent": {
+                "team": [],
+                "innocent": [],
+                "opponent": [
+                  "emasculation",
+                  "backbreaker",
+                  "girlishness",
+                  "dueler",
+                  "decentralization"
+                ],
+                "assassin": []
+              }
+            }
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 1",
+        "timestamp": "2026-07-09T10:55:49.368612",
+        "action": {
+          "type": "send message",
+          "content": "The word insurgence was guessed correctly. Your teammate's turn ended there.\nNow provide another clue relating to some of your remaining team words and a list of the related target words. Remember to start your clue with 'CLUE: ', put a new line, and start your comma-separated list of target words with 'TARGETS: '. Notice: some words have been removed from the lists compared to previous requests.\n\nYour remaining team words are: duckweed, inheritability, deinstitutionalization.\nRemaining words for your opponent are: awardee, moviemaker, underclassman, decentralization.\nRemaining distractor words are: institutionalization, deactivator, multiphase, cataloger, denseness, backslapping.\nRemaining kill words are: sextuplet.",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 1",
+        "to": "GM",
+        "timestamp": "2026-07-09T10:55:49.368631",
+        "action": {
+          "type": "get message",
+          "content": "CLUE: HEREDITY\nTARGETS: inheritability",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T10:55:49.368827",
+        "action": {
+          "type": "clue",
+          "content": "heredity"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T10:55:49.368856",
+        "action": {
+          "type": "targets",
+          "content": [
+            "inheritability"
+          ]
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T10:55:49.368877",
+        "action": {
+          "type": "word targeted",
+          "content": {
+            "word": "inheritability",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 2",
+        "timestamp": "2026-07-09T10:55:59.797956",
+        "action": {
+          "type": "send message",
+          "content": "The word insurgence was guessed correctly. Your turn ended there.\nNow provide another comma-separated list of at least 1 and up to 1 words from the following list of words that best relate or are most closely associated with the word 'heredity'. Remember to start your answer with 'GUESS: '. Notice: some words have been removed from the list compared to previous requests.\n\ninstitutionalization, inheritability, cataloger, deactivator, duckweed, denseness, multiphase, sextuplet, moviemaker, backslapping, awardee, deinstitutionalization, underclassman",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 2",
+        "to": "GM",
+        "timestamp": "2026-07-09T10:55:59.797972",
+        "action": {
+          "type": "get message",
+          "content": "GUESS: inheritability",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T10:55:59.798017",
+        "action": {
+          "type": "guesses",
+          "content": [
+            "inheritability"
+          ]
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T10:55:59.798047",
+        "action": {
+          "type": "team revealed",
+          "content": {
+            "word": "inheritability",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T10:55:59.798069",
+        "action": {
+          "type": "target revealed",
+          "content": {
+            "word": "inheritability",
+            "assignment": "team"
+          }
+        }
+      }
+    ],
+    [
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T10:55:59.798186",
+        "action": {
+          "type": "opponent revealed",
+          "content": {
+            "word": "moviemaker",
+            "assignment": "opponent"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T10:55:59.798220",
+        "action": {
+          "type": "board status",
+          "content": {
+            "hidden": {
+              "team": [
+                "duckweed",
+                "deinstitutionalization"
+              ],
+              "innocent": [
+                "institutionalization",
+                "deactivator",
+                "multiphase",
+                "cataloger",
+                "denseness",
+                "backslapping"
+              ],
+              "opponent": [
+                "awardee",
+                "underclassman"
+              ],
+              "assassin": [
+                "sextuplet"
+              ]
+            },
+            "revealed": {
+              "team": {
+                "team": [
+                  "sleepwear",
+                  "tonsillitis",
+                  "unbefitting",
+                  "lightheadedness",
+                  "dwarfism",
+                  "insurgence",
+                  "inheritability"
+                ],
+                "innocent": [
+                  "pockmark"
+                ],
+                "opponent": [],
+                "assassin": []
+              },
+              "opponent": {
+                "team": [],
+                "innocent": [],
+                "opponent": [
+                  "emasculation",
+                  "backbreaker",
+                  "girlishness",
+                  "dueler",
+                  "decentralization",
+                  "moviemaker"
+                ],
+                "assassin": []
+              }
+            }
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 1",
+        "timestamp": "2026-07-09T10:56:11.309681",
+        "action": {
+          "type": "send message",
+          "content": "The word inheritability was guessed correctly. Your teammate's turn ended there.\nNow provide another clue relating to some of your remaining team words and a list of the related target words. Remember to start your clue with 'CLUE: ', put a new line, and start your comma-separated list of target words with 'TARGETS: '. Notice: some words have been removed from the lists compared to previous requests.\n\nYour remaining team words are: duckweed, deinstitutionalization.\nRemaining words for your opponent are: awardee, moviemaker, underclassman.\nRemaining distractor words are: institutionalization, deactivator, multiphase, cataloger, denseness, backslapping.\nRemaining kill words are: sextuplet.",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 1",
+        "to": "GM",
+        "timestamp": "2026-07-09T10:56:11.309702",
+        "action": {
+          "type": "get message",
+          "content": "CLUE: ALGAE\nTARGETS: duckweed",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T10:56:11.309822",
+        "action": {
+          "type": "clue",
+          "content": "algae"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T10:56:11.309846",
+        "action": {
+          "type": "targets",
+          "content": [
+            "duckweed"
+          ]
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T10:56:11.309866",
+        "action": {
+          "type": "word targeted",
+          "content": {
+            "word": "duckweed",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 2",
+        "timestamp": "2026-07-09T10:56:21.896712",
+        "action": {
+          "type": "send message",
+          "content": "The word inheritability was guessed correctly. Your turn ended there.\nNow provide another comma-separated list of at least 1 and up to 1 words from the following list of words that best relate or are most closely associated with the word 'algae'. Remember to start your answer with 'GUESS: '. Notice: some words have been removed from the list compared to previous requests.\n\ninstitutionalization, cataloger, deactivator, duckweed, denseness, multiphase, sextuplet, backslapping, awardee, deinstitutionalization, underclassman",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 2",
+        "to": "GM",
+        "timestamp": "2026-07-09T10:56:21.896728",
+        "action": {
+          "type": "get message",
+          "content": "GUESS: duckweed",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T10:56:21.896774",
+        "action": {
+          "type": "guesses",
+          "content": [
+            "duckweed"
+          ]
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T10:56:21.896797",
+        "action": {
+          "type": "team revealed",
+          "content": {
+            "word": "duckweed",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T10:56:21.896816",
+        "action": {
+          "type": "target revealed",
+          "content": {
+            "word": "duckweed",
+            "assignment": "team"
+          }
+        }
+      }
+    ],
+    [
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T10:56:21.896925",
+        "action": {
+          "type": "opponent revealed",
+          "content": {
+            "word": "awardee",
+            "assignment": "opponent"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T10:56:21.896952",
+        "action": {
+          "type": "board status",
+          "content": {
+            "hidden": {
+              "team": [
+                "deinstitutionalization"
+              ],
+              "innocent": [
+                "institutionalization",
+                "deactivator",
+                "multiphase",
+                "cataloger",
+                "denseness",
+                "backslapping"
+              ],
+              "opponent": [
+                "underclassman"
+              ],
+              "assassin": [
+                "sextuplet"
+              ]
+            },
+            "revealed": {
+              "team": {
+                "team": [
+                  "sleepwear",
+                  "tonsillitis",
+                  "unbefitting",
+                  "lightheadedness",
+                  "dwarfism",
+                  "insurgence",
+                  "inheritability",
+                  "duckweed"
+                ],
+                "innocent": [
+                  "pockmark"
+                ],
+                "opponent": [],
+                "assassin": []
+              },
+              "opponent": {
+                "team": [],
+                "innocent": [],
+                "opponent": [
+                  "emasculation",
+                  "backbreaker",
+                  "girlishness",
+                  "dueler",
+                  "decentralization",
+                  "moviemaker",
+                  "awardee"
+                ],
+                "assassin": []
+              }
+            }
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 1",
+        "timestamp": "2026-07-09T10:56:28.279430",
+        "action": {
+          "type": "send message",
+          "content": "The word duckweed was guessed correctly. Your teammate's turn ended there.\nNow provide another clue relating to some of your remaining team words and a list of the related target words. Remember to start your clue with 'CLUE: ', put a new line, and start your comma-separated list of target words with 'TARGETS: '. Notice: some words have been removed from the lists compared to previous requests.\n\nYour remaining team words are: deinstitutionalization.\nRemaining words for your opponent are: awardee, underclassman.\nRemaining distractor words are: institutionalization, deactivator, multiphase, cataloger, denseness, backslapping.\nRemaining kill words are: sextuplet.",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 1",
+        "to": "GM",
+        "timestamp": "2026-07-09T10:56:28.279448",
+        "action": {
+          "type": "get message",
+          "content": "CLUE: REHABILITATION\nTARGETS: deinstitutionalization",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T10:56:28.279577",
+        "action": {
+          "type": "clue",
+          "content": "rehabilitation"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T10:56:28.279599",
+        "action": {
+          "type": "targets",
+          "content": [
+            "deinstitutionalization"
+          ]
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T10:56:28.279619",
+        "action": {
+          "type": "word targeted",
+          "content": {
+            "word": "deinstitutionalization",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 2",
+        "timestamp": "2026-07-09T10:56:35.933883",
+        "action": {
+          "type": "send message",
+          "content": "The word duckweed was guessed correctly. Your turn ended there.\nNow provide another comma-separated list of at least 1 and up to 1 words from the following list of words that best relate or are most closely associated with the word 'rehabilitation'. Remember to start your answer with 'GUESS: '. Notice: some words have been removed from the list compared to previous requests.\n\ninstitutionalization, cataloger, deactivator, denseness, multiphase, sextuplet, backslapping, deinstitutionalization, underclassman",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 2",
+        "to": "GM",
+        "timestamp": "2026-07-09T10:56:35.933913",
+        "action": {
+          "type": "get message",
+          "content": "GUESS: deinstitutionalization",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T10:56:35.933997",
+        "action": {
+          "type": "guesses",
+          "content": [
+            "deinstitutionalization"
+          ]
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T10:56:35.934042",
+        "action": {
+          "type": "team revealed",
+          "content": {
+            "word": "deinstitutionalization",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T10:56:35.934080",
+        "action": {
+          "type": "target revealed",
+          "content": {
+            "word": "deinstitutionalization",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T10:56:35.934247",
+        "action": {
+          "type": "game end",
+          "content": "team has won"
+        }
+      }
+    ]
+  ],
+  "board end status": {
+    "hidden": {
+      "team": [],
+      "innocent": [
+        "institutionalization",
+        "deactivator",
+        "multiphase",
+        "cataloger",
+        "denseness",
+        "backslapping"
+      ],
+      "opponent": [
+        "underclassman"
+      ],
+      "assassin": [
+        "sextuplet"
+      ]
+    },
+    "revealed": {
+      "team": {
+        "team": [
+          "sleepwear",
+          "tonsillitis",
+          "unbefitting",
+          "lightheadedness",
+          "dwarfism",
+          "insurgence",
+          "inheritability",
+          "duckweed",
+          "deinstitutionalization"
+        ],
+        "innocent": [
+          "pockmark"
+        ],
+        "opponent": [],
+        "assassin": []
+      },
+      "opponent": {
+        "team": [],
+        "innocent": [],
+        "opponent": [
+          "emasculation",
+          "backbreaker",
+          "girlishness",
+          "dueler",
+          "decentralization",
+          "moviemaker",
+          "awardee"
+        ],
+        "assassin": []
+      }
+    }
+  },
+  "Number of turns": 9,
+  "Aborted": false,
+  "Lose": false,
+  "Game ended through assassin": false,
+  "Request Count": 16,
+  "Parsed Request Count": 16,
+  "Violated Request Count": 0,
+  "Cluegiver engaged flags": {
+    "IGNORE RAMBLING": 0,
+    "IGNORE FALSE TARGETS OR GUESSES": 0,
+    "REPROMPT ON ERROR": 0,
+    "STRIP WORDS": 0,
+    "IGNORE NUMBER OF TARGETS": 0
+  },
+  "Guesser engaged flags": {
+    "IGNORE RAMBLING": 0,
+    "IGNORE FALSE TARGETS OR GUESSES": 0,
+    "REPROMPT ON ERROR": 0,
+    "STRIP WORDS": 0,
+    "IGNORE NUMBER OF TARGETS": 0
+  }
+}

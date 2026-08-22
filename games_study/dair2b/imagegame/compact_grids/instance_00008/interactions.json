@@ -1,0 +1,278 @@
+{
+  "meta": {
+    "game_name": "imagegame",
+    "experiment_name": "compact_grids",
+    "game_id": 8,
+    "results_folder": "DAIR__qwen3.5-2b__sft-dpo-v2",
+    "clem_version": "3.7.2",
+    "round_count": 4,
+    "completed": true
+  },
+  "player_models": {
+    "0": {
+      "model_spec": {
+        "model_name": "DAIR__qwen3.5-2b__sft-dpo-v2",
+        "_team": "DAIR",
+        "_version": "sft-dpo-v2",
+        "backend": "huggingface_local",
+        "context_size": "32k",
+        "huggingface_id": "varadsrivastava/lm-playschool-qwen3.5-2b-sft-dpo",
+        "languages": [
+          "en"
+        ],
+        "license": {
+          "name": "apache-2.0",
+          "url": "https://www.apache.org/licenses/LICENSE-2.0"
+        },
+        "lookup_source": "/project/mmanina/lm-playschool-test-set/playpen/model_registry.json",
+        "model_config": {
+          "premade_chat_template": true,
+          "eos_to_cull": "<\\|im_end\\|>|<\\|endoftext\\|>",
+          "chat_template_kwargs": {
+            "enable_thinking": false
+          },
+          "multimodality": {
+            "single_image": true,
+            "multiple_images": true,
+            "audio": false,
+            "video": true
+          }
+        },
+        "open_weight": true,
+        "parameters": "2B",
+        "release_date": "2026-07-06"
+      },
+      "gen_args": {
+        "temperature": 0.0,
+        "max_tokens": 5000
+      }
+    }
+  },
+  "players": {
+    "GM": {
+      "game_role": "Game Master",
+      "model_name": "programmatic"
+    },
+    "Player 1": {
+      "game_role": "Instruction Giver",
+      "model_name": "DAIR__qwen3.5-2b__sft-dpo-v2"
+    },
+    "Player 2": {
+      "game_role": "Instruction Follower",
+      "model_name": "DAIR__qwen3.5-2b__sft-dpo-v2"
+    }
+  },
+  "turns": [
+    [
+      {
+        "from": "GM",
+        "to": "Player 1",
+        "timestamp": "2026-07-09T09:59:54.336769",
+        "action": {
+          "type": "send message",
+          "content": "Let us do the following task. The goal is to fill an empty grid that looks like this:\n\n▢ ▢ ▢ ▢ ▢\n▢ ▢ ▢ ▢ ▢\n▢ ▢ ▢ ▢ ▢\n▢ ▢ ▢ ▢ ▢\n▢ ▢ ▢ ▢ ▢\n\nA filled grid below is 5 by 5 and can look like this:\n\n▢ ▢ ▢ ▢ ▢\n▢ ▢ E ▢ ▢\n▢ ▢ ▢ ▢ ▢\n▢ ▢ ▢ ▢ ▢\nX X X X X\n\nI want you to describe this grid to me, step by step. You don't need to describe the empty squares, which are denoted with \"▢\". Only describe the location of letters in the grid. Then you wait for me to say \"What is your next command?\", and then you continue with the next step. Take the size of the grid into consideration while giving commands. You can give only one command at each turn but it can refer to single or multiple cells, rows, columns or even the whole grid at once. When you have described everything, you say \"Command: DONE\". Only give the command and omit everything else.\n\nFor the filled grid above, here are the example steps.\n\nCommand: Put an E in second row third column\n\nWhat is your next command?\nCommand: Fill the last row with X\n\nWhat is your next command?\nCommand: DONE\n\nOk. Please do this for the following example, which is a 5 by 5 grid.\nB ▢ ▢ ▢ B\n▢ B ▢ B ▢\n▢ ▢ B ▢ ▢\n▢ B ▢ B ▢\nB ▢ ▢ ▢ B\nWhat is your next command?",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 1",
+        "to": "GM",
+        "timestamp": "2026-07-09T09:59:54.336785",
+        "action": {
+          "type": "get message",
+          "content": "Command: Put a B in the first and fifth columns of the first and fifth rows",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T09:59:54.336833",
+        "action": {
+          "type": "found instruction",
+          "content": "Command: Put a B in the first and fifth columns of the first and fifth rows"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 2",
+        "timestamp": "2026-07-09T10:00:04.669891",
+        "action": {
+          "type": "send message",
+          "content": "Let us draw something together. There is an empty grid with a size 5 by 5, like so:\n\n▢ ▢ ▢ ▢ ▢\n▢ ▢ ▢ ▢ ▢\n▢ ▢ ▢ ▢ ▢\n▢ ▢ ▢ ▢ ▢\n▢ ▢ ▢ ▢ ▢\n\nI will give you commands like \"put an X in the top left\", and you return the grid by applying the given command, like so:\n\nCommand: put an X in the top left\n\nX ▢ ▢ ▢ ▢\n▢ ▢ ▢ ▢ ▢\n▢ ▢ ▢ ▢ ▢\n▢ ▢ ▢ ▢ ▢\n▢ ▢ ▢ ▢ ▢\n\nNow create an empty grid with a size 5 by 5 and execute the following commands at each step. Once you execute the command, return only the grid and exclude all other text from the output.\n\nCommand: Put a B in the first and fifth columns of the first and fifth rows",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 2",
+        "to": "GM",
+        "timestamp": "2026-07-09T10:00:04.669908",
+        "action": {
+          "type": "get message",
+          "content": "B ▢ ▢ ▢ B\n▢ ▢ ▢ ▢ ▢\n▢ ▢ ▢ ▢ ▢\n▢ ▢ ▢ ▢ ▢\nB ▢ ▢ ▢ B",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T10:00:04.669940",
+        "action": {
+          "type": "found grid",
+          "content": "B ▢ ▢ ▢ B\n▢ ▢ ▢ ▢ ▢\n▢ ▢ ▢ ▢ ▢\n▢ ▢ ▢ ▢ ▢\nB ▢ ▢ ▢ B"
+        }
+      }
+    ],
+    [
+      {
+        "from": "GM",
+        "to": "Player 1",
+        "timestamp": "2026-07-09T10:00:20.779290",
+        "action": {
+          "type": "send message",
+          "content": "What is your next command?",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 1",
+        "to": "GM",
+        "timestamp": "2026-07-09T10:00:20.779306",
+        "action": {
+          "type": "get message",
+          "content": "Command: Put a B in the second and fourth columns of the second and fourth rows",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T10:00:20.779353",
+        "action": {
+          "type": "found instruction",
+          "content": "Command: Put a B in the second and fourth columns of the second and fourth rows"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 2",
+        "timestamp": "2026-07-09T10:00:31.351449",
+        "action": {
+          "type": "send message",
+          "content": "Command: Put a B in the second and fourth columns of the second and fourth rows",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 2",
+        "to": "GM",
+        "timestamp": "2026-07-09T10:00:31.351465",
+        "action": {
+          "type": "get message",
+          "content": "B ▢ ▢ ▢ B\n▢ B ▢ B ▢\n▢ ▢ ▢ ▢ ▢\n▢ B ▢ B ▢\nB ▢ ▢ ▢ B",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T10:00:31.351508",
+        "action": {
+          "type": "found grid",
+          "content": "B ▢ ▢ ▢ B\n▢ B ▢ B ▢\n▢ ▢ ▢ ▢ ▢\n▢ B ▢ B ▢\nB ▢ ▢ ▢ B"
+        }
+      }
+    ],
+    [
+      {
+        "from": "GM",
+        "to": "Player 1",
+        "timestamp": "2026-07-09T10:00:47.199799",
+        "action": {
+          "type": "send message",
+          "content": "What is your next command?",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 1",
+        "to": "GM",
+        "timestamp": "2026-07-09T10:00:47.199815",
+        "action": {
+          "type": "get message",
+          "content": "Command: Put a B in the third column of the third row",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T10:00:47.199863",
+        "action": {
+          "type": "found instruction",
+          "content": "Command: Put a B in the third column of the third row"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 2",
+        "timestamp": "2026-07-09T10:00:56.194828",
+        "action": {
+          "type": "send message",
+          "content": "Command: Put a B in the third column of the third row",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 2",
+        "to": "GM",
+        "timestamp": "2026-07-09T10:00:56.194845",
+        "action": {
+          "type": "get message",
+          "content": "B ▢ ▢ ▢ B\n▢ B ▢ B ▢\n▢ ▢ B ▢ ▢\n▢ B ▢ B ▢\nB ▢ ▢ ▢ B",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T10:00:56.194888",
+        "action": {
+          "type": "found grid",
+          "content": "B ▢ ▢ ▢ B\n▢ B ▢ B ▢\n▢ ▢ B ▢ ▢\n▢ B ▢ B ▢\nB ▢ ▢ ▢ B"
+        }
+      }
+    ],
+    [
+      {
+        "from": "GM",
+        "to": "Player 1",
+        "timestamp": "2026-07-09T10:01:08.856864",
+        "action": {
+          "type": "send message",
+          "content": "What is your next command?",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 1",
+        "to": "GM",
+        "timestamp": "2026-07-09T10:01:08.856880",
+        "action": {
+          "type": "get message",
+          "content": "Command: DONE",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T10:01:08.856928",
+        "action": {
+          "type": "found terminate pattern",
+          "content": "Command: DONE"
+        }
+      }
+    ]
+  ]
+}

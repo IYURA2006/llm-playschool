@@ -18,15 +18,18 @@ _STEPS = [
      "and Overall Quality, then submit."),
 ]
 
+# (number, badge colour, text colour, label, description). The badge keeps its
+# original hue for fill and border; the digit uses the lighter -400 step, because
+# the same hue as text on its own 13%-alpha fill only reached 3.6:1.
 _RATINGS = [
-    ("1", "#ef4444", "Poor",          "Completely fails — random, rule-breaking, or incoherent."),
-    ("2", "#f59e0b", "Below average", "Struggling — makes obvious mistakes or wastes turns."),
-    ("3", "#3b82f6", "Good",          "Competent — sensible, logical, on-task play."),
-    ("4", "#22c55e", "Excellent",     "Strong — clever, efficient and clearly strategic."),
+    ("1", "#ef4444", "#f87171", "Poor",          "Completely fails — random, rule-breaking, or incoherent."),
+    ("2", "#f59e0b", "#fbbf24", "Below average", "Struggling — makes obvious mistakes or wastes turns."),
+    ("3", "#3b82f6", "#60a5fa", "Good",          "Competent — sensible, logical, on-task play."),
+    ("4", "#22c55e", "#4ade80", "Excellent",     "Strong — clever, efficient and clearly strategic."),
 ]
 
 
-def _start(err, playlist, block, annotator, session_day):
+def _start(err, playlist, block, annotator):
     """Route the Start click: error banner > consent gate > playlist (resumes
     at the first game without a submitted verdict) > legacy single-game link."""
     # Never visible=False — Gradio 6 lazily mounts hidden columns, and
@@ -65,9 +68,11 @@ def _start(err, playlist, block, annotator, session_day):
         if not path:
             return stay(f"⚠️ Your assignment references an unknown game "
                         f"({item['game']!r}) — tell the study coordinator.")
-        # Practice only on a first-time participant's very first game;
-        # session_day == "1" (or "" for the legacy debug link) means this.
-        if idx == 0 and session_day in ("", "1"):
+        # Practice only for a first-timer. Gated on a persisted flag, not the
+        # session index — a mid-session-1 page reload used to replay it.
+        # has_completed_practice("") is False, so the legacy debug link
+        # (annotator="") still gets it, as it did before.
+        if not db.has_completed_practice(annotator):
             pages = (gr.update(visible=False), noop, gr.update(visible=True))
         else:          # resuming → straight to annotation
             pages = (gr.update(visible=False), gr.update(visible=True), noop)
@@ -81,6 +86,22 @@ def _start(err, playlist, block, annotator, session_day):
 
     return stay("⚠️ No participant link detected. Please use the study link "
                 "you were given (or ask the study coordinator for a corrected one).")
+
+
+def _decline_consent():
+    """Close the consent popup without recording consent or starting anything.
+
+    Exists so the dialog's focus trap has an exit — see consent.py. Declining
+    is not an error, so the welcome-page note is worded neutrally and explains
+    how to change their mind.
+    """
+    return (
+        gr.update(visible=False),
+        "",
+        "You have not given consent, so the study has not started. "
+        "You can close this tab, or press **Start Annotation** again if you "
+        "would like to re-read the information sheet.",
+    )
 
 
 def _confirm_consent(agreed, annotator_id):
@@ -115,7 +136,8 @@ def build(welcome_page, annotation_page, training_page, error_state,
             @gr.render(inputs=[error_state])
             def _error_banner(msg):
                 if msg:
-                    gr.Markdown(f"**{msg}**", elem_classes=["info-box"])
+                    gr.Markdown(f"**{msg}**", elem_classes=["info-box"],
+                                elem_id="welcome-error")
 
             gr.Markdown("# Human Annotation Study")
             gr.Markdown(
@@ -124,6 +146,10 @@ def build(welcome_page, annotation_page, training_page, error_state,
                 "about 90 seconds.",
                 elem_classes=["welcome-sub"],
             )
+
+            # The step cards are h3s; without this the outline jumps h1 -> h3.
+            # sr-only rather than a visible heading so the layout is untouched.
+            gr.HTML('<h2 class="a11y-sr-only">How the study works</h2>')
 
             with gr.Row(equal_height=True):
                 for icon, n, title, desc in _STEPS:
@@ -140,10 +166,12 @@ def build(welcome_page, annotation_page, training_page, error_state,
                     "play. Judge the **thinking**, not the outcome."
                 )
 
-            gr.Markdown("**Rating scale** - applies to all scored questions")
+            # Was bold body text acting as a heading for the whole scale group.
+            gr.HTML('<h2 class="rating-scale-h">Rating scale'
+                    '<span> - applies to all scored questions</span></h2>')
 
             with gr.Group(elem_classes=["question-card"]):
-                for n, color, label, desc in _RATINGS:
+                for n, color, text_color, label, desc in _RATINGS:
 
                     with gr.Row(elem_classes=["ovr-row"]):
 
@@ -151,7 +179,7 @@ def build(welcome_page, annotation_page, training_page, error_state,
                             gr.HTML(
                                 f'<div class="rating-badge" '
                                 f'style="background:{color}22;border-color:{color};'
-                                f'color:{color};">{n}</div>'
+                                f'color:{text_color};">{n}</div>'
                             )
 
                         with gr.Column(scale=0, min_width=130, elem_classes=["ovr-label"]):
@@ -161,7 +189,7 @@ def build(welcome_page, annotation_page, training_page, error_state,
                         with gr.Column(scale=1, elem_classes=["ovr-desc"]):
                             gr.Markdown(desc)
 
-            status_note = gr.Markdown("")
+            status_note = gr.Markdown("", elem_id="welcome-status")
 
             # First chained click blanks the annotation page, then _start (below) mounts it fresh.
             start_btn = gr.Button(
@@ -175,10 +203,10 @@ def build(welcome_page, annotation_page, training_page, error_state,
                 elem_classes=["welcome-foot"],
             )
 
-        agree_cb, confirm_btn, popup_note = consent.build(consent_popup)
+        agree_cb, confirm_btn, popup_note, decline_btn = consent.build(consent_popup)
 
         _start_inputs = [error_state, playlist_state, block_state,
-                         annotator_state, session_day_state]
+                         annotator_state]
         _start_outputs = [welcome_page, annotation_page, training_page,
                           started_at_state, session_started_at_state,
                           annotator_state, block_state,
@@ -195,3 +223,12 @@ def build(welcome_page, annotation_page, training_page, error_state,
             inputs=[agree_cb, annotator_state],
             outputs=[clearing_state, consent_popup, popup_note],
         ).then(_start, inputs=_start_inputs, outputs=_start_outputs)
+
+        # Declining just closes the popup and leaves them on welcome — no
+        # consent recorded, nothing started. Hides an already-mounted column,
+        # exactly as _confirm_consent does, so it's safe for the blank-page bug.
+        decline_btn.click(
+            _decline_consent,
+            inputs=None,
+            outputs=[consent_popup, popup_note, status_note],
+        )

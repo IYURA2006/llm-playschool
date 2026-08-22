@@ -1,0 +1,283 @@
+{
+  "meta": {
+    "game_name": "dond",
+    "experiment_name": "semi_en",
+    "game_id": 18,
+    "results_folder": "DAIR__qwen3.5-2b__sft-dpo-v2",
+    "clem_version": "3.7.2",
+    "round_count": 2,
+    "completed": true
+  },
+  "player_models": {
+    "0": {
+      "model_spec": {
+        "model_name": "DAIR__qwen3.5-2b__sft-dpo-v2",
+        "_team": "DAIR",
+        "_version": "sft-dpo-v2",
+        "backend": "huggingface_local",
+        "context_size": "32k",
+        "huggingface_id": "varadsrivastava/lm-playschool-qwen3.5-2b-sft-dpo",
+        "languages": [
+          "en"
+        ],
+        "license": {
+          "name": "apache-2.0",
+          "url": "https://www.apache.org/licenses/LICENSE-2.0"
+        },
+        "lookup_source": "/project/mmanina/lm-playschool-test-set/playpen/model_registry.json",
+        "model_config": {
+          "premade_chat_template": true,
+          "eos_to_cull": "<\\|im_end\\|>|<\\|endoftext\\|>",
+          "chat_template_kwargs": {
+            "enable_thinking": false
+          },
+          "multimodality": {
+            "single_image": true,
+            "multiple_images": true,
+            "audio": false,
+            "video": true
+          }
+        },
+        "open_weight": true,
+        "parameters": "2B",
+        "release_date": "2026-07-06"
+      },
+      "gen_args": {
+        "temperature": 0.0,
+        "max_tokens": 5000
+      }
+    }
+  },
+  "players": {
+    "GM": {
+      "game_role": "Game Master",
+      "model_name": "programmatic"
+    },
+    "Player 1": {
+      "game_role": "DealOrNoDealPlayer",
+      "model_name": "DAIR__qwen3.5-2b__sft-dpo-v2"
+    },
+    "Player 2": {
+      "game_role": "DealOrNoDealPlayer",
+      "model_name": "DAIR__qwen3.5-2b__sft-dpo-v2"
+    }
+  },
+  "turns": [
+    [
+      {
+        "from": "GM",
+        "to": "Player 1",
+        "timestamp": "2026-07-09T10:44:59.903454",
+        "action": {
+          "type": "send message",
+          "content": "You are playing a negotiation game in which you have to agree on how to divide a set of items among you and another player.\n\nRules:\n(a) You and the other player are given a set of items. Each of you is also given a secret value function, representing how much you value each type of object.\n(b) You exchange messages with the other player to agree on who gets which items. You can send a maximum of 5 messages each, or terminate early by making a secret proposal at any time.\n(c) You are each asked to submit a secret proposal indicating the items you want formatted in square brackets as follows: \"[Proposal: <number> <object name>, <number> <object name>, <...>]\"\n(d) If your proposals are complementary, i.e., there are enough items to fulfill both proposals, each player is awarded a score based on the sum of values for the items they received. Otherwise, both of you get zero points.\n(e) Your goal is to maximize the score you receive.\n\nLet us start.\n\nThe set of available items is:\n\n2 frames, 2 leaves, 2 onions\n\nYour secret value function is:\n\nframe: 0, leaf: 1, onion: 4\n\nIMPORTANT: Your messages, unless it is the secret proposal, are directly transmitted to the other player, so do not include any response to the rules or text announcing your message. To make a secret proposal, use the indicated format. Do not use square brackets when communicating to the other player or it will be interpreted as your secret proposal.\n",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 1",
+        "to": "GM",
+        "timestamp": "2026-07-09T10:44:59.903468",
+        "action": {
+          "type": "get message",
+          "content": "I’m most interested in the onions. Would you be okay with me taking both onions, and you taking both frames and both leaves?",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T10:44:59.903485",
+        "action": {
+          "type": "valid response",
+          "content": "continue"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T10:44:59.903497",
+        "action": {
+          "type": "valid message",
+          "content": "I’m most interested in the onions. Would you be okay with me taking both onions, and you taking both frames and both leaves?"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 2",
+        "timestamp": "2026-07-09T10:45:19.682712",
+        "action": {
+          "type": "send message",
+          "content": "You are playing a negotiation game in which you have to agree on how to divide a set of items among you and another player.\n\nRules:\n(a) You and the other player are given a set of items. Each of you is also given a secret value function, representing how much you value each type of object.\n(b) You exchange messages with the other player to agree on who gets which items. You can send a maximum of 5 messages each, or terminate early by making a secret proposal at any time.\n(c) You are each asked to submit a secret proposal indicating the items you want formatted in square brackets as follows: \"[Proposal: <number> <object name>, <number> <object name>, <...>]\"\n(d) If your proposals are complementary, i.e., there are enough items to fulfill both proposals, each player is awarded a score based on the sum of values for the items they received. Otherwise, both of you get zero points.\n(e) Your goal is to maximize the score you receive.\n\nLet us start.\n\nThe set of available items is:\n\n2 frames, 2 leaves, 2 onions\n\nYour secret value function is:\n\nframe: 2, leaf: 3, onion: 0\n\nIMPORTANT: Your messages, unless it is the secret proposal, are directly transmitted to the other player, so do not include any response to the rules or text announcing your message. To make a secret proposal, use the indicated format. Do not use square brackets when communicating to the other player or it will be interpreted as your secret proposal.\n\n\nI’m most interested in the onions. Would you be okay with me taking both onions, and you taking both frames and both leaves?",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 2",
+        "to": "GM",
+        "timestamp": "2026-07-09T10:45:19.682726",
+        "action": {
+          "type": "get message",
+          "content": "Works for me. I’ll take both frames and both leaves, and you can have both onions.",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T10:45:19.682744",
+        "action": {
+          "type": "valid response",
+          "content": "continue"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T10:45:19.682757",
+        "action": {
+          "type": "valid message",
+          "content": "Works for me. I’ll take both frames and both leaves, and you can have both onions."
+        }
+      }
+    ],
+    [
+      {
+        "from": "GM",
+        "to": "Player 1",
+        "timestamp": "2026-07-09T10:45:32.706435",
+        "action": {
+          "type": "send message",
+          "content": "Works for me. I’ll take both frames and both leaves, and you can have both onions.",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 1",
+        "to": "GM",
+        "timestamp": "2026-07-09T10:45:32.706450",
+        "action": {
+          "type": "get message",
+          "content": "[Proposal: 2 onions]",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T10:45:32.706478",
+        "action": {
+          "type": "valid response",
+          "content": "proposal"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T10:45:32.706494",
+        "action": {
+          "type": "valid proposal",
+          "content": [
+            0,
+            0,
+            2
+          ]
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 2",
+        "timestamp": "2026-07-09T10:45:41.531742",
+        "action": {
+          "type": "send message",
+          "content": "The other player has submitted a secret proposal. It is now your turn to submit a proposal of your own.\n",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 2",
+        "to": "GM",
+        "timestamp": "2026-07-09T10:45:41.531757",
+        "action": {
+          "type": "get message",
+          "content": "[Proposal: 2 frames, 2 leaves]",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T10:45:41.531791",
+        "action": {
+          "type": "valid response",
+          "content": "proposal"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T10:45:41.531807",
+        "action": {
+          "type": "valid proposal",
+          "content": [
+            2,
+            2,
+            0
+          ]
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T10:45:41.531826",
+        "action": {
+          "type": "successful agreement",
+          "content": [
+            [
+              0,
+              0,
+              2
+            ],
+            [
+              2,
+              2,
+              0
+            ]
+          ]
+        }
+      }
+    ]
+  ],
+  "Aborted": 0,
+  "Lose": 0,
+  "Success": 1,
+  "player_a_proposal": [
+    0,
+    0,
+    2
+  ],
+  "player_b_proposal": [
+    2,
+    2,
+    0
+  ],
+  "sum_of_scores": 18,
+  "max_sum_of_scores": 18,
+  "max_player_scores": 10,
+  "max_pareto_improvement": 10,
+  "pareto_improvement": 0,
+  "pareto_optimal": 1,
+  "episode_score": 1.0,
+  "Request Count": [
+    2,
+    2
+  ],
+  "Violated Request Count": [
+    0,
+    0
+  ],
+  "Parsed Request Count": [
+    2,
+    2
+  ]
+}

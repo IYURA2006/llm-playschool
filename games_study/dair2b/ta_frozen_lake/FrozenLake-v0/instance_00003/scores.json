@@ -1,0 +1,96 @@
+{
+  "meta": {
+    "game_name": "ta_frozen_lake",
+    "experiment_name": "FrozenLake-v0",
+    "game_id": 3,
+    "results_folder": "DAIR__qwen3.5-2b__sft-dpo-v2",
+    "clem_version": "3.7.2",
+    "round_count": 3,
+    "completed": true,
+    "ta_version": "0.7.3"
+  },
+  "players": {
+    "GM": {
+      "game_role": "Game Master",
+      "model_name": "programmatic"
+    },
+    "Player 0": {
+      "game_role": "Player 0",
+      "model_name": "DAIR__qwen3.5-2b__sft-dpo-v2"
+    }
+  },
+  "round scores": {
+    "0": {
+      "Request Count": 2,
+      "Violated Request Count": 1,
+      "Parsed Request Count": 1,
+      "Request Success Ratio": 0.5
+    },
+    "1": {
+      "Request Count": 1,
+      "Violated Request Count": 0,
+      "Parsed Request Count": 1,
+      "Request Success Ratio": 1.0
+    },
+    "2": {
+      "Request Count": 1,
+      "Violated Request Count": 0,
+      "Parsed Request Count": 1,
+      "Request Success Ratio": 1.0
+    }
+  },
+  "episode scores": {
+    "Request Count": 4,
+    "Parsed Request Count": 3,
+    "Violated Request Count": 1,
+    "Request Success Ratio": 0.75,
+    "Aborted": 0,
+    "Lose": 0,
+    "Success": 0,
+    "Numeric Reward": 0.5,
+    "ta_reward": {
+      "0": 0.5
+    },
+    "Main Score": 50.0
+  },
+  "player_models": {
+    "0": {
+      "model_spec": {
+        "model_name": "DAIR__qwen3.5-2b__sft-dpo-v2",
+        "_team": "DAIR",
+        "_version": "sft-dpo-v2",
+        "backend": "huggingface_local",
+        "context_size": "32k",
+        "huggingface_id": "varadsrivastava/lm-playschool-qwen3.5-2b-sft-dpo",
+        "languages": [
+          "en"
+        ],
+        "license": {
+          "name": "apache-2.0",
+          "url": "https://www.apache.org/licenses/LICENSE-2.0"
+        },
+        "lookup_source": "/project/mmanina/lm-playschool-test-set/playpen/model_registry.json",
+        "model_config": {
+          "premade_chat_template": true,
+          "eos_to_cull": "<\\|im_end\\|>|<\\|endoftext\\|>",
+          "chat_template_kwargs": {
+            "enable_thinking": false
+          },
+          "multimodality": {
+            "single_image": true,
+            "multiple_images": true,
+            "audio": false,
+            "video": true
+          }
+        },
+        "open_weight": true,
+        "parameters": "2B",
+        "release_date": "2026-07-06"
+      },
+      "gen_args": {
+        "temperature": 0.0,
+        "max_tokens": 5000
+      }
+    }
+  }
+}

@@ -1,0 +1,282 @@
+{
+  "meta": {
+    "game_name": "dond",
+    "experiment_name": "semi_en",
+    "game_id": 2,
+    "results_folder": "qwen3.5-27b",
+    "clem_version": "3.7.2",
+    "round_count": 2,
+    "completed": true
+  },
+  "player_models": {
+    "0": {
+      "model_spec": {
+        "model_name": "qwen3.5-27b",
+        "backend": "huggingface_local",
+        "context_size": "262k",
+        "huggingface_id": "Qwen/Qwen3.5-27B",
+        "languages": [
+          "en",
+          "zh"
+        ],
+        "license": {
+          "name": "Apache 2.0",
+          "url": "https://www.apache.org/licenses/LICENSE-2.0"
+        },
+        "lookup_source": "/project/mmanina/lm-playschool-test-set/playpen/model_registry.json",
+        "model_config": {
+          "premade_chat_template": true,
+          "eos_to_cull": "<\\|im_end\\|>|<\\|endoftext\\|>",
+          "chat_template_kwargs": {
+            "enable_thinking": false
+          },
+          "multimodality": {
+            "single_image": true,
+            "multiple_images": true,
+            "audio": false,
+            "video": true
+          }
+        },
+        "open_weight": true,
+        "parameters": "27B",
+        "release_date": "2026-02-24"
+      },
+      "gen_args": {
+        "temperature": 0.0,
+        "max_tokens": 5000
+      }
+    }
+  },
+  "players": {
+    "GM": {
+      "game_role": "Game Master",
+      "model_name": "programmatic"
+    },
+    "Player 1": {
+      "game_role": "DealOrNoDealPlayer",
+      "model_name": "qwen3.5-27b"
+    },
+    "Player 2": {
+      "game_role": "DealOrNoDealPlayer",
+      "model_name": "qwen3.5-27b"
+    }
+  },
+  "turns": [
+    [
+      {
+        "from": "GM",
+        "to": "Player 1",
+        "timestamp": "2026-07-01T14:45:43.436412",
+        "action": {
+          "type": "send message",
+          "content": "You are playing a negotiation game in which you have to agree on how to divide a set of items among you and another player.\n\nRules:\n(a) You and the other player are given a set of items. Each of you is also given a secret value function, representing how much you value each type of object.\n(b) You exchange messages with the other player to agree on who gets which items. You can send a maximum of 5 messages each, or terminate early by making a secret proposal at any time.\n(c) You are each asked to submit a secret proposal indicating the items you want formatted in square brackets as follows: \"[Proposal: <number> <object name>, <number> <object name>, <...>]\"\n(d) If your proposals are complementary, i.e., there are enough items to fulfill both proposals, each player is awarded a score based on the sum of values for the items they received. Otherwise, both of you get zero points.\n(e) Your goal is to maximize the score you receive.\n\nLet us start.\n\nThe set of available items is:\n\n1 bowl, 2 hooks, 3 socks\n\nYour secret value function is:\n\nbowl: 5, hook: 1, sock: 1\n\nIMPORTANT: Your messages, unless it is the secret proposal, are directly transmitted to the other player, so do not include any response to the rules or text announcing your message. To make a secret proposal, use the indicated format. Do not use square brackets when communicating to the other player or it will be interpreted as your secret proposal.\n",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 1",
+        "to": "GM",
+        "timestamp": "2026-07-01T14:45:43.436427",
+        "action": {
+          "type": "get message",
+          "content": "I value the bowl the most, while the hooks and socks are worth very little to me. I'm willing to give up the hooks and socks if it means I can secure the bowl. What is your preference for these items?",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T14:45:43.436444",
+        "action": {
+          "type": "valid response",
+          "content": "continue"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T14:45:43.436456",
+        "action": {
+          "type": "valid message",
+          "content": "I value the bowl the most, while the hooks and socks are worth very little to me. I'm willing to give up the hooks and socks if it means I can secure the bowl. What is your preference for these items?"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 2",
+        "timestamp": "2026-07-01T14:49:28.878948",
+        "action": {
+          "type": "send message",
+          "content": "You are playing a negotiation game in which you have to agree on how to divide a set of items among you and another player.\n\nRules:\n(a) You and the other player are given a set of items. Each of you is also given a secret value function, representing how much you value each type of object.\n(b) You exchange messages with the other player to agree on who gets which items. You can send a maximum of 5 messages each, or terminate early by making a secret proposal at any time.\n(c) You are each asked to submit a secret proposal indicating the items you want formatted in square brackets as follows: \"[Proposal: <number> <object name>, <number> <object name>, <...>]\"\n(d) If your proposals are complementary, i.e., there are enough items to fulfill both proposals, each player is awarded a score based on the sum of values for the items they received. Otherwise, both of you get zero points.\n(e) Your goal is to maximize the score you receive.\n\nLet us start.\n\nThe set of available items is:\n\n1 bowl, 2 hooks, 3 socks\n\nYour secret value function is:\n\nbowl: 1, hook: 0, sock: 3\n\nIMPORTANT: Your messages, unless it is the secret proposal, are directly transmitted to the other player, so do not include any response to the rules or text announcing your message. To make a secret proposal, use the indicated format. Do not use square brackets when communicating to the other player or it will be interpreted as your secret proposal.\n\n\nI value the bowl the most, while the hooks and socks are worth very little to me. I'm willing to give up the hooks and socks if it means I can secure the bowl. What is your preference for these items?",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 2",
+        "to": "GM",
+        "timestamp": "2026-07-01T14:49:28.878964",
+        "action": {
+          "type": "get message",
+          "content": "I value the socks the most, with each sock being worth 3 points to me, while the bowl is only worth 1 and the hooks are worth nothing. Since you want the bowl and I want the socks, it seems like we can easily agree: you take the bowl, and I take all three socks. We can both ignore the hooks since neither of us values them. Does that sound fair to you?",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T14:49:28.878982",
+        "action": {
+          "type": "valid response",
+          "content": "continue"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T14:49:28.878994",
+        "action": {
+          "type": "valid message",
+          "content": "I value the socks the most, with each sock being worth 3 points to me, while the bowl is only worth 1 and the hooks are worth nothing. Since you want the bowl and I want the socks, it seems like we can easily agree: you take the bowl, and I take all three socks. We can both ignore the hooks since neither of us values them. Does that sound fair to you?"
+        }
+      }
+    ],
+    [
+      {
+        "from": "GM",
+        "to": "Player 1",
+        "timestamp": "2026-07-01T14:52:39.134950",
+        "action": {
+          "type": "send message",
+          "content": "I value the socks the most, with each sock being worth 3 points to me, while the bowl is only worth 1 and the hooks are worth nothing. Since you want the bowl and I want the socks, it seems like we can easily agree: you take the bowl, and I take all three socks. We can both ignore the hooks since neither of us values them. Does that sound fair to you?",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 1",
+        "to": "GM",
+        "timestamp": "2026-07-01T14:52:39.134966",
+        "action": {
+          "type": "get message",
+          "content": "That sounds like a perfect agreement. I will take the bowl, and you can have all three socks. We can leave the hooks unassigned since neither of us values them.\n\n[Proposal: 1 bowl]",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T14:52:39.134995",
+        "action": {
+          "type": "valid response",
+          "content": "proposal"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T14:52:39.135010",
+        "action": {
+          "type": "valid proposal",
+          "content": [
+            1,
+            0,
+            0
+          ]
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 2",
+        "timestamp": "2026-07-01T14:53:15.564611",
+        "action": {
+          "type": "send message",
+          "content": "The other player has submitted a secret proposal. It is now your turn to submit a proposal of your own.\n",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 2",
+        "to": "GM",
+        "timestamp": "2026-07-01T14:53:15.564643",
+        "action": {
+          "type": "get message",
+          "content": "[Proposal: 1 bowl]",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T14:53:15.564696",
+        "action": {
+          "type": "valid response",
+          "content": "proposal"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T14:53:15.564722",
+        "action": {
+          "type": "valid proposal",
+          "content": [
+            1,
+            0,
+            0
+          ]
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T14:53:15.564748",
+        "action": {
+          "type": "failed agreement",
+          "content": [
+            [
+              1,
+              0,
+              0
+            ],
+            [
+              1,
+              0,
+              0
+            ]
+          ]
+        }
+      }
+    ]
+  ],
+  "Aborted": 0,
+  "Lose": 1,
+  "Success": 0,
+  "player_a_proposal": [
+    1,
+    0,
+    0
+  ],
+  "player_b_proposal": [
+    1,
+    0,
+    0
+  ],
+  "sum_of_scores": 0,
+  "max_sum_of_scores": 16,
+  "max_player_scores": 10,
+  "max_pareto_improvement": 10,
+  "pareto_improvement": 10,
+  "pareto_optimal": 0,
+  "episode_score": 0.0,
+  "Request Count": [
+    2,
+    2
+  ],
+  "Violated Request Count": [
+    0,
+    0
+  ],
+  "Parsed Request Count": [
+    2,
+    2
+  ]
+}

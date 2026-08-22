@@ -1,0 +1,118 @@
+{
+  "meta": {
+    "game_name": "wordle-crazy_withclue",
+    "experiment_name": "medium_frequency_words_clue_no_critic",
+    "game_id": 15,
+    "results_folder": "DAIR__qwen3.5-2b__sft-dpo-v2",
+    "clem_version": "3.7.2",
+    "round_count": 1,
+    "completed": true
+  },
+  "player_models": {
+    "0": {
+      "model_spec": {
+        "model_name": "DAIR__qwen3.5-2b__sft-dpo-v2",
+        "_team": "DAIR",
+        "_version": "sft-dpo-v2",
+        "backend": "huggingface_local",
+        "context_size": "32k",
+        "huggingface_id": "varadsrivastava/lm-playschool-qwen3.5-2b-sft-dpo",
+        "languages": [
+          "en"
+        ],
+        "license": {
+          "name": "apache-2.0",
+          "url": "https://www.apache.org/licenses/LICENSE-2.0"
+        },
+        "lookup_source": "/project/mmanina/lm-playschool-test-set/playpen/model_registry.json",
+        "model_config": {
+          "premade_chat_template": true,
+          "eos_to_cull": "<\\|im_end\\|>|<\\|endoftext\\|>",
+          "chat_template_kwargs": {
+            "enable_thinking": false
+          },
+          "multimodality": {
+            "single_image": true,
+            "multiple_images": true,
+            "audio": false,
+            "video": true
+          }
+        },
+        "open_weight": true,
+        "parameters": "2B",
+        "release_date": "2026-07-06"
+      },
+      "gen_args": {
+        "temperature": 0.0,
+        "max_tokens": 5000
+      }
+    }
+  },
+  "players": {
+    "GM": {
+      "game_role": "Game Master",
+      "model_name": "programmatic"
+    },
+    "Player 1": {
+      "game_role": "WordGuesser",
+      "model_name": "DAIR__qwen3.5-2b__sft-dpo-v2"
+    }
+  },
+  "turns": [
+    [
+      {
+        "from": "GM",
+        "to": "Player 1",
+        "timestamp": "2026-07-09T13:25:36.318116",
+        "action": {
+          "type": "send message",
+          "content": "You are a language wizard who likes to guess words by using the given rules.\n\nWelcome to Wordle! You have six attempts to guess the target word, a valid English word of five lowercase letters (a-z). Please use the tags \"explanation:\" and \"guess:\" to provide a concise explanation for each guess.\n\nTo help you make an informed guess, you will receive a clue for the word, such as\nclue: snowy white.\n\nHere is an example guess based on the clue:\nexplanation: In the fairy tail Snow White, the girl is killed because she eats a poisoned apple. And the word apple has 5 letters.\nguess: apple\n\nAfter each guess, your answer will be validated, and you will receive feedback indicating which letters are correct (yellow), which letters are correct but in the wrong position (black), and which letters are incorrect (purple). This feedback can be useful in determining which letters to include or exclude in your next guess.\n\nFor example, the feedback for \"apple\" might be:\nguess_feedback: a<black> p<black> p<yellow> l<black> e<purple>\n\nThe explanation should contain details about how both the guess_feedback and clue work together in tandem to formulate a new guess.\n\nDo not generate any other text.\n\nLet's begin with your first guess.\n\nclue: passenger ship",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 1",
+        "to": "GM",
+        "timestamp": "2026-07-09T13:25:36.318132",
+        "action": {
+          "type": "get message",
+          "content": "explanation: A passenger ship is commonly called a “liner,” which is a five-letter word directly related to the clue.\nguess: liner",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T13:25:36.318351",
+        "action": {
+          "type": "metadata",
+          "content": "attempts = 1\ntarget_word = liner\ntarget_word_clue = passenger ship\nguess = liner\nguess_feedback = l<yellow> i<yellow> n<yellow> e<yellow> r<yellow>"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T13:25:36.318366",
+        "action": {
+          "type": "correct guess",
+          "content": "game_result = WIN"
+        }
+      }
+    ]
+  ],
+  "Aborted": 0,
+  "Lose": 0,
+  "Success": 1,
+  "Request Count": 1,
+  "Parsed Request Count": 1,
+  "Violated Request Count": 0,
+  "Guesser Guesses": [
+    "liner"
+  ],
+  "Guesser Feedbacks": [
+    "l<yellow> i<yellow> n<yellow> e<yellow> r<yellow>"
+  ],
+  "Guesser Explanations": [
+    "A passenger ship is commonly called a “liner,” which is a five-letter word directly related to the clue."
+  ]
+}

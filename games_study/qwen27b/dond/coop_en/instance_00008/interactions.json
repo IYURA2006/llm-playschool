@@ -1,0 +1,282 @@
+{
+  "meta": {
+    "game_name": "dond",
+    "experiment_name": "coop_en",
+    "game_id": 8,
+    "results_folder": "qwen3.5-27b",
+    "clem_version": "3.7.2",
+    "round_count": 2,
+    "completed": true
+  },
+  "player_models": {
+    "0": {
+      "model_spec": {
+        "model_name": "qwen3.5-27b",
+        "backend": "huggingface_local",
+        "context_size": "262k",
+        "huggingface_id": "Qwen/Qwen3.5-27B",
+        "languages": [
+          "en",
+          "zh"
+        ],
+        "license": {
+          "name": "Apache 2.0",
+          "url": "https://www.apache.org/licenses/LICENSE-2.0"
+        },
+        "lookup_source": "/project/mmanina/lm-playschool-test-set/playpen/model_registry.json",
+        "model_config": {
+          "premade_chat_template": true,
+          "eos_to_cull": "<\\|im_end\\|>|<\\|endoftext\\|>",
+          "chat_template_kwargs": {
+            "enable_thinking": false
+          },
+          "multimodality": {
+            "single_image": true,
+            "multiple_images": true,
+            "audio": false,
+            "video": true
+          }
+        },
+        "open_weight": true,
+        "parameters": "27B",
+        "release_date": "2026-02-24"
+      },
+      "gen_args": {
+        "temperature": 0.0,
+        "max_tokens": 5000
+      }
+    }
+  },
+  "players": {
+    "GM": {
+      "game_role": "Game Master",
+      "model_name": "programmatic"
+    },
+    "Player 1": {
+      "game_role": "DealOrNoDealPlayer",
+      "model_name": "qwen3.5-27b"
+    },
+    "Player 2": {
+      "game_role": "DealOrNoDealPlayer",
+      "model_name": "qwen3.5-27b"
+    }
+  },
+  "turns": [
+    [
+      {
+        "from": "GM",
+        "to": "Player 1",
+        "timestamp": "2026-07-01T14:45:09.348552",
+        "action": {
+          "type": "send message",
+          "content": "You are playing a cooperative negotiation game in which you have to agree on how to divide a set of items among you and another player.\n\nRules:\n(a) You and the other player are given a set of items. Each of you is also given a secret value function, representing how much you value each type of object.\n(b) You exchange messages with the other player to agree on who gets which items. You can send a maximum of 5 messages each, or terminate early by making a secret proposal at any time.\n(c) You are each asked to submit a secret proposal indicating the items you want formatted in square brackets as follows: \"[Proposal: <number> <object name>, <number> <object name>, <...>]\"\n(d) If your proposals are complementary, i.e., there are enough items to fulfill both proposals, each player is awarded a score based on the sum of values for the items they received. Otherwise, both of you get zero points.\n(e) Your goal is to maximize the sum of your score and the score of the other player.\n\nLet us start.\n\nThe set of available items is:\n\n2 vases, 2 towels, 2 fruits\n\nYour secret value function is:\n\nvase: 0, towel: 1, fruit: 4\n\nIMPORTANT: Your messages, unless it is the secret proposal, are directly transmitted to the other player, so do not include any response to the rules or text announcing your message. To make a secret proposal, use the indicated format. Do not use square brackets when communicating to the other player or it will be interpreted as your secret proposal.\n",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 1",
+        "to": "GM",
+        "timestamp": "2026-07-01T14:45:09.348571",
+        "action": {
+          "type": "get message",
+          "content": "Hi! Let's figure out the best way to split these items. I have 2 vases, 2 towels, and 2 fruits to divide between us.\n\nSince I value fruits the most (4 points each) and towels a bit (1 point each), but vases not at all (0 points), I'm really hoping to get the fruits. I suspect you might value the vases more since I don't.\n\nWhat are your preferences? If you tell me what you value most, we can make sure we both get the items we want most to maximize our total score.",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T14:45:09.348607",
+        "action": {
+          "type": "valid response",
+          "content": "continue"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T14:45:09.348632",
+        "action": {
+          "type": "valid message",
+          "content": "Hi! Let's figure out the best way to split these items. I have 2 vases, 2 towels, and 2 fruits to divide between us.\n\nSince I value fruits the most (4 points each) and towels a bit (1 point each), but vases not at all (0 points), I'm really hoping to get the fruits. I suspect you might value the vases more since I don't.\n\nWhat are your preferences? If you tell me what you value most, we can make sure we both get the items we want most to maximize our total score."
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 2",
+        "timestamp": "2026-07-01T14:47:54.438670",
+        "action": {
+          "type": "send message",
+          "content": "You are playing a cooperative negotiation game in which you have to agree on how to divide a set of items among you and another player.\n\nRules:\n(a) You and the other player are given a set of items. Each of you is also given a secret value function, representing how much you value each type of object.\n(b) You exchange messages with the other player to agree on who gets which items. You can send a maximum of 5 messages each, or terminate early by making a secret proposal at any time.\n(c) You are each asked to submit a secret proposal indicating the items you want formatted in square brackets as follows: \"[Proposal: <number> <object name>, <number> <object name>, <...>]\"\n(d) If your proposals are complementary, i.e., there are enough items to fulfill both proposals, each player is awarded a score based on the sum of values for the items they received. Otherwise, both of you get zero points.\n(e) Your goal is to maximize the sum of your score and the score of the other player.\n\nLet us start.\n\nThe set of available items is:\n\n2 vases, 2 towels, 2 fruits\n\nYour secret value function is:\n\nvase: 3, towel: 0, fruit: 2\n\nIMPORTANT: Your messages, unless it is the secret proposal, are directly transmitted to the other player, so do not include any response to the rules or text announcing your message. To make a secret proposal, use the indicated format. Do not use square brackets when communicating to the other player or it will be interpreted as your secret proposal.\n\n\nHi! Let's figure out the best way to split these items. I have 2 vases, 2 towels, and 2 fruits to divide between us.\n\nSince I value fruits the most (4 points each) and towels a bit (1 point each), but vases not at all (0 points), I'm really hoping to get the fruits. I suspect you might value the vases more since I don't.\n\nWhat are your preferences? If you tell me what you value most, we can make sure we both get the items we want most to maximize our total score.",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 2",
+        "to": "GM",
+        "timestamp": "2026-07-01T14:47:54.438694",
+        "action": {
+          "type": "get message",
+          "content": "Hi! Thanks for sharing your preferences. It sounds like you really want the fruits and towels, while I value the vases and fruits.\n\nHere is my secret value function:\n- Vase: 3 points\n- Towel: 0 points\n- Fruit: 2 points\n\nSince I value vases the most (3 points each) and fruits moderately (2 points each), but towels not at all (0 points), I would love to get the vases. You mentioned you value fruits the most, so it seems like a great match if I take the vases and you take the fruits.\n\nWhat about the towels? Since neither of us values them highly (you get 1 point, I get 0), maybe we can just split them or give them to whoever needs them to balance the deal, though they don't add much to the total score.\n\nHow about this plan:\n- I take both vases.\n- You take both fruits.\n- We can split the towels however you like, or I can take them since they don't matter to me, but they might be worth something to you.\n\nDoes this sound good to you? If so, I can make a secret proposal to lock it in.",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T14:47:54.438733",
+        "action": {
+          "type": "valid response",
+          "content": "continue"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T14:47:54.438758",
+        "action": {
+          "type": "valid message",
+          "content": "Hi! Thanks for sharing your preferences. It sounds like you really want the fruits and towels, while I value the vases and fruits.\n\nHere is my secret value function:\n- Vase: 3 points\n- Towel: 0 points\n- Fruit: 2 points\n\nSince I value vases the most (3 points each) and fruits moderately (2 points each), but towels not at all (0 points), I would love to get the vases. You mentioned you value fruits the most, so it seems like a great match if I take the vases and you take the fruits.\n\nWhat about the towels? Since neither of us values them highly (you get 1 point, I get 0), maybe we can just split them or give them to whoever needs them to balance the deal, though they don't add much to the total score.\n\nHow about this plan:\n- I take both vases.\n- You take both fruits.\n- We can split the towels however you like, or I can take them since they don't matter to me, but they might be worth something to you.\n\nDoes this sound good to you? If so, I can make a secret proposal to lock it in."
+        }
+      }
+    ],
+    [
+      {
+        "from": "GM",
+        "to": "Player 1",
+        "timestamp": "2026-07-01T14:51:34.148970",
+        "action": {
+          "type": "send message",
+          "content": "Hi! Thanks for sharing your preferences. It sounds like you really want the fruits and towels, while I value the vases and fruits.\n\nHere is my secret value function:\n- Vase: 3 points\n- Towel: 0 points\n- Fruit: 2 points\n\nSince I value vases the most (3 points each) and fruits moderately (2 points each), but towels not at all (0 points), I would love to get the vases. You mentioned you value fruits the most, so it seems like a great match if I take the vases and you take the fruits.\n\nWhat about the towels? Since neither of us values them highly (you get 1 point, I get 0), maybe we can just split them or give them to whoever needs them to balance the deal, though they don't add much to the total score.\n\nHow about this plan:\n- I take both vases.\n- You take both fruits.\n- We can split the towels however you like, or I can take them since they don't matter to me, but they might be worth something to you.\n\nDoes this sound good to you? If so, I can make a secret proposal to lock it in.",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 1",
+        "to": "GM",
+        "timestamp": "2026-07-01T14:51:34.148989",
+        "action": {
+          "type": "get message",
+          "content": "That sounds like a perfect plan! Let's break down the total value to make sure we are maximizing our combined score:\n\n- **You take 2 Vases**: You get $2 \\times 3 = 6$ points.\n- **I take 2 Fruits**: I get $2 \\times 4 = 8$ points.\n- **Towels**: Since I value them at 1 point each and you value them at 0, I should take the **2 Towels** to add $2 \\times 1 = 2$ points to the total.\n\nThis gives us a total combined score of $6 + 8 + 2 = 16$ points, which is the maximum possible since we are assigning every item to the person who values it most.\n\nHere is the final agreement:\n- **You**: 2 vases\n- **Me**: 2 fruits, 2 towels\n\nI will submit the secret proposal now to lock this in.\n\n[Proposal: 2 fruits, 2 towels]",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T14:51:34.149070",
+        "action": {
+          "type": "valid response",
+          "content": "proposal"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T14:51:34.149091",
+        "action": {
+          "type": "valid proposal",
+          "content": [
+            0,
+            2,
+            2
+          ]
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 2",
+        "timestamp": "2026-07-01T14:53:11.392180",
+        "action": {
+          "type": "send message",
+          "content": "The other player has submitted a secret proposal. It is now your turn to submit a proposal of your own.\n",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 2",
+        "to": "GM",
+        "timestamp": "2026-07-01T14:53:11.392203",
+        "action": {
+          "type": "get message",
+          "content": "[Proposal: 2 fruits, 2 towels]",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T14:53:11.392245",
+        "action": {
+          "type": "valid response",
+          "content": "proposal"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T14:53:11.392263",
+        "action": {
+          "type": "valid proposal",
+          "content": [
+            0,
+            2,
+            2
+          ]
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T14:53:11.392284",
+        "action": {
+          "type": "failed agreement",
+          "content": [
+            [
+              0,
+              2,
+              2
+            ],
+            [
+              0,
+              2,
+              2
+            ]
+          ]
+        }
+      }
+    ]
+  ],
+  "Aborted": 0,
+  "Lose": 1,
+  "Success": 0,
+  "player_a_proposal": [
+    0,
+    2,
+    2
+  ],
+  "player_b_proposal": [
+    0,
+    2,
+    2
+  ],
+  "sum_of_scores": 0,
+  "max_sum_of_scores": 16,
+  "max_player_scores": 10,
+  "max_pareto_improvement": 16,
+  "pareto_improvement": 16,
+  "pareto_optimal": 0,
+  "episode_score": 0.0,
+  "Request Count": [
+    2,
+    2
+  ],
+  "Violated Request Count": [
+    0,
+    0
+  ],
+  "Parsed Request Count": [
+    2,
+    2
+  ]
+}

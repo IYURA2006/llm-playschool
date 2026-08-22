@@ -1,0 +1,1485 @@
+{
+  "meta": {
+    "game_name": "codenames",
+    "experiment_name": "frequency_high",
+    "game_id": 9,
+    "results_folder": "CityUoL__qwen3.5-2b__Qwen-GuidePlay-2B-v1",
+    "clem_version": "3.7.2",
+    "round_count": 7,
+    "completed": true
+  },
+  "player_models": {
+    "0": {
+      "model_spec": {
+        "model_name": "CityUoL__qwen3.5-2b__Qwen-GuidePlay-2B-v1",
+        "_team": "CityUoL",
+        "_version": "Qwen-GuidePlay-2B-v1",
+        "backend": "huggingface_local",
+        "context_size": "262k",
+        "huggingface_id": "syedhuq/qwen-guideplay-2b",
+        "languages": [
+          "en"
+        ],
+        "license": {
+          "name": "Apache-2.0",
+          "url": "https://www.apache.org/licenses/LICENSE-2.0"
+        },
+        "lookup_source": "/project/mmanina/lm-playschool-test-set/playpen/model_registry.json",
+        "model_config": {
+          "premade_chat_template": true,
+          "eos_to_cull": "<\\|im_end\\|>|<\\|endoftext\\|>",
+          "chat_template_kwargs": {
+            "enable_thinking": false
+          },
+          "multimodality": {
+            "single_image": true,
+            "multiple_images": true,
+            "audio": false,
+            "video": true
+          }
+        },
+        "open_weight": true,
+        "parameters": "2B",
+        "release_date": "2026-07-06"
+      },
+      "gen_args": {
+        "temperature": 0.0,
+        "max_tokens": 5000
+      }
+    }
+  },
+  "players": {
+    "GM": {
+      "game_role": "Game Master",
+      "model_name": "programmatic"
+    },
+    "Player 1": {
+      "game_role": "ClueGiver",
+      "model_name": "CityUoL__qwen3.5-2b__Qwen-GuidePlay-2B-v1"
+    },
+    "Player 2": {
+      "game_role": "Guesser",
+      "model_name": "CityUoL__qwen3.5-2b__Qwen-GuidePlay-2B-v1"
+    }
+  },
+  "turns": [
+    [
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:51:18.784999",
+        "action": {
+          "type": "board status",
+          "content": {
+            "hidden": {
+              "team": [
+                "table",
+                "picture",
+                "head",
+                "doc",
+                "bag",
+                "food",
+                "war",
+                "paper",
+                "lady"
+              ],
+              "innocent": [
+                "box",
+                "date",
+                "fool",
+                "times",
+                "charge",
+                "star",
+                "captain"
+              ],
+              "opponent": [
+                "ball",
+                "king",
+                "fish",
+                "mistake",
+                "death",
+                "school",
+                "tv",
+                "matter"
+              ],
+              "assassin": [
+                "state"
+              ]
+            },
+            "revealed": {
+              "team": {
+                "team": [],
+                "innocent": [],
+                "opponent": [],
+                "assassin": []
+              },
+              "opponent": {
+                "team": [],
+                "innocent": [],
+                "opponent": [],
+                "assassin": []
+              }
+            }
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 1",
+        "timestamp": "2026-07-09T07:51:37.822125",
+        "action": {
+          "type": "send message",
+          "content": "Provide one single-word clue that relates to some of your team's words from the list below. You can choose to how many and to which words your clue relates to.\nThe goal is to have your partner guess all of your team's words based on the clues you give them, before the other team has uncovered all of theirs. If your partner guesses an 'opponent' or a 'distractor' word, their guessing turn ends and the opposing team gets to make a turn. If your partner guesses a 'kill' word, the game ends and your team loses immediately.\nThe more words your clue relates to, the quicker you can win the game, but the harder the associations may be to guess for your partner, so choose your clue word wisely. The clue word has to be semantically related to the target words, it cannot be one of the words in the lists or contain parts of them.\n\nAlways give your single-word clue and your comma-separated list of related target words in the following format and make your answers as short as possible, never include any other text than is required in this form:\n\nCLUE: <WORD>\nTARGETS: <TARGETS>\n\nYour team words are: table, picture, head, doc, bag, food, war, paper, lady.\nYour opponent's team words are: ball, king, fish, mistake, death, school, tv, matter.\nDistractor words are: box, date, fool, times, charge, star, captain.\nThe kill words are: state.",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 1",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:51:37.822145",
+        "action": {
+          "type": "get message",
+          "content": "CLUE: document\nTARGETS: doc, paper",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:51:37.822334",
+        "action": {
+          "type": "clue",
+          "content": "document"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:51:37.822358",
+        "action": {
+          "type": "targets",
+          "content": [
+            "doc",
+            "paper"
+          ]
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:51:37.822379",
+        "action": {
+          "type": "word targeted",
+          "content": {
+            "word": "doc",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:51:37.822400",
+        "action": {
+          "type": "word targeted",
+          "content": {
+            "word": "paper",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 2",
+        "timestamp": "2026-07-09T07:51:56.252996",
+        "action": {
+          "type": "send message",
+          "content": "Provide a comma-separated list of up to 2 words from the following list that best relate or are most closely associated with the word 'document'. Always start your list of guess(es) with 'GUESS: ' and do not include any other text in your answer.\n\npaper, times, charge, fish, bag, table, fool, tv, state, captain, matter, food, king, doc, picture, mistake, date, lady, ball, school, head, star, war, box, death",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 2",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:51:56.253011",
+        "action": {
+          "type": "get message",
+          "content": "GUESS: paper, doc",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:51:56.253060",
+        "action": {
+          "type": "guesses",
+          "content": [
+            "paper",
+            "doc"
+          ]
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:51:56.253085",
+        "action": {
+          "type": "team revealed",
+          "content": {
+            "word": "paper",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:51:56.253104",
+        "action": {
+          "type": "target revealed",
+          "content": {
+            "word": "paper",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:51:56.253124",
+        "action": {
+          "type": "team revealed",
+          "content": {
+            "word": "doc",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:51:56.253142",
+        "action": {
+          "type": "target revealed",
+          "content": {
+            "word": "doc",
+            "assignment": "team"
+          }
+        }
+      }
+    ],
+    [
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:51:56.253290",
+        "action": {
+          "type": "opponent revealed",
+          "content": {
+            "word": "mistake",
+            "assignment": "opponent"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:51:56.253317",
+        "action": {
+          "type": "board status",
+          "content": {
+            "hidden": {
+              "team": [
+                "table",
+                "picture",
+                "head",
+                "bag",
+                "food",
+                "war",
+                "lady"
+              ],
+              "innocent": [
+                "box",
+                "date",
+                "fool",
+                "times",
+                "charge",
+                "star",
+                "captain"
+              ],
+              "opponent": [
+                "ball",
+                "king",
+                "fish",
+                "death",
+                "school",
+                "tv",
+                "matter"
+              ],
+              "assassin": [
+                "state"
+              ]
+            },
+            "revealed": {
+              "team": {
+                "team": [
+                  "paper",
+                  "doc"
+                ],
+                "innocent": [],
+                "opponent": [],
+                "assassin": []
+              },
+              "opponent": {
+                "team": [],
+                "innocent": [],
+                "opponent": [
+                  "mistake"
+                ],
+                "assassin": []
+              }
+            }
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 1",
+        "timestamp": "2026-07-09T07:52:15.333144",
+        "action": {
+          "type": "send message",
+          "content": "The words paper, doc were guessed correctly. Your teammate's turn ended there.\nNow provide another clue relating to some of your remaining team words and a list of the related target words. Remember to start your clue with 'CLUE: ', put a new line, and start your comma-separated list of target words with 'TARGETS: '. Notice: some words have been removed from the lists compared to previous requests.\n\nYour remaining team words are: table, picture, head, bag, food, war, lady.\nRemaining words for your opponent are: ball, king, fish, mistake, death, school, tv, matter.\nRemaining distractor words are: box, date, fool, times, charge, star, captain.\nRemaining kill words are: state.",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 1",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:52:15.333160",
+        "action": {
+          "type": "get message",
+          "content": "CLUE: meal\nTARGETS: food",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:52:15.333395",
+        "action": {
+          "type": "clue",
+          "content": "meal"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:52:15.333428",
+        "action": {
+          "type": "targets",
+          "content": [
+            "food"
+          ]
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:52:15.333452",
+        "action": {
+          "type": "word targeted",
+          "content": {
+            "word": "food",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 2",
+        "timestamp": "2026-07-09T07:52:29.489436",
+        "action": {
+          "type": "send message",
+          "content": "The words paper, doc were guessed correctly. Your turn ended there.\nNow provide another comma-separated list of at least 1 and up to 1 words from the following list of words that best relate or are most closely associated with the word 'meal'. Remember to start your answer with 'GUESS: '. Notice: some words have been removed from the list compared to previous requests.\n\ntimes, charge, fish, bag, table, fool, tv, state, captain, matter, food, king, picture, date, lady, ball, school, head, star, war, box, death",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 2",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:52:29.489452",
+        "action": {
+          "type": "get message",
+          "content": "GUESS: food",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:52:29.489501",
+        "action": {
+          "type": "guesses",
+          "content": [
+            "food"
+          ]
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:52:29.489526",
+        "action": {
+          "type": "team revealed",
+          "content": {
+            "word": "food",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:52:29.489546",
+        "action": {
+          "type": "target revealed",
+          "content": {
+            "word": "food",
+            "assignment": "team"
+          }
+        }
+      }
+    ],
+    [
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:52:29.489658",
+        "action": {
+          "type": "opponent revealed",
+          "content": {
+            "word": "fish",
+            "assignment": "opponent"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:52:29.489686",
+        "action": {
+          "type": "board status",
+          "content": {
+            "hidden": {
+              "team": [
+                "table",
+                "picture",
+                "head",
+                "bag",
+                "war",
+                "lady"
+              ],
+              "innocent": [
+                "box",
+                "date",
+                "fool",
+                "times",
+                "charge",
+                "star",
+                "captain"
+              ],
+              "opponent": [
+                "ball",
+                "king",
+                "death",
+                "school",
+                "tv",
+                "matter"
+              ],
+              "assassin": [
+                "state"
+              ]
+            },
+            "revealed": {
+              "team": {
+                "team": [
+                  "paper",
+                  "doc",
+                  "food"
+                ],
+                "innocent": [],
+                "opponent": [],
+                "assassin": []
+              },
+              "opponent": {
+                "team": [],
+                "innocent": [],
+                "opponent": [
+                  "mistake",
+                  "fish"
+                ],
+                "assassin": []
+              }
+            }
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 1",
+        "timestamp": "2026-07-09T07:52:45.025411",
+        "action": {
+          "type": "send message",
+          "content": "The word food was guessed correctly. Your teammate's turn ended there.\nNow provide another clue relating to some of your remaining team words and a list of the related target words. Remember to start your clue with 'CLUE: ', put a new line, and start your comma-separated list of target words with 'TARGETS: '. Notice: some words have been removed from the lists compared to previous requests.\n\nYour remaining team words are: table, picture, head, bag, war, lady.\nRemaining words for your opponent are: ball, king, fish, death, school, tv, matter.\nRemaining distractor words are: box, date, fool, times, charge, star, captain.\nRemaining kill words are: state.",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 1",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:52:45.025434",
+        "action": {
+          "type": "get message",
+          "content": "CLUE: portrait\nTARGETS: picture, lady",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:52:45.025598",
+        "action": {
+          "type": "clue",
+          "content": "portrait"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:52:45.025622",
+        "action": {
+          "type": "targets",
+          "content": [
+            "picture",
+            "lady"
+          ]
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:52:45.025643",
+        "action": {
+          "type": "word targeted",
+          "content": {
+            "word": "picture",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:52:45.025662",
+        "action": {
+          "type": "word targeted",
+          "content": {
+            "word": "lady",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 2",
+        "timestamp": "2026-07-09T07:52:57.218954",
+        "action": {
+          "type": "send message",
+          "content": "The word food was guessed correctly. Your turn ended there.\nNow provide another comma-separated list of at least 1 and up to 2 words from the following list of words that best relate or are most closely associated with the word 'portrait'. Remember to start your answer with 'GUESS: '. Notice: some words have been removed from the list compared to previous requests.\n\ntimes, charge, bag, table, fool, tv, state, captain, matter, king, picture, date, lady, ball, school, head, star, war, box, death",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 2",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:52:57.218970",
+        "action": {
+          "type": "get message",
+          "content": "GUESS: picture, lady",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:52:57.219022",
+        "action": {
+          "type": "guesses",
+          "content": [
+            "picture",
+            "lady"
+          ]
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:52:57.219046",
+        "action": {
+          "type": "team revealed",
+          "content": {
+            "word": "picture",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:52:57.219066",
+        "action": {
+          "type": "target revealed",
+          "content": {
+            "word": "picture",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:52:57.219086",
+        "action": {
+          "type": "team revealed",
+          "content": {
+            "word": "lady",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:52:57.219104",
+        "action": {
+          "type": "target revealed",
+          "content": {
+            "word": "lady",
+            "assignment": "team"
+          }
+        }
+      }
+    ],
+    [
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:52:57.219243",
+        "action": {
+          "type": "opponent revealed",
+          "content": {
+            "word": "tv",
+            "assignment": "opponent"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:52:57.219270",
+        "action": {
+          "type": "board status",
+          "content": {
+            "hidden": {
+              "team": [
+                "table",
+                "head",
+                "bag",
+                "war"
+              ],
+              "innocent": [
+                "box",
+                "date",
+                "fool",
+                "times",
+                "charge",
+                "star",
+                "captain"
+              ],
+              "opponent": [
+                "ball",
+                "king",
+                "death",
+                "school",
+                "matter"
+              ],
+              "assassin": [
+                "state"
+              ]
+            },
+            "revealed": {
+              "team": {
+                "team": [
+                  "paper",
+                  "doc",
+                  "food",
+                  "picture",
+                  "lady"
+                ],
+                "innocent": [],
+                "opponent": [],
+                "assassin": []
+              },
+              "opponent": {
+                "team": [],
+                "innocent": [],
+                "opponent": [
+                  "mistake",
+                  "fish",
+                  "tv"
+                ],
+                "assassin": []
+              }
+            }
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 1",
+        "timestamp": "2026-07-09T07:53:08.968814",
+        "action": {
+          "type": "send message",
+          "content": "The words picture, lady were guessed correctly. Your teammate's turn ended there.\nNow provide another clue relating to some of your remaining team words and a list of the related target words. Remember to start your clue with 'CLUE: ', put a new line, and start your comma-separated list of target words with 'TARGETS: '. Notice: some words have been removed from the lists compared to previous requests.\n\nYour remaining team words are: table, head, bag, war.\nRemaining words for your opponent are: ball, king, death, school, tv, matter.\nRemaining distractor words are: box, date, fool, times, charge, star, captain.\nRemaining kill words are: state.",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 1",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:53:08.968831",
+        "action": {
+          "type": "get message",
+          "content": "CLUE: battle\nTARGETS: war",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:53:08.969029",
+        "action": {
+          "type": "clue",
+          "content": "battle"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:53:08.969064",
+        "action": {
+          "type": "targets",
+          "content": [
+            "war"
+          ]
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:53:08.969089",
+        "action": {
+          "type": "word targeted",
+          "content": {
+            "word": "war",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 2",
+        "timestamp": "2026-07-09T07:53:19.214437",
+        "action": {
+          "type": "send message",
+          "content": "The words picture, lady were guessed correctly. Your turn ended there.\nNow provide another comma-separated list of at least 1 and up to 1 words from the following list of words that best relate or are most closely associated with the word 'battle'. Remember to start your answer with 'GUESS: '. Notice: some words have been removed from the list compared to previous requests.\n\ntimes, charge, bag, table, fool, state, captain, matter, king, date, ball, school, head, star, war, box, death",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 2",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:53:19.214454",
+        "action": {
+          "type": "get message",
+          "content": "GUESS: war",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:53:19.214504",
+        "action": {
+          "type": "guesses",
+          "content": [
+            "war"
+          ]
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:53:19.214527",
+        "action": {
+          "type": "team revealed",
+          "content": {
+            "word": "war",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:53:19.214547",
+        "action": {
+          "type": "target revealed",
+          "content": {
+            "word": "war",
+            "assignment": "team"
+          }
+        }
+      }
+    ],
+    [
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:53:19.214687",
+        "action": {
+          "type": "opponent revealed",
+          "content": {
+            "word": "ball",
+            "assignment": "opponent"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:53:19.214713",
+        "action": {
+          "type": "board status",
+          "content": {
+            "hidden": {
+              "team": [
+                "table",
+                "head",
+                "bag"
+              ],
+              "innocent": [
+                "box",
+                "date",
+                "fool",
+                "times",
+                "charge",
+                "star",
+                "captain"
+              ],
+              "opponent": [
+                "king",
+                "death",
+                "school",
+                "matter"
+              ],
+              "assassin": [
+                "state"
+              ]
+            },
+            "revealed": {
+              "team": {
+                "team": [
+                  "paper",
+                  "doc",
+                  "food",
+                  "picture",
+                  "lady",
+                  "war"
+                ],
+                "innocent": [],
+                "opponent": [],
+                "assassin": []
+              },
+              "opponent": {
+                "team": [],
+                "innocent": [],
+                "opponent": [
+                  "mistake",
+                  "fish",
+                  "tv",
+                  "ball"
+                ],
+                "assassin": []
+              }
+            }
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 1",
+        "timestamp": "2026-07-09T07:53:28.839504",
+        "action": {
+          "type": "send message",
+          "content": "The word war was guessed correctly. Your teammate's turn ended there.\nNow provide another clue relating to some of your remaining team words and a list of the related target words. Remember to start your clue with 'CLUE: ', put a new line, and start your comma-separated list of target words with 'TARGETS: '. Notice: some words have been removed from the lists compared to previous requests.\n\nYour remaining team words are: table, head, bag.\nRemaining words for your opponent are: ball, king, death, school, matter.\nRemaining distractor words are: box, date, fool, times, charge, star, captain.\nRemaining kill words are: state.",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 1",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:53:28.839522",
+        "action": {
+          "type": "get message",
+          "content": "CLUE: luggage\nTARGETS: bag",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:53:28.839667",
+        "action": {
+          "type": "clue",
+          "content": "luggage"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:53:28.839691",
+        "action": {
+          "type": "targets",
+          "content": [
+            "bag"
+          ]
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:53:28.839711",
+        "action": {
+          "type": "word targeted",
+          "content": {
+            "word": "bag",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 2",
+        "timestamp": "2026-07-09T07:53:36.912325",
+        "action": {
+          "type": "send message",
+          "content": "The word war was guessed correctly. Your turn ended there.\nNow provide another comma-separated list of at least 1 and up to 1 words from the following list of words that best relate or are most closely associated with the word 'luggage'. Remember to start your answer with 'GUESS: '. Notice: some words have been removed from the list compared to previous requests.\n\ntimes, charge, bag, table, fool, state, captain, matter, king, date, school, head, star, box, death",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 2",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:53:36.912341",
+        "action": {
+          "type": "get message",
+          "content": "GUESS: bag",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:53:36.912390",
+        "action": {
+          "type": "guesses",
+          "content": [
+            "bag"
+          ]
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:53:36.912413",
+        "action": {
+          "type": "team revealed",
+          "content": {
+            "word": "bag",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:53:36.912433",
+        "action": {
+          "type": "target revealed",
+          "content": {
+            "word": "bag",
+            "assignment": "team"
+          }
+        }
+      }
+    ],
+    [
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:53:36.912571",
+        "action": {
+          "type": "opponent revealed",
+          "content": {
+            "word": "death",
+            "assignment": "opponent"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:53:36.912597",
+        "action": {
+          "type": "board status",
+          "content": {
+            "hidden": {
+              "team": [
+                "table",
+                "head"
+              ],
+              "innocent": [
+                "box",
+                "date",
+                "fool",
+                "times",
+                "charge",
+                "star",
+                "captain"
+              ],
+              "opponent": [
+                "king",
+                "school",
+                "matter"
+              ],
+              "assassin": [
+                "state"
+              ]
+            },
+            "revealed": {
+              "team": {
+                "team": [
+                  "paper",
+                  "doc",
+                  "food",
+                  "picture",
+                  "lady",
+                  "war",
+                  "bag"
+                ],
+                "innocent": [],
+                "opponent": [],
+                "assassin": []
+              },
+              "opponent": {
+                "team": [],
+                "innocent": [],
+                "opponent": [
+                  "mistake",
+                  "fish",
+                  "tv",
+                  "ball",
+                  "death"
+                ],
+                "assassin": []
+              }
+            }
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 1",
+        "timestamp": "2026-07-09T07:53:44.914002",
+        "action": {
+          "type": "send message",
+          "content": "The word bag was guessed correctly. Your teammate's turn ended there.\nNow provide another clue relating to some of your remaining team words and a list of the related target words. Remember to start your clue with 'CLUE: ', put a new line, and start your comma-separated list of target words with 'TARGETS: '. Notice: some words have been removed from the lists compared to previous requests.\n\nYour remaining team words are: table, head.\nRemaining words for your opponent are: king, death, school, matter.\nRemaining distractor words are: box, date, fool, times, charge, star, captain.\nRemaining kill words are: state.",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 1",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:53:44.914022",
+        "action": {
+          "type": "get message",
+          "content": "CLUE: desk\nTARGETS: table",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:53:44.914151",
+        "action": {
+          "type": "clue",
+          "content": "desk"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:53:44.914174",
+        "action": {
+          "type": "targets",
+          "content": [
+            "table"
+          ]
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:53:44.914194",
+        "action": {
+          "type": "word targeted",
+          "content": {
+            "word": "table",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 2",
+        "timestamp": "2026-07-09T07:53:51.820880",
+        "action": {
+          "type": "send message",
+          "content": "The word bag was guessed correctly. Your turn ended there.\nNow provide another comma-separated list of at least 1 and up to 1 words from the following list of words that best relate or are most closely associated with the word 'desk'. Remember to start your answer with 'GUESS: '. Notice: some words have been removed from the list compared to previous requests.\n\ntimes, charge, table, fool, state, captain, matter, king, date, school, head, star, box",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 2",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:53:51.820896",
+        "action": {
+          "type": "get message",
+          "content": "GUESS: table",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:53:51.820944",
+        "action": {
+          "type": "guesses",
+          "content": [
+            "table"
+          ]
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:53:51.820968",
+        "action": {
+          "type": "team revealed",
+          "content": {
+            "word": "table",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:53:51.820988",
+        "action": {
+          "type": "target revealed",
+          "content": {
+            "word": "table",
+            "assignment": "team"
+          }
+        }
+      }
+    ],
+    [
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:53:51.821104",
+        "action": {
+          "type": "opponent revealed",
+          "content": {
+            "word": "school",
+            "assignment": "opponent"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:53:51.821130",
+        "action": {
+          "type": "board status",
+          "content": {
+            "hidden": {
+              "team": [
+                "head"
+              ],
+              "innocent": [
+                "box",
+                "date",
+                "fool",
+                "times",
+                "charge",
+                "star",
+                "captain"
+              ],
+              "opponent": [
+                "king",
+                "matter"
+              ],
+              "assassin": [
+                "state"
+              ]
+            },
+            "revealed": {
+              "team": {
+                "team": [
+                  "paper",
+                  "doc",
+                  "food",
+                  "picture",
+                  "lady",
+                  "war",
+                  "bag",
+                  "table"
+                ],
+                "innocent": [],
+                "opponent": [],
+                "assassin": []
+              },
+              "opponent": {
+                "team": [],
+                "innocent": [],
+                "opponent": [
+                  "mistake",
+                  "fish",
+                  "tv",
+                  "ball",
+                  "death",
+                  "school"
+                ],
+                "assassin": []
+              }
+            }
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 1",
+        "timestamp": "2026-07-09T07:53:57.825787",
+        "action": {
+          "type": "send message",
+          "content": "The word table was guessed correctly. Your teammate's turn ended there.\nNow provide another clue relating to some of your remaining team words and a list of the related target words. Remember to start your clue with 'CLUE: ', put a new line, and start your comma-separated list of target words with 'TARGETS: '. Notice: some words have been removed from the lists compared to previous requests.\n\nYour remaining team words are: head.\nRemaining words for your opponent are: king, school, matter.\nRemaining distractor words are: box, date, fool, times, charge, star, captain.\nRemaining kill words are: state.",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 1",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:53:57.825820",
+        "action": {
+          "type": "get message",
+          "content": "CLUE: brain\nTARGETS: head",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:53:57.826033",
+        "action": {
+          "type": "clue",
+          "content": "brain"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:53:57.826073",
+        "action": {
+          "type": "targets",
+          "content": [
+            "head"
+          ]
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:53:57.826107",
+        "action": {
+          "type": "word targeted",
+          "content": {
+            "word": "head",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 2",
+        "timestamp": "2026-07-09T07:54:02.745415",
+        "action": {
+          "type": "send message",
+          "content": "The word table was guessed correctly. Your turn ended there.\nNow provide another comma-separated list of at least 1 and up to 1 words from the following list of words that best relate or are most closely associated with the word 'brain'. Remember to start your answer with 'GUESS: '. Notice: some words have been removed from the list compared to previous requests.\n\ntimes, charge, fool, state, captain, matter, king, date, head, star, box",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 2",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:54:02.745435",
+        "action": {
+          "type": "get message",
+          "content": "GUESS: head",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:54:02.745487",
+        "action": {
+          "type": "guesses",
+          "content": [
+            "head"
+          ]
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:54:02.745520",
+        "action": {
+          "type": "team revealed",
+          "content": {
+            "word": "head",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:54:02.745543",
+        "action": {
+          "type": "target revealed",
+          "content": {
+            "word": "head",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:54:02.745653",
+        "action": {
+          "type": "game end",
+          "content": "team has won"
+        }
+      }
+    ]
+  ],
+  "board end status": {
+    "hidden": {
+      "team": [],
+      "innocent": [
+        "box",
+        "date",
+        "fool",
+        "times",
+        "charge",
+        "star",
+        "captain"
+      ],
+      "opponent": [
+        "king",
+        "matter"
+      ],
+      "assassin": [
+        "state"
+      ]
+    },
+    "revealed": {
+      "team": {
+        "team": [
+          "paper",
+          "doc",
+          "food",
+          "picture",
+          "lady",
+          "war",
+          "bag",
+          "table",
+          "head"
+        ],
+        "innocent": [],
+        "opponent": [],
+        "assassin": []
+      },
+      "opponent": {
+        "team": [],
+        "innocent": [],
+        "opponent": [
+          "mistake",
+          "fish",
+          "tv",
+          "ball",
+          "death",
+          "school"
+        ],
+        "assassin": []
+      }
+    }
+  },
+  "Number of turns": 8,
+  "Aborted": false,
+  "Lose": false,
+  "Game ended through assassin": false,
+  "Request Count": 14,
+  "Parsed Request Count": 14,
+  "Violated Request Count": 0,
+  "Cluegiver engaged flags": {
+    "IGNORE RAMBLING": 0,
+    "IGNORE FALSE TARGETS OR GUESSES": 0,
+    "REPROMPT ON ERROR": 0,
+    "STRIP WORDS": 0,
+    "IGNORE NUMBER OF TARGETS": 0
+  },
+  "Guesser engaged flags": {
+    "IGNORE RAMBLING": 0,
+    "IGNORE FALSE TARGETS OR GUESSES": 0,
+    "REPROMPT ON ERROR": 0,
+    "STRIP WORDS": 0,
+    "IGNORE NUMBER OF TARGETS": 0
+  }
+}

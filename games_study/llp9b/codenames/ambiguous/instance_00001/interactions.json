@@ -1,0 +1,1596 @@
+{
+  "meta": {
+    "game_name": "codenames",
+    "experiment_name": "ambiguous",
+    "game_id": 1,
+    "results_folder": "LLP: Large Language Problems__qwen3.5-9b__llp-final",
+    "clem_version": "3.7.2",
+    "round_count": 7,
+    "completed": true
+  },
+  "player_models": {
+    "0": {
+      "model_spec": {
+        "model_name": "LLP: Large Language Problems__qwen3.5-9b__llp-final",
+        "_team": "LLP: Large Language Problems",
+        "_version": "llp-final",
+        "backend": "huggingface_local",
+        "context_size": "262k",
+        "huggingface_id": "Makaco/lmps-challenge-qwen3.5-9b-dpo",
+        "languages": [
+          "en",
+          "zh"
+        ],
+        "license": {
+          "name": "Apache 2.0",
+          "url": "https://www.apache.org/licenses/LICENSE-2.0"
+        },
+        "lookup_source": "/project/mmanina/lm-playschool-test-set/playpen/model_registry.json",
+        "model_config": {
+          "premade_chat_template": true,
+          "eos_to_cull": "<\\|im_end\\|>|<\\|endoftext\\|>",
+          "chat_template_kwargs": {
+            "enable_thinking": false
+          }
+        },
+        "open_weight": true,
+        "parameters": "9B",
+        "release_date": "2026-06-22"
+      },
+      "gen_args": {
+        "temperature": 0.0,
+        "max_tokens": 5000
+      }
+    }
+  },
+  "players": {
+    "GM": {
+      "game_role": "Game Master",
+      "model_name": "programmatic"
+    },
+    "Player 1": {
+      "game_role": "ClueGiver",
+      "model_name": "LLP: Large Language Problems__qwen3.5-9b__llp-final"
+    },
+    "Player 2": {
+      "game_role": "Guesser",
+      "model_name": "LLP: Large Language Problems__qwen3.5-9b__llp-final"
+    }
+  },
+  "turns": [
+    [
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-08T13:23:21.757843",
+        "action": {
+          "type": "board status",
+          "content": {
+            "hidden": {
+              "team": [
+                "flip",
+                "scale",
+                "flaw",
+                "plump",
+                "pipe",
+                "peck",
+                "pawn",
+                "coil",
+                "bush"
+              ],
+              "innocent": [
+                "grave",
+                "peep",
+                "flock",
+                "hack",
+                "blow",
+                "race",
+                "pump"
+              ],
+              "opponent": [
+                "net",
+                "rib",
+                "shock",
+                "fan",
+                "jar",
+                "cock",
+                "toll",
+                "pink"
+              ],
+              "assassin": [
+                "gag"
+              ]
+            },
+            "revealed": {
+              "team": {
+                "team": [],
+                "innocent": [],
+                "opponent": [],
+                "assassin": []
+              },
+              "opponent": {
+                "team": [],
+                "innocent": [],
+                "opponent": [],
+                "assassin": []
+              }
+            }
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 1",
+        "timestamp": "2026-07-08T13:23:51.704543",
+        "action": {
+          "type": "send message",
+          "content": "Provide one single-word clue that relates to some of your team's words from the list below. You can choose to how many and to which words your clue relates to.\nThe goal is to have your partner guess all of your team's words based on the clues you give them, before the other team has uncovered all of theirs. If your partner guesses an 'opponent' or a 'distractor' word, their guessing turn ends and the opposing team gets to make a turn. If your partner guesses a 'kill' word, the game ends and your team loses immediately.\nThe more words your clue relates to, the quicker you can win the game, but the harder the associations may be to guess for your partner, so choose your clue word wisely. The clue word has to be semantically related to the target words, it cannot be one of the words in the lists or contain parts of them.\n\nAlways give your single-word clue and your comma-separated list of related target words in the following format and make your answers as short as possible, never include any other text than is required in this form:\n\nCLUE: <WORD>\nTARGETS: <TARGETS>\n\nYour team words are: flip, scale, flaw, plump, pipe, peck, pawn, coil, bush.\nYour opponent's team words are: net, rib, shock, fan, jar, cock, toll, pink.\nDistractor words are: grave, peep, flock, hack, blow, race, pump.\nThe kill words are: gag.",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 1",
+        "to": "GM",
+        "timestamp": "2026-07-08T13:23:51.704562",
+        "action": {
+          "type": "get message",
+          "content": "CLUE: snake\nTARGETS: coil, pipe, scale",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-08T13:23:51.704751",
+        "action": {
+          "type": "clue",
+          "content": "snake"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-08T13:23:51.704777",
+        "action": {
+          "type": "targets",
+          "content": [
+            "coil",
+            "pipe",
+            "scale"
+          ]
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-08T13:23:51.704800",
+        "action": {
+          "type": "word targeted",
+          "content": {
+            "word": "coil",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-08T13:23:51.704819",
+        "action": {
+          "type": "word targeted",
+          "content": {
+            "word": "pipe",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-08T13:23:51.704838",
+        "action": {
+          "type": "word targeted",
+          "content": {
+            "word": "scale",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 2",
+        "timestamp": "2026-07-08T13:24:17.770191",
+        "action": {
+          "type": "send message",
+          "content": "Provide a comma-separated list of up to 3 words from the following list that best relate or are most closely associated with the word 'snake'. Always start your list of guess(es) with 'GUESS: ' and do not include any other text in your answer.\n\nflip, blow, net, coil, grave, flaw, toll, pipe, peck, jar, flock, scale, cock, rib, plump, fan, shock, gag, peep, bush, hack, pink, pawn, pump, race",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 2",
+        "to": "GM",
+        "timestamp": "2026-07-08T13:24:17.770210",
+        "action": {
+          "type": "get message",
+          "content": "GUESS: coil, scale, pipe",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-08T13:24:17.770271",
+        "action": {
+          "type": "guesses",
+          "content": [
+            "coil",
+            "scale",
+            "pipe"
+          ]
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-08T13:24:17.770299",
+        "action": {
+          "type": "team revealed",
+          "content": {
+            "word": "coil",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-08T13:24:17.770319",
+        "action": {
+          "type": "target revealed",
+          "content": {
+            "word": "coil",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-08T13:24:17.770339",
+        "action": {
+          "type": "team revealed",
+          "content": {
+            "word": "scale",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-08T13:24:17.770356",
+        "action": {
+          "type": "target revealed",
+          "content": {
+            "word": "scale",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-08T13:24:17.770375",
+        "action": {
+          "type": "team revealed",
+          "content": {
+            "word": "pipe",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-08T13:24:17.770392",
+        "action": {
+          "type": "target revealed",
+          "content": {
+            "word": "pipe",
+            "assignment": "team"
+          }
+        }
+      }
+    ],
+    [
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-08T13:24:17.770541",
+        "action": {
+          "type": "opponent revealed",
+          "content": {
+            "word": "cock",
+            "assignment": "opponent"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-08T13:24:17.770569",
+        "action": {
+          "type": "board status",
+          "content": {
+            "hidden": {
+              "team": [
+                "flip",
+                "flaw",
+                "plump",
+                "peck",
+                "pawn",
+                "bush"
+              ],
+              "innocent": [
+                "grave",
+                "peep",
+                "flock",
+                "hack",
+                "blow",
+                "race",
+                "pump"
+              ],
+              "opponent": [
+                "net",
+                "rib",
+                "shock",
+                "fan",
+                "jar",
+                "toll",
+                "pink"
+              ],
+              "assassin": [
+                "gag"
+              ]
+            },
+            "revealed": {
+              "team": {
+                "team": [
+                  "coil",
+                  "scale",
+                  "pipe"
+                ],
+                "innocent": [],
+                "opponent": [],
+                "assassin": []
+              },
+              "opponent": {
+                "team": [],
+                "innocent": [],
+                "opponent": [
+                  "cock"
+                ],
+                "assassin": []
+              }
+            }
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 1",
+        "timestamp": "2026-07-08T13:24:46.715283",
+        "action": {
+          "type": "send message",
+          "content": "The words coil, scale, pipe were guessed correctly. Your teammate's turn ended there.\nNow provide another clue relating to some of your remaining team words and a list of the related target words. Remember to start your clue with 'CLUE: ', put a new line, and start your comma-separated list of target words with 'TARGETS: '. Notice: some words have been removed from the lists compared to previous requests.\n\nYour remaining team words are: flip, flaw, plump, peck, pawn, bush.\nRemaining words for your opponent are: net, rib, shock, fan, jar, cock, toll, pink.\nRemaining distractor words are: grave, peep, flock, hack, blow, race, pump.\nRemaining kill words are: gag.",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 1",
+        "to": "GM",
+        "timestamp": "2026-07-08T13:24:46.715302",
+        "action": {
+          "type": "get message",
+          "content": "CLUE: bird\nTARGETS: peck, bush",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-08T13:24:46.715494",
+        "action": {
+          "type": "clue",
+          "content": "bird"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-08T13:24:46.715517",
+        "action": {
+          "type": "targets",
+          "content": [
+            "peck",
+            "bush"
+          ]
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-08T13:24:46.715538",
+        "action": {
+          "type": "word targeted",
+          "content": {
+            "word": "peck",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-08T13:24:46.715559",
+        "action": {
+          "type": "word targeted",
+          "content": {
+            "word": "bush",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 2",
+        "timestamp": "2026-07-08T13:25:05.429917",
+        "action": {
+          "type": "send message",
+          "content": "The words coil, scale, pipe were guessed correctly. Your turn ended there.\nNow provide another comma-separated list of at least 1 and up to 2 words from the following list of words that best relate or are most closely associated with the word 'bird'. Remember to start your answer with 'GUESS: '. Notice: some words have been removed from the list compared to previous requests.\n\nflip, blow, net, grave, flaw, toll, peck, jar, flock, rib, plump, fan, shock, gag, peep, bush, hack, pink, pawn, pump, race",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 2",
+        "to": "GM",
+        "timestamp": "2026-07-08T13:25:05.429934",
+        "action": {
+          "type": "get message",
+          "content": "GUESS: peck, flock",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-08T13:25:05.430028",
+        "action": {
+          "type": "guesses",
+          "content": [
+            "peck",
+            "flock"
+          ]
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-08T13:25:05.430071",
+        "action": {
+          "type": "team revealed",
+          "content": {
+            "word": "peck",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-08T13:25:05.430094",
+        "action": {
+          "type": "target revealed",
+          "content": {
+            "word": "peck",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-08T13:25:05.430116",
+        "action": {
+          "type": "team revealed",
+          "content": {
+            "word": "flock",
+            "assignment": "innocent"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-08T13:25:05.430134",
+        "action": {
+          "type": "turn end after",
+          "content": "flock"
+        }
+      }
+    ],
+    [
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-08T13:25:05.430413",
+        "action": {
+          "type": "opponent revealed",
+          "content": {
+            "word": "rib",
+            "assignment": "opponent"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-08T13:25:05.430442",
+        "action": {
+          "type": "board status",
+          "content": {
+            "hidden": {
+              "team": [
+                "flip",
+                "flaw",
+                "plump",
+                "pawn",
+                "bush"
+              ],
+              "innocent": [
+                "grave",
+                "peep",
+                "hack",
+                "blow",
+                "race",
+                "pump"
+              ],
+              "opponent": [
+                "net",
+                "shock",
+                "fan",
+                "jar",
+                "toll",
+                "pink"
+              ],
+              "assassin": [
+                "gag"
+              ]
+            },
+            "revealed": {
+              "team": {
+                "team": [
+                  "coil",
+                  "scale",
+                  "pipe",
+                  "peck"
+                ],
+                "innocent": [
+                  "flock"
+                ],
+                "opponent": [],
+                "assassin": []
+              },
+              "opponent": {
+                "team": [],
+                "innocent": [],
+                "opponent": [
+                  "cock",
+                  "rib"
+                ],
+                "assassin": []
+              }
+            }
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 1",
+        "timestamp": "2026-07-08T13:25:28.816040",
+        "action": {
+          "type": "send message",
+          "content": "The word peck was guessed correctly. The word flock was guessed but is an innocent word. Your teammate's turn ended there.\nNow provide another clue relating to some of your remaining team words and a list of the related target words. Remember to start your clue with 'CLUE: ', put a new line, and start your comma-separated list of target words with 'TARGETS: '. Notice: some words have been removed from the lists compared to previous requests.\n\nYour remaining team words are: flip, flaw, plump, pawn, bush.\nRemaining words for your opponent are: net, rib, shock, fan, jar, toll, pink.\nRemaining distractor words are: grave, peep, hack, blow, race, pump.\nRemaining kill words are: gag.",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 1",
+        "to": "GM",
+        "timestamp": "2026-07-08T13:25:28.816058",
+        "action": {
+          "type": "get message",
+          "content": "CLUE: card\nTARGETS: flip, flaw, pawn",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-08T13:25:28.816205",
+        "action": {
+          "type": "clue",
+          "content": "card"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-08T13:25:28.816228",
+        "action": {
+          "type": "targets",
+          "content": [
+            "flip",
+            "flaw",
+            "pawn"
+          ]
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-08T13:25:28.816249",
+        "action": {
+          "type": "word targeted",
+          "content": {
+            "word": "flip",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-08T13:25:28.816269",
+        "action": {
+          "type": "word targeted",
+          "content": {
+            "word": "flaw",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-08T13:25:28.816287",
+        "action": {
+          "type": "word targeted",
+          "content": {
+            "word": "pawn",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 2",
+        "timestamp": "2026-07-08T13:25:47.380570",
+        "action": {
+          "type": "send message",
+          "content": "The word peck was guessed correctly. The word flock was guessed but is an innocent word. Your turn ended there.\nNow provide another comma-separated list of at least 1 and up to 3 words from the following list of words that best relate or are most closely associated with the word 'card'. Remember to start your answer with 'GUESS: '. Notice: some words have been removed from the list compared to previous requests.\n\nflip, blow, net, grave, flaw, toll, jar, plump, fan, shock, gag, peep, bush, hack, pink, pawn, pump, race",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 2",
+        "to": "GM",
+        "timestamp": "2026-07-08T13:25:47.380585",
+        "action": {
+          "type": "get message",
+          "content": "GUESS: fan, pink, hack",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-08T13:25:47.380683",
+        "action": {
+          "type": "guesses",
+          "content": [
+            "fan",
+            "pink",
+            "hack"
+          ]
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-08T13:25:47.380725",
+        "action": {
+          "type": "team revealed",
+          "content": {
+            "word": "fan",
+            "assignment": "opponent"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-08T13:25:47.380750",
+        "action": {
+          "type": "turn end after",
+          "content": "fan"
+        }
+      }
+    ],
+    [
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-08T13:25:47.381005",
+        "action": {
+          "type": "opponent revealed",
+          "content": {
+            "word": "shock",
+            "assignment": "opponent"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-08T13:25:47.381034",
+        "action": {
+          "type": "board status",
+          "content": {
+            "hidden": {
+              "team": [
+                "flip",
+                "flaw",
+                "plump",
+                "pawn",
+                "bush"
+              ],
+              "innocent": [
+                "grave",
+                "peep",
+                "hack",
+                "blow",
+                "race",
+                "pump"
+              ],
+              "opponent": [
+                "net",
+                "jar",
+                "toll",
+                "pink"
+              ],
+              "assassin": [
+                "gag"
+              ]
+            },
+            "revealed": {
+              "team": {
+                "team": [
+                  "coil",
+                  "scale",
+                  "pipe",
+                  "peck"
+                ],
+                "innocent": [
+                  "flock"
+                ],
+                "opponent": [
+                  "fan"
+                ],
+                "assassin": []
+              },
+              "opponent": {
+                "team": [],
+                "innocent": [],
+                "opponent": [
+                  "cock",
+                  "rib",
+                  "shock"
+                ],
+                "assassin": []
+              }
+            }
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 1",
+        "timestamp": "2026-07-08T13:26:08.612115",
+        "action": {
+          "type": "send message",
+          "content": "The word fan was guessed but is an opponent word. Your teammate's turn ended there.\nNow provide another clue relating to some of your remaining team words and a list of the related target words. Remember to start your clue with 'CLUE: ', put a new line, and start your comma-separated list of target words with 'TARGETS: '. Notice: some words have been removed from the lists compared to previous requests.\n\nYour remaining team words are: flip, flaw, plump, pawn, bush.\nRemaining words for your opponent are: net, shock, jar, toll, pink.\nRemaining distractor words are: grave, peep, hack, blow, race, pump.\nRemaining kill words are: gag.",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 1",
+        "to": "GM",
+        "timestamp": "2026-07-08T13:26:08.612135",
+        "action": {
+          "type": "get message",
+          "content": "CLUE: golf\nTARGETS: flip, flaw, bush",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-08T13:26:08.612292",
+        "action": {
+          "type": "clue",
+          "content": "golf"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-08T13:26:08.612316",
+        "action": {
+          "type": "targets",
+          "content": [
+            "flip",
+            "flaw",
+            "bush"
+          ]
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-08T13:26:08.612338",
+        "action": {
+          "type": "word targeted",
+          "content": {
+            "word": "flip",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-08T13:26:08.612358",
+        "action": {
+          "type": "word targeted",
+          "content": {
+            "word": "flaw",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-08T13:26:08.612376",
+        "action": {
+          "type": "word targeted",
+          "content": {
+            "word": "bush",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 2",
+        "timestamp": "2026-07-08T13:26:25.401826",
+        "action": {
+          "type": "send message",
+          "content": "The word fan was guessed but is an opponent word. Your turn ended there.\nNow provide another comma-separated list of at least 1 and up to 3 words from the following list of words that best relate or are most closely associated with the word 'golf'. Remember to start your answer with 'GUESS: '. Notice: some words have been removed from the list compared to previous requests.\n\nflip, blow, net, grave, flaw, toll, jar, plump, gag, peep, bush, hack, pink, pawn, pump, race",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 2",
+        "to": "GM",
+        "timestamp": "2026-07-08T13:26:25.401842",
+        "action": {
+          "type": "get message",
+          "content": "GUESS: hack, pink, race",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-08T13:26:25.401946",
+        "action": {
+          "type": "guesses",
+          "content": [
+            "hack",
+            "pink",
+            "race"
+          ]
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-08T13:26:25.401989",
+        "action": {
+          "type": "team revealed",
+          "content": {
+            "word": "hack",
+            "assignment": "innocent"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-08T13:26:25.402012",
+        "action": {
+          "type": "turn end after",
+          "content": "hack"
+        }
+      }
+    ],
+    [
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-08T13:26:25.402288",
+        "action": {
+          "type": "opponent revealed",
+          "content": {
+            "word": "toll",
+            "assignment": "opponent"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-08T13:26:25.402317",
+        "action": {
+          "type": "board status",
+          "content": {
+            "hidden": {
+              "team": [
+                "flip",
+                "flaw",
+                "plump",
+                "pawn",
+                "bush"
+              ],
+              "innocent": [
+                "grave",
+                "peep",
+                "blow",
+                "race",
+                "pump"
+              ],
+              "opponent": [
+                "net",
+                "jar",
+                "pink"
+              ],
+              "assassin": [
+                "gag"
+              ]
+            },
+            "revealed": {
+              "team": {
+                "team": [
+                  "coil",
+                  "scale",
+                  "pipe",
+                  "peck"
+                ],
+                "innocent": [
+                  "flock",
+                  "hack"
+                ],
+                "opponent": [
+                  "fan"
+                ],
+                "assassin": []
+              },
+              "opponent": {
+                "team": [],
+                "innocent": [],
+                "opponent": [
+                  "cock",
+                  "rib",
+                  "shock",
+                  "toll"
+                ],
+                "assassin": []
+              }
+            }
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 1",
+        "timestamp": "2026-07-08T13:26:43.706794",
+        "action": {
+          "type": "send message",
+          "content": "The word hack was guessed but is an innocent word. Your teammate's turn ended there.\nNow provide another clue relating to some of your remaining team words and a list of the related target words. Remember to start your clue with 'CLUE: ', put a new line, and start your comma-separated list of target words with 'TARGETS: '. Notice: some words have been removed from the lists compared to previous requests.\n\nYour remaining team words are: flip, flaw, plump, pawn, bush.\nRemaining words for your opponent are: net, jar, toll, pink.\nRemaining distractor words are: grave, peep, blow, race, pump.\nRemaining kill words are: gag.",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 1",
+        "to": "GM",
+        "timestamp": "2026-07-08T13:26:43.706817",
+        "action": {
+          "type": "get message",
+          "content": "CLUE: golf\nTARGETS: flip, flaw, bush",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-08T13:26:43.706990",
+        "action": {
+          "type": "clue",
+          "content": "golf"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-08T13:26:43.707015",
+        "action": {
+          "type": "targets",
+          "content": [
+            "flip",
+            "flaw",
+            "bush"
+          ]
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-08T13:26:43.707037",
+        "action": {
+          "type": "word targeted",
+          "content": {
+            "word": "flip",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-08T13:26:43.707057",
+        "action": {
+          "type": "word targeted",
+          "content": {
+            "word": "flaw",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-08T13:26:43.707075",
+        "action": {
+          "type": "word targeted",
+          "content": {
+            "word": "bush",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 2",
+        "timestamp": "2026-07-08T13:26:58.145953",
+        "action": {
+          "type": "send message",
+          "content": "The word hack was guessed but is an innocent word. Your turn ended there.\nNow provide another comma-separated list of at least 1 and up to 3 words from the following list of words that best relate or are most closely associated with the word 'golf'. Remember to start your answer with 'GUESS: '. Notice: some words have been removed from the list compared to previous requests.\n\nflip, blow, net, grave, flaw, jar, plump, gag, peep, bush, pink, pawn, pump, race",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 2",
+        "to": "GM",
+        "timestamp": "2026-07-08T13:26:58.145969",
+        "action": {
+          "type": "get message",
+          "content": "GUESS: pink, race, net",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-08T13:26:58.146068",
+        "action": {
+          "type": "guesses",
+          "content": [
+            "pink",
+            "race",
+            "net"
+          ]
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-08T13:26:58.146110",
+        "action": {
+          "type": "team revealed",
+          "content": {
+            "word": "pink",
+            "assignment": "opponent"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-08T13:26:58.146134",
+        "action": {
+          "type": "turn end after",
+          "content": "pink"
+        }
+      }
+    ],
+    [
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-08T13:26:58.146394",
+        "action": {
+          "type": "opponent revealed",
+          "content": {
+            "word": "net",
+            "assignment": "opponent"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-08T13:26:58.146424",
+        "action": {
+          "type": "board status",
+          "content": {
+            "hidden": {
+              "team": [
+                "flip",
+                "flaw",
+                "plump",
+                "pawn",
+                "bush"
+              ],
+              "innocent": [
+                "grave",
+                "peep",
+                "blow",
+                "race",
+                "pump"
+              ],
+              "opponent": [
+                "jar"
+              ],
+              "assassin": [
+                "gag"
+              ]
+            },
+            "revealed": {
+              "team": {
+                "team": [
+                  "coil",
+                  "scale",
+                  "pipe",
+                  "peck"
+                ],
+                "innocent": [
+                  "flock",
+                  "hack"
+                ],
+                "opponent": [
+                  "fan",
+                  "pink"
+                ],
+                "assassin": []
+              },
+              "opponent": {
+                "team": [],
+                "innocent": [],
+                "opponent": [
+                  "cock",
+                  "rib",
+                  "shock",
+                  "toll",
+                  "net"
+                ],
+                "assassin": []
+              }
+            }
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 1",
+        "timestamp": "2026-07-08T13:27:12.171666",
+        "action": {
+          "type": "send message",
+          "content": "The word pink was guessed but is an opponent word. Your teammate's turn ended there.\nNow provide another clue relating to some of your remaining team words and a list of the related target words. Remember to start your clue with 'CLUE: ', put a new line, and start your comma-separated list of target words with 'TARGETS: '. Notice: some words have been removed from the lists compared to previous requests.\n\nYour remaining team words are: flip, flaw, plump, pawn, bush.\nRemaining words for your opponent are: net, jar.\nRemaining distractor words are: grave, peep, blow, race, pump.\nRemaining kill words are: gag.",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 1",
+        "to": "GM",
+        "timestamp": "2026-07-08T13:27:12.171683",
+        "action": {
+          "type": "get message",
+          "content": "CLUE: golf\nTARGETS: flip, flaw, bush",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-08T13:27:12.171879",
+        "action": {
+          "type": "clue",
+          "content": "golf"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-08T13:27:12.171916",
+        "action": {
+          "type": "targets",
+          "content": [
+            "flip",
+            "flaw",
+            "bush"
+          ]
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-08T13:27:12.171942",
+        "action": {
+          "type": "word targeted",
+          "content": {
+            "word": "flip",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-08T13:27:12.171962",
+        "action": {
+          "type": "word targeted",
+          "content": {
+            "word": "flaw",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-08T13:27:12.171980",
+        "action": {
+          "type": "word targeted",
+          "content": {
+            "word": "bush",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 2",
+        "timestamp": "2026-07-08T13:27:22.281530",
+        "action": {
+          "type": "send message",
+          "content": "The word pink was guessed but is an opponent word. Your turn ended there.\nNow provide another comma-separated list of at least 1 and up to 3 words from the following list of words that best relate or are most closely associated with the word 'golf'. Remember to start your answer with 'GUESS: '. Notice: some words have been removed from the list compared to previous requests.\n\nflip, blow, grave, flaw, jar, plump, gag, peep, bush, pawn, pump, race",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 2",
+        "to": "GM",
+        "timestamp": "2026-07-08T13:27:22.281547",
+        "action": {
+          "type": "get message",
+          "content": "GUESS: race, blow, jar",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-08T13:27:22.281644",
+        "action": {
+          "type": "guesses",
+          "content": [
+            "race",
+            "blow",
+            "jar"
+          ]
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-08T13:27:22.281691",
+        "action": {
+          "type": "team revealed",
+          "content": {
+            "word": "race",
+            "assignment": "innocent"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-08T13:27:22.281716",
+        "action": {
+          "type": "turn end after",
+          "content": "race"
+        }
+      }
+    ],
+    [
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-08T13:27:22.282016",
+        "action": {
+          "type": "opponent revealed",
+          "content": {
+            "word": "jar",
+            "assignment": "opponent"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-08T13:27:22.282046",
+        "action": {
+          "type": "board status",
+          "content": {
+            "hidden": {
+              "team": [
+                "flip",
+                "flaw",
+                "plump",
+                "pawn",
+                "bush"
+              ],
+              "innocent": [
+                "grave",
+                "peep",
+                "blow",
+                "pump"
+              ],
+              "opponent": [],
+              "assassin": [
+                "gag"
+              ]
+            },
+            "revealed": {
+              "team": {
+                "team": [
+                  "coil",
+                  "scale",
+                  "pipe",
+                  "peck"
+                ],
+                "innocent": [
+                  "flock",
+                  "hack",
+                  "race"
+                ],
+                "opponent": [
+                  "fan",
+                  "pink"
+                ],
+                "assassin": []
+              },
+              "opponent": {
+                "team": [],
+                "innocent": [],
+                "opponent": [
+                  "cock",
+                  "rib",
+                  "shock",
+                  "toll",
+                  "net",
+                  "jar"
+                ],
+                "assassin": []
+              }
+            }
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 1",
+        "timestamp": "2026-07-08T13:27:31.818045",
+        "action": {
+          "type": "send message",
+          "content": "The word race was guessed but is an innocent word. Your teammate's turn ended there.\nNow provide another clue relating to some of your remaining team words and a list of the related target words. Remember to start your clue with 'CLUE: ', put a new line, and start your comma-separated list of target words with 'TARGETS: '. Notice: some words have been removed from the lists compared to previous requests.\n\nYour remaining team words are: flip, flaw, plump, pawn, bush.\nRemaining words for your opponent are: jar.\nRemaining distractor words are: grave, peep, blow, pump.\nRemaining kill words are: gag.",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 1",
+        "to": "GM",
+        "timestamp": "2026-07-08T13:27:31.818065",
+        "action": {
+          "type": "get message",
+          "content": "CLUE: golf\nTARGETS: flip, flaw, bush",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-08T13:27:31.818248",
+        "action": {
+          "type": "clue",
+          "content": "golf"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-08T13:27:31.818283",
+        "action": {
+          "type": "targets",
+          "content": [
+            "flip",
+            "flaw",
+            "bush"
+          ]
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-08T13:27:31.818309",
+        "action": {
+          "type": "word targeted",
+          "content": {
+            "word": "flip",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-08T13:27:31.818329",
+        "action": {
+          "type": "word targeted",
+          "content": {
+            "word": "flaw",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-08T13:27:31.818347",
+        "action": {
+          "type": "word targeted",
+          "content": {
+            "word": "bush",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-08T13:27:31.818600",
+        "action": {
+          "type": "game end",
+          "content": "opponent has won"
+        }
+      }
+    ]
+  ],
+  "board end status": {
+    "hidden": {
+      "team": [
+        "flip",
+        "flaw",
+        "plump",
+        "pawn",
+        "bush"
+      ],
+      "innocent": [
+        "grave",
+        "peep",
+        "blow",
+        "pump"
+      ],
+      "opponent": [],
+      "assassin": [
+        "gag"
+      ]
+    },
+    "revealed": {
+      "team": {
+        "team": [
+          "coil",
+          "scale",
+          "pipe",
+          "peck"
+        ],
+        "innocent": [
+          "flock",
+          "hack",
+          "race"
+        ],
+        "opponent": [
+          "fan",
+          "pink"
+        ],
+        "assassin": []
+      },
+      "opponent": {
+        "team": [],
+        "innocent": [],
+        "opponent": [
+          "cock",
+          "rib",
+          "shock",
+          "toll",
+          "net",
+          "jar"
+        ],
+        "assassin": []
+      }
+    }
+  },
+  "Number of turns": 7,
+  "Aborted": false,
+  "Lose": true,
+  "Game ended through assassin": false,
+  "Request Count": 13,
+  "Parsed Request Count": 13,
+  "Violated Request Count": 0,
+  "Cluegiver engaged flags": {
+    "IGNORE RAMBLING": 0,
+    "IGNORE FALSE TARGETS OR GUESSES": 0,
+    "REPROMPT ON ERROR": 0,
+    "STRIP WORDS": 0,
+    "IGNORE NUMBER OF TARGETS": 0
+  },
+  "Guesser engaged flags": {
+    "IGNORE RAMBLING": 0,
+    "IGNORE FALSE TARGETS OR GUESSES": 0,
+    "REPROMPT ON ERROR": 0,
+    "STRIP WORDS": 0,
+    "IGNORE NUMBER OF TARGETS": 0
+  }
+}

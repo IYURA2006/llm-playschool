@@ -7,7 +7,9 @@ from datetime import datetime
 
 import gradio as gr
 
-from annotation import load_game, _build_transcript_html, _card_header_html, _turn_nav_html
+import db
+from annotation import (load_game, plain_label, _build_transcript_html,
+                        _card_header_html, _turn_nav_html)
 
 _dir = os.path.dirname(os.path.abspath(__file__))
 
@@ -112,7 +114,11 @@ def _check(*vals):
     return (*fb_updates, summary, gr.update(visible=True))
 
 
-def _start_annotation():
+def _start_annotation(annotator_id):
+    # Recorded on both buttons: someone who deliberately skipped shouldn't be
+    # shown the practice round again next session. This flag — not the session
+    # index — is what stops a page reload replaying it (welcome._start).
+    db.record_practice(annotator_id)
     return (
         gr.update(visible=False),   # training_page
         gr.update(visible=True),    # annotation_page
@@ -120,10 +126,14 @@ def _start_annotation():
     )
 
 
-def build(welcome_page, training_page, annotation_page, started_at_state):
+def build(welcome_page, training_page, annotation_page, started_at_state,
+          annotator_state):
     g = load_game(TRAINING_GAME)
 
     with training_page:
+        # This screen had no heading at all; it's also the focus target the
+        # a11y module moves to when the screen becomes visible.
+        gr.HTML('<h1 class="a11y-sr-only" tabindex="-1">Practice round</h1>')
         with gr.Row(elem_classes=["annot-topnav"]):
             gr.HTML(
                 '<div class="nav-left">'
@@ -163,17 +173,22 @@ def build(welcome_page, training_page, annotation_page, started_at_state):
                 for i in range(g.n_turns):
                     with gr.Group(elem_classes=["train-card", "turn-anno-card"]):
                         gr.HTML(_card_header_html(g, i))
+                        _t = f"Practice turn {i + 1} — "
                         gr.Markdown(_Q1_MD)
-                        q1 = gr.Radio(choices=_SCALE_Q1, show_label=False,
+                        q1 = gr.Radio(choices=_SCALE_Q1,
+                                      label=_t + plain_label(_Q1_MD),
+                                      show_label=False,
                                       elem_classes=["scale-radio"])
                         gr.Markdown(_Q2_MD)
-                        q2 = gr.Radio(choices=_SCALE_Q2, show_label=False,
+                        q2 = gr.Radio(choices=_SCALE_Q2,
+                                      label=_t + plain_label(_Q2_MD),
+                                      show_label=False,
                                       elem_classes=["scale-radio"])
                         fb = gr.HTML("", visible=False)
                     radios += [q1, q2]
                     feedbacks.append(fb)
 
-                summary = gr.Markdown("")
+                summary = gr.Markdown("", elem_id="train-summary")
                 with gr.Row():
                     skip_btn = gr.Button("Skip practice", variant="secondary")
                     check_btn = gr.Button("Check my ratings", variant="primary")
@@ -188,5 +203,6 @@ def build(welcome_page, training_page, annotation_page, started_at_state):
         for btn in (start_btn, skip_btn):
             btn.click(
                 fn=_start_annotation,
+                inputs=[annotator_state],
                 outputs=[training_page, annotation_page, started_at_state],
             )

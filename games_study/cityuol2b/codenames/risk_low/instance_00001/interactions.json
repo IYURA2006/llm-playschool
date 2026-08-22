@@ -1,0 +1,1270 @@
+{
+  "meta": {
+    "game_name": "codenames",
+    "experiment_name": "risk_low",
+    "game_id": 1,
+    "results_folder": "CityUoL__qwen3.5-2b__Qwen-GuidePlay-2B-v1",
+    "clem_version": "3.7.2",
+    "round_count": 5,
+    "completed": true
+  },
+  "player_models": {
+    "0": {
+      "model_spec": {
+        "model_name": "CityUoL__qwen3.5-2b__Qwen-GuidePlay-2B-v1",
+        "_team": "CityUoL",
+        "_version": "Qwen-GuidePlay-2B-v1",
+        "backend": "huggingface_local",
+        "context_size": "262k",
+        "huggingface_id": "syedhuq/qwen-guideplay-2b",
+        "languages": [
+          "en"
+        ],
+        "license": {
+          "name": "Apache-2.0",
+          "url": "https://www.apache.org/licenses/LICENSE-2.0"
+        },
+        "lookup_source": "/project/mmanina/lm-playschool-test-set/playpen/model_registry.json",
+        "model_config": {
+          "premade_chat_template": true,
+          "eos_to_cull": "<\\|im_end\\|>|<\\|endoftext\\|>",
+          "chat_template_kwargs": {
+            "enable_thinking": false
+          },
+          "multimodality": {
+            "single_image": true,
+            "multiple_images": true,
+            "audio": false,
+            "video": true
+          }
+        },
+        "open_weight": true,
+        "parameters": "2B",
+        "release_date": "2026-07-06"
+      },
+      "gen_args": {
+        "temperature": 0.0,
+        "max_tokens": 5000
+      }
+    }
+  },
+  "players": {
+    "GM": {
+      "game_role": "Game Master",
+      "model_name": "programmatic"
+    },
+    "Player 1": {
+      "game_role": "ClueGiver",
+      "model_name": "CityUoL__qwen3.5-2b__Qwen-GuidePlay-2B-v1"
+    },
+    "Player 2": {
+      "game_role": "Guesser",
+      "model_name": "CityUoL__qwen3.5-2b__Qwen-GuidePlay-2B-v1"
+    }
+  },
+  "turns": [
+    [
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:51:17.224131",
+        "action": {
+          "type": "board status",
+          "content": {
+            "hidden": {
+              "team": [
+                "ship",
+                "eagle",
+                "hospital",
+                "ambulance",
+                "dinosaur",
+                "arm",
+                "parachute",
+                "knight",
+                "green"
+              ],
+              "innocent": [
+                "shop",
+                "skyscraper",
+                "agent",
+                "pants",
+                "straw",
+                "deck",
+                "bow",
+                "king"
+              ],
+              "opponent": [
+                "shadow",
+                "fence",
+                "nut",
+                "calf",
+                "tap",
+                "match",
+                "canada",
+                "organ"
+              ],
+              "assassin": []
+            },
+            "revealed": {
+              "team": {
+                "team": [],
+                "innocent": [],
+                "opponent": [],
+                "assassin": []
+              },
+              "opponent": {
+                "team": [],
+                "innocent": [],
+                "opponent": [],
+                "assassin": []
+              }
+            }
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 1",
+        "timestamp": "2026-07-09T07:51:23.547800",
+        "action": {
+          "type": "send message",
+          "content": "Provide one single-word clue that relates to some of your team's words from the list below. You can choose to how many and to which words your clue relates to.\nThe goal is to have your partner guess all of your team's words based on the clues you give them, before the other team has uncovered all of theirs. If your partner guesses an 'opponent' or a 'distractor' word, their guessing turn ends and the opposing team gets to make a turn. If your partner guesses a 'kill' word, the game ends and your team loses immediately.\nThe more words your clue relates to, the quicker you can win the game, but the harder the associations may be to guess for your partner, so choose your clue word wisely. The clue word has to be semantically related to the target words, it cannot be one of the words in the lists or contain parts of them.\n\nAlways give your single-word clue and your comma-separated list of related target words in the following format and make your answers as short as possible, never include any other text than is required in this form:\n\nCLUE: <WORD>\nTARGETS: <TARGETS>\n\nYour team words are: ship, eagle, hospital, ambulance, dinosaur, arm, parachute, knight, green.\nYour opponent's team words are: shadow, fence, nut, calf, tap, match, canada, organ.\nDistractor words are: shop, skyscraper, agent, pants, straw, deck, bow, king.\nThe kill words are: .",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 1",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:51:23.547826",
+        "action": {
+          "type": "get message",
+          "content": "CLUE: air\nTARGETS: ship, eagle, parachute, ambulance",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:51:23.548029",
+        "action": {
+          "type": "clue",
+          "content": "air"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:51:23.548055",
+        "action": {
+          "type": "targets",
+          "content": [
+            "ship",
+            "eagle",
+            "parachute",
+            "ambulance"
+          ]
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:51:23.548077",
+        "action": {
+          "type": "word targeted",
+          "content": {
+            "word": "ship",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:51:23.548098",
+        "action": {
+          "type": "word targeted",
+          "content": {
+            "word": "eagle",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:51:23.548117",
+        "action": {
+          "type": "word targeted",
+          "content": {
+            "word": "parachute",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:51:23.548135",
+        "action": {
+          "type": "word targeted",
+          "content": {
+            "word": "ambulance",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 2",
+        "timestamp": "2026-07-09T07:51:45.820670",
+        "action": {
+          "type": "send message",
+          "content": "Provide a comma-separated list of up to 4 words from the following list that best relate or are most closely associated with the word 'air'. Always start your list of guess(es) with 'GUESS: ' and do not include any other text in your answer.\n\nbow, ship, arm, ambulance, deck, organ, match, green, knight, parachute, shop, dinosaur, agent, straw, eagle, skyscraper, king, nut, canada, pants, hospital, shadow, tap, calf, fence",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 2",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:51:45.820690",
+        "action": {
+          "type": "get message",
+          "content": "GUESS: ship, parachute, eagle, skyscraper",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:51:45.820754",
+        "action": {
+          "type": "guesses",
+          "content": [
+            "ship",
+            "parachute",
+            "eagle",
+            "skyscraper"
+          ]
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:51:45.820782",
+        "action": {
+          "type": "team revealed",
+          "content": {
+            "word": "ship",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:51:45.820803",
+        "action": {
+          "type": "target revealed",
+          "content": {
+            "word": "ship",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:51:45.820823",
+        "action": {
+          "type": "team revealed",
+          "content": {
+            "word": "parachute",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:51:45.820841",
+        "action": {
+          "type": "target revealed",
+          "content": {
+            "word": "parachute",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:51:45.820860",
+        "action": {
+          "type": "team revealed",
+          "content": {
+            "word": "eagle",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:51:45.820877",
+        "action": {
+          "type": "target revealed",
+          "content": {
+            "word": "eagle",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:51:45.820896",
+        "action": {
+          "type": "team revealed",
+          "content": {
+            "word": "skyscraper",
+            "assignment": "innocent"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:51:45.820913",
+        "action": {
+          "type": "turn end after",
+          "content": "skyscraper"
+        }
+      }
+    ],
+    [
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:51:45.821040",
+        "action": {
+          "type": "opponent revealed",
+          "content": {
+            "word": "shadow",
+            "assignment": "opponent"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:51:45.821068",
+        "action": {
+          "type": "board status",
+          "content": {
+            "hidden": {
+              "team": [
+                "hospital",
+                "ambulance",
+                "dinosaur",
+                "arm",
+                "knight",
+                "green"
+              ],
+              "innocent": [
+                "shop",
+                "agent",
+                "pants",
+                "straw",
+                "deck",
+                "bow",
+                "king"
+              ],
+              "opponent": [
+                "fence",
+                "nut",
+                "calf",
+                "tap",
+                "match",
+                "canada",
+                "organ"
+              ],
+              "assassin": []
+            },
+            "revealed": {
+              "team": {
+                "team": [
+                  "ship",
+                  "parachute",
+                  "eagle"
+                ],
+                "innocent": [
+                  "skyscraper"
+                ],
+                "opponent": [],
+                "assassin": []
+              },
+              "opponent": {
+                "team": [],
+                "innocent": [],
+                "opponent": [
+                  "shadow"
+                ],
+                "assassin": []
+              }
+            }
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 1",
+        "timestamp": "2026-07-09T07:52:02.667928",
+        "action": {
+          "type": "send message",
+          "content": "The words ship, parachute, eagle were guessed correctly. The word skyscraper was guessed but is an innocent word. Your teammate's turn ended there.\nNow provide another clue relating to some of your remaining team words and a list of the related target words. Remember to start your clue with 'CLUE: ', put a new line, and start your comma-separated list of target words with 'TARGETS: '. Notice: some words have been removed from the lists compared to previous requests.\n\nYour remaining team words are: hospital, ambulance, dinosaur, arm, knight, green.\nRemaining words for your opponent are: shadow, fence, nut, calf, tap, match, canada, organ.\nRemaining distractor words are: shop, agent, pants, straw, deck, bow, king.\nRemaining kill words are: .",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 1",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:52:02.667948",
+        "action": {
+          "type": "get message",
+          "content": "CLUE: medical\nTARGETS: hospital, ambulance, arm",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:52:02.668119",
+        "action": {
+          "type": "clue",
+          "content": "medical"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:52:02.668143",
+        "action": {
+          "type": "targets",
+          "content": [
+            "hospital",
+            "ambulance",
+            "arm"
+          ]
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:52:02.668166",
+        "action": {
+          "type": "word targeted",
+          "content": {
+            "word": "hospital",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:52:02.668186",
+        "action": {
+          "type": "word targeted",
+          "content": {
+            "word": "ambulance",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:52:02.668204",
+        "action": {
+          "type": "word targeted",
+          "content": {
+            "word": "arm",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 2",
+        "timestamp": "2026-07-09T07:52:21.534769",
+        "action": {
+          "type": "send message",
+          "content": "The words ship, parachute, eagle were guessed correctly. The word skyscraper was guessed but is an innocent word. Your turn ended there.\nNow provide another comma-separated list of at least 1 and up to 3 words from the following list of words that best relate or are most closely associated with the word 'medical'. Remember to start your answer with 'GUESS: '. Notice: some words have been removed from the list compared to previous requests.\n\nbow, arm, ambulance, deck, organ, match, green, knight, shop, dinosaur, agent, straw, king, nut, canada, pants, hospital, tap, calf, fence",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 2",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:52:21.534789",
+        "action": {
+          "type": "get message",
+          "content": "GUESS: ambulance, hospital, organ",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:52:21.534854",
+        "action": {
+          "type": "guesses",
+          "content": [
+            "ambulance",
+            "hospital",
+            "organ"
+          ]
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:52:21.534881",
+        "action": {
+          "type": "team revealed",
+          "content": {
+            "word": "ambulance",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:52:21.534905",
+        "action": {
+          "type": "target revealed",
+          "content": {
+            "word": "ambulance",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:52:21.534926",
+        "action": {
+          "type": "team revealed",
+          "content": {
+            "word": "hospital",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:52:21.534945",
+        "action": {
+          "type": "target revealed",
+          "content": {
+            "word": "hospital",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:52:21.534965",
+        "action": {
+          "type": "team revealed",
+          "content": {
+            "word": "organ",
+            "assignment": "opponent"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:52:21.534984",
+        "action": {
+          "type": "turn end after",
+          "content": "organ"
+        }
+      }
+    ],
+    [
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:52:21.535143",
+        "action": {
+          "type": "opponent revealed",
+          "content": {
+            "word": "tap",
+            "assignment": "opponent"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:52:21.535171",
+        "action": {
+          "type": "board status",
+          "content": {
+            "hidden": {
+              "team": [
+                "dinosaur",
+                "arm",
+                "knight",
+                "green"
+              ],
+              "innocent": [
+                "shop",
+                "agent",
+                "pants",
+                "straw",
+                "deck",
+                "bow",
+                "king"
+              ],
+              "opponent": [
+                "fence",
+                "nut",
+                "calf",
+                "match",
+                "canada"
+              ],
+              "assassin": []
+            },
+            "revealed": {
+              "team": {
+                "team": [
+                  "ship",
+                  "parachute",
+                  "eagle",
+                  "ambulance",
+                  "hospital"
+                ],
+                "innocent": [
+                  "skyscraper"
+                ],
+                "opponent": [
+                  "organ"
+                ],
+                "assassin": []
+              },
+              "opponent": {
+                "team": [],
+                "innocent": [],
+                "opponent": [
+                  "shadow",
+                  "tap"
+                ],
+                "assassin": []
+              }
+            }
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 1",
+        "timestamp": "2026-07-09T07:52:34.624903",
+        "action": {
+          "type": "send message",
+          "content": "The words ambulance, hospital were guessed correctly. The word organ was guessed but is an opponent word. Your teammate's turn ended there.\nNow provide another clue relating to some of your remaining team words and a list of the related target words. Remember to start your clue with 'CLUE: ', put a new line, and start your comma-separated list of target words with 'TARGETS: '. Notice: some words have been removed from the lists compared to previous requests.\n\nYour remaining team words are: dinosaur, arm, knight, green.\nRemaining words for your opponent are: fence, nut, calf, tap, match, canada.\nRemaining distractor words are: shop, agent, pants, straw, deck, bow, king.\nRemaining kill words are: .",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 1",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:52:34.624936",
+        "action": {
+          "type": "get message",
+          "content": "CLUE: armor\nTARGETS: knight, arm",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:52:34.625171",
+        "action": {
+          "type": "clue",
+          "content": "armor"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:52:34.625199",
+        "action": {
+          "type": "targets",
+          "content": [
+            "knight",
+            "arm"
+          ]
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:52:34.625227",
+        "action": {
+          "type": "word targeted",
+          "content": {
+            "word": "knight",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:52:34.625247",
+        "action": {
+          "type": "word targeted",
+          "content": {
+            "word": "arm",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 2",
+        "timestamp": "2026-07-09T07:52:51.239786",
+        "action": {
+          "type": "send message",
+          "content": "The words ambulance, hospital were guessed correctly. The word organ was guessed but is an opponent word. Your turn ended there.\nNow provide another comma-separated list of at least 1 and up to 2 words from the following list of words that best relate or are most closely associated with the word 'armor'. Remember to start your answer with 'GUESS: '. Notice: some words have been removed from the list compared to previous requests.\n\nbow, arm, deck, match, green, knight, shop, dinosaur, agent, straw, king, nut, canada, pants, calf, fence",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 2",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:52:51.239802",
+        "action": {
+          "type": "get message",
+          "content": "GUESS: knight, arm",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:52:51.239893",
+        "action": {
+          "type": "guesses",
+          "content": [
+            "knight",
+            "arm"
+          ]
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:52:51.239933",
+        "action": {
+          "type": "team revealed",
+          "content": {
+            "word": "knight",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:52:51.239956",
+        "action": {
+          "type": "target revealed",
+          "content": {
+            "word": "knight",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:52:51.239976",
+        "action": {
+          "type": "team revealed",
+          "content": {
+            "word": "arm",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:52:51.239994",
+        "action": {
+          "type": "target revealed",
+          "content": {
+            "word": "arm",
+            "assignment": "team"
+          }
+        }
+      }
+    ],
+    [
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:52:51.240300",
+        "action": {
+          "type": "opponent revealed",
+          "content": {
+            "word": "nut",
+            "assignment": "opponent"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:52:51.240331",
+        "action": {
+          "type": "board status",
+          "content": {
+            "hidden": {
+              "team": [
+                "dinosaur",
+                "green"
+              ],
+              "innocent": [
+                "shop",
+                "agent",
+                "pants",
+                "straw",
+                "deck",
+                "bow",
+                "king"
+              ],
+              "opponent": [
+                "fence",
+                "calf",
+                "match",
+                "canada"
+              ],
+              "assassin": []
+            },
+            "revealed": {
+              "team": {
+                "team": [
+                  "ship",
+                  "parachute",
+                  "eagle",
+                  "ambulance",
+                  "hospital",
+                  "knight",
+                  "arm"
+                ],
+                "innocent": [
+                  "skyscraper"
+                ],
+                "opponent": [
+                  "organ"
+                ],
+                "assassin": []
+              },
+              "opponent": {
+                "team": [],
+                "innocent": [],
+                "opponent": [
+                  "shadow",
+                  "tap",
+                  "nut"
+                ],
+                "assassin": []
+              }
+            }
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 1",
+        "timestamp": "2026-07-09T07:53:01.263378",
+        "action": {
+          "type": "send message",
+          "content": "The words knight, arm were guessed correctly. Your teammate's turn ended there.\nNow provide another clue relating to some of your remaining team words and a list of the related target words. Remember to start your clue with 'CLUE: ', put a new line, and start your comma-separated list of target words with 'TARGETS: '. Notice: some words have been removed from the lists compared to previous requests.\n\nYour remaining team words are: dinosaur, green.\nRemaining words for your opponent are: fence, nut, calf, match, canada.\nRemaining distractor words are: shop, agent, pants, straw, deck, bow, king.\nRemaining kill words are: .",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 1",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:53:01.263394",
+        "action": {
+          "type": "get message",
+          "content": "CLUE: reptile\nTARGETS: dinosaur",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:53:01.263581",
+        "action": {
+          "type": "clue",
+          "content": "reptile"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:53:01.263615",
+        "action": {
+          "type": "targets",
+          "content": [
+            "dinosaur"
+          ]
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:53:01.263639",
+        "action": {
+          "type": "word targeted",
+          "content": {
+            "word": "dinosaur",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 2",
+        "timestamp": "2026-07-09T07:53:13.616360",
+        "action": {
+          "type": "send message",
+          "content": "The words knight, arm were guessed correctly. Your turn ended there.\nNow provide another comma-separated list of at least 1 and up to 1 words from the following list of words that best relate or are most closely associated with the word 'reptile'. Remember to start your answer with 'GUESS: '. Notice: some words have been removed from the list compared to previous requests.\n\nbow, deck, match, green, shop, dinosaur, agent, straw, king, canada, pants, calf, fence",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 2",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:53:13.616377",
+        "action": {
+          "type": "get message",
+          "content": "GUESS: dinosaur",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:53:13.616450",
+        "action": {
+          "type": "guesses",
+          "content": [
+            "dinosaur"
+          ]
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:53:13.616490",
+        "action": {
+          "type": "team revealed",
+          "content": {
+            "word": "dinosaur",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:53:13.616513",
+        "action": {
+          "type": "target revealed",
+          "content": {
+            "word": "dinosaur",
+            "assignment": "team"
+          }
+        }
+      }
+    ],
+    [
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:53:13.616827",
+        "action": {
+          "type": "opponent revealed",
+          "content": {
+            "word": "fence",
+            "assignment": "opponent"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:53:13.616857",
+        "action": {
+          "type": "board status",
+          "content": {
+            "hidden": {
+              "team": [
+                "green"
+              ],
+              "innocent": [
+                "shop",
+                "agent",
+                "pants",
+                "straw",
+                "deck",
+                "bow",
+                "king"
+              ],
+              "opponent": [
+                "calf",
+                "match",
+                "canada"
+              ],
+              "assassin": []
+            },
+            "revealed": {
+              "team": {
+                "team": [
+                  "ship",
+                  "parachute",
+                  "eagle",
+                  "ambulance",
+                  "hospital",
+                  "knight",
+                  "arm",
+                  "dinosaur"
+                ],
+                "innocent": [
+                  "skyscraper"
+                ],
+                "opponent": [
+                  "organ"
+                ],
+                "assassin": []
+              },
+              "opponent": {
+                "team": [],
+                "innocent": [],
+                "opponent": [
+                  "shadow",
+                  "tap",
+                  "nut",
+                  "fence"
+                ],
+                "assassin": []
+              }
+            }
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 1",
+        "timestamp": "2026-07-09T07:53:22.908573",
+        "action": {
+          "type": "send message",
+          "content": "The word dinosaur was guessed correctly. Your teammate's turn ended there.\nNow provide another clue relating to some of your remaining team words and a list of the related target words. Remember to start your clue with 'CLUE: ', put a new line, and start your comma-separated list of target words with 'TARGETS: '. Notice: some words have been removed from the lists compared to previous requests.\n\nYour remaining team words are: green.\nRemaining words for your opponent are: fence, calf, match, canada.\nRemaining distractor words are: shop, agent, pants, straw, deck, bow, king.\nRemaining kill words are: .",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 1",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:53:22.908590",
+        "action": {
+          "type": "get message",
+          "content": "CLUE: grass\nTARGETS: green",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:53:22.908813",
+        "action": {
+          "type": "clue",
+          "content": "grass"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:53:22.908849",
+        "action": {
+          "type": "targets",
+          "content": [
+            "green"
+          ]
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:53:22.908872",
+        "action": {
+          "type": "word targeted",
+          "content": {
+            "word": "green",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 2",
+        "timestamp": "2026-07-09T07:53:32.859559",
+        "action": {
+          "type": "send message",
+          "content": "The word dinosaur was guessed correctly. Your turn ended there.\nNow provide another comma-separated list of at least 1 and up to 1 words from the following list of words that best relate or are most closely associated with the word 'grass'. Remember to start your answer with 'GUESS: '. Notice: some words have been removed from the list compared to previous requests.\n\nbow, deck, match, green, shop, agent, straw, king, canada, pants, calf",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 2",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:53:32.859577",
+        "action": {
+          "type": "get message",
+          "content": "GUESS: green",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:53:32.859660",
+        "action": {
+          "type": "guesses",
+          "content": [
+            "green"
+          ]
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:53:32.859702",
+        "action": {
+          "type": "team revealed",
+          "content": {
+            "word": "green",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:53:32.859727",
+        "action": {
+          "type": "target revealed",
+          "content": {
+            "word": "green",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:53:32.860677",
+        "action": {
+          "type": "game end",
+          "content": "team has won"
+        }
+      }
+    ]
+  ],
+  "board end status": {
+    "hidden": {
+      "team": [],
+      "innocent": [
+        "shop",
+        "agent",
+        "pants",
+        "straw",
+        "deck",
+        "bow",
+        "king"
+      ],
+      "opponent": [
+        "calf",
+        "match",
+        "canada"
+      ],
+      "assassin": []
+    },
+    "revealed": {
+      "team": {
+        "team": [
+          "ship",
+          "parachute",
+          "eagle",
+          "ambulance",
+          "hospital",
+          "knight",
+          "arm",
+          "dinosaur",
+          "green"
+        ],
+        "innocent": [
+          "skyscraper"
+        ],
+        "opponent": [
+          "organ"
+        ],
+        "assassin": []
+      },
+      "opponent": {
+        "team": [],
+        "innocent": [],
+        "opponent": [
+          "shadow",
+          "tap",
+          "nut",
+          "fence"
+        ],
+        "assassin": []
+      }
+    }
+  },
+  "Number of turns": 6,
+  "Aborted": false,
+  "Lose": false,
+  "Game ended through assassin": false,
+  "Request Count": 10,
+  "Parsed Request Count": 10,
+  "Violated Request Count": 0,
+  "Cluegiver engaged flags": {
+    "IGNORE RAMBLING": 0,
+    "IGNORE FALSE TARGETS OR GUESSES": 0,
+    "REPROMPT ON ERROR": 0,
+    "STRIP WORDS": 0,
+    "IGNORE NUMBER OF TARGETS": 0
+  },
+  "Guesser engaged flags": {
+    "IGNORE RAMBLING": 0,
+    "IGNORE FALSE TARGETS OR GUESSES": 0,
+    "REPROMPT ON ERROR": 0,
+    "STRIP WORDS": 0,
+    "IGNORE NUMBER OF TARGETS": 0
+  }
+}

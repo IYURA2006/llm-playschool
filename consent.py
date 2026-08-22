@@ -148,9 +148,18 @@ def build(consent_popup):
                 label="I have read and understood the information above and agree to take part",
                 value=False,
             )
-            popup_note = gr.Markdown("")
+            popup_note = gr.Markdown("", elem_id="consent-note")
             confirm_btn = gr.Button(
                 "I agree", variant="primary", size="lg",
                 elem_classes=["start-btn"],
             )
-    return agree_cb, confirm_btn, popup_note
+            # A way out. "I agree" used to be the only exit, which made the
+            # dialog's focus trap a WCAG 2.1.2 keyboard trap for anyone who
+            # read the sheet and decided not to take part. Escape is bound to
+            # this same button by the a11y module. The certified sheet text
+            # above is untouched.
+            decline_btn = gr.Button(
+                "I do not agree", variant="secondary", size="sm",
+                elem_classes=["consent-decline-btn"],
+            )
+    return agree_cb, confirm_btn, popup_note, decline_btn

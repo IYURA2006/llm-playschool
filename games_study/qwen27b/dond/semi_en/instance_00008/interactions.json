@@ -1,0 +1,282 @@
+{
+  "meta": {
+    "game_name": "dond",
+    "experiment_name": "semi_en",
+    "game_id": 8,
+    "results_folder": "qwen3.5-27b",
+    "clem_version": "3.7.2",
+    "round_count": 2,
+    "completed": true
+  },
+  "player_models": {
+    "0": {
+      "model_spec": {
+        "model_name": "qwen3.5-27b",
+        "backend": "huggingface_local",
+        "context_size": "262k",
+        "huggingface_id": "Qwen/Qwen3.5-27B",
+        "languages": [
+          "en",
+          "zh"
+        ],
+        "license": {
+          "name": "Apache 2.0",
+          "url": "https://www.apache.org/licenses/LICENSE-2.0"
+        },
+        "lookup_source": "/project/mmanina/lm-playschool-test-set/playpen/model_registry.json",
+        "model_config": {
+          "premade_chat_template": true,
+          "eos_to_cull": "<\\|im_end\\|>|<\\|endoftext\\|>",
+          "chat_template_kwargs": {
+            "enable_thinking": false
+          },
+          "multimodality": {
+            "single_image": true,
+            "multiple_images": true,
+            "audio": false,
+            "video": true
+          }
+        },
+        "open_weight": true,
+        "parameters": "27B",
+        "release_date": "2026-02-24"
+      },
+      "gen_args": {
+        "temperature": 0.0,
+        "max_tokens": 5000
+      }
+    }
+  },
+  "players": {
+    "GM": {
+      "game_role": "Game Master",
+      "model_name": "programmatic"
+    },
+    "Player 1": {
+      "game_role": "DealOrNoDealPlayer",
+      "model_name": "qwen3.5-27b"
+    },
+    "Player 2": {
+      "game_role": "DealOrNoDealPlayer",
+      "model_name": "qwen3.5-27b"
+    }
+  },
+  "turns": [
+    [
+      {
+        "from": "GM",
+        "to": "Player 1",
+        "timestamp": "2026-07-01T14:45:55.227567",
+        "action": {
+          "type": "send message",
+          "content": "You are playing a negotiation game in which you have to agree on how to divide a set of items among you and another player.\n\nRules:\n(a) You and the other player are given a set of items. Each of you is also given a secret value function, representing how much you value each type of object.\n(b) You exchange messages with the other player to agree on who gets which items. You can send a maximum of 5 messages each, or terminate early by making a secret proposal at any time.\n(c) You are each asked to submit a secret proposal indicating the items you want formatted in square brackets as follows: \"[Proposal: <number> <object name>, <number> <object name>, <...>]\"\n(d) If your proposals are complementary, i.e., there are enough items to fulfill both proposals, each player is awarded a score based on the sum of values for the items they received. Otherwise, both of you get zero points.\n(e) Your goal is to maximize the score you receive.\n\nLet us start.\n\nThe set of available items is:\n\n1 phone, 2 leaves, 2 oranges\n\nYour secret value function is:\n\nphone: 4, leaf: 0, orange: 3\n\nIMPORTANT: Your messages, unless it is the secret proposal, are directly transmitted to the other player, so do not include any response to the rules or text announcing your message. To make a secret proposal, use the indicated format. Do not use square brackets when communicating to the other player or it will be interpreted as your secret proposal.\n",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 1",
+        "to": "GM",
+        "timestamp": "2026-07-01T14:45:55.227583",
+        "action": {
+          "type": "get message",
+          "content": "I value the phone and oranges highly, while leaves have no value to me. Since there are two oranges and two leaves, perhaps we can split the oranges and I take the phone, leaving the leaves for you? Let me know what works for you.",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T14:45:55.227608",
+        "action": {
+          "type": "valid response",
+          "content": "continue"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T14:45:55.227624",
+        "action": {
+          "type": "valid message",
+          "content": "I value the phone and oranges highly, while leaves have no value to me. Since there are two oranges and two leaves, perhaps we can split the oranges and I take the phone, leaving the leaves for you? Let me know what works for you."
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 2",
+        "timestamp": "2026-07-01T14:50:12.792905",
+        "action": {
+          "type": "send message",
+          "content": "You are playing a negotiation game in which you have to agree on how to divide a set of items among you and another player.\n\nRules:\n(a) You and the other player are given a set of items. Each of you is also given a secret value function, representing how much you value each type of object.\n(b) You exchange messages with the other player to agree on who gets which items. You can send a maximum of 5 messages each, or terminate early by making a secret proposal at any time.\n(c) You are each asked to submit a secret proposal indicating the items you want formatted in square brackets as follows: \"[Proposal: <number> <object name>, <number> <object name>, <...>]\"\n(d) If your proposals are complementary, i.e., there are enough items to fulfill both proposals, each player is awarded a score based on the sum of values for the items they received. Otherwise, both of you get zero points.\n(e) Your goal is to maximize the score you receive.\n\nLet us start.\n\nThe set of available items is:\n\n1 phone, 2 leaves, 2 oranges\n\nYour secret value function is:\n\nphone: 2, leaf: 1, orange: 3\n\nIMPORTANT: Your messages, unless it is the secret proposal, are directly transmitted to the other player, so do not include any response to the rules or text announcing your message. To make a secret proposal, use the indicated format. Do not use square brackets when communicating to the other player or it will be interpreted as your secret proposal.\n\n\nI value the phone and oranges highly, while leaves have no value to me. Since there are two oranges and two leaves, perhaps we can split the oranges and I take the phone, leaving the leaves for you? Let me know what works for you.",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 2",
+        "to": "GM",
+        "timestamp": "2026-07-01T14:50:12.792925",
+        "action": {
+          "type": "get message",
+          "content": "That sounds like a fair starting point. If you take the phone and one orange, and I take the other orange and both leaves, we would both get items we value. However, since you mentioned leaves have no value to you, you might be willing to give up the second orange if I give you something else, but I don't have anything else to offer besides the leaves which you don't want.\n\nActually, let's clarify: if you take the phone and both oranges, that's 2 + 3 + 3 = 8 points for you. I would get the two leaves. If my value for leaves is high, this works. If my value for leaves is low, I might prefer to keep an orange.\n\nWait, you said \"I value the phone and oranges highly, while leaves have no value to me.\" This implies you want the phone and oranges. If I take the leaves, and you take the phone and both oranges, that is a valid split (1 phone, 2 oranges to you; 2 leaves to me).\n\nDoes that work for you? You get the phone and both oranges, and I get the two leaves. If you agree, I can make a secret proposal for the leaves, and you can make one for the phone and oranges.\n\nLet me know if you want to proceed with:\n- You: 1 phone, 2 oranges\n- Me: 2 leaves\n\nOr if you prefer to split the oranges (1 each) and you take the phone, I take the leaves and one orange? But you said you value oranges highly, so maybe you want both.\n\nPlease confirm your preference so I can finalize the proposal.",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T14:50:12.792955",
+        "action": {
+          "type": "valid response",
+          "content": "continue"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T14:50:12.792972",
+        "action": {
+          "type": "valid message",
+          "content": "That sounds like a fair starting point. If you take the phone and one orange, and I take the other orange and both leaves, we would both get items we value. However, since you mentioned leaves have no value to you, you might be willing to give up the second orange if I give you something else, but I don't have anything else to offer besides the leaves which you don't want.\n\nActually, let's clarify: if you take the phone and both oranges, that's 2 + 3 + 3 = 8 points for you. I would get the two leaves. If my value for leaves is high, this works. If my value for leaves is low, I might prefer to keep an orange.\n\nWait, you said \"I value the phone and oranges highly, while leaves have no value to me.\" This implies you want the phone and oranges. If I take the leaves, and you take the phone and both oranges, that is a valid split (1 phone, 2 oranges to you; 2 leaves to me).\n\nDoes that work for you? You get the phone and both oranges, and I get the two leaves. If you agree, I can make a secret proposal for the leaves, and you can make one for the phone and oranges.\n\nLet me know if you want to proceed with:\n- You: 1 phone, 2 oranges\n- Me: 2 leaves\n\nOr if you prefer to split the oranges (1 each) and you take the phone, I take the leaves and one orange? But you said you value oranges highly, so maybe you want both.\n\nPlease confirm your preference so I can finalize the proposal."
+        }
+      }
+    ],
+    [
+      {
+        "from": "GM",
+        "to": "Player 1",
+        "timestamp": "2026-07-01T14:52:55.332429",
+        "action": {
+          "type": "send message",
+          "content": "That sounds like a fair starting point. If you take the phone and one orange, and I take the other orange and both leaves, we would both get items we value. However, since you mentioned leaves have no value to you, you might be willing to give up the second orange if I give you something else, but I don't have anything else to offer besides the leaves which you don't want.\n\nActually, let's clarify: if you take the phone and both oranges, that's 2 + 3 + 3 = 8 points for you. I would get the two leaves. If my value for leaves is high, this works. If my value for leaves is low, I might prefer to keep an orange.\n\nWait, you said \"I value the phone and oranges highly, while leaves have no value to me.\" This implies you want the phone and oranges. If I take the leaves, and you take the phone and both oranges, that is a valid split (1 phone, 2 oranges to you; 2 leaves to me).\n\nDoes that work for you? You get the phone and both oranges, and I get the two leaves. If you agree, I can make a secret proposal for the leaves, and you can make one for the phone and oranges.\n\nLet me know if you want to proceed with:\n- You: 1 phone, 2 oranges\n- Me: 2 leaves\n\nOr if you prefer to split the oranges (1 each) and you take the phone, I take the leaves and one orange? But you said you value oranges highly, so maybe you want both.\n\nPlease confirm your preference so I can finalize the proposal.",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 1",
+        "to": "GM",
+        "timestamp": "2026-07-01T14:52:55.332450",
+        "action": {
+          "type": "get message",
+          "content": "That split works perfectly for me. Since leaves have zero value to me, I am happy to let you have both of them in exchange for the phone and both oranges. This maximizes my score.\n\nLet's proceed with:\n- You: 2 leaves\n- Me: 1 phone, 2 oranges\n\nI will submit my secret proposal now.\n\n[Proposal: 1 phone, 2 oranges]",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T14:52:55.332526",
+        "action": {
+          "type": "valid response",
+          "content": "proposal"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T14:52:55.332546",
+        "action": {
+          "type": "valid proposal",
+          "content": [
+            1,
+            0,
+            2
+          ]
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 2",
+        "timestamp": "2026-07-01T14:53:42.916347",
+        "action": {
+          "type": "send message",
+          "content": "The other player has submitted a secret proposal. It is now your turn to submit a proposal of your own.\n",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 2",
+        "to": "GM",
+        "timestamp": "2026-07-01T14:53:42.916368",
+        "action": {
+          "type": "get message",
+          "content": "[Proposal: 1 phone, 2 oranges]",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T14:53:42.916485",
+        "action": {
+          "type": "valid response",
+          "content": "proposal"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T14:53:42.916510",
+        "action": {
+          "type": "valid proposal",
+          "content": [
+            1,
+            0,
+            2
+          ]
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T14:53:42.916542",
+        "action": {
+          "type": "failed agreement",
+          "content": [
+            [
+              1,
+              0,
+              2
+            ],
+            [
+              1,
+              0,
+              2
+            ]
+          ]
+        }
+      }
+    ]
+  ],
+  "Aborted": 0,
+  "Lose": 1,
+  "Success": 0,
+  "player_a_proposal": [
+    1,
+    0,
+    2
+  ],
+  "player_b_proposal": [
+    1,
+    0,
+    2
+  ],
+  "sum_of_scores": 0,
+  "max_sum_of_scores": 12,
+  "max_player_scores": 10,
+  "max_pareto_improvement": 10,
+  "pareto_improvement": 10,
+  "pareto_optimal": 0,
+  "episode_score": 0.0,
+  "Request Count": [
+    2,
+    2
+  ],
+  "Violated Request Count": [
+    0,
+    0
+  ],
+  "Parsed Request Count": [
+    2,
+    2
+  ]
+}

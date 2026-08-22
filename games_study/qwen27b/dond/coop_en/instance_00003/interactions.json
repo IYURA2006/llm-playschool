@@ -1,0 +1,288 @@
+{
+  "meta": {
+    "game_name": "dond",
+    "experiment_name": "coop_en",
+    "game_id": 3,
+    "results_folder": "qwen3.5-27b",
+    "clem_version": "3.7.2",
+    "round_count": 2,
+    "completed": true
+  },
+  "player_models": {
+    "0": {
+      "model_spec": {
+        "model_name": "qwen3.5-27b",
+        "backend": "huggingface_local",
+        "context_size": "262k",
+        "huggingface_id": "Qwen/Qwen3.5-27B",
+        "languages": [
+          "en",
+          "zh"
+        ],
+        "license": {
+          "name": "Apache 2.0",
+          "url": "https://www.apache.org/licenses/LICENSE-2.0"
+        },
+        "lookup_source": "/project/mmanina/lm-playschool-test-set/playpen/model_registry.json",
+        "model_config": {
+          "premade_chat_template": true,
+          "eos_to_cull": "<\\|im_end\\|>|<\\|endoftext\\|>",
+          "chat_template_kwargs": {
+            "enable_thinking": false
+          },
+          "multimodality": {
+            "single_image": true,
+            "multiple_images": true,
+            "audio": false,
+            "video": true
+          }
+        },
+        "open_weight": true,
+        "parameters": "27B",
+        "release_date": "2026-02-24"
+      },
+      "gen_args": {
+        "temperature": 0.0,
+        "max_tokens": 5000
+      }
+    }
+  },
+  "players": {
+    "GM": {
+      "game_role": "Game Master",
+      "model_name": "programmatic"
+    },
+    "Player 1": {
+      "game_role": "DealOrNoDealPlayer",
+      "model_name": "qwen3.5-27b"
+    },
+    "Player 2": {
+      "game_role": "DealOrNoDealPlayer",
+      "model_name": "qwen3.5-27b"
+    }
+  },
+  "turns": [
+    [
+      {
+        "from": "GM",
+        "to": "Player 1",
+        "timestamp": "2026-07-01T14:44:42.860403",
+        "action": {
+          "type": "send message",
+          "content": "You are playing a cooperative negotiation game in which you have to agree on how to divide a set of items among you and another player.\n\nRules:\n(a) You and the other player are given a set of items. Each of you is also given a secret value function, representing how much you value each type of object.\n(b) You exchange messages with the other player to agree on who gets which items. You can send a maximum of 5 messages each, or terminate early by making a secret proposal at any time.\n(c) You are each asked to submit a secret proposal indicating the items you want formatted in square brackets as follows: \"[Proposal: <number> <object name>, <number> <object name>, <...>]\"\n(d) If your proposals are complementary, i.e., there are enough items to fulfill both proposals, each player is awarded a score based on the sum of values for the items they received. Otherwise, both of you get zero points.\n(e) Your goal is to maximize the sum of your score and the score of the other player.\n\nLet us start.\n\nThe set of available items is:\n\n1 hammer, 1 broom, 2 socks, 1 box\n\nYour secret value function is:\n\nhammer: 5, broom: 3, sock: 1, box: 0\n\nIMPORTANT: Your messages, unless it is the secret proposal, are directly transmitted to the other player, so do not include any response to the rules or text announcing your message. To make a secret proposal, use the indicated format. Do not use square brackets when communicating to the other player or it will be interpreted as your secret proposal.\n",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 1",
+        "to": "GM",
+        "timestamp": "2026-07-01T14:44:42.860421",
+        "action": {
+          "type": "get message",
+          "content": "Hi! Let's figure out the best way to split these items. I value the hammer the most (5 points), followed by the broom (3 points). I don't really care about the socks (1 point each) or the box (0 points).\n\nWhat are your values for these items? Knowing that will help us make sure we both get the things we want most.",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T14:44:42.860439",
+        "action": {
+          "type": "valid response",
+          "content": "continue"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T14:44:42.860453",
+        "action": {
+          "type": "valid message",
+          "content": "Hi! Let's figure out the best way to split these items. I value the hammer the most (5 points), followed by the broom (3 points). I don't really care about the socks (1 point each) or the box (0 points).\n\nWhat are your values for these items? Knowing that will help us make sure we both get the things we want most."
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 2",
+        "timestamp": "2026-07-01T14:46:22.243386",
+        "action": {
+          "type": "send message",
+          "content": "You are playing a cooperative negotiation game in which you have to agree on how to divide a set of items among you and another player.\n\nRules:\n(a) You and the other player are given a set of items. Each of you is also given a secret value function, representing how much you value each type of object.\n(b) You exchange messages with the other player to agree on who gets which items. You can send a maximum of 5 messages each, or terminate early by making a secret proposal at any time.\n(c) You are each asked to submit a secret proposal indicating the items you want formatted in square brackets as follows: \"[Proposal: <number> <object name>, <number> <object name>, <...>]\"\n(d) If your proposals are complementary, i.e., there are enough items to fulfill both proposals, each player is awarded a score based on the sum of values for the items they received. Otherwise, both of you get zero points.\n(e) Your goal is to maximize the sum of your score and the score of the other player.\n\nLet us start.\n\nThe set of available items is:\n\n1 hammer, 1 broom, 2 socks, 1 box\n\nYour secret value function is:\n\nhammer: 2, broom: 1, sock: 2, box: 3\n\nIMPORTANT: Your messages, unless it is the secret proposal, are directly transmitted to the other player, so do not include any response to the rules or text announcing your message. To make a secret proposal, use the indicated format. Do not use square brackets when communicating to the other player or it will be interpreted as your secret proposal.\n\n\nHi! Let's figure out the best way to split these items. I value the hammer the most (5 points), followed by the broom (3 points). I don't really care about the socks (1 point each) or the box (0 points).\n\nWhat are your values for these items? Knowing that will help us make sure we both get the things we want most.",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 2",
+        "to": "GM",
+        "timestamp": "2026-07-01T14:46:22.243404",
+        "action": {
+          "type": "get message",
+          "content": "Hi! Thanks for sharing your values. Here's how I value the items:\n\n- Hammer: 2 points\n- Broom: 1 point\n- Sock: 2 points each (so 4 total for both)\n- Box: 3 points\n\nSince you value the hammer and broom highly, and I value the box and socks more, it seems like a good split would be:\n\n- You take the hammer and broom (your top priorities).\n- I take the box and both socks (my top priorities).\n\nThis way, we both get the items we value most, and the total combined score is maximized. Does that sound fair to you? If so, I can make a secret proposal to lock it in.",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T14:46:22.243423",
+        "action": {
+          "type": "valid response",
+          "content": "continue"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T14:46:22.243437",
+        "action": {
+          "type": "valid message",
+          "content": "Hi! Thanks for sharing your values. Here's how I value the items:\n\n- Hammer: 2 points\n- Broom: 1 point\n- Sock: 2 points each (so 4 total for both)\n- Box: 3 points\n\nSince you value the hammer and broom highly, and I value the box and socks more, it seems like a good split would be:\n\n- You take the hammer and broom (your top priorities).\n- I take the box and both socks (my top priorities).\n\nThis way, we both get the items we value most, and the total combined score is maximized. Does that sound fair to you? If so, I can make a secret proposal to lock it in."
+        }
+      }
+    ],
+    [
+      {
+        "from": "GM",
+        "to": "Player 1",
+        "timestamp": "2026-07-01T14:51:01.035941",
+        "action": {
+          "type": "send message",
+          "content": "Hi! Thanks for sharing your values. Here's how I value the items:\n\n- Hammer: 2 points\n- Broom: 1 point\n- Sock: 2 points each (so 4 total for both)\n- Box: 3 points\n\nSince you value the hammer and broom highly, and I value the box and socks more, it seems like a good split would be:\n\n- You take the hammer and broom (your top priorities).\n- I take the box and both socks (my top priorities).\n\nThis way, we both get the items we value most, and the total combined score is maximized. Does that sound fair to you? If so, I can make a secret proposal to lock it in.",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 1",
+        "to": "GM",
+        "timestamp": "2026-07-01T14:51:01.035958",
+        "action": {
+          "type": "get message",
+          "content": "That sounds like a perfect plan! Let's verify the math quickly:\n\n- **You get:** Hammer (5) + Broom (3) = **8 points**.\n- **I get:** Box (3) + 2 Socks (2+2) = **7 points**.\n- **Total:** 15 points.\n\nSince we have no overlap in our top priorities, this split ensures we both get exactly what we value most without any conflict. I agree completely.\n\nPlease go ahead and make the secret proposal for your items (Box and 2 Socks), and I will submit my proposal for the Hammer and Broom.\n\n[Proposal: 1 hammer, 1 broom]",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T14:51:01.035992",
+        "action": {
+          "type": "valid response",
+          "content": "proposal"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T14:51:01.036008",
+        "action": {
+          "type": "valid proposal",
+          "content": [
+            1,
+            1,
+            0,
+            0
+          ]
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 2",
+        "timestamp": "2026-07-01T14:53:09.149370",
+        "action": {
+          "type": "send message",
+          "content": "The other player has submitted a secret proposal. It is now your turn to submit a proposal of your own.\n",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 2",
+        "to": "GM",
+        "timestamp": "2026-07-01T14:53:09.149409",
+        "action": {
+          "type": "get message",
+          "content": "[Proposal: 1 hammer, 1 broom]",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T14:53:09.149471",
+        "action": {
+          "type": "valid response",
+          "content": "proposal"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T14:53:09.149499",
+        "action": {
+          "type": "valid proposal",
+          "content": [
+            1,
+            1,
+            0,
+            0
+          ]
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T14:53:09.149533",
+        "action": {
+          "type": "failed agreement",
+          "content": [
+            [
+              1,
+              1,
+              0,
+              0
+            ],
+            [
+              1,
+              1,
+              0,
+              0
+            ]
+          ]
+        }
+      }
+    ]
+  ],
+  "Aborted": 0,
+  "Lose": 1,
+  "Success": 0,
+  "player_a_proposal": [
+    1,
+    1,
+    0,
+    0
+  ],
+  "player_b_proposal": [
+    1,
+    1,
+    0,
+    0
+  ],
+  "sum_of_scores": 0,
+  "max_sum_of_scores": 15,
+  "max_player_scores": 10,
+  "max_pareto_improvement": 15,
+  "pareto_improvement": 15,
+  "pareto_optimal": 0,
+  "episode_score": 0.0,
+  "Request Count": [
+    2,
+    2
+  ],
+  "Violated Request Count": [
+    0,
+    0
+  ],
+  "Parsed Request Count": [
+    2,
+    2
+  ]
+}

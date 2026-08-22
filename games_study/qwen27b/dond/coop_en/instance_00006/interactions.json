@@ -1,0 +1,282 @@
+{
+  "meta": {
+    "game_name": "dond",
+    "experiment_name": "coop_en",
+    "game_id": 6,
+    "results_folder": "qwen3.5-27b",
+    "clem_version": "3.7.2",
+    "round_count": 2,
+    "completed": true
+  },
+  "player_models": {
+    "0": {
+      "model_spec": {
+        "model_name": "qwen3.5-27b",
+        "backend": "huggingface_local",
+        "context_size": "262k",
+        "huggingface_id": "Qwen/Qwen3.5-27B",
+        "languages": [
+          "en",
+          "zh"
+        ],
+        "license": {
+          "name": "Apache 2.0",
+          "url": "https://www.apache.org/licenses/LICENSE-2.0"
+        },
+        "lookup_source": "/project/mmanina/lm-playschool-test-set/playpen/model_registry.json",
+        "model_config": {
+          "premade_chat_template": true,
+          "eos_to_cull": "<\\|im_end\\|>|<\\|endoftext\\|>",
+          "chat_template_kwargs": {
+            "enable_thinking": false
+          },
+          "multimodality": {
+            "single_image": true,
+            "multiple_images": true,
+            "audio": false,
+            "video": true
+          }
+        },
+        "open_weight": true,
+        "parameters": "27B",
+        "release_date": "2026-02-24"
+      },
+      "gen_args": {
+        "temperature": 0.0,
+        "max_tokens": 5000
+      }
+    }
+  },
+  "players": {
+    "GM": {
+      "game_role": "Game Master",
+      "model_name": "programmatic"
+    },
+    "Player 1": {
+      "game_role": "DealOrNoDealPlayer",
+      "model_name": "qwen3.5-27b"
+    },
+    "Player 2": {
+      "game_role": "DealOrNoDealPlayer",
+      "model_name": "qwen3.5-27b"
+    }
+  },
+  "turns": [
+    [
+      {
+        "from": "GM",
+        "to": "Player 1",
+        "timestamp": "2026-07-01T14:44:57.214721",
+        "action": {
+          "type": "send message",
+          "content": "You are playing a cooperative negotiation game in which you have to agree on how to divide a set of items among you and another player.\n\nRules:\n(a) You and the other player are given a set of items. Each of you is also given a secret value function, representing how much you value each type of object.\n(b) You exchange messages with the other player to agree on who gets which items. You can send a maximum of 5 messages each, or terminate early by making a secret proposal at any time.\n(c) You are each asked to submit a secret proposal indicating the items you want formatted in square brackets as follows: \"[Proposal: <number> <object name>, <number> <object name>, <...>]\"\n(d) If your proposals are complementary, i.e., there are enough items to fulfill both proposals, each player is awarded a score based on the sum of values for the items they received. Otherwise, both of you get zero points.\n(e) Your goal is to maximize the sum of your score and the score of the other player.\n\nLet us start.\n\nThe set of available items is:\n\n1 grape, 3 ropes, 1 clock\n\nYour secret value function is:\n\ngrape: 4, rope: 1, clock: 3\n\nIMPORTANT: Your messages, unless it is the secret proposal, are directly transmitted to the other player, so do not include any response to the rules or text announcing your message. To make a secret proposal, use the indicated format. Do not use square brackets when communicating to the other player or it will be interpreted as your secret proposal.\n",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 1",
+        "to": "GM",
+        "timestamp": "2026-07-01T14:44:57.214736",
+        "action": {
+          "type": "get message",
+          "content": "Hi! Let's figure out the best way to split the items: 1 grape, 3 ropes, and 1 clock.\n\nI value the grape the most (4 points), followed by the clock (3 points), and the ropes are worth very little to me (1 point each).\n\nHow do you value these items? Knowing your preferences will help us find a split where we both get the items we want most, maximizing our total score.",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T14:44:57.214754",
+        "action": {
+          "type": "valid response",
+          "content": "continue"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T14:44:57.214768",
+        "action": {
+          "type": "valid message",
+          "content": "Hi! Let's figure out the best way to split the items: 1 grape, 3 ropes, and 1 clock.\n\nI value the grape the most (4 points), followed by the clock (3 points), and the ropes are worth very little to me (1 point each).\n\nHow do you value these items? Knowing your preferences will help us find a split where we both get the items we want most, maximizing our total score."
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 2",
+        "timestamp": "2026-07-01T14:47:04.768995",
+        "action": {
+          "type": "send message",
+          "content": "You are playing a cooperative negotiation game in which you have to agree on how to divide a set of items among you and another player.\n\nRules:\n(a) You and the other player are given a set of items. Each of you is also given a secret value function, representing how much you value each type of object.\n(b) You exchange messages with the other player to agree on who gets which items. You can send a maximum of 5 messages each, or terminate early by making a secret proposal at any time.\n(c) You are each asked to submit a secret proposal indicating the items you want formatted in square brackets as follows: \"[Proposal: <number> <object name>, <number> <object name>, <...>]\"\n(d) If your proposals are complementary, i.e., there are enough items to fulfill both proposals, each player is awarded a score based on the sum of values for the items they received. Otherwise, both of you get zero points.\n(e) Your goal is to maximize the sum of your score and the score of the other player.\n\nLet us start.\n\nThe set of available items is:\n\n1 grape, 3 ropes, 1 clock\n\nYour secret value function is:\n\ngrape: 1, rope: 3, clock: 0\n\nIMPORTANT: Your messages, unless it is the secret proposal, are directly transmitted to the other player, so do not include any response to the rules or text announcing your message. To make a secret proposal, use the indicated format. Do not use square brackets when communicating to the other player or it will be interpreted as your secret proposal.\n\n\nHi! Let's figure out the best way to split the items: 1 grape, 3 ropes, and 1 clock.\n\nI value the grape the most (4 points), followed by the clock (3 points), and the ropes are worth very little to me (1 point each).\n\nHow do you value these items? Knowing your preferences will help us find a split where we both get the items we want most, maximizing our total score.",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 2",
+        "to": "GM",
+        "timestamp": "2026-07-01T14:47:04.769011",
+        "action": {
+          "type": "get message",
+          "content": "Thanks for sharing your preferences! It sounds like you really want the grape and the clock, while the ropes are less important to you.\n\nHere is how I value the items:\n- **Rope**: 3 points each (I really need these!)\n- **Grape**: 1 point\n- **Clock**: 0 points (I don't value this at all)\n\nSince you value the grape and clock highly, and I value the ropes highly, it seems like a perfect match for us to split the items based on our preferences.\n\nHow about this plan:\n- **You** take the **1 grape** and the **1 clock**.\n- **I** take all **3 ropes**.\n\nThis way, you get the items you value most, and I get the items I value most. Does this sound good to you? If so, I can make a secret proposal to finalize it.",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T14:47:04.769030",
+        "action": {
+          "type": "valid response",
+          "content": "continue"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T14:47:04.769045",
+        "action": {
+          "type": "valid message",
+          "content": "Thanks for sharing your preferences! It sounds like you really want the grape and the clock, while the ropes are less important to you.\n\nHere is how I value the items:\n- **Rope**: 3 points each (I really need these!)\n- **Grape**: 1 point\n- **Clock**: 0 points (I don't value this at all)\n\nSince you value the grape and clock highly, and I value the ropes highly, it seems like a perfect match for us to split the items based on our preferences.\n\nHow about this plan:\n- **You** take the **1 grape** and the **1 clock**.\n- **I** take all **3 ropes**.\n\nThis way, you get the items you value most, and I get the items I value most. Does this sound good to you? If so, I can make a secret proposal to finalize it."
+        }
+      }
+    ],
+    [
+      {
+        "from": "GM",
+        "to": "Player 1",
+        "timestamp": "2026-07-01T14:51:12.128562",
+        "action": {
+          "type": "send message",
+          "content": "Thanks for sharing your preferences! It sounds like you really want the grape and the clock, while the ropes are less important to you.\n\nHere is how I value the items:\n- **Rope**: 3 points each (I really need these!)\n- **Grape**: 1 point\n- **Clock**: 0 points (I don't value this at all)\n\nSince you value the grape and clock highly, and I value the ropes highly, it seems like a perfect match for us to split the items based on our preferences.\n\nHow about this plan:\n- **You** take the **1 grape** and the **1 clock**.\n- **I** take all **3 ropes**.\n\nThis way, you get the items you value most, and I get the items I value most. Does this sound good to you? If so, I can make a secret proposal to finalize it.",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 1",
+        "to": "GM",
+        "timestamp": "2026-07-01T14:51:12.128605",
+        "action": {
+          "type": "get message",
+          "content": "That sounds like a perfect plan! Since I value the grape (4) and clock (3) highly, and you value the ropes (3 each) much more than I do, this split maximizes our combined score.\n\nI agree to:\n- **Me**: 1 grape, 1 clock\n- **You**: 3 ropes\n\nPlease go ahead and make the secret proposal to finalize this agreement. I will submit my matching proposal immediately after.\n\n[Proposal: 1 grape, 1 clock]",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T14:51:12.128679",
+        "action": {
+          "type": "valid response",
+          "content": "proposal"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T14:51:12.128702",
+        "action": {
+          "type": "valid proposal",
+          "content": [
+            1,
+            0,
+            1
+          ]
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 2",
+        "timestamp": "2026-07-01T14:53:11.336966",
+        "action": {
+          "type": "send message",
+          "content": "The other player has submitted a secret proposal. It is now your turn to submit a proposal of your own.\n",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 2",
+        "to": "GM",
+        "timestamp": "2026-07-01T14:53:11.336989",
+        "action": {
+          "type": "get message",
+          "content": "[Proposal: 1 grape, 1 clock]",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T14:53:11.337082",
+        "action": {
+          "type": "valid response",
+          "content": "proposal"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T14:53:11.337106",
+        "action": {
+          "type": "valid proposal",
+          "content": [
+            1,
+            0,
+            1
+          ]
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-01T14:53:11.337135",
+        "action": {
+          "type": "failed agreement",
+          "content": [
+            [
+              1,
+              0,
+              1
+            ],
+            [
+              1,
+              0,
+              1
+            ]
+          ]
+        }
+      }
+    ]
+  ],
+  "Aborted": 0,
+  "Lose": 1,
+  "Success": 0,
+  "player_a_proposal": [
+    1,
+    0,
+    1
+  ],
+  "player_b_proposal": [
+    1,
+    0,
+    1
+  ],
+  "sum_of_scores": 0,
+  "max_sum_of_scores": 16,
+  "max_player_scores": 10,
+  "max_pareto_improvement": 16,
+  "pareto_improvement": 16,
+  "pareto_optimal": 0,
+  "episode_score": 0.0,
+  "Request Count": [
+    2,
+    2
+  ],
+  "Violated Request Count": [
+    0,
+    0
+  ],
+  "Parsed Request Count": [
+    2,
+    2
+  ]
+}
