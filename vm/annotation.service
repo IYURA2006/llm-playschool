@@ -1,0 +1,25 @@
+# systemd USER unit — installed to ~/.config/systemd/user/ by vm/setup_vm.sh,
+# which rewrites the two paths below for wherever the repo actually lives.
+#
+# Requires `loginctl enable-linger <user>` (computing support may have to run
+# it): without linger, systemd tears down the whole user manager when you log
+# out and takes the app with it.
+[Unit]
+Description=LM Playschool annotation app (Gradio, 127.0.0.1:3000)
+After=network.target
+
+[Service]
+WorkingDirectory=__APP_DIR__
+# .env is read by db.py's load_dotenv() from the working directory, so it
+# supplies DB_* and GAMES_DIR without being named here.
+#
+# No PORT and no GRADIO_SERVER_NAME on purpose. app.py defaults to 3000, which
+# is what Apache reverse-proxies to, and Gradio's default 127.0.0.1 bind is
+# what keeps Apache the only public entry point. Setting GRADIO_SERVER_NAME to
+# 0.0.0.0 here would publish the app directly over plain HTTP.
+ExecStart=__APP_DIR__/.venv/bin/python app.py
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=default.target
