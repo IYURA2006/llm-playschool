@@ -772,6 +772,13 @@ fieldset[aria-invalid="true"] {
 .welcome-col { max-width: 880px; margin: 0 auto !important; }
 .welcome-sub p { color: #94a3b8 !important; font-size: 14px !important; line-height: 1.6 !important; }
 .welcome-foot p { color: #475569 !important; font-size: 12px !important; text-align: center !important; margin-top: 8px !important; }
+/* The accessibility link is a bare <p>, not Markdown-wrapped, so it needs the
+   same treatment directly. Colour is lifted off .welcome-foot's #475569:
+   that fails WCAG AA on this background, and a link people cannot read is
+   the one link on the page that has to be legible. */
+.a11y-foot { font-size: 12px !important; text-align: center !important; margin-top: 4px !important; }
+.a11y-foot a { color: #94a3b8 !important; text-decoration: underline !important; }
+.a11y-foot a:hover, .a11y-foot a:focus { color: #e2e8f0 !important; }
 /* Top nav: name badge left, Prolific badge pushed right */
 .welcome-nav { display: flex; align-items: center; gap: 10px; width: 100%; }
 .welcome-nav .prolific-badge { margin-left: auto; }
@@ -1677,6 +1684,16 @@ with gr.Blocks(title="LM Playschool — Annotation Study") as app:
 
 # System fonts avoid a remote Google Fonts fetch on first paint. Must be
 # gr.themes.Font objects — a plain string crashes Gradio's font comparison.
+# Serve the accessibility statement as a static file, reachable at
+# /gradio_api/file/accessibility.html. Required by the Public Sector Bodies
+# Accessibility Regulations 2018: a statement nobody can reach does not
+# discharge the duty, and this app has no other route to it.
+#
+# set_static_paths is an ALLOW-LIST, not a served directory — anything not
+# named here (db.py, .env) still returns 403, verified. Keep it that way.
+gr.set_static_paths([os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                                  "accessibility.html")])
+
 theme = gr.themes.Soft(
     font=[gr.themes.Font(f) for f in ("system-ui", "-apple-system", "Segoe UI", "sans-serif")],
     font_mono=[gr.themes.Font(f) for f in ("ui-monospace", "SFMono-Regular", "monospace")],

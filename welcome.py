@@ -203,6 +203,16 @@ def build(welcome_page, annotation_page, training_page, error_state,
                 elem_classes=["welcome-foot"],
             )
 
+            # target=_blank so following it never costs a participant their
+            # session: this page holds the playlist and consent state, and a
+            # same-tab navigation away from it would drop both.
+            gr.HTML(
+                '<p class="welcome-foot a11y-foot">'
+                '<a href="/gradio_api/file/accessibility.html" target="_blank" '
+                'rel="noopener">Accessibility statement</a>'
+                '</p>'
+            )
+
         agree_cb, confirm_btn, popup_note, decline_btn = consent.build(consent_popup)
 
         _start_inputs = [error_state, playlist_state, block_state,
