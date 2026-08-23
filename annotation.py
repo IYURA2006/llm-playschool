@@ -2191,9 +2191,17 @@ def _assert_spec_matches_render(spec, field_specs, g):
         cfg = spec["roles"].get(role)
         if cfg is None:
             continue
-        for slot in ("q1", "q2", "q3"):
+        for slot in ("q1", "q2"):
             if cfg.get(slot) is not None:
                 want.add((turn_i, slot))
+        # q3 is NOT conditional here, even though the spec records it as None
+        # when Reasoning Clarity isn't asked. The render loop always emits a q3
+        # component — a real radio when it is asked, a hidden preset-N/A one
+        # when it isn't — so that field_specs stays 1:1 with the component list
+        # and the JS rated-counter keeps working. The spec is describing what
+        # was on SCREEN; field_specs is describing what was WIRED UP. Only the
+        # latter decides what lands in this set.
+        want.add((turn_i, "q3"))
         for key, _md, _ch in cfg.get("bolt_ons", []):
             want.add((turn_i, "extra", key))
     got = {tuple(fs) for fs in field_specs
