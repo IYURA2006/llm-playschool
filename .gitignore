@@ -12,8 +12,15 @@ annotations.db-shm
 .claude/
 .DS_Store
 .gradio/certificate.pem
-test_games.py
+# Local-only test scripts. The first pattern used to read `test_games.py`,
+# which matched nothing — the real filename has a leading underscore, so
+# the file stayed tracked despite e5edc98 meaning to drop it.
+_test_games.py
 _test_assignment.py
+
+# Pre-study transcript samples. No code reads these any more (training.py
+# moved to games_practice/); kept on disk, out of the repo.
+interactions/
 exports/
 
 # Raw clembench dump that games_study/ is built FROM (85MB, 6k files).

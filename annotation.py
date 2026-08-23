@@ -70,8 +70,12 @@ def slug_to_path(slug):
     return _SLUG_TO_PATH.get(slug)
 
 
-# Maps a block/condition value to its question-set mode. The day1_*/day2_*
-# names are older single-game debug links; playlists always send "hybrid".
+# Maps a block/condition value to its question-set MODE. This is a decode
+# table, not an allow-list: the day1_*/day2_* entries are retired internal-pilot
+# condition names, kept solely so an export can still resolve rows collected
+# under them. Dropping them would not be inert — BLOCK_TO_TYPE is read via
+# .get(condition, "universal"), so a removed "day1_hybrid" would silently start
+# decoding as universal and re-label data that was collected as hybrid.
 BLOCK_TO_TYPE = {
     "day1_universal": "universal",
     "day1_hybrid": "hybrid",
@@ -79,7 +83,13 @@ BLOCK_TO_TYPE = {
     "universal": "universal",
     "hybrid": "hybrid",
 }
-VALID_BLOCKS = set(BLOCK_TO_TYPE)
+
+# What a session URL is allowed to ask for, which is a strictly smaller set.
+# app.py validates ?block= against this. The retired names above are
+# decode-only: accepting "day1_universal" from a hand-built link would route a
+# study transcript to the generic question set and store it under a condition
+# assignment.py never issues (it only ever assigns CONDITION = "hybrid").
+VALID_BLOCKS = {"universal", "hybrid"}
 
 
 def _scale4(labels):
