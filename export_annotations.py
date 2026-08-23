@@ -680,6 +680,72 @@ def _manifest_disagreements(records):
     return problems, sorted(set(unknown))
 
 
+def _batch_progress(records, coverage_target):
+    """How far the study has got, batch by batch.
+
+    A batch's coverage is its WEAKEST transcript, matching assignment._pick_batch
+    — pruning can leave a batch partially covered, and any looser definition
+    would call such a batch finished while one of its transcripts still sits at
+    two ratings.
+    """
+    try:
+        import study_set
+    except Exception as exc:                                   # pragma: no cover
+        return None, [f"cannot import study_set: {exc!r}"]
+
+    done = defaultdict(set)          # slug -> annotators who COMPLETED it
+    for r in records:
+        if r["is_debug"] or r["status"] != "complete" or not r["annotator_id"]:
+            continue
+        done[r["game_slug"]].add(r["annotator_id"])
+
+    rows = []
+    for batch_id, members in sorted(study_set.BATCH_MEMBERS.items()):
+        levels = [len(done.get(s, ())) for s in members]
+        rows.append({
+            "batch_id": batch_id,
+            "template_id": study_set.BATCH_TEMPLATE.get(batch_id),
+            "game": study_set.BATCH_GAME.get(batch_id),
+            "n_transcripts": len(members),
+            "coverage": min(levels) if levels else 0,
+            "remaining": max(0, coverage_target - (min(levels) if levels else 0)),
+        })
+    return rows, []
+
+
+def _print_batch_progress(records, coverage_target):
+    rows, problems = _batch_progress(records, coverage_target)
+    for pr in problems:
+        print(f"    - {pr}")
+    if not rows:
+        return
+    complete = [r for r in rows if r["coverage"] >= coverage_target]
+    untouched = [r for r in rows if r["coverage"] == 0]
+    partial = [r for r in rows if 0 < r["coverage"] < coverage_target]
+    sittings_left = sum(r["remaining"] for r in rows)
+
+    print(f"\nBatch progress ({len(rows)} batches, target {coverage_target}):")
+    print(f"  complete   : {len(complete)}")
+    print(f"  partial    : {len(partial)}")
+    print(f"  untouched  : {len(untouched)}")
+    print(f"  sittings still to buy: {sittings_left}")
+    if partial:
+        print("  under-covered:")
+        for r in sorted(partial, key=lambda x: x["coverage"])[:15]:
+            print(f"      {r['batch_id']:28} {r['coverage']}/{coverage_target}"
+                  f"  ({r['game']}, {r['n_transcripts']} transcripts)")
+        if len(partial) > 15:
+            print(f"      … and {len(partial) - 15} more")
+
+
+def _participant_ids(records):
+    """Every PID with non-debug data. Cross-check this against Prolific's own
+    submission list: a PID here that never submitted on Prolific was typed into
+    the URL by hand, and its ratings are not an independent third opinion."""
+    return sorted({r["annotator_id"] for r in records
+                   if r["annotator_id"] and not r["is_debug"]})
+
+
 def _assignment_violations(records, max_batches):
     """Verify the assignment rules against COLLECTED data, not just in tests.
 
@@ -789,6 +855,15 @@ def main(argv=None):
             print(f"\nANNOTATORS WITH DATA BUT NO CONSENT RECORD ({len(gaps)}):")
             for a in gaps[:10]:
                 print(f"    - {a}")
+
+        _print_batch_progress(records, assignment.COVERAGE_TARGET)
+        pids = _participant_ids(records)
+        print(f"\nparticipants with data: {len(pids)}")
+        if pids:
+            print("  cross-check these against Prolific's submission list — any "
+                  "PID here that never submitted was hand-entered:")
+            print(f"    {', '.join(pids[:12])}"
+                  + (f" … (+{len(pids) - 12})" if len(pids) > 12 else ""))
 
         violations = _assignment_violations(records, assignment.MAX_BATCHES)
         if violations:

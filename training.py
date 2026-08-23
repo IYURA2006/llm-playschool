@@ -1,6 +1,6 @@
 """Interactive practice round shown before a playlist session starts. Rates a
-short reference Wordle game, then reveals explained reference ratings to
-calibrate the 1-4 scales. Nothing here is persisted."""
+short reference game, then reveals explained reference ratings to calibrate the
+1-4 scales. Nothing here is persisted."""
 
 import os
 from datetime import datetime
@@ -13,9 +13,38 @@ from annotation import (load_game, plain_label, _build_transcript_html,
 
 _dir = os.path.dirname(os.path.abspath(__file__))
 
-# A real gemini-flash Wordle game (3 turns, won). Lives outside games/ on
-# purpose so it can never be picked up by game discovery / assignments.
-TRAINING_GAME = os.path.join(_dir, "interactions", "interactions-20.json")
+# A real GuessWhat episode (target "theatre", guessed correctly on turn 5).
+# Lives in games_practice/, OUTSIDE the study tree, so it can never be picked up
+# by discovery or handed out in a batch — and its instance (Abs_Level_1/
+# instance_00004) is deliberately not one of the 13 guesswhat instances the
+# study uses, so no annotator ever meets it twice.
+TRAINING_GAME = os.path.join(
+    _dir, "games_practice", "guesswhat", "Abs_Level_1", "instance_00004",
+    "interactions.json")
+
+# Only this role's turns are rated. GuessWhat has two seats, but the Answerer's
+# forced yes/no carries no strategy worth judging (the real annotation page
+# gives it no questions either) — rating "ANSWER: no" would teach the wrong
+# thing. Its replies still show in the transcript as context.
+PRACTICE_ROLE = "Guesser"
+
+
+def _load_practice_game():
+    """load_game, narrowed to the rated role.
+
+    Filtering ai_ids as well as ai_turns keeps three things aligned that the
+    page's JS assumes are 1:1 — transcript cards, nav chips and question cards —
+    and turns the Answerer's messages into context lines rather than empty
+    rateable cards.
+    """
+    g = load_game(TRAINING_GAME)
+    keep = {s for s in g.ai_ids if g.role(s) == PRACTICE_ROLE}
+    if keep and keep != set(g.ai_ids):
+        g.ai_turns = [m for m in g.ai_turns if m.get("from") in keep]
+        g.ai_ids = keep
+        g.n_turns = len(g.ai_turns)
+        g.multi_role = False
+    return g
 
 _Q1_MD = ("**Q1 — Prior Information Use**\n\nDid the AI correctly use "
           "information from earlier in the game?")
@@ -25,45 +54,81 @@ _SCALE_Q1 = [("1\nNone", "1"), ("2\nPartial", "2"), ("3\nGood", "3"), ("4\nExcel
 _SCALE_Q2 = [("1\nNonsensical", "1"), ("2\nPoor", "2"), ("3\nReasonable", "3"), ("4\nStrong", "4")]
 
 # `lower` teaches what would have scored worse, calibrating the scale's bottom too.
+#
+# ⚠️ UNVERIFIED DRAFT — written from the transcript, NOT reviewed by the study
+# team. This is the calibration standard every annotator is trained against, so
+# shipping it unreviewed would quietly bias the whole study toward one reading
+# of what "good questioning" means. Review and correct before recruiting.
+#
+# The episode: target "theatre" from {charming, compassionate, genocide, gun,
+# writing, theatre, overwhelmed, sorrow}. The Guesser eliminates the four
+# emotion words, establishes it is a physical object, rules out the weapon, then
+# confirms and guesses correctly on turn 5.
+#
+# Note this is a CLEAN run — nothing here scores below 3. The `lower` lines are
+# doing all the work of teaching the bottom of the scale, which is a weakness of
+# using a well-played episode for calibration.
 _REFERENCE = {
     0: {
         "q1": "4",
-        "why_q1": "First guess — no earlier information existed yet, so there was "
-                  "nothing to use or misuse. When there is nothing to get wrong, "
-                  "don't punish.",
+        "why_q1": "First question — no earlier information existed yet, so there "
+                  "was nothing to use or misuse. When there is nothing to get "
+                  "wrong, don't punish.",
         "q2": "4",
-        "why_q2": "\"arise\" is a textbook opener: three common vowels plus R and S "
-                  "maximise what the first round of feedback can reveal.",
-        "lower": "A rare word like \"fjord\" as an opener would be a 2 — it wastes "
-                 "the first turn on letters unlikely to appear.",
+        "why_q2": "\"Related to a feeling or emotion?\" splits the eight "
+                  "candidates almost perfectly: four emotion words (charming, "
+                  "compassionate, overwhelmed, sorrow) against four that aren't. "
+                  "A near-even split is the most a single yes/no can buy.",
+        "lower": "\"Is the word 'gun'?\" would be a 2 — it tests one candidate "
+                 "instead of half of them, so a 'no' eliminates only one word.",
     },
     1: {
         "q1": "4",
-        "why_q1": "The feedback said A is out and R, I, S, E are in but misplaced. "
-                  "\"siren\" drops the A, keeps all four yellow letters, and moves "
-                  "every one of them to a NEW position — the feedback was used "
-                  "completely and correctly.",
+        "why_q1": "The 'no' ruled out all four emotion words, leaving genocide, "
+                  "gun, writing and theatre. Asking about physical objects moves "
+                  "to a genuinely new axis rather than re-testing what was just "
+                  "settled.",
         "q2": "3",
-        "why_q2": "Reasonable, not maximal: with R, I, S, E confirmed, several "
-                  "arrangements were still alive (resin, risen, rinse…). \"siren\" "
-                  "tests one of them plus a new letter N — solid, but nothing about "
-                  "it narrows down WHICH arrangement is right faster than any other "
-                  "permutation would.",
-        "lower": "Re-guessing a word containing A, or putting a yellow letter back "
-                 "in the same slot it was just flagged in, would drop Q1 to 1–2.",
+        "why_q2": "Sensible and it does divide the remainder — but \"physical "
+                  "object\" is fuzzy for 'writing' and arguably for 'theatre' "
+                  "(the art form versus the building), so the answer is less "
+                  "decisive than the question looks.",
+        "lower": "Asking \"is it an emotion?\" again would be a 1 — the previous "
+                 "answer already settled that, so the turn buys nothing.",
     },
     2: {
         "q1": "4",
-        "why_q1": "It combined everything: N locked at position 5, plus every "
-                  "position each yellow letter had already been excluded from. "
-                  "Work it through and \"resin\" is the only valid word left.",
+        "why_q1": "Correctly carried the 'yes' forward: among the physical "
+                  "candidates, 'gun' is the one worth separating out.",
+        "q2": "3",
+        "why_q2": "Reasonable with only two or three candidates left, but it "
+                  "tests a single word rather than splitting the remainder. With "
+                  "more candidates alive this would have been wasteful.",
+        "lower": "\"Is it a weapon?\" asked as the FIRST question would be a 2 — "
+                 "same question, far worse timing, because it eliminates one of "
+                 "eight instead of one of three.",
+    },
+    3: {
+        "q1": "4",
+        "why_q1": "Used every previous answer — not an emotion, is a physical "
+                  "object, not a weapon — to arrive at the one remaining "
+                  "category worth testing.",
         "q2": "4",
-        "why_q2": "A clean, forced deduction played with confidence. (Its written "
-                  "explanation mixes up position numbers a little — but the MOVE "
-                  "used the information correctly, and Q1/Q2 rate the move, not "
-                  "the prose.)",
-        "lower": "Guessing another permutation that violated a known position "
-                 "exclusion would be a 1 — the information was all there.",
+        "why_q2": "\"A place where performances are held\" is effectively a "
+                  "definition of the target. Confirming before committing is "
+                  "sound play when a turn is still available.",
+        "lower": "Guessing 'gun' here would be a 1 — the previous answer "
+                 "explicitly ruled it out.",
+    },
+    4: {
+        "q1": "4",
+        "why_q1": "The guess follows directly from the confirmed 'yes': every "
+                  "answer in the episode points at this word and no other.",
+        "q2": "4",
+        "why_q2": "Correct word, and committed at the right moment — the "
+                  "previous answer left nothing further to narrow.",
+        "lower": "Asking another question instead of guessing here would be a 2 "
+                 "— the answer was already determined, so it burns a turn.",
     },
 }
 
@@ -128,7 +193,7 @@ def _start_annotation(annotator_id):
 
 def build(welcome_page, training_page, annotation_page, started_at_state,
           annotator_state):
-    g = load_game(TRAINING_GAME)
+    g = _load_practice_game()
 
     with training_page:
         # This screen had no heading at all; it's also the focus target the

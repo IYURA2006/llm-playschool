@@ -1683,6 +1683,11 @@ theme = gr.themes.Soft(
 )
 # share=True tunnels through Gradio's own servers, which we don't need —
 # the VM's own domain/TLS setup is the real public entry point.
-# PORT lets deployments override the default without code changes.
+# 3000 is not arbitrary: Apache on breezy.inf.ed.ac.uk terminates TLS on 443
+# and reverse-proxies to 127.0.0.1:3000, so this default is what makes the
+# public URL work with no config on the VM. Do not "align" it with the 7860 in
+# the Dockerfile/nginx template on the vm-deploy branch — that infra predates
+# the VM and targets nginx, which breezy does not run. A mismatch here surfaces
+# as an Apache 503, with a perfectly healthy-looking app log.
 app.launch(css=css, theme=theme, head=force_dark, share=False,
            server_port=int(os.environ.get("PORT", 3000)))

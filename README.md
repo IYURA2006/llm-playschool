@@ -53,10 +53,11 @@ the full text.
    ```bash
    python app.py
    ```
-   It opens at `http://localhost:3000` by default. To use a different
-   port, set the `PORT` environment variable:
+   It opens at `http://localhost:3000` by default — the port Apache on
+   the deployment VM proxies to, so leave it alone on a server. To run a
+   second copy locally, set `PORT`:
    ```bash
-   PORT=7860 python app.py
+   PORT=3001 python app.py
    ```
 
 Game transcripts under `games/` are already included in this repository —

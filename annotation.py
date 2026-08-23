@@ -171,12 +171,30 @@ BESPOKE_QUESTIONS = {
                     (
                         "guess_on_board",
                         "**Bolt-on — Valid Guess**\n\nIs this guess a real word "
-                        "that exists on the board at all?",
+                        "that is present and still available on the board?",
+                        [("Yes", "yes"), ("No", "no")],
+                    ),
+                    (
+                        "guessed_clue_or_used_word",
+                        "**Bolt-on — Invalid Selection**\n\nDid the Guesser "
+                        "select the clue word itself, or a word that had already "
+                        "been guessed?",
                         [("Yes", "yes"), ("No", "no")],
                     ),
                 ],
             },
         },
+        "whole_game": [
+            (
+                "clue_safety_overall",
+                # scale_1_4, NOT the 1-7 the other games use — the spec asks for
+                # the same four-point scale as the per-turn safety question so
+                # the two are directly comparable.
+                "**Whole game — How consistently safe were the ClueGiver's "
+                "clues throughout the game?**",
+                _scale4(["Very risky", "Somewhat risky", "Mostly safe", "Fully safe"]),
+            ),
+        ],
     },
     "taboo": {
         "flags": [
@@ -272,36 +290,36 @@ BESPOKE_QUESTIONS = {
         ],
     },
     "dond": {
-        "flags": [
-            "Player revealed its own secret values in the open chat",
-            "This player's secret proposal doesn't match what was just agreed",
-        ],
+        # design_type: shared_core, plus the conditional explanation pair
+        # (SC_Q3 / SC_TICK_D) — dond responses carry reasoning.
+        "flags": None,              # SC_TICK_A/B/C
+        "reasoning_clarity": True,  # show SC_Q3 + the explanation-mismatch tick
         "roles": {
             # Both seats share the "DealOrNoDealPlayer" role.
-            "DealOrNoDealPlayer": {
-                "q1": (
-                    "**Q1 — Value Consistency**\n\nDoes this offer make sense "
-                    "given what this player says they value?",
-                    _scale4([
-                        "Contradicts it", "Barely consistent",
-                        "Mostly consistent", "Fully consistent",
-                    ]),
-                ),
-                "q2": (
-                    "**Q2 — Builds on the Agreement**\n\nDoes this message build "
-                    "on what was agreed earlier?",
-                    _scale4([
-                        "Ignores/contradicts it", "Barely connected",
-                        "Mostly follows on", "Clearly builds on it",
-                    ]),
-                ),
-            },
+            "DealOrNoDealPlayer": {"q1": "generic", "q2": "generic"},
         },
         "whole_game": [
             (
+                "proposals_match",
+                "**Whole game — Did each player's final secret proposal match "
+                "the agreement reached in open chat?**",
+                [
+                    ("Both matched", "both"),
+                    ("Only Player 1 matched", "p1"),
+                    ("Only Player 2 matched", "p2"),
+                    ("Neither matched", "neither"),
+                    ("No clear agreement was reached", "no_agreement"),
+                ],
+            ),
+            (
                 "negotiation_quality",
-                "**Whole game — Did they reach an agreement that was genuinely "
-                "collaborative and close to the best value for both?**",
+                # Deliberately says nothing about whether the split was FAIR or
+                # close to best value — the spec excludes that judgement, and
+                # the previous wording ("close to the best value for both") was
+                # exactly it. Communication quality is kept separate from
+                # whether the proposals matched, which is the question above.
+                "**Whole game — How collaborative and coherent was the "
+                "negotiation before the final proposals?**",
                 _scaleN(7),
             ),
         ],
@@ -351,7 +369,9 @@ BESPOKE_QUESTIONS = {
     "imagegame": {
         # Giver and Follower are different roles, so each gets its own question set.
         "flags": [],
-        "whole_game_only": True,  # verdict shows only the whole_game sliders
+        # whole_game_only was True, which hid G1/G2 entirely. The study keeps
+        # the generic overall pair on every game so there is one cross-game
+        # comparable measure, so the flag is gone.
         "roles": {
             "Instruction Giver": {
                 "q1": (
@@ -397,19 +417,15 @@ BESPOKE_QUESTIONS = {
         "whole_game": [
             (
                 "giver_plan",
-                "**Whole game — Giver's plan**\n\nEven if the Follower made mistakes "
-                "along the way, was the Giver's overall plan for the shape a good one?",
+                "**Whole game — Did the Giver's plan correctly track toward the "
+                "real target, regardless of small execution slips?**",
                 _scaleN(7, {1: "plan itself was confused / didn't make sense",
                             7: "clear and correct the whole way through"}),
             ),
-            (
-                "follower_execution",
-                "**Whole game — Follower's execution**\n\nEven if the Giver's "
-                "instructions weren't always correct, did the Follower update the "
-                "grid correctly based on what it was actually told?",
-                _scaleN(7, {1: "rarely followed instructions correctly",
-                            7: "followed correctly nearly every time"}),
-            ),
+            # The spec asks for ONE overall here. Follower execution is already
+            # captured per turn by the Follower's Q1 ("did the grid actually
+            # change to match this instruction?"), so a whole-game duplicate of
+            # it bought nothing.
         ],
     },
 
@@ -558,31 +574,20 @@ BESPOKE_QUESTIONS = {
         ],
     },
     "ta_frozen_lake": {
-        # This family logs the role as plain "Player 0", not a descriptive name.
-        "flags": [
-            "Moved onto a cell it had already identified as a hole",
-            "Repeated a move that already failed",
-            "Ignored information revealed by an earlier step",
-        ],
+        # design_type: shared_core. This family logs the role as plain
+        # "Player 0", not a descriptive name.
+        "flags": None,  # SC_TICK_A/B/C — note SC_TICK_A ("repeated a move that
+                        # already failed") is exactly the hazard this game
+                        # needs, so the custom list added nothing the core
+                        # didn't already cover.
         "roles": {
-            "Player 0": {
-                "q1": (
-                    "**Q1 — Hazard Avoidance**\n\nDoes this move avoid a "
-                    "hole the board has already revealed to it?",
-                    _scale4(["Walks into a known hole", "Risky", "Mostly careful", "Fully careful"]),
-                ),
-                "q2": (
-                    "**Q2 — Progress**\n\nIs this move a sensible step "
-                    "toward the goal given what's currently visible?",
-                    _scale4(["Nonsensical", "Wastes a turn", "Reasonable", "Efficient"]),
-                ),
-            },
+            "Player 0": {"q1": "generic", "q2": "generic"},
         },
         "whole_game": [
             (
                 "route_coherence",
-                "**Whole game — Did it navigate carefully and purposefully "
-                "toward the goal?**",
+                "**Whole game — How coherent and goal-directed was the complete "
+                "route taken by the model?**",
                 _scaleN(7),
             ),
         ],
@@ -744,15 +749,23 @@ BESPOKE_QUESTIONS.update({
         },
         "whole_game": _WORDLE_CRAZY_WHOLE_GAME,
     },
+    # design_type: shared_core, plus the conditional explanation pair. This is
+    # the STUDY variant, so it follows the spec's locked phrasing; the other
+    # wordle-crazy entries are out of scope and keep their tailored sets.
     "wordle-crazy_withclue": {
-        "flags": _WORDLE_CRAZY_FLAGS,
+        "flags": None,              # SC_TICK_A/B/C
+        "reasoning_clarity": True,  # SC_Q3 + the explanation-mismatch tick
         "roles": {
-            "WordGuesser": {
-                "q1": _WORDLE_CRAZY_Q1,
-                "q2": "generic",
-            },
+            "WordGuesser": {"q1": "generic", "q2": "generic"},
         },
-        "whole_game": _WORDLE_CRAZY_WHOLE_GAME,
+        "whole_game": [
+            (
+                "clue_feedback_integration",
+                "**Whole game — How consistently did the model combine the clue "
+                "and letter feedback throughout the game?**",
+                _scaleN(7),
+            ),
+        ],
     },
     "wordle-crazy_withcritic": {
         "flags": _WORDLE_CRAZY_FLAGS + [
@@ -799,25 +812,22 @@ _WORDLE_Q2 = (
 # Games that used to fall back to the generic Q1/Q2 now get bespoke wording.
 BESPOKE_QUESTIONS.update({
     "guesswhat": {
+        # design_type: shared_core. The study spec locks SC_Q1/SC_Q2 phrasing —
+        # game-specific wording belongs in the supplementary overall question,
+        # not in a rewritten per-turn prompt.
         "roles": {
-            "Guesser": {
-                "q1": (
-                    "**Q1 — Useful Question**\n\nWas this question a sharp, "
-                    "useful choice given everything learned from earlier "
-                    "answers?",
-                    _scale4(["Not useful", "Weak", "Reasonable", "Sharp, well-targeted"]),
-                ),
-                "q2": None,
-            },
-            # The Answerer's forced yes/no has no strategy worth judging.
+            "Guesser": {"q1": "generic", "q2": "generic"},
+            # The Answerer's forced yes/no has no strategy worth judging;
+            # the spec says not to evaluate it as a separate role.
             "Answerer": {"q1": None, "q2": None},
         },
-        "flags": ["Repeated a question already asked and answered (exact or near-exact)"],
+        "flags": None,  # SC_TICK_A/B/C — the default set
         "whole_game": [
             (
                 "turn_efficiency",
                 "**Whole game — Did the Guesser's questioning use its turns "
-                "efficiently, narrowing things down rather than wasting turns?**",
+                "efficiently, or were many turns spent without meaningfully "
+                "narrowing the possibilities?**",
                 _scaleN(7),
             ),
         ],
