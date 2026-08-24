@@ -1,3 +1,4 @@
+import html
 from datetime import datetime
 
 import gradio as gr
@@ -5,28 +6,127 @@ import gradio as gr
 import consent
 import db
 import annotation
+from annotation import GENERIC_Q1, GENERIC_Q2, GENERIC_Q3
+from annotation_verdict import COHERENCE, OVERALL_RATINGS
 
 _STEPS = [
-    ("📖", "1", "Read the transcript",
-     "A full AI game session is shown on the left. Take your time to read "
-     "through each turn before rating."),
-    ("⭐", "2", "Rate each AI turn",
-     "For every AI move, score how it uses prior information and whether it's a "
-     "sensible next step on a 1–4 scale. Flag any obvious errors you spot."),
-    ("✅", "3", "Give an overall verdict",
-     "After rating all turns, score the game as a whole on Strategic Coherence "
-     "and Overall Quality, then submit."),
+    ("1", "Read the transcript",
+     "A full AI game session is shown on the left. Read through every turn "
+     "before you start rating."),
+    ("2", "Rate each AI turn",
+     "For each AI move, answer the questions shown beside it. Most games ask "
+     "how well it used earlier information and whether the move was a sensible "
+     "next step; some games ask questions written for that game."),
+    ("3", "Give an overall verdict",
+     "After the last turn, score the game as a whole, add any comments, then "
+     "submit and move on to the next transcript."),
 ]
 
-# (number, badge colour, text colour, label, description). The badge keeps its
+# (badge colour, digit colour) for scale points 1..4. The badge keeps its
 # original hue for fill and border; the digit uses the lighter -400 step, because
 # the same hue as text on its own 13%-alpha fill only reached 3.6:1.
-_RATINGS = [
-    ("1", "#ef4444", "#f87171", "Poor",          "Completely fails — random, rule-breaking, or incoherent."),
-    ("2", "#f59e0b", "#fbbf24", "Below average", "Struggling — makes obvious mistakes or wastes turns."),
-    ("3", "#3b82f6", "#60a5fa", "Good",          "Competent — sensible, logical, on-task play."),
-    ("4", "#22c55e", "#4ade80", "Excellent",     "Strong — clever, efficient and clearly strategic."),
+_BADGE_COLOURS = [
+    ("#ef4444", "#f87171"),
+    ("#f59e0b", "#fbbf24"),
+    ("#3b82f6", "#60a5fa"),
+    ("#22c55e", "#4ade80"),
 ]
+
+
+def _transcripts(n):
+    """Batches hold 4 to 13 transcripts, so the count is always plural in the
+    real study - but the singular is one word and costs nothing to get right."""
+    return "transcript" if n == 1 else "transcripts"
+
+
+def _badge(number, idx):
+    """One coloured number badge. idx picks the palette step; anything past the
+    4th point (the 1-7 overall scale) reuses the top colour."""
+    fill, digit = _BADGE_COLOURS[min(idx, len(_BADGE_COLOURS) - 1)]
+    return (f'<span class="rating-badge" style="background:{fill}22;'
+            f'border-color:{fill};color:{digit};">{html.escape(number)}</span>')
+
+
+def _opts_html(items):
+    """items: (number, label, palette index) -> one wrapping row of badges."""
+    opts = "".join(
+        f'<span class="scale-opt">{_badge(n, i)}{html.escape(lbl)}</span>'
+        for n, lbl, i in items
+    )
+    return f'<div class="scale-opts">{opts}</div>'
+
+
+def _from_choices(choices):
+    """Gradio radio choices -> (number, label, index) triples.
+
+    The display half of every choice in annotation.py is "<number>\n<label>",
+    so reading the real lists is what keeps this page in step with the
+    questions the annotation screen actually shows.
+    """
+    out = []
+    for i, (display, _value) in enumerate(choices):
+        number, _, label = display.partition("\n")
+        out.append((number, label, i))
+    return out
+
+
+def _question_html(question, items=None, note=None):
+    """Render one generic question from its own definition in annotation.py:
+    "**Q1 - Title**\n\nPrompt?" -> heading, prompt, and its scale points."""
+    title, _, prompt = question[0].partition("\n\n")
+    title = title.replace("**", "").replace(" · conditional", "").strip()
+    return (
+        '<div class="scale-q">'
+        f'<div class="scale-q-title">{html.escape(title)}</div>'
+        f'<div class="scale-q-note">{html.escape(prompt)}'
+        + (f' {html.escape(note)}' if note else "")
+        + '</div>'
+        + _opts_html(items if items is not None else _from_choices(question[1]))
+        + '</div>'
+    )
+
+
+def _turn_scales_html():
+    """The three per-turn questions, read from annotation.GENERIC_Q1/Q2/Q3."""
+    return (
+        '<h3 class="scale-group-h">During the game — every AI turn</h3>'
+        + _question_html(GENERIC_Q1)
+        + _question_html(GENERIC_Q2)
+        # Q3 is conditional and its 5th choice is a bare "N/A", which has no
+        # number to put in a badge — so it is explained in words instead.
+        + _question_html(GENERIC_Q3, items=_from_choices(GENERIC_Q3[1][:4]),
+                         note="This one appears only when the AI explains its "
+                              "thinking; otherwise choose N/A.")
+        + '<p class="scale-foot">Some games ask their own questions instead of '
+          'the first two. When they do, the question and its labels are shown '
+          'next to the turn you are rating.</p>'
+    )
+
+
+def _verdict_scales_html():
+    """The end-of-game scales, read from annotation_verdict so the landing page
+    and the verdict screen can never describe different scales."""
+    lo_num, lo_name, _ = OVERALL_RATINGS[0]
+    hi_num, hi_name, _ = OVERALL_RATINGS[-1]
+    return (
+        '<h3 class="scale-group-h">At the end of each game</h3>'
+        '<div class="scale-q">'
+        '<div class="scale-q-title">Strategic coherence</div>'
+        '<div class="scale-q-note">How well the AI stuck to a plan and '
+        'adapted it as the game went on.</div>'
+        + _opts_html([(v, name, i) for i, (v, name, _d) in enumerate(COHERENCE)])
+        + '</div><div class="scale-q">'
+          '<div class="scale-q-title">Overall game quality</div>'
+          '<div class="scale-q-note">How well it actually played, on a slider '
+          f'from 1 to {len(OVERALL_RATINGS)}.</div>'
+        + '<div class="scale-opts">'
+        + f'<span class="scale-opt">{_badge(lo_num, 0)}{html.escape(lo_name)}</span>'
+        + '<span class="scale-gap">to</span>'
+        + f'<span class="scale-opt">{_badge(hi_num, 3)}{html.escape(hi_name)}</span>'
+        + '</div></div>'
+        + '<p class="scale-foot">Some games add one further question about '
+          'that game specifically.</p>'
+    )
 
 
 def _start(err, playlist, block, annotator):
@@ -61,13 +161,15 @@ def _start(err, playlist, block, annotator):
         idx = next((i for i, it in enumerate(playlist)
                     if (it["game"], it["condition"]) not in done), None)
         if idx is None:
-            return stay(f"🎉 You've already completed all {len(playlist)} games "
-                        f"for this session. Nothing left to do — thank you!")
+            return stay(f"You have already completed all {len(playlist)} "
+                        f"{_transcripts(len(playlist))} for this session. "
+                        f"Nothing left to do — thank you.")
         item = playlist[idx]
         path = annotation.slug_to_path(item["game"])
         if not path:
-            return stay(f"⚠️ Your assignment references an unknown game "
-                        f"({item['game']!r}) — tell the study coordinator.")
+            return stay(f"Cannot start — your assignment references an "
+                        f"unknown game ({item['game']!r}). Please tell the "
+                        f"study coordinator.")
         # Practice only for a first-timer. Gated on a persisted flag, not the
         # session index — a mid-session-1 page reload used to replay it.
         # has_completed_practice("") is False, so the legacy debug link
@@ -84,8 +186,9 @@ def _start(err, playlist, block, annotator):
                 gr.skip(), gr.skip(), gr.skip(), gr.skip(), gr.skip(), gr.skip(),
                 "", gr.skip(), False)
 
-    return stay("⚠️ No participant link detected. Please use the study link "
-                "you were given (or ask the study coordinator for a corrected one).")
+    return stay("Cannot start — no participant link detected. Please use "
+                "the study link you were given, or ask the study coordinator "
+                "for a corrected one.")
 
 
 def _decline_consent():
@@ -108,7 +211,7 @@ def _confirm_consent(agreed, annotator_id):
     """Step 1 of the consent popup's click chain; _start runs next and
     decides whether to keep the popup open."""
     if not agreed:
-        return True, gr.skip(), "⚠️ Please tick the box above to confirm before continuing."
+        return True, gr.skip(), "Please tick the box above to confirm before continuing."
     db.record_consent(annotator_id)
     return True, gr.update(visible=False), ""
 
@@ -142,52 +245,52 @@ def build(welcome_page, annotation_page, training_page, error_state,
             gr.Markdown("# Human Annotation Study")
             gr.Markdown(
                 "You will review transcripts of AI models playing dialogue games and "
-                "rate the quality of their reasoning and strategy. Each session takes "
-                "about 90 seconds.",
+                "rate the quality of their reasoning and strategy. A session takes "
+                "about 15–20 minutes. The first time you take part, a short "
+                "practice round comes first.",
                 elem_classes=["welcome-sub"],
             )
+
+            # Batches are not a fixed size (4 to 13 transcripts), so the count
+            # has to be read from the assigned playlist rather than stated as a
+            # constant. Same render-on-state pattern as the error banner above.
+            @gr.render(inputs=[playlist_state])
+            def _session_size(pl):
+                if pl:
+                    gr.Markdown(f"This session has **{len(pl)}** "
+                                f"{_transcripts(len(pl))} to rate.",
+                                elem_classes=["welcome-sub"])
 
             # The step cards are h3s; without this the outline jumps h1 -> h3.
             # sr-only rather than a visible heading so the layout is untouched.
             gr.HTML('<h2 class="a11y-sr-only">How the study works</h2>')
 
             with gr.Row(equal_height=True):
-                for icon, n, title, desc in _STEPS:
+                for n, title, desc in _STEPS:
                     with gr.Group(elem_classes=["question-card", "step-card"]):
-                        gr.Markdown(f"{icon} **{n}** \n\n ### {title}  \n\n {desc}")
+                        gr.Markdown(f"**{n}** \n\n ### {title}  \n\n {desc}")
 
             with gr.Group(elem_classes=["info-box"]):
                 gr.Markdown(
-                    "**ℹ️ You are evaluating AI reasoning quality — not the game itself**\n\n"
-
-
+                    "**You are evaluating AI reasoning quality — not the game itself**\n\n"
                     "Focus on whether the AI uses information logically and makes sensible "
                     "strategic choices. A game can be won by luck — or lost despite excellent "
                     "play. Judge the **thinking**, not the outcome."
                 )
 
             # Was bold body text acting as a heading for the whole scale group.
-            gr.HTML('<h2 class="rating-scale-h">Rating scale'
-                    '<span> - applies to all scored questions</span></h2>')
+            # The old copy claimed one 1-4 scale covered every scored question;
+            # it covered none of them, so both groups below are generated from
+            # the question definitions themselves instead of being retyped.
+            gr.HTML('<h2 class="rating-scale-h">Rating scales'
+                    '<span> - the words beside each number change from question '
+                    'to question, so read them before you choose</span></h2>')
 
             with gr.Group(elem_classes=["question-card"]):
-                for n, color, text_color, label, desc in _RATINGS:
+                gr.HTML(_turn_scales_html())
 
-                    with gr.Row(elem_classes=["ovr-row"]):
-
-                        with gr.Column(scale=0, min_width=46, elem_classes=["ovr-num"]):
-                            gr.HTML(
-                                f'<div class="rating-badge" '
-                                f'style="background:{color}22;border-color:{color};'
-                                f'color:{text_color};">{n}</div>'
-                            )
-
-                        with gr.Column(scale=0, min_width=130, elem_classes=["ovr-label"]):
-                            gr.Markdown(f"**{label}**")
-
-
-                        with gr.Column(scale=1, elem_classes=["ovr-desc"]):
-                            gr.Markdown(desc)
+            with gr.Group(elem_classes=["question-card"]):
+                gr.HTML(_verdict_scales_html())
 
             status_note = gr.Markdown("", elem_id="welcome-status")
 

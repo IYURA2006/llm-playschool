@@ -12,14 +12,14 @@ from annotation import (DEFAULT_GAME, load_game, game_slug, slug_to_path,
 # TODO: placeholder completion code — swap for the real one before going live.
 PROLIFIC_COMPLETION_URL = "https://app.prolific.com/submissions/complete?cc=C10WMMGK"
 
-_COHERENCE = [
+COHERENCE = [
     ("1", "No plan",   "Each move seems disconnected from the last — no consistent logic across turns."),
     ("2", "Rigid",     "Had a plan but kept following it even when feedback clearly showed it was not working."),
     ("3", "Adaptive",  "Maintained a clear goal and adjusted its approach when something was not working."),
     ("4", "Strategic", "Built every new piece of information into its plan smoothly."),
 ]
 
-_OVERALL_RATINGS = [
+OVERALL_RATINGS = [
     ("1", "Broken",    "The AI did not follow the game's format or rules. The game could not continue properly because of this."),
     ("2", "Blind",     "Stumbled around blindly — choices constantly hurt its own chances of winning."),
     ("3", "Sloppy",    "Understood the goal but played poorly — wasted turns or missed obvious opportunities."),
@@ -44,7 +44,7 @@ def _btn_updates(options, chosen):
 
 
 def _coh_select(chosen):
-    return (*_col_updates(_COHERENCE, chosen), *_btn_updates(_COHERENCE, chosen), chosen)
+    return (*_col_updates(COHERENCE, chosen), *_btn_updates(COHERENCE, chosen), chosen)
 
 
 def _overall_update(err):
@@ -92,7 +92,7 @@ def _verdict_save_and_clear(game_path, annotator_id, condition, playlist, playli
             "⚠️ Please fill in the highlighted fields before submitting.",
             gr.skip(),                              # clearing_state
             gr.skip(),                               # coherence value
-            *_col_updates(_COHERENCE, coherence, err=True),
+            *_col_updates(COHERENCE, coherence, err=True),
             *([gr.skip()] * 4),                      # coh_btns unchanged
             _overall_update(err=True),
             gr.skip(), gr.skip(),                     # overall_touched, comment
@@ -125,7 +125,7 @@ def _verdict_save_and_clear(game_path, annotator_id, condition, playlist, playli
             "Please reload the page and rate this transcript again — your "
             "earlier games are safe.",
             gr.skip(), gr.skip(),
-            *_col_updates(_COHERENCE, coherence),
+            *_col_updates(COHERENCE, coherence),
             *([gr.skip()] * 4),
             _overall_update(err=False),
             gr.skip(), gr.skip(), gr.skip(),
@@ -135,7 +135,7 @@ def _verdict_save_and_clear(game_path, annotator_id, condition, playlist, playli
         return (
             "⚠️ Turn annotations not found. Please complete Step 1 first.",
             gr.skip(), gr.skip(),
-            *_col_updates(_COHERENCE, coherence),
+            *_col_updates(COHERENCE, coherence),
             *([gr.skip()] * 4),
             _overall_update(err=False),
             gr.skip(), gr.skip(),
@@ -150,8 +150,8 @@ def _verdict_save_and_clear(game_path, annotator_id, condition, playlist, playli
             "",
             True,                          # clearing_state — blank annotation page
             "",                            # coherence value
-            *_col_updates(_COHERENCE, ""),
-            *_btn_updates(_COHERENCE, ""),
+            *_col_updates(COHERENCE, ""),
+            *_btn_updates(COHERENCE, ""),
             # Cosmetic only — overall_touched (reset next) is what gates validation.
             gr.update(value=4, elem_classes=["ovr-slider"]),  # overall
             False,                         # overall_touched
@@ -165,7 +165,7 @@ def _verdict_save_and_clear(game_path, annotator_id, condition, playlist, playli
         "",
         gr.skip(),
         gr.skip(),
-        *_col_updates(_COHERENCE, coherence),
+        *_col_updates(COHERENCE, coherence),
         *([gr.skip()] * 4),
         _overall_update(err=False),
         gr.skip(), gr.skip(),
@@ -260,7 +260,7 @@ def build(welcome_page, annotation_page, verdict_page,
             gr.Markdown("How well did the AI stick to and adapt its plan throughout the game?")
             coh_cols, coh_btns = [], []
             with gr.Row(equal_height=True):
-                for v, name, desc in _COHERENCE:
+                for v, name, desc in COHERENCE:
                     with gr.Column(scale=1, min_width=0, elem_classes=["coh-col"]) as col:
                         # A div, not "## {v}" — as markdown these rendered as
                         # four <h2>s whose entire text was a bare digit, which
@@ -278,8 +278,8 @@ def build(welcome_page, annotation_page, verdict_page,
         with gr.Group(elem_classes=["question-card", "g2-card"]):
             gr.Markdown("### G2 — Overall Game Quality")
             gr.Markdown("Looking at the whole game, how well did the AI actually play to achieve the main goal?")
-            _lo_v, _lo_lbl, _lo_desc = _OVERALL_RATINGS[0]
-            _hi_v, _hi_lbl, _hi_desc = _OVERALL_RATINGS[-1]
+            _lo_v, _lo_lbl, _lo_desc = OVERALL_RATINGS[0]
+            _hi_v, _hi_lbl, _hi_desc = OVERALL_RATINGS[-1]
             gr.HTML(
                 '<div class="ovr-slider-ends">'
                 f'<div class="ovr-end ovr-end-lo"><span class="ovr-end-num">{_lo_v}</span>'
@@ -368,7 +368,7 @@ def build(welcome_page, annotation_page, verdict_page,
         # threaded to app.py.
         verdict_ok_state = gr.State(False)
 
-        for i, (val, *_) in enumerate(_COHERENCE):
+        for i, (val, *_) in enumerate(COHERENCE):
             coh_btns[i].click(
                 fn=lambda v=val: _coh_select(v),
                 outputs=[*coh_cols, *coh_btns, coherence],

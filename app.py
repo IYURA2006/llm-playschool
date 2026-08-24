@@ -805,6 +805,31 @@ fieldset[aria-invalid="true"] {
     display: flex; align-items: center; justify-content: center;
     font-size: 14px; font-weight: 700; box-sizing: border-box;
 }
+/* Welcome-screen scale summary. The rating rows on the annotation screens are
+   one option per line, which would run to 19 lines here; on the landing page
+   the same information has to stay scannable, so options sit inline and wrap.
+   .rating-badge is reused as-is for the numbers. */
+.scale-group-h {
+    font-size: 14px !important; font-weight: 700 !important;
+    color: #e2e8f0 !important; margin: 2px 0 10px !important;
+}
+.scale-q { padding: 8px 2px 12px; border-bottom: 1px solid #1e293b; }
+.scale-q:last-of-type { border-bottom: none; padding-bottom: 4px; }
+.scale-q-title { font-size: 13.5px; font-weight: 700; color: #e2e8f0; }
+.scale-q-note {
+    font-size: 13px; color: #94a3b8; line-height: 1.5; margin: 2px 0 9px;
+}
+.scale-opts { display: flex; flex-wrap: wrap; gap: 8px 18px; }
+.scale-opt {
+    display: flex; align-items: center; gap: 7px;
+    font-size: 13px; color: #cbd5e1;
+}
+.scale-opt .rating-badge { flex: 0 0 auto; }
+.scale-gap { color: #475569; align-self: center; font-size: 13px; }
+.scale-foot {
+    font-size: 12.5px !important; color: #94a3b8 !important;
+    line-height: 1.5 !important; margin: 10px 0 0 !important;
+}
 .start-btn { width: 100% !important; margin-top: 6px !important; }
 
 #consent-modal {
