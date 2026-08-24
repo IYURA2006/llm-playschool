@@ -20,7 +20,15 @@ set -euo pipefail
 REPO_URL=${REPO_URL:-https://github.com/IYURA2006/llm-playschool.git}
 BRANCH=${BRANCH:-main}
 APP_DIR=${APP_DIR:-$HOME/llm-playschool}
-BACKUP_DIR=${BACKUP_DIR:-$HOME/annotation-backups}
+# Everything the app writes goes NEXT TO the app, not under $HOME. On breezy
+# $HOME is AFS, and neither cron nor the systemd user manager holds an AFS
+# token, so a backup directory or a log file under $HOME is silently
+# unwritable to exactly the two things that need it.
+LOCAL_STATE=${LOCAL_STATE:-$(dirname "$APP_DIR")}
+BACKUP_DIR=${BACKUP_DIR:-$LOCAL_STATE/annotation-backups}
+SVC_HOME=${SVC_HOME:-$LOCAL_STATE/svc-home}
+LOG_FILE=${LOG_FILE:-$LOCAL_STATE/app.log}
+HOME_FS=$(df -PT "$HOME" 2>/dev/null | tail -1 | awk '{print $2}')
 
 say() { printf '>> %s\n' "$*"; }
 die() { printf '!! %s\n' "$*" >&2; exit 1; }
@@ -74,6 +82,14 @@ fi
 say "installing dependencies"
 .venv/bin/pip install --quiet --upgrade pip
 .venv/bin/pip install --quiet -r requirements.txt
+# numpy ships wheels built for the x86-64-v2 baseline, which this VM's CPU does
+# not expose. The failure surfaces far from its cause — an import error several
+# frames deep inside gradio — so check it here where the message can be plain.
+if ! .venv/bin/python -c "import numpy" >/dev/null 2>&1; then
+    say "the numpy wheel does not run on this CPU — installing a baseline build"
+    .venv/bin/pip install --quiet "numpy<2" \
+        || die "could not install a numpy build for this CPU."
+fi
 
 # ── Database reachability + schema ───────────────────────────────────────────
 # Checked before the service starts, so a DB problem reports itself here rather
@@ -81,7 +97,10 @@ say "installing dependencies"
 say "checking database connectivity"
 .venv/bin/python - <<'PY' || die "cannot reach the database with the credentials in .env — fix those first."
 import sys
-from dotenv import load_dotenv; load_dotenv()
+# Explicit path, not bare load_dotenv(): this block is fed to python on
+# stdin, so find_dotenv() has no caller file to walk up from and dies on
+# an assert - which then reported itself as "cannot reach the database".
+from dotenv import load_dotenv; load_dotenv(".env")
 import os, psycopg2
 psycopg2.connect(host=os.environ["DB_HOST"], port=os.environ.get("DB_PORT", "5432"),
                  dbname=os.environ["DB_NAME"], user=os.environ["DB_USER"],
@@ -110,15 +129,44 @@ else
     say "Apache proxies to 127.0.0.1:$PORT — matches the app"
 fi
 
-# ── systemd user service ─────────────────────────────────────────────────────
+# ── Service ──────────────────────────────────────────────────────────────────
+# HOME is overridden for the service either way. libpq looks for an optional
+# client certificate in $HOME/.postgresql/ and treats AFS's "permission denied"
+# as fatal rather than as "there is no certificate"; gradio and huggingface
+# write caches under $HOME too. Pointing it at local disk avoids all of that.
+mkdir -p "$SVC_HOME"
+SVC_RUN="systemd-run --user --unit=annotation --working-directory=$APP_DIR"
+SVC_RUN="$SVC_RUN --setenv=HOME=$SVC_HOME --setenv=PYTHONUNBUFFERED=1"
+SVC_RUN="$SVC_RUN --property=Restart=always --property=RestartSec=5"
+SVC_RUN="$SVC_RUN --property=StandardOutput=append:$LOG_FILE"
+SVC_RUN="$SVC_RUN --property=StandardError=append:$LOG_FILE"
+SVC_RUN="$SVC_RUN $APP_DIR/.venv/bin/python app.py"
+
 if command -v systemctl >/dev/null 2>&1 && systemctl --user show-environment >/dev/null 2>&1; then
-    mkdir -p "$HOME/.config/systemd/user"
-    sed "s|__APP_DIR__|$APP_DIR|g" vm/annotation.service \
-        > "$HOME/.config/systemd/user/annotation.service"
-    systemctl --user daemon-reload
-    systemctl --user enable annotation.service >/dev/null
-    systemctl --user restart annotation.service
-    say "systemd user service (re)started"
+    if [ "$HOME_FS" = "afs" ]; then
+        # A systemd USER unit is only ever read from ~/.config/systemd/user, and
+        # the user manager has no AFS token — so the file is written, readable by
+        # you, and invisible to systemd, which reports "Unit file does not exist"
+        # while you are looking straight at it. Register it as a TRANSIENT unit
+        # instead: those live in /run/user/UID, on local disk.
+        say "AFS home detected — registering a transient unit (systemd cannot read units on AFS)"
+        systemctl --user stop annotation >/dev/null 2>&1 || true
+        systemctl --user reset-failed annotation >/dev/null 2>&1 || true
+        eval "$SVC_RUN" >/dev/null || die "could not start the transient service unit."
+        # Transient units do not survive a reboot, so cron re-creates it.
+        { crontab -l 2>/dev/null | grep -vF 'unit=annotation' || true;
+          echo "@reboot $SVC_RUN"; } | crontab -
+        say "transient service started; an @reboot cron entry re-creates it after a reboot"
+    else
+        mkdir -p "$HOME/.config/systemd/user"
+        sed -e "s|__APP_DIR__|$APP_DIR|g" -e "s|__SVC_HOME__|$SVC_HOME|g" \
+            -e "s|__LOG_FILE__|$LOG_FILE|g" vm/annotation.service \
+            > "$HOME/.config/systemd/user/annotation.service"
+        systemctl --user daemon-reload
+        systemctl --user enable annotation.service >/dev/null
+        systemctl --user restart annotation.service
+        say "systemd user service (re)started"
+    fi
     if ! loginctl show-user "$USER" 2>/dev/null | grep -q 'Linger=yes'; then
         say "IMPORTANT: linger is OFF — the app will die when you log out."
         say "           Run 'loginctl enable-linger $USER', or ask computing support to."
@@ -128,6 +176,7 @@ else
     say "  tmux new -s annotation"
     say "  cd $APP_DIR && .venv/bin/python app.py"
 fi
+say "logs: tail -f $LOG_FILE"
 
 # ── Nightly pg_dump ──────────────────────────────────────────────────────────
 mkdir -p "$BACKUP_DIR"

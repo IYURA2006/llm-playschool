@@ -17,6 +17,13 @@ WorkingDirectory=__APP_DIR__
 # is what Apache reverse-proxies to, and Gradio's default 127.0.0.1 bind is
 # what keeps Apache the only public entry point. Setting GRADIO_SERVER_NAME to
 # 0.0.0.0 here would publish the app directly over plain HTTP.
+# HOME points at local disk, not $HOME: on an AFS home libpq reads
+# $HOME/.postgresql/ for an optional client certificate and treats AFS's
+# "permission denied" as fatal, and gradio/huggingface cache under $HOME too.
+Environment=HOME=__SVC_HOME__
+Environment=PYTHONUNBUFFERED=1
+StandardOutput=append:__LOG_FILE__
+StandardError=append:__LOG_FILE__
 ExecStart=__APP_DIR__/.venv/bin/python app.py
 Restart=always
 RestartSec=5
