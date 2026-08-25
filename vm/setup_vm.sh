@@ -154,8 +154,12 @@ if command -v systemctl >/dev/null 2>&1 && systemctl --user show-environment >/d
         systemctl --user reset-failed annotation >/dev/null 2>&1 || true
         eval "$SVC_RUN" >/dev/null || die "could not start the transient service unit."
         # Transient units do not survive a reboot, so cron re-creates it.
+        # XDG_RUNTIME_DIR is what systemd-run --user uses to find the user
+        # manager's bus. cron runs with a bare environment where it is unset,
+        # so without this the @reboot entry fails with "Failed to connect to
+        # bus" — silently, and only at the moment it is needed.
         { crontab -l 2>/dev/null | grep -vF 'unit=annotation' || true;
-          echo "@reboot $SVC_RUN"; } | crontab -
+          echo "@reboot XDG_RUNTIME_DIR=/run/user/$(id -u) $SVC_RUN"; } | crontab -
         say "transient service started; an @reboot cron entry re-creates it after a reboot"
     else
         mkdir -p "$HOME/.config/systemd/user"
