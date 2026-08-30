@@ -5,13 +5,18 @@ they are asked on; the code that renders them, stores them and exports them
 lives in annotation.py and export_annotations.py and does not need editing to
 change a question.
 
-Two commands, both of which run without a database or a browser:
+Three commands, none of which needs a database or a browser:
 
     python questions.py --show dond      # exactly what an annotator will see
     python questions.py --check          # validate every entry before it ships
+    python questions.py --markdown       # regenerate question_set.md
 
 --check is the safety net. The only other thing that verifies an edit is an
 assertion that fires when an annotator presses Submit, which is far too late.
+
+--markdown is why question_set.md must not be hand-edited: a document written
+out by hand goes stale silently, which is exactly how the practice screen came
+to name the wrong game and the wrong turn count for weeks.
 
 
 HOW AN ENTRY IS SHAPED
@@ -1372,6 +1377,137 @@ def _verdict():
     return annotation_verdict
 
 
+def _md_choices(choices):
+    """Choices as a readable one-liner: "1 None · 2 Partial · …"."""
+    out = []
+    for display, _value in choices:
+        head, _, tail = display.partition("\n")
+        out.append(f"**{head}** {tail}".strip() if tail else f"**{head}**")
+    return " · ".join(out)
+
+
+def _md_question(md, choices, indent=""):
+    title, _, prompt = (md or "").partition("\n\n")
+    title = title.replace("**", "").strip()
+    lines = [f"{indent}- **{title}**"]
+    if prompt:
+        lines.append(f"{indent}  {prompt.strip()}")
+    lines.append(f"{indent}  {_md_choices(choices)}")
+    return "\n".join(lines)
+
+
+def markdown():
+    """The current question set as a document, built from this file.
+
+    Written out rather than maintained by hand: the practice screen spent
+    weeks telling participants it was a different game with a different turn
+    count, because two strings were updated in one place and not the other.
+    """
+    import annotation
+    fams = _families()
+    out = [
+        "# Annotation Question Set",
+        "",
+        "**Generated — do not edit by hand.** Edit `questions.py` and run:",
+        "",
+        "```bash",
+        "python questions.py --markdown > question_set.md",
+        "```",
+        "",
+        f"Covers the {len(fams)} game families with transcripts under "
+        f"`GAMES_DIR={os.environ.get('GAMES_DIR', 'games')}`. Anything a game "
+        "does not override falls back to the Shared Core below.",
+        "",
+        "---",
+        "",
+        "## Shared Core",
+        "",
+        "Asked on every AI turn unless the game replaces them.",
+        "",
+        _md_question(*GENERIC_Q1),
+        _md_question(*GENERIC_Q2),
+        "",
+        "Conditional pair — shown only where the game asks the model to "
+        "explain its move:",
+        "",
+        _md_question(*GENERIC_Q3),
+        "",
+        "Ticks (optional, tick all that apply):",
+        "",
+    ]
+    out += [f"- {t}" for t in SC_TICKS]
+    out += [f"- {SC_TICK_D} *(with Q3 only)*", "", "---", "",
+            "## End of every game", ""]
+    v = _verdict()
+    out.append("- **G1 — Strategic coherence** — "
+               + " · ".join(f"**{n}** {name}" for n, name, _d in v.COHERENCE))
+    lo, hi = v.OVERALL_RATINGS[0], v.OVERALL_RATINGS[-1]
+    out.append(f"- **G2 — Overall game quality** — slider "
+               f"1 ({lo[1]}) to {len(v.OVERALL_RATINGS)} ({hi[1]})")
+    out.append("- **G3 — This game specifically** — where the game defines "
+               "one; listed per game below.")
+    out += ["", "---", "", "## Per game", ""]
+
+    for fam in sorted(fams):
+        entry = BESPOKE_QUESTIONS.get(fam)
+        n = len(fams[fam])
+        out.append(f"### {fam}")
+        out.append("")
+        out.append(f"*{n} transcript(s).*"
+                   + ("" if entry else " Shared Core only — no overrides."))
+        out.append("")
+        if not entry:
+            out.append("")
+            continue
+
+        roles = entry.get("roles") or {}
+        for role in sorted(roles):
+            cfg = roles[role] or {}
+            out.append(f"**Role: {role}**")
+            out.append("")
+            asked = False
+            for slot, generic in (("q1", GENERIC_Q1), ("q2", GENERIC_Q2)):
+                c = cfg.get(slot, "generic")
+                if c is None:
+                    continue
+                md, choices = generic if c == "generic" else c
+                tag = " *(Shared Core)*" if c == "generic" else ""
+                out.append(_md_question(md, choices) + tag)
+                asked = True
+            for key, md, choices in (cfg.get("bolt_ons") or []):
+                out.append(_md_question(md, choices) + f" *(stored as `{key}`)*")
+                asked = True
+            for key, md, choices in (cfg.get("bolt_ons_first_turn") or []):
+                out.append(_md_question(md, choices)
+                           + f" *(first turn of this role only; `{key}`)*")
+                asked = True
+            if not asked:
+                out.append("- *Not rated — shown for context only.*")
+            out.append("")
+
+        out.append("**Q3 — Reasoning Clarity:** "
+                   + ("shown" if entry.get("reasoning_clarity") else "not shown"))
+        _bf = entry.get("flags")
+        out.append("")
+        if not isinstance(_bf, list):
+            out.append("**Ticks:** the Shared Core set")
+        elif not _bf:
+            out.append("**Ticks:** none")
+        else:
+            out.append("**Ticks:**")
+            out.append("")
+            out += [f"- {t}" for t in _bf]
+        out.append("")
+        wg = annotation.normalise_whole_game(entry.get("whole_game"))
+        if wg:
+            out.append("**G3 — this game's whole-game question(s):**")
+            out.append("")
+            for qid, md, choices in wg:
+                out.append(_md_question(md, choices) + f" *(stored as `{qid}`)*")
+            out.append("")
+    return "\n".join(out).rstrip() + "\n"
+
+
 def main(argv=None):
     import argparse
     p = argparse.ArgumentParser(
@@ -1382,6 +1518,8 @@ def main(argv=None):
                    help="print what an annotator sees for one game family")
     p.add_argument("--list", action="store_true",
                    help="list every game family and whether it has an entry")
+    p.add_argument("--markdown", action="store_true",
+                   help="print the whole question set as markdown (for question_set.md)")
     args = p.parse_args(argv)
 
     if args.list:
@@ -1392,6 +1530,10 @@ def main(argv=None):
             what = "Shared Core" if not entry else ", ".join(
                 k for k in ("roles", "flags", "whole_game") if entry.get(k) is not None)
             print(f"  {fam:32} {n:4} transcript(s)   {what}")
+        return 0
+
+    if args.markdown:
+        print(markdown(), end="")
         return 0
 
     if args.show:
