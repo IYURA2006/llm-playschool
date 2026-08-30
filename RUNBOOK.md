@@ -26,10 +26,34 @@ bash <(curl -sL https://raw.githubusercontent.com/IYURA2006/llm-playschool/main/
 ```
 
 Idempotent — re-run it to pull the latest `main` and restart. It clones or
-updates the repo, validates `.env`, builds the venv, checks the database is
-reachable, compares the app's port against the Apache vhost, installs and
-restarts the systemd user service, schedules a nightly `pg_dump`, and
-smoke-checks the port.
+updates the repo, repoints `origin` if `REPO_URL` has changed, validates
+`.env`, builds the venv, checks the database is reachable, compares the app's
+port against the Apache vhost, installs and restarts the systemd user service,
+schedules a nightly `pg_dump`, and smoke-checks the port.
+
+**The VM deploys from `IYURA2006/llm-playschool`, which is public** — that is
+what lets the VM clone and re-pull with no credentials at all. The group repo
+(`esgi-research-group/lm-playschool-human-eval`) is private, so it cannot serve
+either half of the command above: `raw.githubusercontent` returns 404 and an
+anonymous clone fails on `could not read Username`. Deploying from it would
+mean putting a deploy key on the VM.
+
+Both remotes hold the same `main`. Push to **both**, or a redeploy silently
+ships without whatever only reached the other one:
+
+```bash
+git push origin main && git push eval main
+```
+
+If `git pull --ff-only` fails with *"Not possible to fast-forward"*, `main` was
+rewritten upstream (a force-push). The working directory holds nothing that
+needs preserving except `.env`, which is untracked, so it is safe to take the
+remote's version wholesale:
+
+```bash
+git -C ~/llm-playschool fetch origin main
+git -C ~/llm-playschool reset --hard origin/main
+```
 
 On a first run it will stop and tell you to fill in `.env`. That is deliberate:
 it refuses to invent database credentials, because an app started without them

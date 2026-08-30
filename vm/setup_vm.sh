@@ -38,9 +38,24 @@ if [ ! -d "$APP_DIR/.git" ]; then
     say "cloning $BRANCH into $APP_DIR"
     git clone -b "$BRANCH" "$REPO_URL" "$APP_DIR"
 else
+    # The remote is only ever set at clone time, so an existing checkout keeps
+    # pulling from whatever it was first cloned from — changing REPO_URL here
+    # would look like it worked and quietly deploy the old repo forever.
+    # Reconcile it explicitly, and say so, because switching deploy source is
+    # not something that should happen silently.
+    CURRENT_URL=$(git -C "$APP_DIR" remote get-url origin 2>/dev/null || echo "")
+    if [ -n "$CURRENT_URL" ] && [ "$CURRENT_URL" != "$REPO_URL" ]; then
+        say "repointing origin"
+        say "    from $CURRENT_URL"
+        say "      to $REPO_URL"
+        git -C "$APP_DIR" remote set-url origin "$REPO_URL"
+    fi
     say "updating $APP_DIR to latest $BRANCH"
     git -C "$APP_DIR" fetch origin "$BRANCH"
     git -C "$APP_DIR" checkout "$BRANCH"
+    # --ff-only refuses rather than merges, so a rewritten history upstream
+    # (a force-push) stops here with a clear error instead of a merge commit
+    # nobody asked for. Recover with: git -C "$APP_DIR" reset --hard origin/main
     git -C "$APP_DIR" pull --ff-only origin "$BRANCH"
 fi
 cd "$APP_DIR"
