@@ -22,6 +22,12 @@ TRAINING_GAME = os.path.join(
     _dir, "games_practice", "guesswhat", "Abs_Level_1", "instance_00004",
     "interactions.json")
 
+# Display name for the practice game, derived from the path so that swapping
+# TRAINING_GAME cannot leave the on-screen text describing the previous one.
+_PRACTICE_NAME = os.path.basename(
+    os.path.dirname(os.path.dirname(os.path.dirname(TRAINING_GAME)))
+).replace("_", " ").title().replace("Guesswhat", "GuessWhat")
+
 # Only this role's turns are rated. GuessWhat has two seats, but the Answerer's
 # forced yes/no carries no strategy worth judging (the real annotation page
 # gives it no questions either) — rating "ANSWER: no" would teach the wrong
@@ -208,18 +214,23 @@ def build(welcome_page, training_page, annotation_page, started_at_state,
             )
             gr.HTML(
                 '<div class="annot-progress"><span class="prog-rated">'
-                'Rate the 3 turns, then check yourself against the reference'
+                f'Rate the {len(_REFERENCE)} turns, then check yourself '
+                'against the reference'
                 '</span></div>',
                 elem_classes=["nav-center"],
             )
 
         with gr.Group(elem_classes=["info-box"]):
+            # Game name and turn count are read from the practice episode, not
+            # written out: both were left saying "Wordle" and "3 turns" when the
+            # practice round was swapped to GuessWhat, and every new participant
+            # was told the wrong thing on the first screen they see.
             gr.Markdown(
-                "**🎓 Practice before you start.** This is a real transcript of an AI "
-                "playing Wordle. Rate each of its 3 turns with the two standard "
-                "questions, then press **Check my ratings** to compare against "
-                "reference ratings with explanations. Your practice answers are "
-                "not saved."
+                f"**🎓 Practice before you start.** This is a real transcript of "
+                f"an AI playing {_PRACTICE_NAME}. Rate each of its "
+                f"{len(_REFERENCE)} turns with the two standard questions, then "
+                f"press **Check my ratings** to compare against reference "
+                f"ratings with explanations. Your practice answers are not saved."
             )
 
         with gr.Row(equal_height=False):

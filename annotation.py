@@ -1531,6 +1531,24 @@ def build(welcome_page, annotation_page, verdict_page, game_state, annotator_sta
                         with gr.Group(elem_classes=["turn-anno-card"]):
                             gr.HTML(_card_header_html(g, i))
 
+                            # Some roles are deliberately not rated at all —
+                            # GuessWhat's Answerer only replies yes/no, so the
+                            # spec gives it no questions. Say so, rather than
+                            # showing a card that looks like it lost its
+                            # contents. Q3 counts: when it is shown there IS
+                            # something to answer here.
+                            if (role_cfg.get("q1", "generic") is None
+                                    and role_cfg.get("q2", "generic") is None
+                                    and not role_cfg.get("bolt_ons")
+                                    and not (first_turn.get(role) == i
+                                             and role_cfg.get("bolt_ons_first_turn"))
+                                    and not show_q3):
+                                gr.HTML(
+                                    '<p class="no-q-note">This turn is not '
+                                    'rated — it is shown for context only. '
+                                    'Move on to the next turn.</p>'
+                                )
+
                             # Q1 slot: "generic" (default) = universal widget,
                             # None = not rendered for this role, tuple = bespoke.
                             # label= is sr-only under show_label=False, so it

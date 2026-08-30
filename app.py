@@ -503,6 +503,19 @@ div:focus {
     background: #1e293b; padding: 1px 6px; border-radius: 3px; margin-left: 6px;
 }
 .flags-lbl { color: #cbd5e1; font-size: 13px; font-weight: 600; margin-top: 3px; margin-bottom: 2px; }
+/* Gradio's own footer ("Use via API / Built with Gradio / Settings") renders
+   under every page in the participant's browser language. Nothing there is for
+   them, and the API and Settings links are live. Hidden, not removed, so the
+   app keeps working exactly as before. */
+footer { display: none !important; }
+
+/* Shown on turn cards that carry no rating question (GuessWhat's Answerer). */
+.no-q-note {
+    color: #94a3b8 !important; font-size: 13px !important;
+    line-height: 1.5 !important; margin: 2px 0 10px !important;
+    padding: 9px 11px; border-radius: 8px;
+    background: #0f172a; border: 1px solid #1e293b;
+}
 .flags-sub { color: #94a3b8; font-weight: 400; font-size: 11px; }
 
 .scale-radio fieldset { border: none !important; padding: 0 !important; }
@@ -537,11 +550,15 @@ div:focus {
     border: 1px solid #1e3a5f !important;
     color: #94a3b8 !important;
     border-radius: 6px !important;
-    padding: 6px 12px !important;
+    padding: 6px 9px !important;
     cursor: pointer !important;
     font-size: 13px !important;
     text-align: center !important;
-    min-width: 80px !important;
+    /* Was min-width:80px with 12px side padding, which made the widest labels
+       ("Transparent", "Nonsensical") overflow their button on the 5-option Q3
+       row. Narrower box, and long words wrap instead of spilling. */
+    min-width: 68px !important;
+    overflow-wrap: anywhere !important;
     white-space: pre-line !important;
     line-height: 1.25 !important;
     transition: all .15s !important;
@@ -1008,7 +1025,13 @@ force_dark = """
     // Mirrors annotation._submit's rule: only flags and comments are optional.
     function isRated(card) {
         var groups = card.querySelectorAll('.scale-radio');
-        if (!groups.length) return false;
+        // No questions on this card means there is nothing to answer, so it is
+        // already complete. Returning false here is what made every GuessWhat
+        // Answerer turn permanently un-rated: 44% of that game's turns, so the
+        // counter could never reach "N of N" and the chip never went green,
+        // with nothing on screen to explain why. _submit agrees with this — it
+        // only ever required the fields it actually rendered.
+        if (!groups.length) return true;
         return Array.prototype.every.call(groups, function (grp) {
             return !!grp.querySelector('input:checked');
         });
@@ -1638,6 +1661,17 @@ def _capture_session_params(request: gr.Request):
     game = (qp.get("game") or "").strip()
 
     if block or game or annotator:
+        # This path skips the Prolific gate entirely and writes real rows under
+        # whatever annotator id the URL carries, with no batch or template
+        # attached. That is exactly what it is for during development, and
+        # exactly what must not be reachable while participants are being paid
+        # to use the same deployment. Off unless explicitly switched on.
+        if os.environ.get("ALLOW_DEBUG_LINKS", "").strip().lower() not in {"1", "true", "yes"}:
+            return _session_error(
+                "This study is only accessible via its Prolific link. If you "
+                "believe you're seeing this in error, please contact the study "
+                "coordinator."
+            )
         missing = [name for name, val in (("annotator", annotator), ("block", block), ("game", game)) if not val]
         if missing:
             return _session_error(

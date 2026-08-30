@@ -310,7 +310,8 @@ BESPOKE_QUESTIONS = {
                 # whether the proposals matched, which is the question above.
                 "**Whole game — How collaborative and coherent was the "
                 "negotiation before the final proposals?**",
-                _scaleN(7),
+                _scaleN(7, {1: "no real negotiation",
+                            7: "fully collaborative"}),
             ),
         ],
     },
@@ -586,7 +587,8 @@ BESPOKE_QUESTIONS = {
                 "route_coherence",
                 "**Whole game — How coherent and goal-directed was the complete "
                 "route taken by the model?**",
-                _scaleN(7),
+                _scaleN(7, {1: "aimless wandering",
+                            7: "direct and purposeful"}),
             ),
         ],
     },
@@ -777,7 +779,8 @@ BESPOKE_QUESTIONS.update({
                 "clue_feedback_integration",
                 "**Whole game — How consistently did the model combine the clue "
                 "and letter feedback throughout the game?**",
-                _scaleN(7),
+                _scaleN(7, {1: "ignored both",
+                            7: "used both on every guess"}),
             ),
         ],
     },
@@ -842,7 +845,8 @@ BESPOKE_QUESTIONS.update({
                 "**Whole game — Did the Guesser's questioning use its turns "
                 "efficiently, or were many turns spent without meaningfully "
                 "narrowing the possibilities?**",
-                _scaleN(7),
+                _scaleN(7, {1: "turns mostly wasted",
+                            7: "every question narrowed it"}),
             ),
         ],
     },
