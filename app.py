@@ -795,8 +795,26 @@ fieldset[aria-invalid="true"] {
     color: #e2e8f0 !important; margin: 10px 0 2px !important;
 }
 .rating-scale-h span { font-weight: 400 !important; color: #94a3b8 !important; }
-/* Step cards: equal height, compact heading */
-.step-card { height: 100%; }
+/* Step cards: three boxes of identical size. equal_height=True alone only
+   stretches heights — the widths still follow each card's content, so the
+   three come out uneven. flex-basis 0 makes the row split evenly regardless
+   of how much text each card holds. */
+.step-row { display: flex !important; align-items: stretch !important; }
+.step-row > * {
+    flex: 1 1 0 !important;
+    min-width: 0 !important;
+    align-self: stretch !important;
+    /* height:auto, NOT 100%: an explicit height cancels the stretch, and each
+       card then sizes to its own text — which is what made the middle one
+       taller when its paragraph wrapped onto a fifth line. */
+    height: auto !important;
+}
+.step-card { display: flex !important; flex-direction: column !important; }
+/* The session-count line renders nothing when there is no assigned playlist.
+   Its container still occupies a row's worth of padding and gap, leaving a
+   gap between the intro text and the cards. */
+.session-line { gap: 0 !important; padding: 0 !important; margin: 0 !important; }
+.session-line:empty { display: none !important; }
 .step-card h3 { font-size: 15px !important; margin: 2px 0 4px !important; }
 .step-card p { font-size: 12.5px !important; line-height: 1.55 !important; }
 /* Coloured number badge for the rating rows */
@@ -816,19 +834,22 @@ fieldset[aria-invalid="true"] {
 .scale-q { padding: 8px 2px 12px; border-bottom: 1px solid #1e293b; }
 .scale-q:last-of-type { border-bottom: none; padding-bottom: 4px; }
 .scale-q-title { font-size: 13.5px; font-weight: 700; color: #e2e8f0; }
+.scale-q-range {
+    font-weight: 400 !important; color: #64748b !important;
+    font-size: 12.5px !important; margin-left: 8px;
+}
 .scale-q-note {
     font-size: 13px; color: #94a3b8; line-height: 1.5; margin: 2px 0 9px;
 }
-.scale-opts { display: flex; flex-wrap: wrap; gap: 8px 18px; }
-.scale-opt {
-    display: flex; align-items: center; gap: 7px;
-    font-size: 13px; color: #cbd5e1;
-}
-.scale-opt .rating-badge { flex: 0 0 auto; }
-.scale-gap { color: #475569; align-self: center; font-size: 13px; }
+.scale-star { color: #64748b; font-weight: 400; }
+/* The starred note sits at the foot of its box, below a divider, so it reads
+   as a footnote to the group rather than as part of the last question. */
 .scale-foot {
     font-size: 12.5px !important; color: #94a3b8 !important;
-    line-height: 1.5 !important; margin: 10px 0 0 !important;
+    line-height: 1.5 !important;
+    margin: 16px 0 0 !important;
+    padding-top: 12px !important;
+    border-top: 1px solid #1e293b !important;
 }
 .start-btn { width: 100% !important; margin-top: 6px !important; }
 

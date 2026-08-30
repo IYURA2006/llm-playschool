@@ -215,7 +215,11 @@ class Decoder:
             # the export shows "not asked" rather than an empty answer.
         # Q3 is always present in the payload — preset to "NA" when hidden.
         slots["q3"] = self.a.GENERIC_Q3
-        return slots, list(role_cfg.get("bolt_ons") or [])
+        # First-turn-only bolt-ons are appended to the same list: the caller
+        # skips any key a turn has no answer for, so turns where it was never
+        # asked simply carry nothing.
+        return slots, (list(role_cfg.get("bolt_ons") or [])
+                       + list(role_cfg.get("bolt_ons_first_turn") or []))
 
     def is_bespoke(self, slug, condition, role, slot):
         if not self.is_hybrid(condition):

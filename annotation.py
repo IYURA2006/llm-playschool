@@ -135,6 +135,18 @@ GENERIC_Q3 = (
      ("4\nTransparent", "4"), ("N/A", "NA")],
 )
 
+# The Shared-Core ticks, as constants rather than a literal in load_game, so a
+# bespoke set can EXTEND them (dond adds a secrecy tick) instead of restating
+# the three strings — a copy would drift the moment one of them is reworded.
+# SC_TICK_D is the conditional half of the explanation pair: it is shown with
+# SC_Q3 and only where the game asks the model to explain its move.
+SC_TICKS = [
+    "Repeated a move that already failed",
+    "Invented or got a game fact wrong",
+    "Noticed and fixed an earlier mistake",
+]
+SC_TICK_D = "Explanation does not match the move"
+
 
 # bbh/cladder/mmlu_pro are auto-scored one-shot answers, so the only useful
 # human question is whether the REASONING behind the answer is sound.
@@ -302,7 +314,13 @@ BESPOKE_QUESTIONS = {
     "dond": {
         # design_type: shared_core, plus the conditional explanation pair
         # (SC_Q3 / SC_TICK_D) — dond responses carry reasoning.
-        "flags": None,              # SC_TICK_A/B/C
+        # SC_TICK_A/B/C + SC_TICK_D, extended with the one hazard the core
+        # cannot express: the item values are private, and weaker models put
+        # them straight into the open chat.
+        "flags": SC_TICKS + [
+            SC_TICK_D,
+            "Revealed its own secret item values in the open chat",
+        ],
         "reasoning_clarity": True,  # show SC_Q3 + the explanation-mismatch tick
         "roles": {
             # Both seats share the "DealOrNoDealPlayer" role.
@@ -378,7 +396,15 @@ BESPOKE_QUESTIONS = {
     },
     "imagegame": {
         # Giver and Follower are different roles, so each gets its own question set.
-        "flags": [],
+        # The core ticks don't fit a game whose whole failure mode is an
+        # instruction that never lands on the grid, so this is its own pair.
+        # The first overlaps the Follower's Q1 by design: Q1 grades how well the
+        # grid matched, the tick records the discrete "it didn't move at all"
+        # event, which is the one the Giver is then supposed to notice.
+        "flags": [
+            "The grid did not change to match the instruction just given",
+            "The Giver noticed the grid was wrong or had not updated, and said so",
+        ],
         # whole_game_only was True, which hid G1/G2 entirely. The study keeps
         # the generic overall pair on every game so there is one cross-game
         # comparable measure, so the flag is gone.
@@ -766,7 +792,23 @@ BESPOKE_QUESTIONS.update({
         "flags": None,              # SC_TICK_A/B/C
         "reasoning_clarity": True,  # SC_Q3 + the explanation-mismatch tick
         "roles": {
-            "WordGuesser": {"q1": "generic", "q2": "generic"},
+            "WordGuesser": {
+                "q1": "generic", "q2": "generic",
+                # Asked on the opening guess only: the clue is given once, at
+                # the start, and by the second guess there is letter feedback
+                # to reason from, so "did it use the clue" stops being a clean
+                # question. See first_turn_of_role().
+                "bolt_ons_first_turn": [
+                    (
+                        "first_guess_uses_clue",
+                        "**Bolt-on — Clue Use** *(opening guess only)*\n\nDoes "
+                        "this first guess reflect the meaning of the clue given "
+                        "at the start?",
+                        _scale4(["Ignores the clue", "Loosely related",
+                                 "Mostly reflects it", "Clearly reflects it"]),
+                    ),
+                ],
+            },
         },
         "whole_game": [
             (
@@ -950,7 +992,25 @@ BESPOKE_QUESTIONS.update({
                 ),
             },
         },
-        # No flags/whole_game override — episode is always exactly 2 turns.
+        # No flags override — the episode is always exactly 2 turns.
+        "whole_game": [
+            (
+                "description_pick_pair",
+                # The per-turn pair scores each side alone; the failure this
+                # game actually shows is a clear description followed by a
+                # wrong pick, which only reads as a pair.
+                "**Whole game — Taken together, how well did the Giver's "
+                "description and the Follower's pick work as a pair?**",
+                # A mid anchor as well as the two ends: 4 is the specific case
+                # this question exists to capture, and it is not the midpoint
+                # of "bad to good" that annotators would otherwise assume.
+                _scaleN(7, {
+                    1: "vague description, wrong pick",
+                    4: "one side carried it",
+                    7: "precise description, pick matched every detail",
+                }),
+            ),
+        ],
     },
     "adventuregame": {
         "roles": {
@@ -1240,13 +1300,9 @@ def load_game(path):
     _REASONING_GAMES = {"wordle", "wordle_withclue", "wordle_withcritic", "dond"}
     g.has_reasoning = g.game_key in _REASONING_GAMES or _detect_reasoning(ai_turns)
     g.multi_role = len(ai_ids) > 1
-    g.flag_choices = [
-        "Repeated a move that already failed",
-        "Invented or got a game fact wrong",
-        "Noticed and fixed an earlier mistake",
-    ]
+    g.flag_choices = list(SC_TICKS)
     if g.has_reasoning:
-        g.flag_choices.append("Explanation does not match the move")
+        g.flag_choices.append(SC_TICK_D)
     g.slug = game_slug(path)
     g.source_path = os.path.relpath(path, _dir)
     return g
@@ -2140,6 +2196,16 @@ def show_q3_for(g, condition):
             if bespoke is not None else bool(g.has_reasoning))
 
 
+def first_turn_of_role(g):
+    """{role: index of that role's FIRST turn}. A bolt-on listed under
+    "bolt_ons_first_turn" is asked only there — the wordle clue question is
+    about the opening guess and has no meaning on later turns."""
+    first = {}
+    for i, msg in enumerate(g.ai_turns):
+        first.setdefault(g.role(msg["from"]), i)
+    return first
+
+
 def question_spec(g, condition, show_q3):
     """Canonical description of the exact question set a transcript was shown.
 
@@ -2179,6 +2245,8 @@ def question_spec(g, condition, show_q3):
             "q3": slot("generic", GENERIC_Q3) if show_q3 else None,
             "bolt_ons": [[k, plain_label(md), norm(ch)]
                          for k, md, ch in cfg.get("bolt_ons", [])],
+            "bolt_ons_first_turn": [[k, plain_label(md), norm(ch)]
+                                    for k, md, ch in cfg.get("bolt_ons_first_turn", [])],
         }
 
     _bf = bespoke.get("flags")
@@ -2205,6 +2273,7 @@ def _assert_spec_matches_render(spec, field_specs, g):
     its hash would attach a confident but false description to real data.
     """
     want = set()
+    first_turn = first_turn_of_role(g)
     for turn_i, msg in enumerate(g.ai_turns):
         sender = msg["from"]
         role = g.role(sender)
@@ -2224,6 +2293,9 @@ def _assert_spec_matches_render(spec, field_specs, g):
         want.add((turn_i, "q3"))
         for key, _md, _ch in cfg.get("bolt_ons", []):
             want.add((turn_i, "extra", key))
+        if first_turn.get(role) == turn_i:
+            for key, _md, _ch in cfg.get("bolt_ons_first_turn", []):
+                want.add((turn_i, "extra", key))
     got = {tuple(fs) for fs in field_specs
            if fs[1] in ("q1", "q2", "q3", "extra")}
     if want != got:
@@ -2396,6 +2468,7 @@ def build(welcome_page, annotation_page, verdict_page, game_state, annotator_sta
 
                     # Paired 1:1 with field_specs so _submit can reconstruct per-turn answers.
                     components, field_specs = [], []
+                    first_turn = first_turn_of_role(g)
 
                     for i in range(g.n_turns):
                         sender = g.ai_turns[i]["from"]
@@ -2444,8 +2517,13 @@ def build(welcome_page, annotation_page, verdict_page, game_state, annotator_sta
                                               elem_classes=["scale-radio", "q2-scale"])
                                 components.append(q2); field_specs.append((i, "q2"))
 
-                            # Bespoke bolt-on(s) — additive, beyond the Q1/Q2 slots.
-                            for key, label_md, choices in role_cfg.get("bolt_ons", []):
+                            # Bespoke bolt-on(s) — additive, beyond the Q1/Q2
+                            # slots. The second list is asked once, on this
+                            # role's opening turn only.
+                            _bolts = list(role_cfg.get("bolt_ons", []))
+                            if first_turn.get(role) == i:
+                                _bolts += role_cfg.get("bolt_ons_first_turn", [])
+                            for key, label_md, choices in _bolts:
                                 gr.Markdown(label_md)
                                 bolt = gr.Radio(choices=choices, label=_t + plain_label(label_md),
                                                 show_label=False,
