@@ -1,7 +1,7 @@
 
 """
 
-cd /compute_price/cost_estimete
+cd compute_price
 
 # O1 — 8 IDs
 python3 cost_estimate.py --archive lm-playschool-2026-final-results.zip --option 1 --instances 8 --annotators 1
