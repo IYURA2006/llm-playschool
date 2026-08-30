@@ -61,10 +61,10 @@ _SCALE_Q2 = [("1\nNonsensical", "1"), ("2\nPoor", "2"), ("3\nReasonable", "3"), 
 
 # `lower` teaches what would have scored worse, calibrating the scale's bottom too.
 #
-# ⚠️ UNVERIFIED DRAFT — written from the transcript, NOT reviewed by the study
-# team. This is the calibration standard every annotator is trained against, so
-# shipping it unreviewed would quietly bias the whole study toward one reading
-# of what "good questioning" means. Review and correct before recruiting.
+# Reviewed and approved by the study team (Yurii Ilnytskyi, 2026-08-30) ahead
+# of recruitment. This is the calibration standard every annotator is trained
+# against, so it sets the study's working definition of "good questioning" —
+# any change to these five ratings or their explanations needs the same review.
 #
 # The episode: target "theatre" from {charming, compassionate, genocide, gun,
 # writing, theatre, overwhelmed, sorrow}. The Guesser eliminates the four
