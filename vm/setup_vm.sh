@@ -5,25 +5,22 @@
 #
 #   bash <(curl -sL https://raw.githubusercontent.com/IYURA2006/llm-playschool/main/vm/setup_vm.sh)
 #
-# Deliberately NOT here, versus the pre-Postgres version of this script:
-#   * no DATA_DIR — the database is managed PostgreSQL, not a SQLite file, so
-#     the app holds no durable state on disk and there is nothing to bind-mount
-#     or to keep across a redeploy.
-#   * no Docker path — breezy runs the app under a systemd user service behind
-#     Apache. A second deployment path that nobody exercises is a liability.
-#   * no generated .env — this script REFUSES to invent database credentials.
-#     The old version wrote a DATA_DIR-only .env, which made the app die inside
-#     _require_db_config() at import while Apache went on serving a 503 with
-#     nothing in the app log to explain it.
+# Left out on purpose:
+#   * no DATA_DIR. The database is managed PostgreSQL, so the app keeps no
+#     durable state on disk and there is nothing to preserve across a redeploy.
+#   * no Docker path. breezy runs a systemd user service behind Apache, and a
+#     second deployment path nobody uses is a liability.
+#   * no generated .env. This script will not invent database credentials: the
+#     app would then die at import while Apache served a 503 with nothing in
+#     the log to explain it.
 set -euo pipefail
 
 REPO_URL=${REPO_URL:-https://github.com/IYURA2006/llm-playschool.git}
 BRANCH=${BRANCH:-main}
 APP_DIR=${APP_DIR:-$HOME/llm-playschool}
-# Everything the app writes goes NEXT TO the app, not under $HOME. On breezy
+# Everything the app writes goes next to the app, not under $HOME. On breezy
 # $HOME is AFS, and neither cron nor the systemd user manager holds an AFS
-# token, so a backup directory or a log file under $HOME is silently
-# unwritable to exactly the two things that need it.
+# token, so anything under $HOME is unwritable to exactly those two.
 LOCAL_STATE=${LOCAL_STATE:-$(dirname "$APP_DIR")}
 BACKUP_DIR=${BACKUP_DIR:-$LOCAL_STATE/annotation-backups}
 SVC_HOME=${SVC_HOME:-$LOCAL_STATE/svc-home}
@@ -38,11 +35,9 @@ if [ ! -d "$APP_DIR/.git" ]; then
     say "cloning $BRANCH into $APP_DIR"
     git clone -b "$BRANCH" "$REPO_URL" "$APP_DIR"
 else
-    # The remote is only ever set at clone time, so an existing checkout keeps
-    # pulling from whatever it was first cloned from — changing REPO_URL here
-    # would look like it worked and quietly deploy the old repo forever.
-    # Reconcile it explicitly, and say so, because switching deploy source is
-    # not something that should happen silently.
+    # The remote is otherwise set only at clone time, so an existing checkout
+    # keeps pulling from the repo it was first cloned from and changing
+    # REPO_URL would appear to work while deploying the old one.
     CURRENT_URL=$(git -C "$APP_DIR" remote get-url origin 2>/dev/null || echo "")
     if [ -n "$CURRENT_URL" ] && [ "$CURRENT_URL" != "$REPO_URL" ]; then
         say "repointing origin"
@@ -53,15 +48,13 @@ else
     say "updating $APP_DIR to latest $BRANCH"
     git -C "$APP_DIR" fetch origin "$BRANCH"
     git -C "$APP_DIR" checkout "$BRANCH"
-    # --ff-only refuses rather than merges, so a rewritten history upstream
-    # (a force-push) stops here with a clear error instead of a merge commit
-    # nobody asked for. Recover with: git -C "$APP_DIR" reset --hard origin/main
+    # --ff-only refuses instead of merging, so a force-push upstream stops here
+    # with a clear error. Recover with: git -C "$APP_DIR" reset --hard origin/main
     git -C "$APP_DIR" pull --ff-only origin "$BRANCH"
 fi
 cd "$APP_DIR"
 
-# ── .env ─────────────────────────────────────────────────────────────────────
-# Stop here rather than start a process that cannot possibly work.
+# Stop here rather than start a process that cannot work.
 if [ ! -f .env ]; then
     cp .env.example .env
     chmod 600 .env
@@ -78,14 +71,12 @@ grep -qE "^GAMES_DIR=games_study$" .env \
     || die "GAMES_DIR must be games_study in $APP_DIR/.env, or the study runs \
 on the wrong corpus (app.py refuses to boot without it)."
 
-# The app's port, and therefore what Apache must be proxying to. app.py
-# defaults to 3000; .env may override it.
+# The port Apache must proxy to. app.py defaults to 3000; .env can override it.
 PORT=$(sed -n 's/^PORT=\([0-9]\+\).*/\1/p' .env | tail -1)
 PORT=${PORT:-3000}
 
-# ── Python ───────────────────────────────────────────────────────────────────
-# gradio 6.x needs a modern interpreter; uv provides a user-local 3.13 without
-# sudo if the system python3 is too old.
+# gradio 6 needs a modern interpreter. uv installs a user-local 3.13 without
+# sudo when the system python3 is too old.
 if python3 -c 'import sys; raise SystemExit(0 if sys.version_info >= (3, 11) else 1)' 2>/dev/null; then
     [ -d .venv ] || python3 -m venv .venv
 else
@@ -97,24 +88,22 @@ fi
 say "installing dependencies"
 .venv/bin/pip install --quiet --upgrade pip
 .venv/bin/pip install --quiet -r requirements.txt
-# numpy ships wheels built for the x86-64-v2 baseline, which this VM's CPU does
-# not expose. The failure surfaces far from its cause — an import error several
-# frames deep inside gradio — so check it here where the message can be plain.
+# numpy's wheels are built for x86-64-v2, which this VM's CPU does not expose.
+# The failure shows up deep inside gradio, so check it here where the message
+# can be clear.
 if ! .venv/bin/python -c "import numpy" >/dev/null 2>&1; then
     say "the numpy wheel does not run on this CPU — installing a baseline build"
     .venv/bin/pip install --quiet "numpy<2" \
         || die "could not install a numpy build for this CPU."
 fi
 
-# ── Database reachability + schema ───────────────────────────────────────────
-# Checked before the service starts, so a DB problem reports itself here rather
-# than as a restart loop in journalctl.
+# Checked before the service starts, so a database problem reports itself here
+# rather than as a restart loop in journalctl.
 say "checking database connectivity"
 .venv/bin/python - <<'PY' || die "cannot reach the database with the credentials in .env — fix those first."
 import sys
-# Explicit path, not bare load_dotenv(): this block is fed to python on
-# stdin, so find_dotenv() has no caller file to walk up from and dies on
-# an assert - which then reported itself as "cannot reach the database".
+# Explicit path, not bare load_dotenv(): this block reaches python on stdin,
+# so find_dotenv() has no file to search from and fails.
 from dotenv import load_dotenv; load_dotenv(".env")
 import os, psycopg2
 psycopg2.connect(host=os.environ["DB_HOST"], port=os.environ.get("DB_PORT", "5432"),
@@ -125,10 +114,9 @@ psycopg2.connect(host=os.environ["DB_HOST"], port=os.environ.get("DB_PORT", "543
 print(">> database reachable")
 PY
 
-# ── Apache: verify, do not assume ────────────────────────────────────────────
-# The vhost is managed by computing support and is the authority on which port
-# the app must listen on. A mismatch here is invisible from the app side: the
-# process looks healthy and Apache serves 503.
+# Computing support manages the vhost, and it decides which port the app must
+# use. A mismatch is invisible from the app side: the process looks healthy
+# while Apache serves 503.
 APACHE_PORTS=$(grep -rhoE 'ProxyPass\s+.*127\.0\.0\.1:([0-9]+)' \
     /etc/apache2/sites-enabled/ /etc/httpd/conf.d/ 2>/dev/null \
     | grep -oE '[0-9]+$' | sort -u || true)
@@ -144,11 +132,9 @@ else
     say "Apache proxies to 127.0.0.1:$PORT — matches the app"
 fi
 
-# ── Service ──────────────────────────────────────────────────────────────────
-# HOME is overridden for the service either way. libpq looks for an optional
-# client certificate in $HOME/.postgresql/ and treats AFS's "permission denied"
-# as fatal rather than as "there is no certificate"; gradio and huggingface
-# write caches under $HOME too. Pointing it at local disk avoids all of that.
+# HOME is overridden for the service. libpq looks for a client certificate in
+# $HOME/.postgresql/ and treats AFS's "permission denied" as fatal rather than
+# as "no certificate". gradio also writes caches under $HOME.
 mkdir -p "$SVC_HOME"
 SVC_RUN="systemd-run --user --unit=annotation --working-directory=$APP_DIR"
 SVC_RUN="$SVC_RUN --setenv=HOME=$SVC_HOME --setenv=PYTHONUNBUFFERED=1"
@@ -159,20 +145,18 @@ SVC_RUN="$SVC_RUN $APP_DIR/.venv/bin/python app.py"
 
 if command -v systemctl >/dev/null 2>&1 && systemctl --user show-environment >/dev/null 2>&1; then
     if [ "$HOME_FS" = "afs" ]; then
-        # A systemd USER unit is only ever read from ~/.config/systemd/user, and
-        # the user manager has no AFS token — so the file is written, readable by
-        # you, and invisible to systemd, which reports "Unit file does not exist"
-        # while you are looking straight at it. Register it as a TRANSIENT unit
-        # instead: those live in /run/user/UID, on local disk.
+        # systemd reads user units only from ~/.config/systemd/user, and the
+        # user manager has no AFS token. The file is written and readable by
+        # you, but systemd reports "Unit file does not exist". Register a
+        # transient unit instead: those live in /run/user/UID, on local disk.
         say "AFS home detected — registering a transient unit (systemd cannot read units on AFS)"
         systemctl --user stop annotation >/dev/null 2>&1 || true
         systemctl --user reset-failed annotation >/dev/null 2>&1 || true
         eval "$SVC_RUN" >/dev/null || die "could not start the transient service unit."
         # Transient units do not survive a reboot, so cron re-creates it.
-        # XDG_RUNTIME_DIR is what systemd-run --user uses to find the user
-        # manager's bus. cron runs with a bare environment where it is unset,
-        # so without this the @reboot entry fails with "Failed to connect to
-        # bus" — silently, and only at the moment it is needed.
+        # systemd-run --user needs XDG_RUNTIME_DIR to find the user manager's
+        # bus, and cron runs without it. Without this line the @reboot entry
+        # fails with "Failed to connect to bus", only when it is needed.
         { crontab -l 2>/dev/null | grep -vF 'unit=annotation' || true;
           echo "@reboot XDG_RUNTIME_DIR=/run/user/$(id -u) $SVC_RUN"; } | crontab -
         say "transient service started; an @reboot cron entry re-creates it after a reboot"

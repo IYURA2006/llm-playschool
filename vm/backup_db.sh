@@ -1,10 +1,7 @@
 #!/usr/bin/env bash
 # Nightly pg_dump of the study database. Installed into cron by setup_vm.sh.
-#
-# Replaces the SQLite online-backup script this repo used before the Postgres
-# migration. There is no WAL/one-writer rule to respect any more: pg_dump takes
-# a consistent snapshot inside a single transaction, so it is safe to run while
-# annotators are working.
+# pg_dump takes a consistent snapshot in one transaction, so it is safe to run
+# while annotators are working.
 set -euo pipefail
 
 APP_DIR=${APP_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)}
@@ -25,8 +22,8 @@ PGPASSWORD="$DB_PASSWORD" pg_dump \
     --no-owner --no-privileges \
     | gzip > "$FILE"
 
-# A pg_dump that fails partway still leaves a gzip file, so an empty-ish result
-# means the backup did not actually happen — say so rather than pruning a good
+# A pg_dump that fails partway still leaves a gzip file, so a nearly empty
+# result means the backup did not happen. Say so, rather than deleting a good
 # older snapshot in favour of a broken new one.
 if [ "$(stat -f%z "$FILE" 2>/dev/null || stat -c%s "$FILE")" -lt 1024 ]; then
     echo "backup $FILE is suspiciously small — not pruning old snapshots" >&2

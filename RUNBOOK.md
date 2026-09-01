@@ -1,17 +1,17 @@
 # Deploying the annotation app on breezy.inf.ed.ac.uk
 
-Everything the study runs on lives on `main`. There is one deployment path:
-a Python venv under a **systemd user service**, listening on `127.0.0.1:3000`,
-behind the **Apache** reverse proxy that computing support manages.
+Everything the study runs on is on `main`. There is one deployment path: a
+Python venv under a **systemd user service** listening on `127.0.0.1:3000`,
+behind the **Apache** proxy that computing support manages.
 
-The database is managed **PostgreSQL**. The app keeps no durable state on
-disk, so a redeploy is just "pull, reinstall, restart" — nothing to preserve
-in the working directory except `.env`.
+The database is managed **PostgreSQL**. The app saves nothing lasting to disk,
+so a redeploy is just pull, reinstall, restart. The only file worth keeping in
+the working directory is `.env`.
 
 ## Access
 
-Informatics hosts are not reachable from the open internet — connect to the
-University VPN (or be on campus) first.
+Informatics hosts are not reachable from the open internet. Connect to the
+University VPN, or be on campus, first.
 
 ```bash
 ssh s2634187@breezy.inf.ed.ac.uk
@@ -25,18 +25,18 @@ ssh -J s2634187@ssh.inf.ed.ac.uk s2634187@breezy.inf.ed.ac.uk
 bash <(curl -sL https://raw.githubusercontent.com/IYURA2006/llm-playschool/main/vm/setup_vm.sh)
 ```
 
-Idempotent — re-run it to pull the latest `main` and restart. It clones or
-updates the repo, repoints `origin` if `REPO_URL` has changed, validates
-`.env`, builds the venv, checks the database is reachable, compares the app's
-port against the Apache vhost, installs and restarts the systemd user service,
-schedules a nightly `pg_dump`, and smoke-checks the port.
+Safe to re-run: it pulls the latest `main` and restarts. It clones or updates
+the repo, repoints `origin` if `REPO_URL` changed, checks `.env`, builds the
+venv, tests the database connection, compares the app's port with the Apache
+vhost, restarts the service, schedules the nightly `pg_dump` and checks the
+port answers.
 
-**The VM deploys from `IYURA2006/llm-playschool`, which is public** — that is
-what lets the VM clone and re-pull with no credentials at all. The group repo
+**The VM deploys from `IYURA2006/llm-playschool`, which is public.** That is
+why the VM can clone and pull with no credentials. The group repo
 (`esgi-research-group/lm-playschool-human-eval`) is private, so it cannot serve
-either half of the command above: `raw.githubusercontent` returns 404 and an
-anonymous clone fails on `could not read Username`. Deploying from it would
-mean putting a deploy key on the VM.
+either half of the command above: `raw.githubusercontent` returns 404, and an
+anonymous clone fails with `could not read Username`. Using it would mean
+putting a deploy key on the VM.
 
 Both remotes hold the same `main`. Push to **both**, or a redeploy silently
 ships without whatever only reached the other one:
@@ -45,20 +45,18 @@ ships without whatever only reached the other one:
 git push origin main && git push eval main
 ```
 
-If `git pull --ff-only` fails with *"Not possible to fast-forward"*, `main` was
-rewritten upstream (a force-push). The working directory holds nothing that
-needs preserving except `.env`, which is untracked, so it is safe to take the
-remote's version wholesale:
+If `git pull --ff-only` fails with *"Not possible to fast-forward"*, someone
+force-pushed `main`. The working directory holds nothing worth keeping except
+`.env`, which is untracked, so it is safe to take the remote's version:
 
 ```bash
 git -C ~/llm-playschool fetch origin main
 git -C ~/llm-playschool reset --hard origin/main
 ```
 
-On a first run it will stop and tell you to fill in `.env`. That is deliberate:
-it refuses to invent database credentials, because an app started without them
-dies inside `_require_db_config()` at import while Apache goes on serving a
-503 with nothing in the app's own log to explain it.
+On a first run it stops and asks you to fill in `.env`. That is deliberate: it
+will not invent database credentials. An app started without them dies at
+import while Apache keeps serving a 503, with nothing in the app's log.
 
 ## `.env` on the VM
 
@@ -72,13 +70,12 @@ DB_GSSENCMODE=disable
 GAMES_DIR=games_study
 ```
 
-- `GAMES_DIR=games_study` is mandatory. `games/` is the 234-transcript pilot
-  pool and shares zero slugs with the study's 416; `app.py` refuses to boot if
-  the inventory disagrees with the batch manifest.
+- `GAMES_DIR=games_study` is required. `games/` is the pilot pool and shares no
+  slugs with the study's 416. `app.py` refuses to start if the two disagree.
 - **Do not set `PORT`** unless Apache is proxying somewhere other than 3000.
-- **Do not set `GRADIO_SERVER_NAME`.** Gradio's default 127.0.0.1 bind is what
-  keeps Apache the only public entry point; `0.0.0.0` would publish the app
-  directly over plain HTTP.
+- **Do not set `GRADIO_SERVER_NAME`.** Gradio's default 127.0.0.1 bind keeps
+  Apache the only public entry point. `0.0.0.0` would publish the app directly
+  over plain HTTP.
 
 ## Database, once
 

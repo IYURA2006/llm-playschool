@@ -66,8 +66,8 @@ no extra download is needed.
 ## Exporting the collected data
 
 `export_annotations.py` turns the database into an analysis-ready snapshot.
-It reads the same `DB_*` settings from `.env` that the app uses, and opens
-the connection **read-only**, so it cannot change anything. That means it is
+It reads the same `DB_*` settings from `.env` as the app, and opens the
+connection **read-only**, so it cannot change anything. That means it is
 safe to run while the study is still collecting — the coverage section
 doubles as a progress monitor.
 
