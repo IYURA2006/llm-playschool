@@ -1,9 +1,9 @@
 """Batch assignment for the Prolific study.
 
-A sitting is one whole curated BATCH: one game, one model, 4-13 transcripts.
-The count is chosen so the sitting is about 20 minutes, balanced on rateable
-turns (see batch_plan.json). Each batch is completed independently by
-COVERAGE_TARGET annotators.
+A sitting is one whole curated BATCH: one game, one model, 2-7 transcripts.
+The count is chosen so the sitting is about 20 minutes of real work, using
+modelled annotator time rather than turn count (see batch_plan.json). Each
+batch is completed independently by COVERAGE_TARGET annotators.
 
 A reservation is a placeholder row in db.py's `annotations` table — its
 UNIQUE(game_slug, annotator_id, condition) constraint is what makes the claim
