@@ -63,6 +63,30 @@ the full text.
 Game transcripts under `games/` are already included in this repository —
 no extra download is needed.
 
+## The question set
+
+Every question annotators see lives in `questions.py`. That file is the single
+source; nothing else needs editing to change a question.
+
+```bash
+python questions.py --show dond    # exactly what an annotator sees for a game
+python questions.py --check        # validate every entry; exits non-zero on error
+```
+
+Neither command needs a database or a browser.
+
+`question_set.md` is the readable version of the same thing: the Shared Core,
+the end-of-game questions, and every game's own questions with their scales.
+**Do not edit it by hand** — it is generated, and a hand-written copy goes stale
+without anyone noticing. Regenerate it after changing `questions.py`:
+
+```bash
+GAMES_DIR=games_study python questions.py --markdown > question_set.md
+```
+
+Changing a question that already has data does not corrupt it, but it does split
+that game across two question sets. See the notes at the top of `questions.py`.
+
 ## Exporting the collected data
 
 `export_annotations.py` turns the database into an analysis-ready snapshot.
@@ -111,6 +135,42 @@ treat them like any other personal data, and remove or replace the column
 before sharing anything outside it. And re-submitting a game overwrites its
 previous answers, so only each annotator's final submission exists.
 
+## Estimating study cost
+
+`compute_price/cost_estimate.py` prices an annotation study from the real
+results archive. For each game it counts the episodes all four models finished
+without aborting, caps the instances you ask for at that number, and works out
+total minutes, sessions, participant pay, Prolific's fee and VAT.
+
+```bash
+cd compute_price
+python3 cost_estimate.py
+```
+
+That runs the default: option 3, 10 instances per game, 2 annotators, 4 models.
+To vary it:
+
+```bash
+python3 cost_estimate.py --option 1 --instances 8 --annotators 1
+python3 cost_estimate.py --option 2 --instances 13
+```
+
+`--option 1` is the 8 study games, `2` a 4-game subset, `3` all 17.
+
+**The results archive is not in this repository.** At 307 MB it is past
+GitHub's 100 MB file limit. Download `lm-playschool-2026-final-results.zip`
+from OneDrive and put it **inside `compute_price/`**, next to the script. It is
+found automatically from there — no path argument, and it works from any
+directory. Without it you get:
+
+```
+No results archive found next to this script.
+```
+
+One caveat when reading the output: four of the 17 games have no episodes that
+all four models completed (ST Clean Up, Mastermind, Wordle Crazy, Tower of
+Hanoi), so "all 17 games" is really 13 with usable data.
+
 ## Project structure
 
 | File / folder            | What it does                                                        |
@@ -124,7 +184,15 @@ previous answers, so only each annotator's final submission exists.
 | `assignment.py`            | Picks which games each participant annotates, and keeps coverage balanced. |
 | `db.py`                    | Saves annotations to a PostgreSQL database.                          |
 | `export_annotations.py`    | Read-only export of the collected annotations, plus a quality report. |
+| `questions.py`             | Every annotation question and scale. Also `--show`, `--check`, `--markdown`. |
+| `question_set.md`          | Readable question set. Generated from `questions.py`; do not hand-edit. |
+| `study_set.py`             | Reads the batch manifest that assignment works from.                 |
+| `build_batches.py`         | Builds the batch plan (one batch = one game + one model).            |
+| `build_study_set.py`       | Builds `games_study/` from the full transcript pool.                 |
 | `games/`                   | Game transcripts (clembench format) shown for annotation.            |
+| `games_study/`             | The curated 416 transcripts the study actually serves.               |
+| `compute_price/`           | Prolific cost estimator. Needs the results zip from OneDrive.        |
+| `vm/`                      | Deployment for breezy: setup script, systemd unit, nightly backup.   |
 | `postgres_schema.sql`      | Database table definitions.                                          |
 
 ## Learn more
