@@ -3,14 +3,18 @@
     python build_batches.py            # write batches.csv
     python build_batches.py --dry-run
 
-One batch = ONE game and ONE model. Each of the 17 templates in batch_plan.json
-is repeated for all four models, giving 68 batches; each is completed
-independently by 3 annotators, so 204 participant sittings over 416 transcripts
+One batch = ONE game and ONE model. Each of the 13 templates in batch_plan.json
+is repeated for all four models, giving 52 batches; each is completed
+independently by 3 annotators, so 156 participant sittings over 416 transcripts
 and 1,248 transcript judgements.
 
-Batch sizes deliberately vary (13, 7, 6, 5, 4) because annotation burden does,
-and a uniform split cannot see that: ReferenceGame is always two responses so 13
-fit one sitting, while PrivateShared reaches 30 responses and needs three.
+Batch sizes vary (13, 7, 6, 5, 4) so that a sitting is about 20 minutes.
+Instances are balanced on rateable turns, because a turn is one set of
+questions: ReferenceGame is always two turns, so all 13 fit one sitting, while
+Codenames averages 12.6 and needs three templates.
+
+Two templates cannot reach 20 minutes. REF-1 and WCC-1 already hold all 13
+instances of their game, and those games run 2.0 and 1.3 turns per transcript.
 
 `template_id` is the column that makes the cross-model rule enforceable. Every
 model's version of a template contains the SAME instances, so an annotator who
