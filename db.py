@@ -35,9 +35,8 @@ def _require_db_config():
         )
 
 
-# The schema lives in postgres_schema.sql and is read from disk, not duplicated
-# here. The two used to be maintained in parallel by hand, which meant a column
-# added to one silently did not exist in the other.
+# The schema is read from postgres_schema.sql, never copied here. Keeping two
+# copies by hand meant a new column could exist in only one of them.
 _SCHEMA_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)),
                             "postgres_schema.sql")
 
@@ -47,10 +46,9 @@ with open(_SCHEMA_PATH) as _fh:
 _TABLES = ("annotations", "turn_ratings", "consents", "practice_completions",
            "question_sets")
 
-# Columns added after the first deployment. CREATE TABLE IF NOT EXISTS is a
-# no-op on an existing table, so a database created before these were added
-# still satisfies the table check while missing every one of them — which is
-# exactly how dimensions would end up silently NULL. Verified explicitly.
+# Columns added after the first deployment. CREATE TABLE IF NOT EXISTS does
+# nothing to an existing table, so an older database passes the table check
+# while missing all of these. Checked here explicitly.
 _REQUIRED_COLUMNS = {
     "annotations": ("model_id", "domain", "game", "experiment", "instance",
                     "batch_id", "template_id", "question_set_hash"),
@@ -136,8 +134,7 @@ def init_db():
         _check_schema_exists()
 
 
-# Fixed key for the advisory lock guarding assignment.py's read-decide-write
-# reservation sequence (see write_transaction below).
+# Fixed key for the advisory lock around assignment.py's reservation sequence.
 _ASSIGNMENT_LOCK_KEY = 1
 
 
@@ -177,9 +174,8 @@ def _touch_session(cur, annotation_id, annotator_id, condition, now):
     )
 
 
-# Study dimensions carried on every annotation row. db.py deliberately does not
-# import study_set — it has no study knowledge, and study_set -> annotation -> db
-# would be a cycle. Callers pass a plain dict.
+# Study dimensions carried on every annotation row. db.py does not import
+# study_set: that would be a cycle. Callers pass a plain dict.
 _DIMS = ("model_id", "domain", "game", "experiment", "instance")
 
 
@@ -591,15 +587,15 @@ def save_verdict(game_slug, annotator_id, condition, coherence, overall, comment
         row = cur.fetchone()
         ok = row is not None
         if ok:
-            # Finishing a game is activity too — keep the rest of the sitting
-            # leased so it can't be claimed out from under them.
+            # Finishing a game counts as activity, so the rest of the sitting
+            # stays leased and cannot be claimed by someone else.
             _touch_session(cur, row[0], annotator_id, condition, now)
     return ok
 
 
-# Connecting at import time means `import annotation` (which imports this) needs a
-# live database — that makes every file-only test, and the export's own decoding,
-# impossible to run off the VM. SKIP_DB_INIT=1 opts out; app.py always initialises.
+# Connecting at import would make `import annotation` need a live database, so
+# no file-only test or export could run off the VM. SKIP_DB_INIT=1 opts out;
+# app.py always initialises.
 if os.environ.get("SKIP_DB_INIT") != "1":
     _require_db_config()
     init_db()

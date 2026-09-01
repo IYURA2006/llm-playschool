@@ -51,7 +51,6 @@ _STRAIGHTLINE_MIN_TURNS = 3
 _UNRESOLVED = "<UNRESOLVED: question set changed since collection>"
 
 
-# ---------------------------------------------------------------- connection
 
 def open_readonly():
     """A psycopg2 connection that physically cannot write. Deliberately not
@@ -85,14 +84,12 @@ def fetch_all(conn):
                        "COALESCE(session_index, 1), id"),
             _rows(cur, "SELECT * FROM turn_ratings ORDER BY annotation_id, turn_index"),
             _rows(cur, "SELECT annotator_id, consented_at FROM consents"),
-            # Question sets recorded at collection time. Storing the spec, not
-            # just its hash, is what lets a row whose questions have since
-            # changed still decode correctly instead of merely being flagged.
+            # Storing the whole spec, not just its hash, is what lets a row
+            # whose questions have since changed still decode correctly.
             _rows(cur, "SELECT * FROM question_sets"),
         )
 
 
-# ------------------------------------------------------------------ decoding
 
 def load_annotation_module():
     """Import annotation.py for the question definitions.
@@ -172,9 +169,8 @@ class Decoder:
         (dond/coop_en/…) the family is not the first path part."""
         path = self.path_for(slug)
         if path is None:
-            # The old fallback split the slug and returned its first segment,
-            # which under the study tree is the MODEL id — a plausible-looking
-            # family name that then indexes BESPOKE_QUESTIONS to {} silently.
+            # Returning the slug's first segment would give the model id under
+            # the study tree, which then looks up no questions at all.
             return ""
         return self.a.game_key(path)
 
@@ -211,13 +207,12 @@ class Decoder:
                 slots[slot] = generic
             elif cfg is not None:
                 slots[slot] = cfg
-            # cfg is None → the slot is not rendered for this role; omit it so
-            # the export shows "not asked" rather than an empty answer.
+            # None means the slot is not rendered for this role. Omit it, so
+            # the export says "not asked" instead of showing a blank answer.
         # Q3 is always present in the payload — preset to "NA" when hidden.
         slots["q3"] = self.a.GENERIC_Q3
-        # First-turn-only bolt-ons are appended to the same list: the caller
-        # skips any key a turn has no answer for, so turns where it was never
-        # asked simply carry nothing.
+        # First-turn bolt-ons go in the same list. The caller skips any key a
+        # turn has no answer for, so other turns simply carry nothing.
         return slots, (list(role_cfg.get("bolt_ons") or [])
                        + list(role_cfg.get("bolt_ons_first_turn") or []))
 
@@ -244,8 +239,7 @@ class Decoder:
             return None
         try:
             g = self.a.load_game(path)
-            # Use the app's own decision, never a local guess — see
-            # annotation.show_q3_for.
+            # Use the app's own decision, never a local guess.
             return self.a.question_spec_hash(
                 self.a.question_spec(g, condition, self.a.show_q3_for(g, condition)))
         except Exception:
@@ -256,8 +250,8 @@ class Decoder:
         return bool(path) and self.a.whole_game_only(path, condition)
 
     def coherence_label(self, value):
-        # _COHERENCE is [(value, short, long), …] — not the (display, value)
-        # shape label_for expects, so match on the first element.
+        # _COHERENCE is (value, short, long), not the shape label_for expects,
+        # so match on the first element.
         for val, short, _long in self.v._COHERENCE:
             if str(val) == str(value):
                 return short
@@ -270,7 +264,6 @@ class Decoder:
         return ""
 
 
-# ------------------------------------------------------------ row assembly
 
 def classify(row, has_turns, hybrid_condition):
     """('complete' | 'partial' | 'placeholder', is_debug).
@@ -285,8 +278,8 @@ def classify(row, has_turns, hybrid_condition):
         status = "partial"
     else:
         status = "placeholder"
-    # '' is db.py's "identity not resolved" sentinel; a non-hybrid condition
-    # only ever comes from a legacy debug link, never from assignment.py.
+    # '' means db.py could not resolve the identity. A non-hybrid condition can
+    # only come from a debug link, never from assignment.py.
     is_debug = not row["annotator_id"] or row["condition"] != hybrid_condition
     return status, is_debug
 
@@ -307,8 +300,8 @@ def build(annotations, turn_rows, consents, decoder, hybrid_condition,
     for t in turn_rows:
         turns_by_annotation[t["annotation_id"]].append(t)
 
-    # Session duration is the span from the sitting's start to its last
-    # verdict, so it needs every row of that sitting (see app.py's own note).
+    # Session duration runs from the sitting's start to its last verdict, so it
+    # needs every row of that sitting.
     last_verdict = {}
     for a in annotations:
         if a["verdict_at"] is None:
@@ -341,9 +334,8 @@ def build(annotations, turn_rows, consents, decoder, hybrid_condition,
             last_verdict.get((a["annotator_id"], a["session_index"] or 1)),
         )
 
-        # Whole-game (verdict) bespoke answers. Keys are question IDs (see
-        # annotation.normalise_whole_game); older rows may still carry positional
-        # keys ("0", "1"), which are resolved by index as a fallback and flagged.
+        # Whole-game answers, keyed by question id. Older rows may still use
+        # positional keys ("0", "1"); those are resolved by index and flagged.
         wg_questions = decoder.whole_game(slug, condition)
         by_id = {qid: (qid, md, ch) for qid, md, ch in wg_questions}
         stored = parse_json(a["verdict_specific"], integrity,
@@ -352,8 +344,8 @@ def build(annotations, turn_rows, consents, decoder, hybrid_condition,
         for key, value in sorted(stored.items()):
             entry, positional = by_id.get(key), False
             if entry is None:
-                # Legacy positional key. Only trustworthy when the list length
-                # still matches, since a reorder is undetectable by position.
+                # Old positional key. Only safe when the list length still
+                # matches, since a reorder cannot be detected by position.
                 idx = numeric(key)
                 if (idx is not None and len(stored) == len(wg_questions)
                         and 0 <= idx < len(wg_questions)):
@@ -432,8 +424,7 @@ def build(annotations, turn_rows, consents, decoder, hybrid_condition,
                     "label": label_for(choices, extra[key]),
                     "is_bespoke": True,
                 }
-            # Flags are stored as their full English sentences, so they need no
-            # lookup — a bespoke override changes the wording, not a code.
+            # Flags are stored as full sentences, so they need no lookup.
             flags = parse_json(t["flags"], integrity,
                                f"turn_ratings.id={t['id']}.flags") or []
             decoded_turns.append({
@@ -476,14 +467,13 @@ def _straightlined(turns):
         for question_id, resp in t["responses"].items():
             values[question_id].add(str(resp["value"]))
             asked[question_id] += 1
-    # A question asked only once or twice is constant by construction, not by
-    # the annotator clicking down a column.
+    # A question asked only once or twice is constant by design, not because
+    # the annotator clicked straight down a column.
     if not asked or max(asked.values()) < _STRAIGHTLINE_MIN_TURNS:
         return False
     return all(len(v) == 1 for v in values.values())
 
 
-# ------------------------------------------------------------------- output
 
 def _iso(value):
     return value.isoformat() if isinstance(value, datetime) else value
@@ -500,9 +490,8 @@ def write_csv(path, rows, columns):
 
 _ANNOTATION_COLUMNS = [
     "id", "status", "is_debug", "game_slug",
-    # Study dimensions, stamped at collection time (see db.save_turns). game_key
-    # is kept alongside `game` on purpose: they are derived independently, so a
-    # disagreement between them is an alarm worth being able to see.
+    # Stamped when the data was collected. game_key sits next to `game` on
+    # purpose: they are derived separately, so a disagreement is worth seeing.
     "model_id", "domain", "game", "experiment", "instance",
     "batch_id", "template_id",
     "question_set_hash", "question_set_status",
@@ -525,8 +514,8 @@ _LONG_COLUMNS = [
     "scope", "turn_index", "from_player", "role",
     "question_id", "question_text", "is_bespoke",
     "response_value", "response_label", "response_numeric",
-    # Free text (turn comments). Empty on every coded row — the file stays
-    # analysable, but comments stop being trapped in a table nobody exports.
+    # Turn comments. Empty on coded rows, so the file stays analysable while
+    # the comments still leave the database.
     "response_text",
 ]
 
@@ -538,10 +527,8 @@ def annotation_rows(records, consented_at=None):
     rows = []
     for r in records:
         row = dict(r)
-        # Consent used to reach the export only via participants.csv. Without it
-        # here, nothing in a snapshot shows that every annotator consented.
+        # Without this, nothing in a snapshot shows that every annotator consented.
         row["consented_at"] = consented_at.get(r["annotator_id"])
-        # Whole-game answers flattened alongside the generic verdict columns.
         # Named by question id, so a column means the same thing across exports
         # even if the question order changes.
         for wg in r["whole_game_responses"]:
@@ -624,7 +611,6 @@ def long_rows(records):
     return rows
 
 
-# ------------------------------------------------------------ quality report
 
 
 # ---------------------------------------------------------------------- CLI

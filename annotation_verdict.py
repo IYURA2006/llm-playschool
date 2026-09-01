@@ -48,8 +48,7 @@ def _coh_select(chosen):
 
 
 def _overall_update(err):
-    # .ovr-slider-err is a dedicated rule since a Slider's DOM shape differs
-    # from a Radio's (reused for the coherence radio-error styling too).
+    # A Slider's DOM differs from a Radio's, so the error style needs its own rule.
     classes = ["ovr-slider", "ovr-slider-err"] if err else ["ovr-slider"]
     return gr.update(elem_classes=classes)
 
@@ -73,9 +72,8 @@ def _verdict_save_and_clear(game_path, annotator_id, condition, playlist, playli
 
     A slider is never falsy, so overall_touched (set only by .release()) is
     the sole signal for whether G2 was actually answered."""
-    # Hybrid-only game-specific whole-game question(s): mandatory when shown.
-    # `specific` is the accumulated {question_id: value} dict from specific_state.
-    # Keyed by id, not position — see annotation.normalise_whole_game.
+    # Game-specific whole-game questions; required when shown. `specific` is
+    # {question_id: value}, keyed by id and never by position.
     wg = whole_game_questions(game_path or DEFAULT_GAME, condition)
     wg_only = whole_game_only(game_path or DEFAULT_GAME, condition)
     specific = specific or {}
@@ -101,12 +99,12 @@ def _verdict_save_and_clear(game_path, annotator_id, condition, playlist, playli
         )
 
     slug = game_slug(game_path or DEFAULT_GAME)
-    # For whole_game_only games the generic G1/G2 are hidden, so don't persist
-    # their (untouched) defaults — store NULL; the answers live in verdict_specific.
+    # G1/G2 are hidden for whole_game_only games, so store NULL rather than
+    # their untouched defaults. The answers live in verdict_specific.
     save_coherence = None if wg_only else coherence
     save_overall = None if wg_only else int(overall)
-    # Recompute the fingerprint and let db.save_verdict refuse if it moved since
-    # the turns were saved — see db.QuestionSetChanged.
+    # Recompute the fingerprint; save_verdict refuses if it moved since the
+    # turns were saved.
     try:
         _g = load_game(game_path or DEFAULT_GAME)
         _spec = question_spec(_g, condition, bool(_g.has_reasoning))
@@ -143,8 +141,8 @@ def _verdict_save_and_clear(game_path, annotator_id, condition, playlist, playli
             False,
         )
 
-    # Saved OK. _verdict_finish sets the real status text; only clear widgets
-    # here if we're about to advance to another playlist game.
+    # Saved. _verdict_finish sets the status text; only clear the widgets if
+    # another game follows.
     if playlist and playlist_idx + 1 < len(playlist):
         return (
             "",
@@ -188,10 +186,9 @@ def _verdict_finish(ok, playlist, playlist_idx):
     if playlist_idx + 1 >= len(playlist):
         return (
             gr.skip(),                   # clearing_state — irrelevant from here on
-            # The link is the action, not a fallback. There used to be a 3s
-            # auto-redirect here; it was an uncontrollable time limit (WCAG
-            # 2.2.1) and a screen-reader user would not have finished reading
-            # this before the page vanished.
+            # The link is the action, not a fallback. A 3s auto-redirect used
+            # to sit here, but that is a time limit the user cannot control
+            # (WCAG 2.2.1) and it cut screen-reader users off mid-sentence.
             "🎉 Thank you — you've completed all games in this session!\n\n"
             f"### [Return to Prolific to confirm completion]({PROLIFIC_COMPLETION_URL})\n\n"
             "Your work is already saved. You must follow this link for your "
@@ -211,8 +208,7 @@ def _verdict_finish(ok, playlist, playlist_idx):
         datetime.now().isoformat(),   # started_at
         gr.update(visible=True),      # annotation_page
         gr.update(visible=False),     # verdict_page
-        # Relabel here, not via a separate listener on playlist_idx_state —
-        # a standalone listener races with annotation.py's own @gr.render.
+        # Relabel here: a separate listener would race with annotation.py's render.
         gr.update(value=_action_label(playlist, new_idx)),
     )
 
@@ -221,14 +217,11 @@ def build(welcome_page, annotation_page, verdict_page,
           game_state, annotator_state, block_state, playlist_state,
           playlist_idx_state, started_at_state, session_day_state, clearing_state):
     with verdict_page:
-        # This screen started at h2 with no h1 above it. sr-only rather than
-        # promoting the visible "## Overall Verdict", which would resize it.
-        # Also the a11y module's focus target on screen change.
+        # The screen had no h1. Hidden rather than promoting the visible
+        # heading, which would resize it. Also the a11y focus target.
         gr.HTML('<h1 class="a11y-sr-only" tabindex="-1">'
                 'Overall verdict — step 2 of 2</h1>')
 
-        # Re-renders whenever game_state changes, to reflect whichever game
-        # was selected for annotation.
         with gr.Row(elem_classes=["annot-topnav"]):
             @gr.render(inputs=[game_state])
             def _verdict_nav(path):
@@ -254,7 +247,7 @@ def build(welcome_page, annotation_page, verdict_page,
         gr.Markdown("You have rated all individual turns. Now give your overall assessment of this game session.")
 
         # .g1-card / .g2-card let the head script hide the generic pair for
-        # whole_game_only games — see #verdict-page.hide-generic in app.py.
+        # whole_game_only games.
         with gr.Group(elem_classes=["question-card", "g1-card"]):
             gr.Markdown("### G1 — Strategic Coherence")
             gr.Markdown("How well did the AI stick to and adapt its plan throughout the game?")
@@ -262,10 +255,9 @@ def build(welcome_page, annotation_page, verdict_page,
             with gr.Row(equal_height=True):
                 for v, name, desc in COHERENCE:
                     with gr.Column(scale=1, min_width=0, elem_classes=["coh-col"]) as col:
-                        # A div, not "## {v}" — as markdown these rendered as
-                        # four <h2>s whose entire text was a bare digit, which
-                        # wrecked heading navigation. The number is decorative;
-                        # the JS radiogroup names each option from it instead.
+                        # A div, not markdown: as "## {v}" these became four
+                        # headings containing only a digit, which broke heading
+                        # navigation. The number is decorative.
                         gr.HTML(f'<div class="coh-num">{v}</div>')
                         gr.Markdown(f"**{name}**", elem_classes=["coh-lbl-md"])
                         gr.Markdown(desc, elem_classes=["coh-desc-md"])
@@ -290,11 +282,9 @@ def build(welcome_page, annotation_page, verdict_page,
                 f'<span class="ovr-end-desc">{_hi_desc}</span></div>'
                 '</div>'
             )
-            # overall_touched tracks whether this was actually moved (see the
-            # docstring on _verdict_save_and_clear for why the value alone can't tell).
-            # Gradio hard-codes aria-label="range slider for {label}" on the
-            # input, so the label reads best as a noun phrase. Without it the
-            # control literally announces "range slider for null".
+            # overall_touched tracks whether the slider was actually moved; the
+            # value alone cannot tell. Gradio builds the aria-label as "range
+            # slider for {label}", so the label must read as a noun phrase.
             overall = gr.Slider(
                 minimum=1, maximum=7, step=1, value=4,
                 label="G2 — Overall Game Quality, 1 to 7",
@@ -302,9 +292,8 @@ def build(welcome_page, annotation_page, verdict_page,
             )
             overall_touched = gr.State(False)
 
-        # Bespoke whole-game questions, hybrid only. The .wg-only marker below
-        # tells the head script to hide G1/G2 for whole_game_only games.
-        # Each widget writes into specific_state so the save chain stays fixed-shape.
+        # Game-specific whole-game questions. Each widget writes into
+        # specific_state, so the save chain keeps a fixed shape.
         specific_state = gr.State({})
 
         @gr.render(inputs=[game_state, block_state])
@@ -336,8 +325,8 @@ def build(welcome_page, annotation_page, verdict_page,
                         s = gr.Slider(minimum=1, maximum=n, step=1, value=(1 + n) // 2,
                                       label=f"{plain_label(q_md)}, 1 to {n}",
                                       show_label=False, elem_classes=["ovr-slider"])
-                        # .release only (a user gesture) — an untouched slider stays
-                        # OUT of specific_state, so validation still catches "unanswered".
+                        # .release only, so an untouched slider stays out of
+                        # specific_state and still counts as unanswered.
                         s.release(
                             fn=lambda val, cur, k=qid: {**(cur or {}), k: str(int(val))},
                             inputs=[s, specific_state], outputs=[specific_state],
@@ -364,8 +353,7 @@ def build(welcome_page, annotation_page, verdict_page,
             back_btn = gr.Button("← Back to Annotation", variant="secondary")
             action_btn = gr.Button(_action_label([], 0), variant="primary")
 
-        # Local-only pass-through signal for the click chain below — never
-        # threaded to app.py.
+        # Local signal for the click chain below; never passed to app.py.
         verdict_ok_state = gr.State(False)
 
         for i, (val, *_) in enumerate(COHERENCE):
@@ -392,10 +380,8 @@ def build(welcome_page, annotation_page, verdict_page,
                      block_state, started_at_state, annotation_page, verdict_page,
                      action_btn],
         ).then(
-            # Move focus to the completion link. Nothing else remains to do on
-            # this page, and for a screen-reader user it's the last action of
-            # the study. (This replaced a 3-second auto-redirect, which was an
-            # uncontrollable time limit under WCAG 2.2.1 — see _verdict_finish.)
+            # Move focus to the completion link: it is the last action of the
+            # study and nothing else remains on the page.
             fn=None,
             inputs=[status],
             outputs=None,
@@ -409,8 +395,7 @@ def build(welcome_page, annotation_page, verdict_page,
             }""",
         )
 
-        # Syncs the label for the first view only — _verdict_finish's own
-        # action_btn output resyncs it after that (see its comment above).
+        # First view only; _verdict_finish resyncs the label after that.
         def _sync_action_label(playlist, playlist_idx):
             return gr.update(value=_action_label(playlist, playlist_idx))
 

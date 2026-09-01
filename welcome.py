@@ -63,8 +63,8 @@ def _turn_scales_html():
         '<span class="scale-star"> *</span></h3>'
         + _generic_html(GENERIC_Q1)
         + _generic_html(GENERIC_Q2)
-        # Q3's 5th choice is "N/A", which is an escape hatch rather than a
-        # point on the scale, so the range reads 1-4 and N/A is explained.
+        # Q3's "N/A" is an escape hatch, not a scale point, so the range reads
+        # 1-4 and N/A is explained in words.
         + _generic_html(GENERIC_Q3, points=4,
                         note="This one appears only when the AI explains its "
                              "thinking; otherwise choose N/A.")
@@ -95,12 +95,12 @@ def _verdict_scales_html():
 def _start(err, playlist, block, annotator):
     """Route the Start click: error banner > consent gate > playlist (resumes
     at the first game without a submitted verdict) > legacy single-game link."""
-    # Never visible=False — Gradio 6 lazily mounts hidden columns, and
-    # visible=False on a never-mounted column breaks a later visible=True.
+    # Never send visible=False to a column that has never been mounted: Gradio
+    # mounts hidden columns lazily, and a later visible=True then fails.
     noop = gr.update()
 
-    # Last element is always clearing_state=False — Start's first chained
-    # event set it True to blank the page; every branch here resets it.
+    # Start's first event sets clearing_state True to blank the page; every
+    # branch here resets it to False.
     def stay(note, show_popup=False):
         return (noop, noop, noop, gr.skip(), gr.skip(), gr.skip(), gr.skip(),
                 gr.skip(), gr.skip(), gr.skip(), gr.skip(), note,
@@ -113,13 +113,12 @@ def _start(err, playlist, block, annotator):
     if annotator and not db.has_consented(annotator):
         return stay("", show_popup=True)
 
-    # Doubles as the session clock (practice counts toward it) and the first
-    # game's clock; training re-stamps started_at once real annotation begins.
+    # Serves as both the session clock and the first game's clock; training
+    # re-stamps started_at when real annotation begins.
     now = datetime.now().isoformat()
 
     if playlist:  # the general study's link — the only path a real participant takes
-        # Recompute resume position at click time: the completed set may have
-        # grown since page load (or since a Back → Start round-trip).
+        # Recompute at click time: the completed set may have grown since load.
         done = db.completed_pairs(annotator)
         idx = next((i for i, it in enumerate(playlist)
                     if (it["game"], it["condition"]) not in done), None)
@@ -133,10 +132,8 @@ def _start(err, playlist, block, annotator):
             return stay(f"Cannot start — your assignment references an "
                         f"unknown game ({item['game']!r}). Please tell the "
                         f"study coordinator.")
-        # Practice only for a first-timer. Gated on a persisted flag, not the
-        # session index — a mid-session-1 page reload used to replay it.
-        # has_completed_practice("") is False, so the legacy debug link
-        # (annotator="") still gets it, as it did before.
+        # Practice for first-timers only, gated on a stored flag rather than
+        # the session index, because a reload used to replay it.
         if not db.has_completed_practice(annotator):
             pages = (gr.update(visible=False), noop, gr.update(visible=True))
         else:          # resuming → straight to annotation
@@ -197,8 +194,7 @@ def build(welcome_page, annotation_page, training_page, error_state,
                     '</div>'
                 )
 
-            # Malformed-link banner — only visible when app.load's session-param
-            # parsing (app.py) found a missing/invalid annotator, block, or game.
+            # Shown only when app.py found a missing or invalid link parameter.
             @gr.render(inputs=[error_state])
             def _error_banner(msg):
                 if msg:
@@ -214,9 +210,8 @@ def build(welcome_page, annotation_page, training_page, error_state,
                 elem_classes=["welcome-sub"],
             )
 
-            # Batches are not a fixed size (4 to 13 transcripts), so the count
-            # has to be read from the assigned playlist rather than stated as a
-            # constant. Same render-on-state pattern as the error banner above.
+            # Batches hold 4 to 13 transcripts, so the count must be read from
+            # the assigned playlist rather than written here.
             with gr.Column(elem_classes=["session-line"]):
                 @gr.render(inputs=[playlist_state])
                 def _session_size(pl):
@@ -225,8 +220,8 @@ def build(welcome_page, annotation_page, training_page, error_state,
                                     f"{_transcripts(len(pl))} to rate.",
                                     elem_classes=["welcome-sub"])
 
-            # The step cards are h3s; without this the outline jumps h1 -> h3.
-            # sr-only rather than a visible heading so the layout is untouched.
+            # The cards are h3s, so without this the outline jumps h1 to h3.
+            # Hidden, so the layout is unchanged.
             gr.HTML('<h2 class="a11y-sr-only">How the study works</h2>')
 
             with gr.Row(equal_height=True, elem_classes=["step-row"]):
@@ -242,10 +237,8 @@ def build(welcome_page, annotation_page, training_page, error_state,
                     "play. Judge the **thinking**, not the outcome."
                 )
 
-            # Was bold body text acting as a heading for the whole scale group.
-            # The old copy claimed one 1-4 scale covered every scored question;
-            # it covered none of them, so both groups below are generated from
-            # the question definitions themselves instead of being retyped.
+            # Both groups below are generated from the question definitions,
+            # so the page cannot describe a scale the app no longer uses.
             gr.HTML('<h2 class="rating-scale-h">Rating scales'
                     '<span> - the words beside each number change from question '
                     'to question, so read them before you choose</span></h2>')
@@ -270,9 +263,8 @@ def build(welcome_page, annotation_page, training_page, error_state,
                 elem_classes=["welcome-foot"],
             )
 
-            # target=_blank so following it never costs a participant their
-            # session: this page holds the playlist and consent state, and a
-            # same-tab navigation away from it would drop both.
+            # target=_blank: this page holds the playlist and consent state, and
+            # navigating away in the same tab would lose both.
             gr.HTML(
                 '<p class="welcome-foot a11y-foot">'
                 '<a href="/gradio_api/file/accessibility.html" target="_blank" '
@@ -301,9 +293,8 @@ def build(welcome_page, annotation_page, training_page, error_state,
             outputs=[clearing_state, consent_popup, popup_note],
         ).then(_start, inputs=_start_inputs, outputs=_start_outputs)
 
-        # Declining just closes the popup and leaves them on welcome — no
-        # consent recorded, nothing started. Hides an already-mounted column,
-        # exactly as _confirm_consent does, so it's safe for the blank-page bug.
+        # Declining closes the popup and records nothing. Hides an already
+        # mounted column, so it is safe from the blank-page bug above.
         decline_btn.click(
             _decline_consent,
             inputs=None,

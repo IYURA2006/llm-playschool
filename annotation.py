@@ -9,20 +9,14 @@ import os
 import re
 
 import db
-# The questions themselves live in questions.py — data only, with a
-# --check/--show CLI. They are re-exported here because every other
-# module reads them off annotation.
+# Re-exported here because other modules read them off annotation.
 from questions import (BESPOKE_QUESTIONS, GENERIC_Q1, GENERIC_Q2,
                        GENERIC_Q3, SC_TICKS, SC_TICK_D)
 
-# Games are found automatically from games/ — nothing here is hardcoded.
-
 _dir = os.path.dirname(os.path.abspath(__file__))
-# GAMES_DIR lets the study run off a curated tree (games_study/, built by
-# build_study_set.py) without disturbing the original games/ pool. Discovery,
-# game_slug and game_key are all depth-agnostic, so the extra model level in
-# the study tree needs no other change: game_key takes the 4th-from-last part,
-# which is still the game family.
+# GAMES_DIR picks the tree to serve: games_study/ for the study, games/ for the
+# pilot pool. game_key reads the 4th-from-last path part, so the study tree's
+# extra model level needs no other change.
 _games_dir = os.path.join(_dir, os.environ.get("GAMES_DIR", "games"))
 
 
@@ -41,7 +35,7 @@ def _discover_games():
 
 GAMES = _discover_games()
 
-# Default to the original hardcoded game when present, else the first found.
+# Fall back to the first game found if the usual default is missing.
 _DEFAULT = os.path.join(
     _games_dir, "hot_air_balloon",
     "air_balloon_survival_en_complexity_easy", "instance_00000",
@@ -75,12 +69,9 @@ def slug_to_path(slug):
     return _SLUG_TO_PATH.get(slug)
 
 
-# Maps a block/condition value to its question-set MODE. This is a decode
-# table, not an allow-list: the day1_*/day2_* entries are retired internal-pilot
-# condition names, kept solely so an export can still resolve rows collected
-# under them. Dropping them would not be inert — BLOCK_TO_TYPE is read via
-# .get(condition, "universal"), so a removed "day1_hybrid" would silently start
-# decoding as universal and re-label data that was collected as hybrid.
+# A decode table, not an allow-list. The day1_*/day2_* names are retired pilot
+# conditions, kept so old rows still decode. Removing one would not be harmless:
+# lookups default to "universal", so its rows would quietly change meaning.
 BLOCK_TO_TYPE = {
     "day1_universal": "universal",
     "day1_hybrid": "hybrid",
@@ -89,21 +80,17 @@ BLOCK_TO_TYPE = {
     "hybrid": "hybrid",
 }
 
-# What a session URL is allowed to ask for, which is a strictly smaller set.
-# app.py validates ?block= against this. The retired names above are
-# decode-only: accepting "day1_universal" from a hand-built link would route a
-# study transcript to the generic question set and store it under a condition
-# assignment.py never issues (it only ever assigns CONDITION = "hybrid").
+# What a session URL may ask for — smaller than the table above, which is
+# decode-only. app.py checks ?block= against this.
 VALID_BLOCKS = {"universal", "hybrid"}
 
 
 def plain_label(md):
     """Markdown question text -> a flat string for a control's accessible name.
 
-    Every question in the codebase is "**Title**\\n\\nBody", so one pass covers
-    all of them and the name can never drift from the visible text. Used for
-    label= on controls that also render the markdown visibly; the label is
-    sr-only (show_label=False), so this changes nothing on screen.
+    Every question is "**Title**\\n\\nBody", so one pass handles them all and the
+    name always matches the visible text. The label is sr-only, so nothing
+    changes on screen.
     """
     s = re.sub(r"[*_`#]", "", md or "")
     s = s.replace("\n\n", " — ").replace("\n", " ")
@@ -120,13 +107,11 @@ def _wg_id(md):
 
 
 def normalise_whole_game(entries):
-    """Accept both (question, choices) and (id, question, choices) and always
-    return the 3-tuple form.
+    """Accept (question, choices) or (id, question, choices); always return the
+    3-tuple form.
 
-    Answers used to be stored positionally ({"0": "3"}), so reordering a game's
-    whole-game list silently transposed every stored answer for it — imagegame
-    has two questions across 52 transcripts, and the export's only guard was a
-    count check that a swap passes. Keying by id removes the failure entirely.
+    Answers used to be stored by position, so reordering a game's whole-game
+    list silently swapped every stored answer. Keying by id removes that risk.
     """
     out = []
     for e in entries or []:
@@ -163,8 +148,8 @@ class _Game:
 def _detect_outcome(turns, data=None):
     """One game outcome — "won"/"lost"/"aborted"/"ended" — read from each
     family's own end-of-game signals, not by guessing from substring matches."""
-    # Top-level Success/Lose/Aborted flags are the authoritative verdict when
-    # present; games without them fall through to the per-event scan below.
+    # Top-level Success/Lose/Aborted flags win when present. Other games fall
+    # through to the per-event scan below.
     if isinstance(data, dict):
         if str(data.get("Aborted", "")).strip() in ("1", "True"):
             return "aborted"
@@ -206,8 +191,7 @@ def _detect_outcome(turns, data=None):
             m = re.search(r"game_result\s*=\s*(win|loss)", a["content"], re.I)
             if m:
                 return "won" if m.group(1).lower() == "win" else "lost"
-    # codenames: 'game end' prose names the winner — 'opponent has won' is a
-    # LOSS for the evaluated team, so the opponent check must come first.
+    # codenames: "opponent has won" is a LOSS, so check the opponent first.
     a = first("game end")
     if a and isinstance(a.get("content"), str):
         c = a["content"].lower()
@@ -236,12 +220,10 @@ def _detect_outcome(turns, data=None):
         return "won"
     if first("parse_wrong") or first("parse_incorrect"):
         return "lost"
-    # taboo/guesswhat: a 'correct guess' event is only ever logged when the
-    # guess actually matched — a loss runs out of turns without one.
+    # taboo/guesswhat: a 'correct guess' event is only logged on a real match.
     if first("correct guess"):
         return "won"
-    # Aborted episodes: an explicit abort (textmapworld's 'abort game'), or the
-    # transcript cutting off on an unparseable reply (imagegame).
+    # Aborted: an explicit abort, or the transcript cutting off mid-reply.
     if first("aborted"):
         return "aborted"
     if acts and acts[-1].get("type") == "invalid format":
@@ -258,7 +240,6 @@ def load_game(path):
     players = data["players"]
     turns = data["turns"]
 
-    # Excludes the GM and programmatic/scripted bots, not just non-AI players.
     def _is_ai_player(pid):
         info = players.get(pid, {})
         if pid == "GM":
@@ -271,9 +252,8 @@ def load_game(path):
     def _role(pid):
         return players.get(pid, {}).get("game_role", pid)
 
-    # Some games (e.g. Codenames) put a non-string metadata dict as the first
-    # message, so we cannot assume turns[0][0] is the rules text. Find the first
-    # GM message with string content that looks like an instruction prompt.
+    # Some games put a metadata dict first, so turns[0][0] is not always the
+    # rules text. Find the first GM message that looks like an instruction.
     rules = None
     for turn in turns:
         for msg in turn:
@@ -295,8 +275,8 @@ def load_game(path):
                 break
     rules = rules or "(no rules text found)"
 
-    # When a format error forces a retry, clembench logs both the rejected and
-    # accepted response as label=="response" — keep the fuller original, drop the retry.
+    # A format retry logs both the rejected and the accepted response. Keep the
+    # fuller original and drop the retry.
     def _retry_dupe_ids():
         flat = [m for turn in turns for m in turn]
         resp = [i for i, m in enumerate(flat)
@@ -321,7 +301,7 @@ def load_game(path):
                     and id(msg) not in skip_ids):
                 ai_turns.append(msg)
 
-    # Q3 (Reasoning Clarity) is only meaningful when the AI produces reasoning.
+    # Q3 only makes sense when the AI actually explains itself.
     def _detect_reasoning(ts):
         if not ts:
             return False
@@ -344,11 +324,10 @@ def load_game(path):
     g.ai_turns = ai_turns
     g.n_turns = len(ai_turns)
     g.outcome = _detect_outcome(turns, data)
-    # Response messages to NOT render as turn cards — kept in sync with the
-    # ai_turns filter above so transcript turn_counter matches ai_turns indices.
+    # Not rendered as turn cards. Must match the ai_turns filter above, or the
+    # transcript's turn numbering drifts from the ai_turns indices.
     g.skip_msg_ids = skip_ids
-    # Dond's negotiation prose rarely hits the marker-word heuristic below,
-    # so its game is forced into the reasoning set by name instead.
+    # Dond's prose rarely trips the marker-word check, so it is listed by name.
     g.game_key = game_key(path)
     _REASONING_GAMES = {"wordle", "wordle_withclue", "wordle_withcritic", "dond"}
     g.has_reasoning = g.game_key in _REASONING_GAMES or _detect_reasoning(ai_turns)
@@ -494,9 +473,8 @@ def _map_svg(claim, snap, pos_global):
     h = int(max(y for _, y in px.values()) + 44)
 
     parts = []
-    # Edges (drawn first, deduped to one line per room pair): solid grey when
-    # the walk verified the claim, dashed red when the model asserts a
-    # connection its own experience never showed it.
+    # Edges: solid grey where the walk confirmed the claim, dashed red where the
+    # model claims a connection it never actually saw.
     seen_pairs = {}
     for a, d, b in claimed:
         if a not in px or b not in px:
@@ -541,9 +519,8 @@ _MAP_LEGEND_HTML = (
 )
 
 
-# Path renderer for specific-room: the model never self-reports a map here
-# (just "GO: <dir>"/"DONE"), so this draws the explored path with no
-# correctness rings, plus the target room once its position is known.
+# Path renderer for specific-room. The model only emits "GO: <dir>"/"DONE" and
+# never reports a map, so this draws the path with no correctness rings.
 
 # The rules text opens with a worked example before the real episode, so we
 # anchor on "Let us start." to avoid matching the example's target room.
@@ -669,32 +646,25 @@ _PATH_LEGEND_HTML = (
 )
 
 
-# HTML builders below are pure functions of a loaded game `g`.
-
-# Glyphs that make up ASCII board art: box-drawing chars for clean_up/
-# referencegame/imagegame grids, plus plain wall/floor/goal symbols for the
-# newer spatial games. '-' and '.' are excluded — too common in plain prose.
+# Characters that make up ASCII board art. '-' and '.' are left out: they are
+# far too common in ordinary prose.
 _GRID_CHARS = set("╔╗╚╝║═╟╢╤╧┼┤├┬┴┌┐└┘─│◌▢□" "#+|_√▓█○●")
 _GRID_OBJ_RE = re.compile(r"(?<![A-Za-z])([A-Z])(?![A-Za-z])")
-# A lone digit is a grid cell too, but a multi-digit number ("1804") stays prose.
+# A lone digit is a grid cell; a multi-digit number like "1804" is prose.
 _GRID_DIGIT_RE = re.compile(r"(?<!\w)\d(?!\w)")
 
 # Matched after html.escape (hence &lt;/&gt;), so only this exact token shape
 # turns into markup — everything else stays plain escaped text.
 _WD_TILE_RE = re.compile(r"([A-Za-z])&lt;(red|green|yellow|purple|black)&gt;")
 
-# What each feedback colour MEANS, per game family. The source text spells this
-# out ("...correct (green), ...wrong position (yellow), ...incorrect (red)"),
-# and the crazy variants deliberately scramble it — the same colour name means
-# different things in the two families:
+# What each feedback colour means, per game family. The crazy variants scramble
+# the key, so the same colour name means different things:
 #
 #     standard wordle*      green=correct   yellow=wrong-pos  red=absent
 #     wordle-crazy*         yellow=correct  black=wrong-pos   purple=absent
 #
-# So this can never be a single global map. Rendering a crazy transcript with
-# standard-Wordle meanings would tell the annotator the model got it right when
-# it got it backwards — and judging whether the model coped with the scramble
-# is the whole point of the variant.
+# Never use one global map. Showing a crazy transcript with standard meanings
+# would tell the annotator the model was right when it was backwards.
 _WD_CORRECT = "correct position"
 _WD_WRONG_POS = "wrong position"
 _WD_ABSENT = "not in word"
@@ -870,10 +840,9 @@ def _grid_html(rows, changed=frozenset(), label=""):
 def grid_change_html(prev, cur):
     """Before/after pair with this turn's changed cells marked.
 
-    ImageGame asks the annotator whether an instruction 'still makes sense
-    given everything filled in so far', which means spotting what THIS turn
-    altered inside an otherwise identical grid — reliable to do by eye only
-    when the delta is marked.
+    ImageGame asks whether an instruction fits what has been built so far. That
+    means seeing what this turn changed, which is hard by eye unless it is
+    marked.
     """
     if not cur:
         return ""
@@ -893,13 +862,12 @@ def grid_change_html(prev, cur):
 
 
 def _rich_content_html(text, family=None):
-    """html.escape + proper rendering for board art. The transcript's
-    proportional font breaks grid alignment, so board-shaped fenced blocks
-    and unfenced board runs get re-emitted as a monospace .ascii-grid <pre>;
-    ordinary prose stays as normal wrapping text.
+    """html.escape, plus monospace rendering for board art.
 
-    `family` selects the wordle colour legend; without it tiles still render
-    but carry only the colour name, never a meaning that might be wrong.
+    The proportional font breaks grid alignment, so board-shaped blocks are
+    re-emitted as a monospace <pre>. Ordinary prose stays as wrapping text.
+    `family` picks the wordle colour legend; without it, tiles show the colour
+    name only, never a meaning that could be wrong.
     """
     _sub = _wd_tile_sub(wordle_legend(family))
 
@@ -925,7 +893,6 @@ def _rich_content_html(text, family=None):
         if kind == "fence":
             parts.append(_grid_block(seg) if _fence_is_board(seg) else esc(seg))
             continue
-        # Unfenced: split into board / non-board runs and render each accordingly.
         mask = _board_mask(seg)
         run, run_board = [], False
         for ln, is_b in zip(seg, mask):
@@ -939,7 +906,7 @@ def _rich_content_html(text, family=None):
     return "".join(parts)
 
 
-# Some responses run to 10-15k chars; clamp to a readable head + expandable tail.
+# Responses can run to 15k chars; clamp to a head plus an expandable tail.
 _CLAMP_CHARS = 1200
 
 
@@ -1005,10 +972,9 @@ def _reference_answer(g):
 
 
 def _progress_html(g, rated):
-    # aria-live works in place here (unlike the status Markdowns, which Gradio
-    # re-renders) because this node is created once and thereafter only has its
-    # textContent rewritten by the head script. That script debounces the
-    # rewrite so a burst of clicks announces once, not once per radio.
+    # aria-live works here because this node is created once and only has its
+    # text rewritten. The head script debounces that, so a burst of clicks is
+    # announced once rather than once per radio.
     return (
         f'<div class="annot-progress">'
         f'<span class="prog-rated" role="status" aria-live="polite" '
@@ -1055,8 +1021,7 @@ def _turn_nav_html(g):
 def _build_transcript_html(g, current_idx, pretty_map=False, pretty_path=False,
                            scroll_cls="txscroll", id_prefix="tc-"):
     # scroll_cls/id_prefix let the training screen reuse this renderer without
-    # colliding with the annotation page's JS (which targets .txscroll and
-    # the #tc-N turn-card ids globally).
+    # clashing with the annotation page's JS, which targets those names globally.
     parts = []
     turn_counter = 0  # index over AI-player response turns only
     _prev_grid = None  # ImageGame: last grid seen, for the per-turn diff
@@ -1066,9 +1031,8 @@ def _build_transcript_html(g, current_idx, pretty_map=False, pretty_path=False,
         f'<div class="goal-box">'
         f'<h2 class="goal-label">GAME GOAL</h2>'
         f'<div class="goal-text">{goal_text}</div>'
-        # Stated up front, because the crazy variants' colours are NOT the
-        # standard ones and an annotator working from Wordle intuition would
-        # read every piece of feedback backwards.
+        # Up front, because the crazy variants scramble the colours and an
+        # annotator using Wordle intuition would read the feedback backwards.
         f'{wordle_legend_html(g.game_key)}'
         f'</div>'
     )
@@ -1085,9 +1049,8 @@ def _build_transcript_html(g, current_idx, pretty_map=False, pretty_path=False,
         path_snapshots, path_grid, path_target = _path_truth_and_layout(g)
         parts.append(_PATH_LEGEND_HTML)
 
-    # Skip a verbatim repeat of the rules already shown in the GAME GOAL box.
-    # Only g.rules itself, not every turn-0 message — some games send each
-    # player their own extra private info in turn 0 that must still show.
+    # Skip a repeat of the rules already shown in the GAME GOAL box. Only
+    # g.rules itself: some games also send private per-player info in turn 0.
     _turn0_setup = {g.rules}
 
     # Assign a stable colour slot (p1, p2…) to each AI sender in appearance order.
@@ -1107,7 +1070,6 @@ def _build_transcript_html(g, current_idx, pretty_map=False, pretty_path=False,
             label = action.get("label", "")
             content = action.get("content", "")
 
-            # GM / environment messages
             if sender == "GM" or sender not in g.ai_ids:
                 # End-game bookkeeping events are consumed by _detect_outcome
                 # (one banner rendered after the loop) and never shown inline.
@@ -1154,7 +1116,6 @@ def _build_transcript_html(g, current_idx, pretty_map=False, pretty_path=False,
                     )
                 continue
 
-            # Genuine AI player response → render as a turn card
             if label == "response":
                 # Skip retry duplicates (see load_game) without bumping turn_counter,
                 # so tc-N card ids stay aligned with ai_turns indices.
@@ -1167,16 +1128,13 @@ def _build_transcript_html(g, current_idx, pretty_map=False, pretty_path=False,
                 # Map SVG shows in both conditions — only the questions differ.
                 body_html = _render_response_body(content, g.game_key)
 
-                # ImageGame: the Follower replies with the whole grid, so show
-                # it against the previous one with this turn's changes marked.
-                # Tracked across turns rather than per-card, because "before" is
-                # the last grid ANY turn produced.
+                # ImageGame: the Follower replies with the whole grid, so mark
+                # this turn's changes against the last grid any turn produced.
                 if g.game_key == "imagegame":
                     grid = parse_cell_grid(content)
                     if grid:
-                        # The Follower's entire reply IS the grid, so this
-                        # replaces the body rather than adding to it —
-                        # otherwise the same grid appears twice per card.
+                        # The reply IS the grid, so replace the body rather
+                        # than adding to it, or the grid appears twice.
                         body_html = grid_change_html(_prev_grid, grid)
                         _prev_grid = grid
                 if pretty_map and isinstance(content, str):
@@ -1230,7 +1188,7 @@ def _build_transcript_html(g, current_idx, pretty_map=False, pretty_path=False,
             '</div>'
         )
 
-    # One outcome banner only — per-event end markers are dropped above, not shown inline.
+    # One banner only; per-event end markers were dropped above.
     parts.append(_OUTCOME_BANNERS[getattr(g, "outcome", "ended")])
 
     return f'<div class="{scroll_cls}">' + "".join(parts) + "</div>"
@@ -1250,9 +1208,7 @@ def show_q3_for(g, condition):
 
 
 def first_turn_of_role(g):
-    """{role: index of that role's FIRST turn}. A bolt-on listed under
-    "bolt_ons_first_turn" is asked only there — the wordle clue question is
-    about the opening guess and has no meaning on later turns."""
+    """{role: index of that role's first turn}, for bolt_ons_first_turn."""
     first = {}
     for i, msg in enumerate(g.ai_turns):
         first.setdefault(g.role(msg["from"]), i)
@@ -1260,16 +1216,14 @@ def first_turn_of_role(g):
 
 
 def question_spec(g, condition, show_q3):
-    """Canonical description of the exact question set a transcript was shown.
+    """The exact question set a transcript was shown.
 
-    Per-transcript, not per-family: which roles occur, whether Q3 is shown, and
-    the flag list all vary transcript by transcript, and a family-level spec
-    would miss all three.
+    Per transcript, not per family: roles, whether Q3 is shown, and the flag
+    list all vary between transcripts.
 
-    Hashed and stored at collection time so a later export can decode answers
-    against the questions that were actually on screen. Without it, editing
-    annotation.py silently re-labels data already collected — the per-turn value
-    survives (it is stored in a named column) but its meaning quietly changes.
+    Hashed and stored when the data is collected, so a later export can decode
+    answers against the questions that were really on screen. Without it,
+    editing the questions quietly changes what old answers mean.
     """
     mode = BLOCK_TO_TYPE.get(condition, "universal")
     bespoke = BESPOKE_QUESTIONS.get(g.game_key, {}) if mode == "hybrid" else {}
@@ -1319,11 +1273,11 @@ def question_spec(g, condition, show_q3):
 
 
 def _assert_spec_matches_render(spec, field_specs, g):
-    """Fail loudly if the spec disagrees with what was actually rendered.
+    """Fail loudly if the spec disagrees with what was rendered.
 
-    field_specs is built by the render loop itself, so it cannot drift; the spec
-    is rebuilt independently. If they disagree the spec is wrong, and recording
-    its hash would attach a confident but false description to real data.
+    field_specs comes from the render loop, so it cannot drift. The spec is
+    built separately. If they disagree, storing the spec's hash would attach a
+    wrong description to real data.
     """
     want = set()
     first_turn = first_turn_of_role(g)
@@ -1336,13 +1290,9 @@ def _assert_spec_matches_render(spec, field_specs, g):
         for slot in ("q1", "q2"):
             if cfg.get(slot) is not None:
                 want.add((turn_i, slot))
-        # q3 is NOT conditional here, even though the spec records it as None
-        # when Reasoning Clarity isn't asked. The render loop always emits a q3
-        # component — a real radio when it is asked, a hidden preset-N/A one
-        # when it isn't — so that field_specs stays 1:1 with the component list
-        # and the JS rated-counter keeps working. The spec is describing what
-        # was on SCREEN; field_specs is describing what was WIRED UP. Only the
-        # latter decides what lands in this set.
+        # q3 is always here, even when the spec records it as None. The render
+        # loop always emits a q3 component (hidden and preset to N/A when it is
+        # not asked), so field_specs stays 1:1 with the component list.
         want.add((turn_i, "q3"))
         for key, _md, _ch in cfg.get("bolt_ons", []):
             want.add((turn_i, "extra", key))
@@ -1373,21 +1323,16 @@ def _submit(g, field_specs, condition, show_q3, annotator_id, started_at, sessio
             session_started_at, *vals):
     # field_specs[i] describes what vals[i] holds — see build() for how it's built.
 
-    # Every rendered question is mandatory; only flags and the comment can stay empty.
+    # Every rendered question is required; flags and comments are optional.
     incomplete = sorted({spec[0] for spec, val in zip(field_specs, vals)
                          if spec[1] in ("q1", "q2", "q3", "extra") and not val})
     if incomplete:
         turns = ", ".join(str(i + 1) for i in incomplete)
-        # The empty marker span flags this as a validation failure for the a11y
-        # module in app.py: the unanswered turn card is display:none when this
-        # renders, so the module reveals it, focuses the first unanswered
-        # option and sets aria-invalid.
-        #
-        # The turn numbers travel in the message text itself, and the module
-        # parses them back out of "...on turn(s) 1, 2, 3." — Gradio's markdown
-        # sanitiser drops data-* attributes, extra classes AND element text, so
-        # the visible sentence is the only channel that survives. Keep the
-        # "on turn/turns <n>, <n>." shape in step with the regex there.
+        # This span tells the a11y module in app.py to reveal the hidden turn
+        # card and focus the first unanswered option. The module reads the turn
+        # numbers out of the visible sentence, because Gradio's sanitiser strips
+        # data-* attributes. Keep the "on turn/turns <n>, <n>." wording in step
+        # with the regex there.
         marker = '<span class="a11y-bad-turns" hidden></span>'
         return (
             f"⚠️ **Not submitted.** Every question must be answered — "
@@ -1423,10 +1368,9 @@ def _submit(g, field_specs, condition, show_q3, annotator_id, started_at, sessio
             "extra_responses": t["extra"] or None,
         })
 
-    # Fingerprint the exact question set this submission was collected under.
-    # Cross-checked against field_specs first — field_specs is ground truth for
-    # what was actually rendered, so a spec that disagrees with it would record
-    # a confident lie. Better to fail here than to store a wrong label forever.
+    # Fingerprint the question set this submission was collected under. Checked
+    # against field_specs first, which is what was really rendered — storing a
+    # spec that disagrees would label the data wrongly and permanently.
     spec = question_spec(g, condition, show_q3)
     _assert_spec_matches_render(spec, field_specs, g)
     qs_hash = question_spec_hash(spec)
@@ -1457,9 +1401,8 @@ def build(welcome_page, annotation_page, verdict_page, game_state, annotator_sta
         @gr.render(inputs=[game_state, block_state, playlist_state,
                            playlist_idx_state, clearing_state])
         def _render_annotation(path, block, playlist, playlist_idx, clearing):
-            # While clearing_state is True, render nothing so every widget fully
-            # unmounts before the next game mounts — this is what stops values
-            # carrying over between games.
+            # Render nothing while clearing, so every widget unmounts before the
+            # next game mounts. This is what stops answers carrying over.
             if clearing or not path:
                 return
             g = load_game(path)
@@ -1477,8 +1420,7 @@ def build(welcome_page, annotation_page, verdict_page, game_state, annotator_sta
                 seq_chip = (f'<span class="game-seq-tag">Game {playlist_idx + 1} '
                             f'of {len(playlist)}</span>')
 
-            # No heading existed on this screen at all — the one place heading
-            # navigation matters most. Also the a11y module's focus target.
+            # The screen had no heading, and this is also the a11y focus target.
             gr.HTML(
                 f'<h1 class="a11y-sr-only" tabindex="-1">Rate turns — '
                 f'{html.escape(str(g.meta["game_name"]).title())}</h1>'
@@ -1500,8 +1442,7 @@ def build(welcome_page, annotation_page, verdict_page, game_state, annotator_sta
                     '<div class="goal-text">This transcript has no annotatable AI '
                     'player turns.</div></div>'
                 )
-                # Without this the page is a dead end — no Submit is rendered
-                # (nothing to submit) and no other way back exists.
+                # Without this the page is a dead end: nothing to submit, no way back.
                 gr.Button("Quit", variant="stop", elem_classes=["quit-btn"]).click(
                     fn=lambda: (gr.update(visible=True), gr.update(visible=False)),
                     outputs=[welcome_page, annotation_page],
@@ -1531,12 +1472,9 @@ def build(welcome_page, annotation_page, verdict_page, game_state, annotator_sta
                         with gr.Group(elem_classes=["turn-anno-card"]):
                             gr.HTML(_card_header_html(g, i))
 
-                            # Some roles are deliberately not rated at all —
-                            # GuessWhat's Answerer only replies yes/no, so the
-                            # spec gives it no questions. Say so, rather than
-                            # showing a card that looks like it lost its
-                            # contents. Q3 counts: when it is shown there IS
-                            # something to answer here.
+                            # Some roles are not rated at all (GuessWhat's
+                            # Answerer only replies yes/no). Say so, instead of
+                            # showing a card that looks broken.
                             if (role_cfg.get("q1", "generic") is None
                                     and role_cfg.get("q2", "generic") is None
                                     and not role_cfg.get("bolt_ons")
@@ -1549,11 +1487,10 @@ def build(welcome_page, annotation_page, verdict_page, game_state, annotator_sta
                                     'Move on to the next turn.</p>'
                                 )
 
-                            # Q1 slot: "generic" (default) = universal widget,
-                            # None = not rendered for this role, tuple = bespoke.
-                            # label= is sr-only under show_label=False, so it
-                            # renames the control without touching the layout.
-                            # Turn-qualified: N identical groups share one page.
+                            # Q1 slot: "generic" = the shared question, None =
+                            # not asked of this role, tuple = this game's own.
+                            # Labels are turn-qualified because one page holds
+                            # many identical groups.
                             _t = f"Turn {i + 1} — "
                             q1_cfg = role_cfg.get("q1", "generic")
                             if q1_cfg == "generic":
@@ -1571,7 +1508,6 @@ def build(welcome_page, annotation_page, verdict_page, game_state, annotator_sta
                                               elem_classes=["scale-radio", "q1-scale"])
                                 components.append(q1); field_specs.append((i, "q1"))
 
-                            # Q2 slot — same generic/None/bespoke pattern.
                             q2_cfg = role_cfg.get("q2", "generic")
                             if q2_cfg == "generic":
                                 gr.Markdown(GENERIC_Q2[0])
@@ -1588,9 +1524,8 @@ def build(welcome_page, annotation_page, verdict_page, game_state, annotator_sta
                                               elem_classes=["scale-radio", "q2-scale"])
                                 components.append(q2); field_specs.append((i, "q2"))
 
-                            # Bespoke bolt-on(s) — additive, beyond the Q1/Q2
-                            # slots. The second list is asked once, on this
-                            # role's opening turn only.
+                            # Extra questions beyond Q1/Q2. The second list is
+                            # asked only on this role's first turn.
                             _bolts = list(role_cfg.get("bolt_ons", []))
                             if first_turn.get(role) == i:
                                 _bolts += role_cfg.get("bolt_ons_first_turn", [])

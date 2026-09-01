@@ -13,25 +13,21 @@ from annotation import (load_game, plain_label, _build_transcript_html,
 
 _dir = os.path.dirname(os.path.abspath(__file__))
 
-# A real GuessWhat episode (target "theatre", guessed correctly on turn 5).
-# Lives in games_practice/, OUTSIDE the study tree, so it can never be picked up
-# by discovery or handed out in a batch — and its instance (Abs_Level_1/
-# instance_00004) is deliberately not one of the 13 guesswhat instances the
-# study uses, so no annotator ever meets it twice.
+# A real GuessWhat episode. It lives outside the study tree, so it can never be
+# handed out in a batch, and its instance is not one of the 13 the study uses.
 TRAINING_GAME = os.path.join(
     _dir, "games_practice", "guesswhat", "Abs_Level_1", "instance_00004",
     "interactions.json")
 
-# Display name for the practice game, derived from the path so that swapping
-# TRAINING_GAME cannot leave the on-screen text describing the previous one.
+# Read from the path, so changing TRAINING_GAME cannot leave the on-screen text
+# naming the old game.
 _PRACTICE_NAME = os.path.basename(
     os.path.dirname(os.path.dirname(os.path.dirname(TRAINING_GAME)))
 ).replace("_", " ").title().replace("Guesswhat", "GuessWhat")
 
-# Only this role's turns are rated. GuessWhat has two seats, but the Answerer's
-# forced yes/no carries no strategy worth judging (the real annotation page
-# gives it no questions either) — rating "ANSWER: no" would teach the wrong
-# thing. Its replies still show in the transcript as context.
+# Only this role is rated. The Answerer's forced yes/no has no strategy to
+# judge, and the real annotation page gives it no questions either. Its replies
+# still show in the transcript as context.
 PRACTICE_ROLE = "Guesser"
 
 
@@ -71,9 +67,8 @@ _SCALE_Q2 = [("1\nNonsensical", "1"), ("2\nPoor", "2"), ("3\nReasonable", "3"), 
 # emotion words, establishes it is a physical object, rules out the weapon, then
 # confirms and guesses correctly on turn 5.
 #
-# Note this is a CLEAN run — nothing here scores below 3. The `lower` lines are
-# doing all the work of teaching the bottom of the scale, which is a weakness of
-# using a well-played episode for calibration.
+# This is a clean run: nothing scores below 3. The `lower` lines carry all the
+# work of teaching the bottom of the scale.
 _REFERENCE = {
     0: {
         "q1": "4",
@@ -186,9 +181,8 @@ def _check(*vals):
 
 
 def _start_annotation(annotator_id):
-    # Recorded on both buttons: someone who deliberately skipped shouldn't be
-    # shown the practice round again next session. This flag — not the session
-    # index — is what stops a page reload replaying it (welcome._start).
+    # Recorded on both buttons, so someone who skipped is not shown it again.
+    # This flag, not the session index, is what stops a reload replaying it.
     db.record_practice(annotator_id)
     return (
         gr.update(visible=False),   # training_page
@@ -202,8 +196,7 @@ def build(welcome_page, training_page, annotation_page, started_at_state,
     g = _load_practice_game()
 
     with training_page:
-        # This screen had no heading at all; it's also the focus target the
-        # a11y module moves to when the screen becomes visible.
+        # The screen had no heading, and this is also the a11y focus target.
         gr.HTML('<h1 class="a11y-sr-only" tabindex="-1">Practice round</h1>')
         with gr.Row(elem_classes=["annot-topnav"]):
             gr.HTML(
@@ -221,10 +214,8 @@ def build(welcome_page, training_page, annotation_page, started_at_state,
             )
 
         with gr.Group(elem_classes=["info-box"]):
-            # Game name and turn count are read from the practice episode, not
-            # written out: both were left saying "Wordle" and "3 turns" when the
-            # practice round was swapped to GuessWhat, and every new participant
-            # was told the wrong thing on the first screen they see.
+            # Name and turn count come from the episode itself. Both were left
+            # saying "Wordle" and "3 turns" after the practice game changed.
             gr.Markdown(
                 f"**🎓 Practice before you start.** This is a real transcript of "
                 f"an AI playing {_PRACTICE_NAME}. Rate each of its "
@@ -234,15 +225,14 @@ def build(welcome_page, training_page, annotation_page, started_at_state,
             )
 
         with gr.Row(equal_height=False):
-            # train-specific scroll class + card ids keep the annotation
-            # page's JS from touching these nodes.
+            # Own scroll class and card ids, so the annotation page's JS
+            # leaves these alone.
             with gr.Column(scale=3, elem_classes=["tx-col"]):
                 gr.HTML(_build_transcript_html(g, current_idx=-1,
                                                scroll_cls="train-txscroll",
                                                id_prefix="ttc-"))
 
-            # "turn-anno-card" is what app.py's JS (panes()/chips()) targets;
-            # "train-card" only adds practice-only styling on top of it.
+            # app.py's JS targets "turn-anno-card"; "train-card" only styles it.
             with gr.Column(scale=2, elem_id="train-col"):
                 gr.HTML(_turn_nav_html(g))
                 radios, feedbacks = [], []

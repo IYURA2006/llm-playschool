@@ -1635,8 +1635,8 @@ def _capture_session_params(request: gr.Request):
         "",
     )
     if prolific_pid:
-        # The only bound on what reaches annotator_id, now that the PID is
-        # stored as Prolific sends it — a sanity check, not a format check.
+        # A sanity check, not a format check: the PID is stored as Prolific
+        # sends it.
         if len(prolific_pid) > 100:
             return _session_error("⚠️ Malformed participant link.")
         playlist, err_msg = assignment.build_playlist_for(prolific_pid)
@@ -1651,8 +1651,7 @@ def _capture_session_params(request: gr.Request):
                 f"this study. Thank you!"
             )
         item = playlist[idx]
-        # Session index reaches welcome._start, which only shows the practice
-        # round on session "1" — a returning participant has already done it.
+        # welcome._start shows the practice round on session "1" only.
         return (prolific_pid, item["condition"], annotation.slug_to_path(item["game"]),
                 "", playlist, idx, str(assignment.current_session_index(prolific_pid)))
 
@@ -1661,11 +1660,9 @@ def _capture_session_params(request: gr.Request):
     game = (qp.get("game") or "").strip()
 
     if block or game or annotator:
-        # This path skips the Prolific gate entirely and writes real rows under
-        # whatever annotator id the URL carries, with no batch or template
-        # attached. That is exactly what it is for during development, and
-        # exactly what must not be reachable while participants are being paid
-        # to use the same deployment. Off unless explicitly switched on.
+        # This path skips the Prolific gate and writes real rows under whatever
+        # id the URL carries, with no batch attached. Useful in development,
+        # unsafe while participants are being paid. Off unless switched on.
         if os.environ.get("ALLOW_DEBUG_LINKS", "").strip().lower() not in {"1", "true", "yes"}:
             return _session_error(
                 "This study is only accessible via its Prolific link. If you "
@@ -1697,10 +1694,9 @@ def _capture_session_params(request: gr.Request):
     )
 
 
-# Refuse to serve a misconfigured study. games/ (the 234-transcript pilot pool)
-# and games_study/ (the curated 416) share zero slugs, so pointing GAMES_DIR at
-# the wrong one would recruit real participants onto the wrong corpus — and the
-# symptom would be an "unknown game" error shown AFTER their rows were reserved.
+# Refuse to start a misconfigured study. games/ and games_study/ share no slugs,
+# so the wrong GAMES_DIR would run the study on the wrong corpus, and the error
+# would only appear after a participant's rows were already reserved.
 _preflight = assignment.preflight()
 if _preflight:
     raise SystemExit(
@@ -1718,21 +1714,17 @@ with gr.Blocks(title="LM Playschool — Annotation Study") as app:
     block_state = gr.State("")
     # Non-empty when the session URL is malformed; gates Start Annotation
     error_state = gr.State("")
-    # Ordered [{"game": slug, "condition": ...}, …] from
-    # assignment.build_playlist_for; empty list = legacy single-game debug link
+    # From assignment.build_playlist_for. Empty means a single-game debug link.
     playlist_state = gr.State([])
     playlist_idx_state = gr.State(0)
-    # 1-based session index as a string ("1".."MAX_SESSIONS"), "" on the
-    # legacy debug link; gates the practice round and is persisted per row
+    # Session index as a string, "" on a debug link. Gates the practice round.
     session_day_state = gr.State("")
-    # Stamped when a game's annotation actually starts; duration is
-    # verdict_at − started_at
+    # Stamped when a game's annotation starts; duration is verdict_at minus this.
     started_at_state = gr.State("")
-    # Stamped once per sitting at the Start click; anchors the whole-session
-    # timer (duration is max(verdict_at) − session_started_at)
+    # Stamped once per sitting, at the Start click. Anchors the session timer.
     session_started_at_state = gr.State("")
-    # True only between the two chained events of a game switch, while the
-    # annotation page is blanked so no stale widget value survives.
+    # True only during a game switch, while the page is blank, so no old widget
+    # value survives.
     clearing_state = gr.State(False)
 
     welcome_page = gr.Column(visible=True, elem_id="welcome-page")
@@ -1762,15 +1754,12 @@ with gr.Blocks(title="LM Playschool — Annotation Study") as app:
               outputs=[annotator_state, block_state, game_state, error_state,
                        playlist_state, playlist_idx_state, session_day_state])
 
-# System fonts avoid a remote Google Fonts fetch on first paint. Must be
-# gr.themes.Font objects — a plain string crashes Gradio's font comparison.
-# Serve the accessibility statement as a static file, reachable at
-# /gradio_api/file/accessibility.html. Required by the Public Sector Bodies
-# Accessibility Regulations 2018: a statement nobody can reach does not
-# discharge the duty, and this app has no other route to it.
-#
-# set_static_paths is an ALLOW-LIST, not a served directory — anything not
-# named here (db.py, .env) still returns 403, verified. Keep it that way.
+# System fonts avoid a Google Fonts fetch on first paint. Must be
+# gr.themes.Font objects: a plain string crashes Gradio's font comparison.
+# Serve the accessibility statement as a static file. Required by the Public
+# Sector Bodies Accessibility Regulations 2018, and this app has no other route
+# to it. set_static_paths is an allow-list, not a served directory: anything not
+# named here still returns 403. Keep it that way.
 gr.set_static_paths([os.path.join(os.path.dirname(os.path.abspath(__file__)),
                                   "accessibility.html")])
 

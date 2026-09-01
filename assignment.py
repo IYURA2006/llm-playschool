@@ -33,22 +33,17 @@ import study_set
 COVERAGE_TARGET = 3     # independent annotators before a transcript is "covered"
 CONDITION = "hybrid"    # the only condition the general study ever assigns
 
-# Abandoned (no verdict, no activity) reservations free up after this long.
-# The lease is stamped when the batch is claimed and only refreshed when the
-# annotator SAVES a turn — and the unpaid practice round sits between those two
-# moments. One hour was too tight for a 13-transcript batch: the whole claim
-# would read stale while someone was still working through it, and those
-# transcripts would be handed out again for a 4th rating nobody asked for.
+# Abandoned reservations expire after this long. One hour was too short: a long
+# batch went stale while the annotator was still working on it, and the
+# transcripts were handed out again.
 STALE_AFTER_HOURS = 2
 
-# How many batches one Prolific participant may complete in total. A returning
-# PID gets a fresh batch from a template they have not seen, until this is hit.
+# Total batches one participant may complete. A returning PID gets a batch from
+# a template they have not seen, until this limit.
 MAX_BATCHES = 5
 
-# Every batched transcript. Derived from the manifest rather than from disk, so
-# it is correct regardless of what GAMES_DIR points at — preflight() is what
-# checks the two agree. (This used to mean "transcripts on disk whose family has
-# a bespoke question set"; it now means "the study's 416".)
+# Every batched transcript, read from the manifest rather than from disk, so it
+# does not depend on GAMES_DIR. preflight() checks the two agree.
 POOL_SLUGS = tuple(sorted(
     s for members in study_set.BATCH_MEMBERS.values() for s in members))
 
@@ -64,10 +59,9 @@ CAP_MESSAGE = (
     f"very grateful for your work."
 )
 
-# Distinct from NO_TASKS_MESSAGE on purpose. Work remains, but all of it is
-# templates this participant has already seen, so "check back later" would be a
-# lie — it will never become true for them. They have already accepted the
-# study, so tell them what to do about it.
+# Different from NO_TASKS_MESSAGE on purpose. Work remains, but only in
+# templates this person has already seen, so "check back later" would never
+# come true for them.
 EXHAUSTED_MESSAGE = (
     "🙏 Thank you — you've already completed every set of games available to "
     "you in this study. There's nothing further for you to do, so please "
@@ -118,9 +112,8 @@ def _pick_batch(counts, coverage_target, exclude_templates=(), exclude_slugs=(),
     the last transcript at 2 ratings forever.
     """
     rng = rng or random.Random()
-    # Resolved at CALL time, never as a default argument: a default expression
-    # is bound at def time, which is what made the old target_seconds=
-    # TARGET_SECONDS silently unpatchable from the tests.
+    # Read at call time, not as a default argument: defaults are bound at def
+    # time, which made the old version unpatchable from the tests.
     if batch_members is None:
         batch_members = study_set.BATCH_MEMBERS
     if batch_template is None:
@@ -140,9 +133,8 @@ def _pick_batch(counts, coverage_target, exclude_templates=(), exclude_slugs=(),
         needed = [s for s in under if s not in exclude_slugs]
         if not needed:
             continue                        # belt-and-braces; template rule covers it
-        # Secondary key sends INTACT batches out before partially covered ones,
-        # so holes surface at the tail rather than handing an early participant
-        # a 2-transcript sitting at a full sitting's pay.
+        # Send intact batches out before partly covered ones, so short sittings
+        # land at the end instead of paying a full sitting for two transcripts.
         eligible.append((min(counts.get(s, 0) for s in under),
                          -len(under), batch_id, needed))
 
@@ -197,24 +189,21 @@ def build_playlist_for(annotator_id, condition=CONDITION):
     """
     summary = db.session_summary(annotator_id, condition=condition)
     resume_idx, completed = _resume_target(summary)
-    # Cheap path for a capped-out participant: nothing to write, so no reason to
-    # queue behind the assignment lock.
+    # Nothing to write for a capped-out participant, so skip the lock.
     if resume_idx is None and completed >= MAX_BATCHES:
         return [], CAP_MESSAGE
 
     playlist, reason, picked_batch, new_idx = None, None, None, None
     with db.write_transaction() as conn:
-        # Re-read under the lock: two tabs on one link would otherwise each
-        # reserve a batch.
+        # Re-read under the lock, or two tabs would each reserve a batch.
         summary = db.session_summary(annotator_id, condition=condition, conn=conn)
         resume_idx, completed = _resume_target(summary)
 
         if resume_idx is not None:
             db.prune_over_covered(annotator_id, condition, resume_idx,
                                   COVERAGE_TARGET, conn=conn)
-            # Re-derive: the prune can empty the sitting, in which case its
-            # group disappears and we fall through to a fresh pick. A voided
-            # sitting costs no cap slot.
+            # The prune can empty the sitting; then we fall through to a fresh
+            # pick, and the voided sitting costs no cap slot.
             summary = db.session_summary(annotator_id, condition=condition, conn=conn)
             resume_idx, completed = _resume_target(summary)
 
@@ -233,22 +222,18 @@ def build_playlist_for(annotator_id, condition=CONDITION):
             reason = pick.reason
             if pick.slugs:
                 picked_batch = pick.batch_id
-                # Position order matters and is only preserved by convention:
-                # BATCH_MEMBERS is position-sorted at load, the filters above
-                # are order-preserving, reserve_games inserts in list order, and
-                # assigned_games reads back ORDER BY id. No position column.
+                # There is no position column. Order survives only by
+                # convention: members are sorted at load, the filters keep
+                # order, rows are inserted in list order and read back by id.
                 db.reserve_games(
                     annotator_id, condition, pick.slugs,
                     session_index=new_idx, conn=conn,
                     batch_id=pick.batch_id,
                     dims_by_slug={s: study_set.dimensions(s) for s in pick.slugs},
                 )
-                # Read back rather than building dicts inline, so BOTH paths
-                # return the output of the same function. Extending the item
-                # shape in one branch only would otherwise make a page reload
-                # silently change the object the UI holds — and ON CONFLICT DO
-                # NOTHING means an inline list could name a row that was never
-                # actually written.
+                # Read back rather than building the list here, so both paths
+                # return the same shape. ON CONFLICT DO NOTHING also means an
+                # inline list could name a row that was never written.
                 playlist = db.assigned_games(annotator_id, condition=condition,
                                              session_index=new_idx, conn=conn)
 
