@@ -45,33 +45,39 @@ def main():
     with open(args.manifest, newline="") as fh:
         manifest = {r["transcript_id"]: r for r in csv.DictReader(fh)}
     with open(args.plan) as fh:
-        templates = json.load(fh)["templates"]
+        templates = json.load(fh)["batches"]
 
-    models = sorted({r["model_id"] for r in manifest.values()})
     rows, problems = [], []
-    for tid in sorted(templates):
-        spec = templates[tid]
+    for batch_id in sorted(templates):
+        spec = templates[batch_id]
         game = spec["game"]
-        for model in models:
-            batch_id = f"{tid}__{model}"
-            for pos, ent in enumerate(spec["instances"], 1):
-                experiment, instance = ent.split("/")
-                transcript_id = f"{model}__{game}__{experiment}__{instance}"
-                r = manifest.get(transcript_id)
-                if r is None:
-                    problems.append(f"{batch_id}: {transcript_id} not in manifest")
-                    continue
-                rows.append({
-                    "batch_id": batch_id,
-                    "template_id": tid,
-                    "position": pos,
-                    "transcript_id": transcript_id,
-                    "model_id": model,
-                    "game": game,
-                    "experiment": experiment,
-                    "instance": instance,
-                    "domain": r["domain"],
-                })
+        seen_instances = set()
+        for pos, ent in enumerate(spec["transcripts"], 1):
+            model, experiment, instance = ent.split("/")
+            # Two models of one instance in a sitting would show the annotator
+            # the same game state twice.
+            if (experiment, instance) in seen_instances:
+                problems.append(f"{batch_id}: {experiment}/{instance} appears twice")
+            seen_instances.add((experiment, instance))
+            transcript_id = f"{model}__{game}__{experiment}__{instance}"
+            r = manifest.get(transcript_id)
+            if r is None:
+                problems.append(f"{batch_id}: {transcript_id} not in manifest")
+                continue
+            rows.append({
+                "batch_id": batch_id,
+                # Kept, and equal to batch_id. A batch no longer instantiates a
+                # shared instance set, so this column groups rows for the export
+                # and nothing else; assignment excludes by instance instead.
+                "template_id": batch_id,
+                "position": pos,
+                "transcript_id": transcript_id,
+                "model_id": model,
+                "game": game,
+                "experiment": experiment,
+                "instance": instance,
+                "domain": r["domain"],
+            })
     if problems:
         raise SystemExit("plan does not match the manifest:\n  "
                          + "\n  ".join(problems[:20]))
@@ -80,13 +86,15 @@ def main():
     for r in rows:
         sizes[r["batch_id"]] = sizes.get(r["batch_id"], 0) + 1
 
-    print(f"templates {len(templates)} x models {len(models)} = {len(sizes)} batches")
-    print(f"transcripts {len(rows)}   sittings {len(sizes) * 3}   "
-          f"judgements {len(rows) * 3}")
-    print("\nper template (same for every model):")
-    for tid in sorted(templates):
-        n = len(templates[tid]["instances"])
-        print(f"  {tid:9} {templates[tid]['game']:24} {n:>3} transcripts")
+    print(f"{len(sizes)} batches   transcripts {len(rows)}   "
+          f"sittings {len(sizes) * 3}   judgements {len(rows) * 3}")
+    per_game = {}
+    for bid, spec in templates.items():
+        per_game.setdefault(spec["game"], []).append(len(spec["transcripts"]))
+    print("\nper game:")
+    for game in sorted(per_game):
+        n = per_game[game]
+        print(f"  {game:24} {len(n):>3} batches, {min(n)}-{max(n)} transcripts each")
 
     if args.dry_run:
         print("\n(dry run — nothing written)")

@@ -69,47 +69,59 @@ def _modelled():
             "referencegame": 2.8}
 
 
-def _median_transcript_per_game():
-    """One transcript per game, the one closest to that game's median turn
-    count. Testing the shortest transcript would flatter the estimate."""
+def _pick_per_game(n_each):
+    """n_each transcripts per game, spread evenly across that game's range of
+    turn counts rather than clustered at the median.
+
+    One median transcript would flatter or punish the estimate depending on
+    which it landed on. Spreading them shows how time scales with length inside
+    a game, which is the thing the model actually claims."""
     import annotation
 
     rows = list(csv.DictReader(open("study_manifest.csv")))
     turns, by_game = {}, collections.defaultdict(list)
     for r in rows:
-        n = annotation.load_game(r["source_path"]).n_turns
-        turns[r["transcript_id"]] = n
+        turns[r["transcript_id"]] = annotation.load_game(r["source_path"]).n_turns
         by_game[r["game"]].append(r)
 
     picked = {}
     for game, rs in by_game.items():
+        rs = sorted(rs, key=lambda r: (turns[r["transcript_id"]], r["transcript_id"]))
+        idx = sorted({round((i + 0.5) / n_each * (len(rs) - 1))
+                      for i in range(n_each)})
         med = statistics.median(turns[r["transcript_id"]] for r in rs)
-        best = min(rs, key=lambda r: (abs(turns[r["transcript_id"]] - med),
-                                      r["transcript_id"]))
-        picked[game] = (best, turns[best["transcript_id"]], med)
+        picked[game] = ([(rs[i], turns[rs[i]["transcript_id"]]) for i in idx], med)
     return picked
 
 
 def cmd_links(args):
     import annotation
 
-    picked = _median_transcript_per_game()
-    print(f"Open one at a time, in any order. Base: {BASE}\n")
+    base = args.base or BASE
+    picked = _pick_per_game(args.instances)
+    model = _modelled()
+    total_min = total_n = 0
+    print(f"Open one at a time, in any order. Base: {base}\n")
     for game in sorted(picked):
-        r, n, med = picked[game]
-        # transcript_id IS the slug under games_study. Deriving one from
-        # source_path instead gives a path relative to games_final/, which the
-        # app cannot resolve.
-        slug = r["transcript_id"]
-        if annotation.slug_to_path(slug) is None:
-            sys.exit(f"{slug} does not resolve under GAMES_DIR="
-                     f"{os.environ.get('GAMES_DIR', 'games')}. Set "
-                     f"GAMES_DIR=games_study.")
-        print(f"{game}  ({n} turns; this game's median is {med:.0f})")
-        print(f"  {BASE}/?__theme=dark&annotator={args.pid}"
-              f"&block=hybrid&game={slug}\n")
-    print(f"{len(picked)} transcripts. Expect roughly "
-          f"{sum(_modelled().values()):.0f} minutes in total if the model holds.")
+        items, med = picked[game]
+        print(f"{game}  (median {med:.0f} turns, model says "
+              f"{model.get(game, 0):.1f} min each)")
+        for r, n in items:
+            # transcript_id IS the slug under games_study. Deriving one from
+            # source_path gives a path relative to games_final/, which the app
+            # cannot resolve.
+            slug = r["transcript_id"]
+            if annotation.slug_to_path(slug) is None:
+                sys.exit(f"{slug} does not resolve under GAMES_DIR="
+                         f"{os.environ.get('GAMES_DIR', 'games')}. "
+                         f"Set GAMES_DIR=games_study.")
+            print(f"  [{n:>2} turns] {base}/?__theme=dark&annotator={args.pid}"
+                  f"&block=hybrid&game={slug}")
+            total_min += model.get(game, 0)
+            total_n += 1
+        print()
+    print(f"{total_n} transcripts across {len(picked)} games. "
+          f"Roughly {total_min:.0f} minutes if the model holds.")
     return 0
 
 
@@ -207,6 +219,11 @@ def main(argv=None):
                     help="seconds to add per transcript (default 30)")
     ap.add_argument("--slowdown", type=float, default=1.0,
                     help="multiplier for naive versus expert (default 1.0)")
+    ap.add_argument("--instances", type=int, default=1,
+                    help="transcripts per game, spread across the turn-count "
+                         "range (default 1)")
+    ap.add_argument("--base", default=None,
+                    help="base URL, e.g. http://localhost:3000 for a local run")
     args = ap.parse_args(argv)
 
     if args.links:

@@ -90,14 +90,25 @@ def batch_of(slug):
 
 
 def template_of(batch_id):
-    """The template a batch instantiates.
+    """The template a batch belongs to, which is now the batch id itself.
 
-    Every model's version of a template holds the SAME instances, so assignment
-    must exclude by TEMPLATE, not by batch: an annotator who did REF-1 for one
-    model would otherwise be handed REF-1 for another and re-rate transcripts of
-    games they have already seen, destroying the independence of the 3 ratings.
+    Batches mix models, so a template no longer names a shared instance set.
+    The column is kept because every annotation row stamps it and the export
+    reads it. Assignment excludes by instance instead — see instances_of.
     """
     return BATCH_TEMPLATE.get(batch_id)
+
+
+def instances_of(batch_id):
+    """{(game, experiment, instance)} for one batch, ignoring which model.
+
+    This is what assignment excludes on. An annotator who has rated an instance
+    under one model must never be offered it under another: the game state is
+    identical, so the two ratings would not be independent.
+    """
+    return {(DIMENSIONS[t]["game"], DIMENSIONS[t]["experiment"],
+             DIMENSIONS[t]["instance"])
+            for t in BATCH_MEMBERS.get(batch_id, ()) if t in DIMENSIONS}
 
 
 def batches_for_template(template_id):
@@ -164,20 +175,16 @@ def validate(expect_batch_size=None):
             games = {DIMENSIONS[t]["game"] for t in members if t in DIMENSIONS}
             if len(games) > 1:
                 problems.append(f"batch {bid} mixes game types: {sorted(games)}")
-            # One batch, one model — that is what makes model identity hideable
-            # and keeps a sitting's difficulty uniform.
-            mods = {DIMENSIONS[t]["model_id"] for t in members if t in DIMENSIONS}
-            if len(mods) > 1:
-                problems.append(f"batch {bid} mixes models: {sorted(mods)}")
-
-        # Every template must expand to exactly one batch per model, holding the
-        # same instances — otherwise the cross-model exclusion is unsound.
-        for tpl, bids in sorted(TEMPLATE_BATCHES.items()):
-            shapes = {tuple(sorted(t.split("__", 1)[1] for t in BATCH_MEMBERS[b]))
-                      for b in bids}
-            if len(shapes) > 1:
-                problems.append(f"template {tpl} expands to differing instance "
-                                f"sets across its {len(bids)} batches")
+            # Batches mix models on purpose, so that sittings come out an even
+            # length. What must never happen is the same instance twice in one
+            # sitting under different models: the annotator would be shown the
+            # same game state twice and rate it twice.
+            keys = [(DIMENSIONS[t]["experiment"], DIMENSIONS[t]["instance"])
+                    for t in members if t in DIMENSIONS]
+            dupes = {k for k in keys if keys.count(k) > 1}
+            if dupes:
+                problems.append(f"batch {bid} repeats instance(s): "
+                                f"{sorted('/'.join(k) for k in dupes)}")
     return problems
 
 

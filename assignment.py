@@ -82,25 +82,30 @@ def _stale_cutoff():
     return (datetime.now() - timedelta(hours=STALE_AFTER_HOURS)).isoformat()
 
 
-def _templates_held(slugs):
-    """Templates this participant has already been reserved into.
+def _instances_held(slugs):
+    """Game instances this participant has already been reserved, as
+    (game, experiment, instance) — deliberately ignoring which model.
 
-    Derived from the slugs they hold, NOT from annotations.template_id. The
-    stamped column is the historical answer; batches.csv is the current one. If
-    an instance is ever re-curated into a different template, the column would
-    say they did REF-1 (true then, irrelevant now) and happily offer them the
-    template that today contains a transcript they have already rated.
+    A batch mixes models, so the same instance appears in the pool four times
+    with four different transcripts. All four show the same game state, so
+    someone who rated one must never be offered another: the second rating
+    would not be independent of the first, and independence is the whole point
+    of collecting three.
+
+    Derived from the slugs they hold, not from annotations.template_id. The
+    stamped column is the historical answer; batches.csv is the current one.
     """
     held = set()
     for slug in slugs:
-        dims = study_set.DIMENSIONS.get(slug)
-        if dims and dims.get("template_id"):
-            held.add(dims["template_id"])
+        d = study_set.DIMENSIONS.get(slug)
+        if d and d.get("game"):
+            held.add((d["game"], d.get("experiment", ""), d.get("instance", "")))
     return held
 
 
-def _pick_batch(counts, coverage_target, exclude_templates=(), exclude_slugs=(),
-                rng=None, batch_members=None, batch_template=None):
+def _pick_batch(counts, coverage_target, exclude_instances=(), exclude_slugs=(),
+                rng=None, batch_members=None, batch_template=None,
+                batch_instances=None):
     """Choose one batch. Pure: no database, no disk, everything injectable.
 
     Returns a Pick. `slugs` holds the batch's still-under-covered members in
@@ -119,8 +124,13 @@ def _pick_batch(counts, coverage_target, exclude_templates=(), exclude_slugs=(),
         batch_members = study_set.BATCH_MEMBERS
     if batch_template is None:
         batch_template = study_set.BATCH_TEMPLATE
-    exclude_templates = set(exclude_templates)
+    exclude_instances = set(exclude_instances)
     exclude_slugs = set(exclude_slugs)
+
+    # Injectable like batch_members, so this stays a pure function: the tests
+    # drive it with made-up batches that are in no manifest.
+    if batch_instances is None:
+        batch_instances = {b: study_set.instances_of(b) for b in batch_members}
 
     anything_open = False
     eligible = []
@@ -129,11 +139,14 @@ def _pick_batch(counts, coverage_target, exclude_templates=(), exclude_slugs=(),
         if not under:
             continue                        # this batch is finished
         anything_open = True
-        if batch_template.get(batch_id) in exclude_templates:
-            continue                        # they have already seen these games
+        # Skip the whole batch if ANY of its instances is one they have already
+        # rated, under any model. Dropping just that transcript would leave a
+        # short sitting and still risk the rest of the batch being re-offered.
+        if batch_instances.get(batch_id, frozenset()) & exclude_instances:
+            continue
         needed = [s for s in under if s not in exclude_slugs]
         if not needed:
-            continue                        # belt-and-braces; template rule covers it
+            continue                        # belt-and-braces; the rule above covers it
         # Send intact batches out before partly covered ones, so short sittings
         # land at the end instead of paying a full sitting for two transcripts.
         eligible.append((min(counts.get(s, 0) for s in under),
@@ -218,7 +231,7 @@ def build_playlist_for(annotator_id, condition=CONDITION):
                                         conn=conn)
             held = db.reserved_slugs(annotator_id, conn=conn)
             pick = _pick_batch(counts, COVERAGE_TARGET,
-                               exclude_templates=_templates_held(held),
+                               exclude_instances=_instances_held(held),
                                exclude_slugs=held)
             reason = pick.reason
             if pick.slugs:
