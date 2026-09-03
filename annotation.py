@@ -716,10 +716,10 @@ def wordle_legend_html(family):
 
 # The single end-of-transcript outcome banner (see _detect_outcome).
 _OUTCOME_BANNERS = {
-    "won":     '<div class="game-win-msg">🏆 Game Won!</div>',
-    "lost":    '<div class="game-loss-msg">❌ Game Lost</div>',
-    "aborted": '<div class="game-loss-msg">⚠️ Game aborted</div>',
-    "ended":   '<div class="game-end-msg">🏁 Game Ended</div>',
+    "won":     '<div class="game-win-msg">Game Won!</div>',
+    "lost":    '<div class="game-loss-msg">Game Lost</div>',
+    "aborted": '<div class="game-loss-msg">Game aborted</div>',
+    "ended":   '<div class="game-end-msg">Game Ended</div>',
 }
 
 
@@ -1087,7 +1087,7 @@ def _build_transcript_html(g, current_idx, pretty_map=False, pretty_path=False,
                     if content == "end game" or "game_result" in content:
                         continue
                     parts.append(
-                        f'<div class="correct-msg">✅ '
+                        f'<div class="correct-msg">'
                         f'<strong>{html.escape(str(content))}</strong></div>'
                     )
                     continue
@@ -1335,7 +1335,7 @@ def _submit(g, field_specs, condition, show_q3, annotator_id, started_at, sessio
         # with the regex there.
         marker = '<span class="a11y-bad-turns" hidden></span>'
         return (
-            f"⚠️ **Not submitted.** Every question must be answered — "
+            f"**Not submitted.** Every question must be answered — "
             f"missing answers on turn{'s' if len(incomplete) > 1 else ''} "
             f"{turns}. (Flags and comments are optional.){marker}",
             gr.update(), gr.update(),
@@ -1388,7 +1388,7 @@ def _submit(g, field_specs, condition, show_q3, annotator_id, started_at, sessio
                   session_started_at=session_started_at or None,
                   dims=dims, question_set_hash=qs_hash,
                   question_set_spec=question_spec_json(spec))
-    return "✅ Saved!", gr.update(visible=False), gr.update(visible=True)
+    return "Saved!", gr.update(visible=False), gr.update(visible=True)
 
 
 def build(welcome_page, annotation_page, verdict_page, game_state, annotator_state,

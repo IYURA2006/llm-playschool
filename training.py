@@ -165,7 +165,7 @@ def _check(*vals):
             '<div class="train-fb">'
             + _feedback_row("Q1 — Prior Information Use", ref["q1"], q1, ref["why_q1"])
             + _feedback_row("Q2 — Sensible Next Step", ref["q2"], q2, ref["why_q2"])
-            + f'<div class="fb-note">💡 {ref["lower"]}</div>'
+            + f'<div class="fb-note">{ref["lower"]}</div>'
             + '</div>'
         )
         fb_updates.append(gr.update(value=html, visible=True))
@@ -217,7 +217,7 @@ def build(welcome_page, training_page, annotation_page, started_at_state,
             # Name and turn count come from the episode itself. Both were left
             # saying "Wordle" and "3 turns" after the practice game changed.
             gr.Markdown(
-                f"**🎓 Practice before you start.** This is a real transcript of "
+                f"**Practice before you start.** This is a real transcript of "
                 f"an AI playing {_PRACTICE_NAME}. Rate each of its "
                 f"{len(_REFERENCE)} turns with the two standard questions, then "
                 f"press **Check my ratings** to compare against reference "

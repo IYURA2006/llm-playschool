@@ -87,7 +87,7 @@ def _verdict_save_and_clear(game_path, annotator_id, condition, playlist, playli
 
     if err:
         return (
-            "⚠️ Please fill in the highlighted fields before submitting.",
+            "Please fill in the highlighted fields before submitting.",
             gr.skip(),                              # clearing_state
             gr.skip(),                               # coherence value
             *_col_updates(COHERENCE, coherence, err=True),
@@ -119,7 +119,7 @@ def _verdict_save_and_clear(game_path, annotator_id, condition, playlist, playli
         )
     except db.QuestionSetChanged:
         return (
-            "⚠️ The study was updated while you were working on this game. "
+            "The study was updated while you were working on this game. "
             "Please reload the page and rate this transcript again — your "
             "earlier games are safe.",
             gr.skip(), gr.skip(),
@@ -131,7 +131,7 @@ def _verdict_save_and_clear(game_path, annotator_id, condition, playlist, playli
         )
     if not ok:
         return (
-            "⚠️ Turn annotations not found. Please complete Step 1 first.",
+            "Turn annotations not found. Please complete Step 1 first.",
             gr.skip(), gr.skip(),
             *_col_updates(COHERENCE, coherence),
             *([gr.skip()] * 4),
@@ -180,7 +180,7 @@ def _verdict_finish(ok, playlist, playlist_idx):
         return (gr.skip(),) * 9
     if not playlist:
         return (
-            gr.skip(), "✅ Verdict saved.", gr.skip(), gr.skip(), gr.skip(),
+            gr.skip(), "Verdict saved.", gr.skip(), gr.skip(), gr.skip(),
             gr.skip(), gr.skip(), gr.skip(), gr.skip(),
         )
     if playlist_idx + 1 >= len(playlist):
@@ -189,7 +189,7 @@ def _verdict_finish(ok, playlist, playlist_idx):
             # The link is the action, not a fallback. A 3s auto-redirect used
             # to sit here, but that is a time limit the user cannot control
             # (WCAG 2.2.1) and it cut screen-reader users off mid-sentence.
-            "🎉 Thank you — you've completed all games in this session!\n\n"
+            "Thank you — you've completed all games in this session!\n\n"
             f"### [Return to Prolific to confirm completion]({PROLIFIC_COMPLETION_URL})\n\n"
             "Your work is already saved. You must follow this link for your "
             "participation to be recorded on Prolific.",

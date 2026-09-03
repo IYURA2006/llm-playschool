@@ -49,7 +49,7 @@ POOL_SLUGS = tuple(sorted(
     s for members in study_set.BATCH_MEMBERS.values() for s in members))
 
 NO_TASKS_MESSAGE = (
-    "🙏 There are no annotation tasks available right now — every set of games "
+    "There are no annotation tasks available right now — every set of games "
     "has enough annotators at the moment. Thank you for your interest; "
     "please check back later."
 )
@@ -58,7 +58,7 @@ NO_TASKS_MESSAGE = (
 # complete it - a completion link here would claim payment for nothing. Work
 # they already finished was paid through its own submission.
 CAP_MESSAGE = (
-    f"🎉 Thank you — you've completed the maximum of {MAX_BATCHES} sets of "
+    f"Thank you — you've completed the maximum of {MAX_BATCHES} sets of "
     f"games for this study, so there's nothing further for you to do. We're "
     f"very grateful for your work. Please return this submission on Prolific "
     f"rather than waiting; the work you already finished is unaffected."
@@ -68,7 +68,7 @@ CAP_MESSAGE = (
 # templates this person has already seen, so "check back later" would never
 # come true for them.
 EXHAUSTED_MESSAGE = (
-    "🙏 Thank you — you've already completed every set of games available to "
+    "Thank you — you've already completed every set of games available to "
     "you in this study. There's nothing further for you to do, so please "
     "return your submission on Prolific rather than waiting."
 )
@@ -194,7 +194,7 @@ def _log_short_sitting(annotator_id, session_index, batch_id, playlist):
     paid a full sitting's rate for part of one."""
     n_members = len(study_set.BATCH_MEMBERS.get(batch_id, ()))
     if n_members and len(playlist) < n_members:
-        print(f"⚠️ assignment: sitting {session_index} for {annotator_id!r} is "
+        print(f"assignment: sitting {session_index} for {annotator_id!r} is "
               f"{len(playlist)} of {batch_id}'s {n_members} transcripts — the "
               f"rest already reached COVERAGE_TARGET.")
 

@@ -1591,7 +1591,7 @@ def _capture_session_params(request: gr.Request):
         # A sanity check, not a format check: the PID is stored as Prolific
         # sends it.
         if len(prolific_pid) > 100:
-            return _session_error("⚠️ Malformed participant link.")
+            return _session_error("Malformed participant link.")
         playlist, err_msg = assignment.build_playlist_for(prolific_pid)
         if err_msg:
             return _session_error(err_msg)
@@ -1604,7 +1604,7 @@ def _capture_session_params(request: gr.Request):
             # screen right after the final verdict - so someone who closed
             # that tab would have no way back to it.
             return _session_error(
-                f"🎉 You've already completed all {len(playlist)} tasks for "
+                f"You've already completed all {len(playlist)} tasks for "
                 f"this study. Thank you!\n\n"
                 f"[Return to Prolific to confirm completion]"
                 f"({annotation_verdict.PROLIFIC_COMPLETION_URL})"
@@ -1631,18 +1631,18 @@ def _capture_session_params(request: gr.Request):
         missing = [name for name, val in (("annotator", annotator), ("block", block), ("game", game)) if not val]
         if missing:
             return _session_error(
-                f"⚠️ This link is missing required parameter(s): {', '.join(missing)}. "
+                f"This link is missing required parameter(s): {', '.join(missing)}. "
                 f"Ask the study coordinator for a corrected link."
             )
         if block not in annotation.VALID_BLOCKS:
             return _session_error(
-                f"⚠️ This link has an invalid 'block' value ({block!r}). "
+                f"This link has an invalid 'block' value ({block!r}). "
                 f"Expected one of: {', '.join(sorted(annotation.VALID_BLOCKS))}."
             )
         game_path = annotation.slug_to_path(game)
         if not game_path:
             return _session_error(
-                f"⚠️ This link references an unknown game ({game!r}). "
+                f"This link references an unknown game ({game!r}). "
                 f"Ask the study coordinator for a corrected link."
             )
         return annotator, block, game_path, "", [], 0, ""
