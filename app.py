@@ -1599,9 +1599,15 @@ def _capture_session_params(request: gr.Request):
         idx = next((i for i, it in enumerate(playlist)
                     if (it["game"], it["condition"]) not in done), None)
         if idx is None:
+            # They finished this sitting and came back. The completion link
+            # is how they get paid, and it is otherwise shown only on the
+            # screen right after the final verdict - so someone who closed
+            # that tab would have no way back to it.
             return _session_error(
                 f"🎉 You've already completed all {len(playlist)} tasks for "
-                f"this study. Thank you!"
+                f"this study. Thank you!\n\n"
+                f"[Return to Prolific to confirm completion]"
+                f"({annotation_verdict.PROLIFIC_COMPLETION_URL})"
             )
         item = playlist[idx]
         # welcome._start shows the practice round on session "1" only.

@@ -54,10 +54,14 @@ NO_TASKS_MESSAGE = (
     "please check back later."
 )
 
+# No work in THIS submission, so the right action is to return it, not to
+# complete it - a completion link here would claim payment for nothing. Work
+# they already finished was paid through its own submission.
 CAP_MESSAGE = (
     f"🎉 Thank you — you've completed the maximum of {MAX_BATCHES} sets of "
     f"games for this study, so there's nothing further for you to do. We're "
-    f"very grateful for your work."
+    f"very grateful for your work. Please return this submission on Prolific "
+    f"rather than waiting; the work you already finished is unaffected."
 )
 
 # Different from NO_TASKS_MESSAGE on purpose. Work remains, but only in

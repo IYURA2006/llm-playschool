@@ -7,7 +7,8 @@ import consent
 import db
 import annotation
 from annotation import GENERIC_Q1, GENERIC_Q2, GENERIC_Q3
-from annotation_verdict import COHERENCE, OVERALL_RATINGS
+from annotation_verdict import (COHERENCE, OVERALL_RATINGS,
+                                PROLIFIC_COMPLETION_URL)
 
 # Kept to a similar length each, so the three cards balance on a row.
 _STEPS = [
@@ -123,9 +124,13 @@ def _start(err, playlist, block, annotator):
         idx = next((i for i, it in enumerate(playlist)
                     if (it["game"], it["condition"]) not in done), None)
         if idx is None:
+            # Same dead end as app.py's reload path: they have finished and
+            # the completion link is their only route to payment.
             return stay(f"You have already completed all {len(playlist)} "
                         f"{_transcripts(len(playlist))} for this session. "
-                        f"Nothing left to do — thank you.")
+                        f"Nothing left to do — thank you.\n\n"
+                        f"[Return to Prolific to confirm completion]"
+                        f"({PROLIFIC_COMPLETION_URL})")
         item = playlist[idx]
         path = annotation.slug_to_path(item["game"])
         if not path:

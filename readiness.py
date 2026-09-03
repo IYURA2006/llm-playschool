@@ -173,29 +173,45 @@ def check_participant_path():
     record(g, "Prolific completion code is real",
            OK if not detail else BLOCKER, detail)
 
-    # The completion link is the only way a participant gets paid. If it is
-    # rendered in just one place - the screen shown immediately after the final
-    # verdict - then closing that tab, reloading, or coming back to the Prolific
-    # link later leaves a finished participant with no way to claim payment.
-    sites = 0
-    for f in ("annotation_verdict.py", "app.py", "welcome.py", "assignment.py"):
+    # How a participant leaves the study, and what each ending owes them.
+    #
+    # Finished work in THIS submission -> must show the completion link, or
+    # they cannot be paid. It is otherwise rendered only on the screen shown
+    # straight after the final verdict, so closing that tab is a dead end.
+    #
+    # No work in this submission (cap reached, nothing left for them, nothing
+    # open) -> must tell them to RETURN it. A completion link there would claim
+    # payment for work not done in that submission.
+    finished = [("app.py", r"already completed all"),
+                ("welcome.py", r"already completed all")]
+    no_work = [("assignment.py", r"CAP_MESSAGE = \("),
+               ("assignment.py", r"EXHAUSTED_MESSAGE = \("),
+               ("assignment.py", r"NO_TASKS_MESSAGE = \(")]
+
+    def _near(f, pat, span=700):
         body = open(f, encoding="utf-8").read()
-        sites += len(re.findall(r"PROLIFIC_COMPLETION_URL", body))
-    sites -= 1                       # the assignment statement itself
-    terminal = []
-    for f, pat in (("app.py", r"already completed all"),
-                   ("welcome.py", r"already completed all"),
-                   ("assignment.py", r"CAP_MESSAGE\s*=|EXHAUSTED_MESSAGE\s*=")):
-        body = open(f, encoding="utf-8").read()
-        for m in re.finditer(pat, body):
-            near = body[m.start():m.start() + 700]
-            if "COMPLETION_URL" not in near and "prolific.com/submissions" not in near:
-                terminal.append(f"{f}:{body[:m.start()].count(chr(10)) + 1}")
+        return [(body[:m.start()].count("\n") + 1, body[m.start():m.start() + span])
+                for m in re.finditer(pat, body)]
+
+    bad = []
+    for f, pat in finished:
+        for line, near in _near(f, pat):
+            if "COMPLETION_URL" not in near:
+                bad.append(f"{f}:{line} (no completion link)")
     record(g, "a finished participant can always reach the completion link",
-           BLOCKER if terminal else OK,
-           f"rendered in {sites} place(s); these dead ends have no link: "
-           f"{', '.join(terminal)} - a participant who closes the tab or "
-           f"reloads cannot claim payment" if terminal else "")
+           BLOCKER if bad else OK,
+           "; ".join(bad) + " - closing the tab or reloading would leave them "
+           "unable to claim payment" if bad else "")
+
+    vague = []
+    for f, pat in no_work:
+        for line, near in _near(f, pat):
+            if "return" not in near.lower():
+                vague.append(f"{f}:{line}")
+    record(g, "endings with no work tell the participant to return it",
+           WARN if vague else OK,
+           "; ".join(vague) + " - says neither complete nor return, so they "
+           "will sit on an open submission" if vague else "")
 
     dbg = os.environ.get("ALLOW_DEBUG_LINKS", "").strip().lower()
     record(g, "debug links are off",
