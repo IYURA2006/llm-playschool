@@ -19,6 +19,30 @@ ssh s2634187@breezy.inf.ed.ac.uk
 ssh -J s2634187@ssh.inf.ed.ac.uk s2634187@breezy.inf.ed.ac.uk
 ```
 
+## Before recruiting
+
+```bash
+GAMES_DIR=games_study python readiness.py
+```
+
+One command, go or no-go. It exits non-zero on anything blocking, and it will
+refuse while the Prolific completion code is still a placeholder or while test
+rows remain in the database. Database checks report SKIPPED, never passed, when
+they cannot connect, so run it **on the VM** for the full picture.
+
+It cannot see whether the VM has actually redeployed — it checks that local
+matches `origin/main`, which catches a forgotten push but not a forgotten
+deploy. Run the deploy below first, then readiness, in that order.
+
+Run the assignment suite too, against a disposable database:
+
+```bash
+TEST_DB_NAME=study_test python _test_assignment.py
+```
+
+73 checks, including the one that guarantees no participant ever rates the same
+game instance twice.
+
 ## Deploy, or update
 
 ```bash
