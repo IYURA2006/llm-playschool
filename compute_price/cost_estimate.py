@@ -47,12 +47,16 @@ WHAT IT ACTUALLY COMPUTES, STEP BY STEP
 
 WHERE THE FIXED NUMBERS CAME FROM
 ------------------------------------
-Everything below that ISN'T something you type in on the command line
-(how long each game takes, the pay rate, Prolific's fee, VAT) is copied
-directly from the "Game Library" and "Assumptions" tabs of
-prolific_cost_final_with_abort_1analysis_rerun.xlsx. If those tabs ever get
-updated, this is the file to come back and update too, so the two stay in
-sync.
+The pay rate, Prolific's fee and VAT come from the "Assumptions" tab of
+prolific_cost_final_with_abort_1analysis_rerun.xlsx.
+
+Minutes per instance do NOT. For the 8 study games they were measured with a
+stopwatch on 2026-09-03 and are the same figures batch_plan.json is sized on,
+so the cost estimate and the study shape cannot drift apart. The spreadsheet's
+own column was roughly half the measured value on the heavier games - it put
+Codenames at 2.0 minutes for a transcript with 12.6 turns and 24.8 rating
+questions, which is not reachable. The 9 games outside the study still carry
+the spreadsheet figures and are marked "~" in the output.
 """
 
 from __future__ import annotations
@@ -83,28 +87,43 @@ MODEL_LABELS = {
 }
 
 # Every game, its display name, and how many minutes it takes an annotator
-# to do ONE instance of it. That minutes figure is a straight copy of the
-# "Min/inst" column on the "Game Library" tab — nothing here is guessed or
-# recalculated, it's exactly what's already in the spreadsheet.
+# to do ONE instance of it.
+#
+# The 8 study games carry MEASURED minutes: a real annotator worked through one
+# transcript per game with a stopwatch (2026-09-03), plus 30 seconds each for a
+# participant meeting the game for the first time rather than the person who
+# wrote the questions. These are the figures batch_plan.json is sized on, so the
+# cost estimate and the study shape cannot drift apart.
+#
+# The other 9 games keep their original spreadsheet figures and are NOT
+# measured. Nothing in the study uses them; --option 3 mixes measured and
+# unmeasured, so treat its total as indicative only.
 GAMES = {
-    "eqbench":                 ("EQBench",            1.0),
-    "referencegame":           ("ReferenceGame",       2.0),
-    "guesswhat":               ("GuessWhat",           2.0),
-    "privateshared":           ("PrivateShared",       3.0),
-    "imagegame":               ("ImageGame",           2.5),
-    "dond":                    ("Deal or No Deal",     2.5),
+    # measured
+    "codenames":               ("Codenames",           6.5),
+    "dond":                    ("Deal or No Deal",     4.5),
+    "imagegame":               ("ImageGame",           4.5),
+    "privateshared":           ("PrivateShared",       3.5),
+    "wordle-crazy_withclue":   ("WCrazy w/ clue",      3.5),
+    "guesswhat":               ("GuessWhat",           2.5),
+    "referencegame":           ("ReferenceGame",       2.5),
+    "ta_frozen_lake":          ("Frozen Lake",         2.5),
+    # not measured — original spreadsheet values
+    "eqbench":                 ("EQBench",             1.0),
     "adventuregame":           ("AdventureGame",       4.0),
     "clean_up":                ("Clean Up",            3.0),
-    "codenames":               ("Codenames",           2.0),
     "wordle":                  ("Wordle",              2.5),
     "wordle_withclue":         ("Wordle w/ clue",      2.5),
-    "ta_frozen_lake":          ("Frozen Lake",         2.0),
     "st_clean_up":             ("ST Clean Up",         3.5),
-    "wordle-crazy_withclue":   ("WCrazy w/ clue",      2.5),
     "ta_mastermind":           ("Mastermind",          2.0),
     "wordle-crazy":            ("Wordle Crazy",        2.5),
     "toh_multi_turn":          ("Tower of Hanoi",      2.0),
 }
+
+# Games whose figure came from a stopwatch rather than the spreadsheet.
+MEASURED = {"codenames", "dond", "imagegame", "privateshared",
+            "wordle-crazy_withclue", "guesswhat", "referencegame",
+            "ta_frozen_lake"}
 
 # Three named ways of picking a smaller set of games instead of all 17.
 # Option 3 just means "every game" and isn't listed here explicitly — the
@@ -129,8 +148,12 @@ UK_VAT_RATE = 0.20          # row 7  — UK VAT, charged on Prolific's fee only
 APPLIES_VAT = 1             # row 8  — 1 because we're a UK-based team
 HOURLY_RATE = 13.45         # row 9  — what each participant is paid, per hour
 ONBOARDING_MIN = 5          # row 13 — one-off setup time per person, not per session
-SESSION_LENGTH_MIN = 20     # row 14 — how long we're aiming for one sitting to be
-SESSIONS_PER_ANNOTATOR = 3  # row 15 — how many sittings we expect one person to do
+# The advertised length of a sitting, and now the real one: batch_plan.json is
+# sized so every batch lands between 17 and 24 minutes of measured work.
+SESSION_LENGTH_MIN = 20
+# Was 3, from the spreadsheet. assignment.MAX_BATCHES is 5, and that is what
+# actually limits a participant, so the headcount here was 60% too high.
+SESSIONS_PER_ANNOTATOR = 5  # = assignment.MAX_BATCHES
 
 
 # ============================================================
@@ -230,6 +253,7 @@ def estimate_cost(shared_completed: dict[str, int], desired_instances: int,
         total_minutes += minutes
         per_game.append({
             "game": display_name,
+            "measured": game_id in MEASURED,
             "shared_completed": available,
             "instances_used": instances_used,
             "min_per_inst": min_per_inst,
@@ -332,8 +356,11 @@ def main():
           f"{args.annotators} annotators/transcript, {args.models} models\n")
     print(f"{'Game':<20} {'Real data':>10} {'Used':>6} {'Min/inst':>9} {'Minutes':>9}")
     for row in result["per_game"]:
+        mark = " " if row["measured"] else "~"
         print(f"{row['game']:<20} {row['shared_completed']:>10} {row['instances_used']:>6} "
-              f"{row['min_per_inst']:>9} {row['annotation_minutes']:>9.0f}")
+              f"{row['min_per_inst']:>8}{mark} {row['annotation_minutes']:>9.0f}")
+    if any(not r["measured"] for r in result["per_game"]):
+        print("\n~ = minutes not measured; spreadsheet estimate, treat as indicative")
 
     print()
     print(f"Total annotation minutes : {result['total_annotation_minutes']:.0f}")

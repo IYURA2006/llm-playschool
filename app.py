@@ -102,6 +102,19 @@ div:focus {
 .quit-btn:hover { background: #991b1b !important; border-color: #ef4444 !important; }
 
 /* Fixed height, scrolls on its own, so it stays lined up with the questions column. */
+/* Participants must not be able to lift the transcripts out of the page. This
+   blocks selection, and with it copy, drag and double-click-to-select, across
+   the whole transcript panel on both the annotation and practice screens.
+
+   It is a deterrent, not a control: the text is still in the DOM for anyone who
+   opens developer tools, and nothing here stops a screenshot. The questions
+   column is left selectable on purpose - a participant may legitimately want to
+   copy a question into a support message. */
+.tx-col, .txscroll, .train-txscroll, .tx-col * {
+    -webkit-user-select: none !important;
+    -moz-user-select: none !important;
+    user-select: none !important;
+}
 .tx-col {
     background: #f1f5f9 !important;
     border-radius: 10px !important;
