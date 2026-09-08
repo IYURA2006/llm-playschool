@@ -250,15 +250,15 @@ class Decoder:
         return bool(path) and self.a.whole_game_only(path, condition)
 
     def coherence_label(self, value):
-        # _COHERENCE is (value, short, long), not the shape label_for expects,
+        # COHERENCE is (value, short, long), not the shape label_for expects,
         # so match on the first element.
-        for val, short, _long in self.v._COHERENCE:
+        for val, short, _long in self.v.COHERENCE:
             if str(val) == str(value):
                 return short
         return ""
 
     def overall_label(self, value):
-        for val, short, _long in self.v._OVERALL_RATINGS:
+        for val, short, _long in self.v.OVERALL_RATINGS:
             if str(val) == str(value):
                 return short
         return ""
