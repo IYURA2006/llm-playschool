@@ -40,14 +40,24 @@ Run the assignment suite too, against a disposable database:
 TEST_DB_NAME=study_test python _test_assignment.py
 ```
 
-73 checks, including the one that guarantees no participant ever rates the same
+70 checks, including the one that guarantees no participant ever rates the same
 game instance twice.
 
 ## Deploy, or update
 
 ```bash
-bash <(curl -sL https://raw.githubusercontent.com/IYURA2006/llm-playschool/main/vm/setup_vm.sh)
+APP_DIR=/disk/data/s2634187/llm-playschool \
+  bash <(curl -sL https://raw.githubusercontent.com/IYURA2006/llm-playschool/main/vm/setup_vm.sh)
 ```
+
+**`APP_DIR` is not optional on breezy.** Without it the script deploys into
+`$HOME`, which is AFS, and puts the app's log, HOME and backups there too. The
+service registers and then dies immediately, because systemd holds no AFS token
+and cannot open the log — after the old service has already been stopped. On
+2026-09-08 the bare command took the public site to 503 and left a second
+checkout in AFS whose `.env` was the template, which reads as lost database
+credentials rather than the wrong directory. The script now refuses this before
+it touches anything, but pass the path and the question does not arise.
 
 Safe to re-run: it pulls the latest `main` and restarts. It clones or updates
 the repo, repoints `origin` if `REPO_URL` changed, checks `.env`, builds the
@@ -74,8 +84,8 @@ force-pushed `main`. The working directory holds nothing worth keeping except
 `.env`, which is untracked, so it is safe to take the remote's version:
 
 ```bash
-git -C ~/llm-playschool fetch origin main
-git -C ~/llm-playschool reset --hard origin/main
+git -C /disk/data/s2634187/llm-playschool fetch origin main
+git -C /disk/data/s2634187/llm-playschool reset --hard origin/main
 ```
 
 On a first run it stops and asks you to fill in `.env`. That is deliberate: it
@@ -159,10 +169,10 @@ ProxyPreserveHost On
 ## Day to day
 
 ```bash
-systemctl --user status annotation.service      # is it up?
-journalctl --user -u annotation.service -f      # live logs
-systemctl --user restart annotation.service     # after a config change
-crontab -l                                      # backup schedule
+systemctl --user status annotation             # is it up? (transient unit, no .service)
+tail -f /disk/data/s2634187/app.log            # live logs
+systemctl --user restart annotation            # after a config change
+crontab -l                                     # backup schedule + the @reboot line
 ```
 
 Study progress and data checks, from the repo directory:
@@ -175,14 +185,15 @@ Study progress and data checks, from the repo directory:
 ## Backups
 
 `vm/backup_db.sh` runs nightly via cron and writes `study-<stamp>.sql.gz` to
-`~/annotation-backups`, keeping 30 days. `pg_dump` snapshots inside a single
+`/disk/data/s2634187/annotation-backups`, keeping 30 days. Not `~`: cron holds
+no AFS token. `pg_dump` snapshots inside a single
 transaction, so it is safe to run while annotators are working — there is no
 one-writer rule to respect any more, unlike the SQLite setup this replaced.
 
 Restore into a scratch database:
 
 ```bash
-gunzip -c ~/annotation-backups/study-<stamp>.sql.gz \
+gunzip -c /disk/data/s2634187/annotation-backups/study-<stamp>.sql.gz \
   | psql "host=localhost dbname=study_restore sslmode=require gssencmode=disable"
 ```
 
@@ -190,6 +201,7 @@ gunzip -c ~/annotation-backups/study-<stamp>.sql.gz \
 
 | Symptom | Cause |
 |---|---|
+| Apache 503 right after a deploy, log path printed as `/afs/...` | `APP_DIR` not pinned — deployed onto AFS, unit dies unable to open its log |
 | Apache 503, app not listening | `.env` missing/incomplete → `RuntimeError: Missing required DB config` at import |
 | `Refusing to start — the study inventory does not check out` | `GAMES_DIR` not `games_study`, or the corpus doesn't match the manifest |
 | Apache 503, app *is* listening | Port mismatch between the vhost and the app |

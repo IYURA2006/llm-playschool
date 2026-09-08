@@ -16,6 +16,7 @@
 set -euo pipefail
 
 REPO_URL=${REPO_URL:-https://github.com/IYURA2006/llm-playschool.git}
+REPO_URL_RAW=${REPO_URL_RAW:-https://raw.githubusercontent.com/IYURA2006/llm-playschool/main}
 BRANCH=${BRANCH:-main}
 APP_DIR=${APP_DIR:-$HOME/llm-playschool}
 # Everything the app writes goes next to the app, not under $HOME. On breezy
@@ -29,6 +30,39 @@ HOME_FS=$(df -PT "$HOME" 2>/dev/null | tail -1 | awk '{print $2}')
 
 say() { printf '>> %s\n' "$*"; }
 die() { printf '!! %s\n' "$*" >&2; exit 1; }
+
+# Filesystem type of the nearest ancestor of $1 that exists, so this can be
+# asked about a directory the script has not created yet.
+fstype_of() {
+    local p=$1
+    while [ ! -e "$p" ] && [ "$p" != "/" ]; do p=$(dirname "$p"); done
+    df -PT "$p" 2>/dev/null | tail -1 | awk '{print $2}'
+}
+
+# ── Refuse to deploy onto AFS ────────────────────────────────────────────────
+# The service writes its log, its HOME and its backups under LOCAL_STATE, and
+# neither the systemd user manager nor cron holds an AFS token. Everything
+# below would still appear to succeed: the code checks out, the venv builds,
+# the database answers, the transient unit registers — and then the unit dies
+# on the spot because systemd cannot open StandardOutput=append:$LOG_FILE.
+#
+# It fails here, before the clone, for two reasons. Stopping later would leave
+# a second checkout in AFS whose .env is the template, which reads as lost
+# credentials rather than the wrong directory. And the restart happens after
+# the old service is stopped, so a late failure takes a working site down —
+# which is exactly what happened on 2026-09-08.
+if [ "$(fstype_of "$LOCAL_STATE")" = "afs" ]; then
+    SUGGEST=/disk/data/$USER/llm-playschool
+    [ -d "$(dirname "$SUGGEST")" ] || SUGGEST="<a path on local disk>/llm-playschool"
+    die "LOCAL_STATE is on AFS ($LOCAL_STATE).
+    The app's log, HOME and backups go there, and daemons hold no AFS token,
+    so the service would register and then die without writing a log.
+    Re-run with the path pinned to local disk:
+
+        APP_DIR=$SUGGEST bash <(curl -sL $REPO_URL_RAW/vm/setup_vm.sh)
+
+    Override LOCAL_STATE explicitly if the app really must live on AFS."
+fi
 
 # ── Code ─────────────────────────────────────────────────────────────────────
 if [ ! -d "$APP_DIR/.git" ]; then
@@ -184,7 +218,12 @@ say "logs: tail -f $LOG_FILE"
 # ── Nightly pg_dump ──────────────────────────────────────────────────────────
 mkdir -p "$BACKUP_DIR"
 chmod +x vm/backup_db.sh
-CRON_LINE="17 3 * * * $APP_DIR/vm/backup_db.sh >> $BACKUP_DIR/backup.log 2>&1"
+# BACKUP_DIR must be passed, not inherited: cron starts with a bare
+# environment, so backup_db.sh would fall back to its $HOME default and try
+# to write the dump to AFS, which cron has no token for. The redirect below
+# already points at local disk, so the failure would land in backup.log and
+# nowhere else — a study running with no backups and nothing obviously wrong.
+CRON_LINE="17 3 * * * APP_DIR=$APP_DIR BACKUP_DIR=$BACKUP_DIR $APP_DIR/vm/backup_db.sh >> $BACKUP_DIR/backup.log 2>&1"
 { crontab -l 2>/dev/null | grep -vF 'vm/backup_db.sh' || true; echo "$CRON_LINE"; } | crontab -
 say "nightly pg_dump installed (crontab -l to inspect)"
 
