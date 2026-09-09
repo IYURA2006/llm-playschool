@@ -41,7 +41,13 @@ STALE_AFTER_HOURS = 2
 
 # Total batches one participant may complete. A returning PID gets a batch from
 # a template they have not seen, until this limit.
-MAX_BATCHES = 5
+#
+# Mirrored as "Average sessions per annotator" in the cost model
+# (prolific_cost_final_with_abort_analysis_rerun1.xlsx, Assumptions!B15). Change
+# both together: the two drifting apart is what produced a headline cost that
+# was wrong for weeks. Note the spreadsheet uses this CAP as if it were the
+# mean, so its headcount is a floor.
+MAX_BATCHES = 8
 
 # Every batched transcript, read from the manifest rather than from disk, so it
 # does not depend on GAMES_DIR. preflight() checks the two agree.
