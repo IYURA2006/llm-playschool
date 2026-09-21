@@ -14,10 +14,10 @@ from questions import (BESPOKE_QUESTIONS, GENERIC_Q1, GENERIC_Q2,
                        GENERIC_Q3, SC_TICKS, SC_TICK_D)
 
 _dir = os.path.dirname(os.path.abspath(__file__))
-# GAMES_DIR picks the tree to serve: games_study/ for the study, games/ for the
-# pilot pool. game_key reads the 4th-from-last path part, so the study tree's
-# extra model level needs no other change.
-_games_dir = os.path.join(_dir, os.environ.get("GAMES_DIR", "games"))
+# GAMES_DIR picks the tree to serve; games_study/ is the only corpus now that
+# the games/ pilot pool is gone. game_key reads the 4th-from-last path part, so
+# the study tree's extra model level needs no other change.
+_games_dir = os.path.join(_dir, os.environ.get("GAMES_DIR", "games_study"))
 
 
 def _discover_games():

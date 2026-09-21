@@ -219,7 +219,7 @@ def check_participant_path():
            "ALLOW_DEBUG_LINKS is set - the Prolific gate is bypassed and rows "
            "can be written under any id in the URL" if dbg else "")
 
-    games_dir = os.environ.get("GAMES_DIR", "games")
+    games_dir = os.environ.get("GAMES_DIR", "games_study")
     record(g, "GAMES_DIR is games_study",
            OK if games_dir == "games_study" else BLOCKER,
            "" if games_dir == "games_study" else

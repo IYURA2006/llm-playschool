@@ -1200,7 +1200,7 @@ def check(verbose=False):
     if unreachable:
         warn(f"{len(unreachable)} entr{'y has' if len(unreachable) == 1 else 'ies have'} "
              f"no transcripts under GAMES_DIR="
-             f"{os.environ.get('GAMES_DIR', 'games')} and cannot be reached "
+             f"{os.environ.get('GAMES_DIR', 'games_study')} and cannot be reached "
              f"from here: {', '.join(unreachable)}")
 
     # The strongest check: build the spec for every transcript and compare it
@@ -1378,7 +1378,7 @@ def markdown():
         "```",
         "",
         f"Covers the {len(fams)} game families with transcripts under "
-        f"`GAMES_DIR={os.environ.get('GAMES_DIR', 'games')}`. Anything a game "
+        f"`GAMES_DIR={os.environ.get('GAMES_DIR', 'games_study')}`. Anything a game "
         "does not override falls back to the Shared Core below.",
         "",
         "---",

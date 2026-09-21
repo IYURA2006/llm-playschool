@@ -1653,9 +1653,9 @@ def _capture_session_params(request: gr.Request):
     )
 
 
-# Refuse to start a misconfigured study. games/ and games_study/ share no slugs,
-# so the wrong GAMES_DIR would run the study on the wrong corpus, and the error
-# would only appear after a participant's rows were already reserved.
+# Refuse to start a misconfigured study. A GAMES_DIR pointing anywhere but
+# games_study/ would run the study on the wrong corpus, and the error would
+# only appear after a participant's rows were already reserved.
 _preflight = assignment.preflight()
 if _preflight:
     raise SystemExit(

@@ -104,8 +104,9 @@ DB_GSSENCMODE=disable
 GAMES_DIR=games_study
 ```
 
-- `GAMES_DIR=games_study` is required. `games/` is the pilot pool and shares no
-  slugs with the study's 416. `app.py` refuses to start if the two disagree.
+- `GAMES_DIR=games_study` is the default and the only supported value; any
+  other tree shares no slugs with the study's 416, and `app.py` refuses to
+  start if the corpus and the manifest disagree.
 - **Do not set `PORT`** unless Apache is proxying somewhere other than 3000.
 - **Do not set `GRADIO_SERVER_NAME`.** Gradio's default 127.0.0.1 bind keeps
   Apache the only public entry point. `0.0.0.0` would publish the app directly

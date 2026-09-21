@@ -60,7 +60,7 @@ the full text.
    PORT=3001 python app.py
    ```
 
-Game transcripts under `games/` are already included in this repository —
+Game transcripts under `games_study/` are already included in this repository —
 no extra download is needed.
 
 ## The question set
@@ -189,7 +189,6 @@ Hanoi), so "all 17 games" is really 13 with usable data.
 | `study_set.py`             | Reads the batch manifest that assignment works from.                 |
 | `build_batches.py`         | Builds the batch plan (one batch = one game + one model).            |
 | `build_study_set.py`       | Builds `games_study/` from the full transcript pool.                 |
-| `games/`                   | Game transcripts (clembench format) shown for annotation.            |
 | `games_study/`             | The curated 416 transcripts the study actually serves.               |
 | `compute_price/`           | Prolific cost estimator. Needs the results zip from OneDrive.        |
 | `vm/`                      | Deployment for breezy: setup script, systemd unit, nightly backup.   |

@@ -113,7 +113,7 @@ def cmd_links(args):
             slug = r["transcript_id"]
             if annotation.slug_to_path(slug) is None:
                 sys.exit(f"{slug} does not resolve under GAMES_DIR="
-                         f"{os.environ.get('GAMES_DIR', 'games')}. "
+                         f"{os.environ.get('GAMES_DIR', 'games_study')}. "
                          f"Set GAMES_DIR=games_study.")
             print(f"  [{n:>2} turns] {base}/?__theme=dark&annotator={args.pid}"
                   f"&block=hybrid&game={slug}")
