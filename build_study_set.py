@@ -6,7 +6,7 @@ model comparison is paired.
 
     python build_study_set.py                 # build games_study/ + manifest
     python build_study_set.py --dry-run       # report the selection, write nothing
-    python build_study_set.py --seed 7        # different draw (default 20260822)
+    python build_study_set.py --source DIR    # build from a different export
 
 Output layout — one model level above the clembench structure:
 
@@ -19,12 +19,13 @@ model falls out of it for free.
 
 Point the app at the result with GAMES_DIR=games_study.
 
-Selection rule: stratified by experiment. Each game's 13 are spread as evenly as
-possible over its experiments, and any shortfall from an undersized experiment
-is redistributed to the ones that have spare. This guarantees every experiment
-is represented — it is the only rule under which Codenames' 13 experiments each
-contribute exactly one, and under which its three single-instance experiments
-(risk_high, risk_low, ambiguous) survive at all.
+Selection rule: whatever batch_plan.json names — see select_from_plan(). The
+earlier stratified random draw is kept below as _unused_stratified_select() for
+reference only; it is not called.
+
+games_practice/ is NOT built here. The practice transcript is aborted for three
+of the four models, so the pruning that produced games_final/ removed it: this
+script cannot regenerate it and must never delete it. See check_practice().
 """
 
 import argparse
@@ -34,13 +35,15 @@ import json
 import os
 import random
 import shutil
-import sys
 from collections import Counter, defaultdict
 
 SOURCE = "games_final"
 DEST = "games_study"
 PRACTICE_DEST = "games_practice"
 MANIFEST = "study_manifest.csv"
+# The only files copied into games_study/, in the order they are listed.
+INSTANCE_FILES = ("interactions.json", "instance.json", "scores.json",
+                  "transcript.html")
 BATCH_PLAN = "batch_plan.json"
 PER_GAME = 13
 DEFAULT_SEED = 20260822
@@ -62,10 +65,12 @@ GAMES = [
     "dond", "codenames", "ta_frozen_lake", "wordle-crazy_withclue",
 ]
 
-# Practice transcript, shown once per annotator. Deliberately a game that is NOT
-# in GAMES, so a practice transcript can never reappear inside a real batch.
-PRACTICE_GAME = "wordle_withclue"
-PRACTICE_MODEL = "qwen3.5-27b"
+# The practice transcript, shown once per annotator. training.py:19 hardcodes
+# this exact path, so it is a fixed address, not a search. It IS a guesswhat
+# instance — one of the study games — but it is aborted for three of the four
+# models, so it never enters the matched pool and can never reappear inside a
+# real batch. check_practice() asserts that on every run.
+PRACTICE = ("guesswhat", "Abs_Level_1", "instance_00004")
 
 
 def discover(source):
@@ -73,8 +78,10 @@ def discover(source):
     found = defaultdict(dict)
     pattern = os.path.join(source, "*", "*", "*", "*", "*", "interactions.json")
     for path in glob.glob(pattern):
-        parts = path.split(os.sep)
-        domain, model, game, experiment, instance = parts[1], parts[2], parts[3], parts[4], parts[5]
+        # Relative to source, so --source may be any depth of path. Reading
+        # absolute parts[1:6] silently matched nothing for a nested source.
+        parts = os.path.relpath(path, source).split(os.sep)
+        domain, model, game, experiment, instance = parts[0], parts[1], parts[2], parts[3], parts[4]
         if model not in MODELS or game not in GAMES:
             continue
         found[(game, experiment, instance)][model] = (path, domain)
@@ -100,28 +107,52 @@ def select_from_plan(matched, plan_path):
     real transcript lengths and annotation burden, which a uniform draw cannot
     see: ReferenceGame is always 2 responses while PrivateShared reaches 30, so
     "13 per game" means very different sittings per game.
+
+    The plan addresses one TRANSCRIPT per entry, "<model>/<experiment>/
+    <instance>", and deliberately mixes models inside a batch. This function
+    collapses those back to instances, because build() emits all four models
+    for every instance it is given — the paired comparison the study rests on.
+    An instance the plan names for some models but not all would quietly break
+    that pairing, so it is rejected rather than half-built.
     """
     with open(plan_path) as fh:
-        templates = json.load(fh)["templates"]
-    chosen, plan, missing = [], {}, []
-    for bid in sorted(templates):
-        spec = templates[bid]
+        batches = json.load(fh)["batches"]
+    per_instance, missing, malformed = defaultdict(set), [], []
+    for bid in sorted(batches):
+        spec = batches[bid]
         game = spec["game"]
-        for ent in spec["instances"]:
-            experiment, instance = ent.split("/")
+        for ent in spec["transcripts"]:
+            try:
+                model_id, experiment, instance = ent.split("/")
+            except ValueError:
+                malformed.append(f"{bid}: {ent!r}")
+                continue
             key = (game, experiment, instance)
             if key not in matched:
                 missing.append(f"{bid}: {game}/{ent}")
                 continue
-            chosen.append(key)
-            plan.setdefault(game, Counter())[experiment] += 1
+            per_instance[key].add(model_id)
+    if malformed:
+        raise SystemExit('batch plan entries must be "<model>/<experiment>/'
+                         '<instance>":\n  ' + "\n  ".join(malformed[:20]))
     if missing:
         raise SystemExit("batch plan references instances that are not matched "
                          "across all models:\n  " + "\n  ".join(missing[:20]))
-    dupes = [k for k, n in Counter(chosen).items() if n > 1]
-    if dupes:
-        raise SystemExit(f"batch plan lists the same instance twice: {dupes[:5]}")
-    return sorted(chosen), {g: dict(c) for g, c in plan.items()}
+
+    want = set(MODELS.values())
+    partial = {k: sorted(v) for k, v in per_instance.items() if v != want}
+    if partial:
+        lines = [f"{'/'.join(k)}  has: {', '.join(v)}" for k, v in
+                 sorted(partial.items())[:20]]
+        raise SystemExit("batch plan does not cover all four models for every "
+                         "instance, so the comparison would not be paired:\n  "
+                         + "\n  ".join(lines))
+
+    chosen = sorted(per_instance)
+    plan = {}
+    for game, experiment, _ in chosen:
+        plan.setdefault(game, Counter())[experiment] += 1
+    return chosen, {g: dict(c) for g, c in plan.items()}
 
 
 def _unused_stratified_select(matched, per_game, seed):
@@ -180,12 +211,16 @@ def build(matched, chosen, dest, dry_run):
             out_dir = os.path.join(dest, short, game, experiment, instance)
             if not dry_run:
                 os.makedirs(out_dir, exist_ok=True)
-                # Copy the whole instance folder: instance.json and scores.json
-                # carry the target grids and outcomes the renderer may need.
-                for f in os.listdir(os.path.dirname(src)):
-                    if f.endswith((".json", ".html")):
-                        shutil.copy2(os.path.join(os.path.dirname(src), f),
-                                     os.path.join(out_dir, f))
+                # A fixed set, not "everything ending in .json/.html":
+                # instance.json and scores.json carry the target grids and
+                # outcomes the renderer needs, and transcript.html is the
+                # human-readable fallback. A full clembench export also ships
+                # completed.json and player_*.requests.json, which nothing
+                # reads and which would add ~1,100 files to a tracked tree.
+                for f in INSTANCE_FILES:
+                    fsrc = os.path.join(os.path.dirname(src), f)
+                    if os.path.exists(fsrc):
+                        shutil.copy2(fsrc, os.path.join(out_dir, f))
             rows.append({
                 "transcript_id": f"{short}__{game}__{experiment}__{instance}",
                 "model_id": short,
@@ -221,29 +256,31 @@ def _model_name(path):
         return ""
 
 
-def copy_practice(dest, dry_run):
-    """One practice transcript, from a game deliberately outside the study set.
+def check_practice(chosen):
+    """Verify the existing practice transcript. Never writes, never deletes.
 
-    Written to a SIBLING directory, never inside dest: _discover_games globs
-    the whole tree, so anything under games_study/ becomes assignable, and the
-    practice transcript turning up in a real batch is exactly what using an
-    excluded game was meant to prevent.
+    This used to rebuild games_practice/ from the source tree, which was wrong
+    twice over. The practice instance is aborted for three of the four models,
+    so matched_only() drops it and the pruning that produced games_final/ left
+    it out — there is nothing to rebuild it FROM. And it lives at a fixed path
+    that training.py:19 hardcodes, so regenerating it under a different game
+    silently broke the practice round.
+
+    It sits in a SIBLING directory, never inside games_study/: annotation.py
+    globs that whole tree, so anything under it becomes assignable.
     """
-    hits = sorted(glob.glob(os.path.join(
-        SOURCE, "*", PRACTICE_MODEL, PRACTICE_GAME, "*", "*", "interactions.json")))
-    if not hits:
-        print(f"  ! practice game {PRACTICE_GAME!r} not found — skipped")
-        return None
-    src = hits[0]
-    parts = src.split(os.sep)
-    out_dir = os.path.join(PRACTICE_DEST, PRACTICE_GAME, parts[4], parts[5])
-    if not dry_run:
-        os.makedirs(out_dir, exist_ok=True)
-        for f in os.listdir(os.path.dirname(src)):
-            if f.endswith((".json", ".html")):
-                shutil.copy2(os.path.join(os.path.dirname(src), f),
-                             os.path.join(out_dir, f))
-    return os.path.relpath(os.path.join(out_dir, "interactions.json"))
+    game, experiment, instance = PRACTICE
+    path = os.path.join(PRACTICE_DEST, game, experiment, instance,
+                        "interactions.json")
+    if not os.path.exists(path):
+        raise SystemExit(
+            f"the practice transcript is missing: {path}\n"
+            "It cannot be rebuilt from the source tree (it is aborted for most "
+            "models and was pruned out). Restore it from git.")
+    if PRACTICE in set(chosen):
+        raise SystemExit(f"the practice instance {'/'.join(PRACTICE)} is also "
+                         "in the study set — an annotator would rate it twice")
+    return path
 
 
 def main():
@@ -276,13 +313,13 @@ def main():
         spread = ", ".join(f"{e}:{n}" for e, n in plan[game].items() if n)
         print(f"  {game:24} {sum(plan[game].values()):>3}   {spread}")
 
-    if not args.dry_run:
-        for stale in (args.dest, PRACTICE_DEST):
-            if stale and os.path.exists(stale):
-                shutil.rmtree(stale)
+    # PRACTICE_DEST is deliberately NOT in this list: it cannot be rebuilt
+    # from the source tree, so deleting it would be unrecoverable here.
+    if not args.dry_run and args.dest and os.path.exists(args.dest):
+        shutil.rmtree(args.dest)
     rows = build(matched, chosen, args.dest, args.dry_run)
 
-    practice = copy_practice(args.dest, args.dry_run)
+    practice = check_practice(chosen)
 
     if not args.dry_run:
         cols = ["transcript_id", "model_id", "model_folder", "model_name",
