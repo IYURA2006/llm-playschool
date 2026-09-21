@@ -544,15 +544,13 @@ def test_pick_batch_is_pure():
     regression that made the OLD picker's target_seconds unpatchable."""
     import random
     BM = {"A__m": ("a1", "a2", "a3"), "B__m": ("b1", "b2"), "C__m": ("c1", "c2")}
-    BT = {"A__m": "A", "B__m": "B", "C__m": "C"}
     # One instance key per batch, enough to exercise the exclusion.
     BI = {"A__m": {("g", "e", "A")}, "B__m": {("g", "e", "B")},
           "C__m": {("g", "e", "C")}}
 
     def pick(counts, **kw):
         return assignment._pick_batch(counts, 3, rng=random.Random(0),
-                                      batch_members=BM, batch_template=BT,
-                                      batch_instances=BI, **kw)
+                                      batch_members=BM, batch_instances=BI, **kw)
 
     p = pick({"a1": 2, "a2": 2, "a3": 2, "b1": 0, "b2": 0, "c1": 1, "c2": 1})
     check("least-covered batch wins", p.batch_id == "B__m")
@@ -560,7 +558,6 @@ def test_pick_batch_is_pure():
     p = assignment._pick_batch(
         {"d1": 0, "d2": 0, "e1": 0, "e2": 3}, 3, rng=random.Random(0),
         batch_members={"D__m": ("d1", "d2"), "E__m": ("e1", "e2")},
-        batch_template={"D__m": "D", "E__m": "E"},
         batch_instances={"D__m": set(), "E__m": set()})
     check("intact batch preferred over a holed one at the same level",
           p.batch_id == "D__m")
@@ -582,20 +579,22 @@ def test_pick_batch_is_pure():
                 "c1": 3, "c2": 3}).slugs == ["a2", "a3"])
 
     # study_set is resolved at CALL time, so a reload/monkeypatch takes effect.
-    saved_m, saved_t = study_set.BATCH_MEMBERS, study_set.BATCH_TEMPLATE
+    saved_m = study_set.BATCH_MEMBERS
     try:
         study_set.BATCH_MEMBERS = {"Z__m": ("z1",)}
-        study_set.BATCH_TEMPLATE = {"Z__m": "Z"}
         p = assignment._pick_batch({"z1": 0}, 3, rng=random.Random(0))
         check("study_set is read at call time, not bound at def time",
               p.batch_id == "Z__m")
     finally:
-        study_set.BATCH_MEMBERS, study_set.BATCH_TEMPLATE = saved_m, saved_t
+        study_set.BATCH_MEMBERS = saved_m
 
 
 def test_template_exclusion_across_models():
-    """One PID to their cap must see five DISTINCT templates. Batch-level
-    exclusion alone would let them re-rate the same games under another model."""
+    """One PID to their cap must see MAX_BATCHES distinct templates, one batch
+    each. template_id is 1:1 with batch_id, so this pins the observable
+    consequence; what actually stops them re-rating a game under another model
+    is the instance-level exclusion in _pick_batch, covered by
+    test_never_rates_one_instance_twice."""
     reset_db()
     pid = "fakepid_tpl"
     slugs = []

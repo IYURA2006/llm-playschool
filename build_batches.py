@@ -16,11 +16,15 @@ matters more than how long each one is. Codenames is the heaviest at 6.5
 minutes per transcript and takes 3-4 per sitting; ReferenceGame is the lightest
 at 2.5 and takes 8-9.
 
-`template_id` is the column that makes the cross-model rule enforceable. Every
-model's version of a template contains the SAME instances, so an annotator who
-takes REF-1 for one model must never be offered REF-1 for another — they would
-be re-rating transcripts of games they have already seen, and their judgements
-would not be independent. Assignment excludes on template_id, not batch_id.
+`template_id` is written for every row, but because each batch already mixes
+models there is exactly ONE version of each template, and the column is a copy
+of `batch_id` — not four per-model versions of a shared instance list.
+
+The cross-model rule is therefore enforced at INSTANCE level, not by template.
+Each instance appears four times in the corpus, once per model, and all four
+show the same game state, so an annotator who rated one must never be offered
+another; their judgements would not be independent. assignment._pick_batch
+skips any batch holding an instance they have already rated, under any model.
 """
 
 import argparse

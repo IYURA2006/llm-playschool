@@ -1,6 +1,7 @@
 """Batch assignment for the Prolific study.
 
-A sitting is one whole curated BATCH: one game, one model, 2-7 transcripts.
+A sitting is one whole curated BATCH: one game, with models deliberately
+MIXED inside it, 3-9 transcripts.
 The count is chosen so the sitting is about 20 minutes of real work, using
 modelled annotator time rather than turn count (see batch_plan.json). Each
 batch is completed independently by COVERAGE_TARGET annotators.
@@ -12,10 +13,12 @@ stick under concurrent Prolific traffic.
 Two rules do the real work:
 
   * A participant may take at most MAX_BATCHES batches.
-  * A participant may never take two batches of the same TEMPLATE. Every
-    model's version of a template holds the SAME instances, so REF-1__qwen27b
-    followed by REF-1__dair2b would be re-rating the same games — the two
-    ratings would not be independent, which is the whole point of having three.
+  * A participant may never be offered a batch holding an INSTANCE they have
+    already rated, under any model. Each instance appears four times in the
+    corpus, once per model, and all four show the same game state, so a second
+    rating would not be independent of the first — which is the whole point of
+    collecting three. _pick_batch skips the entire batch on any overlap rather
+    than dropping the one transcript; see _instances_held.
 
 This module is files + database only. It deliberately does not import
 annotation: batch membership comes from study_set (which reads the manifest),
@@ -39,8 +42,8 @@ CONDITION = "hybrid"    # the only condition the general study ever assigns
 # transcripts were handed out again.
 STALE_AFTER_HOURS = 2
 
-# Total batches one participant may complete. A returning PID gets a batch from
-# a template they have not seen, until this limit.
+# Total batches one participant may complete. A returning PID gets a batch
+# sharing no instance with anything they have already rated, until this limit.
 #
 # Mirrored as "Average sessions per annotator" in the cost model
 # (prolific_cost_final_with_abort_analysis_rerun1.xlsx, Assumptions!B15). Change
@@ -70,9 +73,9 @@ CAP_MESSAGE = (
     f"rather than waiting; the work you already finished is unaffected."
 )
 
-# Different from NO_TASKS_MESSAGE on purpose. Work remains, but only in
-# templates this person has already seen, so "check back later" would never
-# come true for them.
+# Different from NO_TASKS_MESSAGE on purpose. Work remains, but every still-open
+# batch holds an instance this person has already rated, so "check back later"
+# would never come true for them.
 EXHAUSTED_MESSAGE = (
     "Thank you — you've already completed every set of games available to "
     "you in this study. There's nothing further for you to do, so please "
@@ -114,8 +117,7 @@ def _instances_held(slugs):
 
 
 def _pick_batch(counts, coverage_target, exclude_instances=(), exclude_slugs=(),
-                rng=None, batch_members=None, batch_template=None,
-                batch_instances=None):
+                rng=None, batch_members=None, batch_instances=None):
     """Choose one batch. Pure: no database, no disk, everything injectable.
 
     Returns a Pick. `slugs` holds the batch's still-under-covered members in
@@ -132,8 +134,6 @@ def _pick_batch(counts, coverage_target, exclude_instances=(), exclude_slugs=(),
     # time, which made the old version unpatchable from the tests.
     if batch_members is None:
         batch_members = study_set.BATCH_MEMBERS
-    if batch_template is None:
-        batch_template = study_set.BATCH_TEMPLATE
     exclude_instances = set(exclude_instances)
     exclude_slugs = set(exclude_slugs)
 
@@ -288,7 +288,7 @@ def preflight():
     if missing:
         problems.append(
             f"{len(missing)}/{len(POOL_SLUGS)} batched transcripts do not "
-            f"resolve under GAMES_DIR={os.environ.get('GAMES_DIR', 'games')!r} "
+            f"resolve under GAMES_DIR={os.environ.get('GAMES_DIR', 'games_study')!r} "
             f"(e.g. {missing[0]}) — the app is pointed at the wrong tree")
     if len(study_set.TEMPLATE_BATCHES) < MAX_BATCHES:
         problems.append(
