@@ -11,7 +11,7 @@ from annotation import (DEFAULT_GAME, load_game, game_slug, slug_to_path,
 
 # The completion code belongs to ONE Prolific study. This is the pilot's; the
 # main study gets its own from Prolific and readiness.py blocks until it is set.
-PROLIFIC_COMPLETION_URL = "https://app.prolific.com/submissions/complete?cc=C7ZBGQYY"
+PROLIFIC_COMPLETION_URL = "https://app.prolific.com/submissions/complete?cc=C7X7C3UY"
 
 COHERENCE = [
     ("1", "No plan",   "Each move seems disconnected from the last — no consistent logic across turns."),

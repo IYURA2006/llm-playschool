@@ -179,7 +179,7 @@ def check_participant_path():
     m = re.search(r'PROLIFIC_COMPLETION_URL\s*=\s*["\']([^"\']+)', src)
     url = m.group(1) if m else ""
     placeholder = "C10WMMGK"
-    pilot_code = "C7ZBGQYY"     # the pilot's Prolific study; not the main one's
+    pilot_code = "C7X7C3UY"     # the pilot's Prolific study; not the main one's
     todo = re.search(r"#\s*TODO[^\n]*\n\s*PROLIFIC_COMPLETION_URL", src)
     if not url:
         detail = "not found"
