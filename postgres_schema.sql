@@ -53,6 +53,13 @@ ALTER TABLE annotations ADD COLUMN IF NOT EXISTS template_id TEXT;
 -- Fingerprint of the question set this row was collected under, so the export
 -- can decode old rows against the questions really shown at the time.
 ALTER TABLE annotations ADD COLUMN IF NOT EXISTS question_set_hash TEXT;
+-- Prolific's SESSION_ID: one per submission, sent in the study link. Stamped on
+-- every row of the sitting that submission was given, which is what lets the
+-- app tell "came back for the completion link" (same id: show the link) from
+-- "came back to do another sitting" (new id: reserve one). NULL for anyone who
+-- arrives without one. The app runs without this column - it just cannot make
+-- that distinction - so adding it never has to be timed against a deploy.
+ALTER TABLE annotations ADD COLUMN IF NOT EXISTS prolific_session_id TEXT;
 
 CREATE TABLE IF NOT EXISTS turn_ratings (
     id INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,

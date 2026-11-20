@@ -56,6 +56,35 @@ _REQUIRED_COLUMNS = {
 }
 
 
+# Columns the app uses when they exist and does without when they do not.
+# Unlike _REQUIRED_COLUMNS, a database missing one of these still starts: on the
+# VM the app's role cannot alter tables, so a required column added here would
+# turn the next deploy into a 503 until an admin had run the schema.
+_OPTIONAL_COLUMNS = {"annotations": ("prolific_session_id",)}
+_optional_seen = {}
+
+
+def _has_column(table, column, refresh=False):
+    key = (table, column)
+    if refresh or key not in _optional_seen:
+        try:
+            with _connect() as conn:
+                cur = conn.cursor()
+                cur.execute(
+                    "SELECT 1 FROM information_schema.columns WHERE "
+                    "table_schema='public' AND table_name=%s AND column_name=%s",
+                    (table, column))
+                _optional_seen[key] = cur.fetchone() is not None
+        except Exception:
+            return False            # not cached: ask again next time
+    return _optional_seen[key]
+
+
+def has_session_id_column(refresh=False):
+    """Whether annotations.prolific_session_id exists in this database."""
+    return _has_column("annotations", "prolific_session_id", refresh)
+
+
 def _open():
     return psycopg2.connect(
         host=DB_HOST,
@@ -454,8 +483,55 @@ def coverage_counts(condition, stale_before=None, conn=None):
     return dict(rows)
 
 
+def session_for_submission(annotator_id, prolific_session_id, condition=None,
+                           conn=None):
+    """The sitting (session_index) this Prolific submission was given, or None.
+
+    None too when the column is missing or no id was sent, so callers can treat
+    "cannot tell" and "never seen" alike: both mean reserve as before."""
+    if not prolific_session_id or not has_session_id_column():
+        return None
+    q = ("SELECT MAX(COALESCE(session_index, 1)) FROM annotations "
+         "WHERE annotator_id=%s AND prolific_session_id=%s")
+    params = [annotator_id or "", prolific_session_id]
+    if condition is not None:
+        q += " AND condition=%s"
+        params.append(condition)
+    if conn is not None:
+        cur = conn.cursor()
+        cur.execute(q, params)
+        row = cur.fetchone()
+    else:
+        with _connect() as c:
+            cur = c.cursor()
+            cur.execute(q, params)
+            row = cur.fetchone()
+    return int(row[0]) if row and row[0] is not None else None
+
+
+def stamp_submission(annotator_id, condition, session_index, prolific_session_id,
+                     conn=None):
+    """Mark a whole sitting as belonging to this Prolific submission.
+
+    Called when an unfinished sitting is resumed. Someone who returned one
+    submission part-way and took the study again arrives with a new id, and the
+    sitting they finish must answer to the submission that will be paid."""
+    if not prolific_session_id or not has_session_id_column():
+        return
+    q = ("UPDATE annotations SET prolific_session_id=%s WHERE annotator_id=%s "
+         "AND condition=%s AND COALESCE(session_index,1)=%s "
+         "AND prolific_session_id IS DISTINCT FROM %s")
+    params = (prolific_session_id, annotator_id or "", condition, session_index,
+              prolific_session_id)
+    if conn is not None:
+        conn.cursor().execute(q, params)
+        return
+    with _connect() as c:
+        c.cursor().execute(q, params)
+
+
 def reserve_games(annotator_id, condition, game_slugs, session_index=1, conn=None,
-                  batch_id=None, dims_by_slug=None):
+                  batch_id=None, dims_by_slug=None, prolific_session_id=None):
     """Claim `game_slugs` for `annotator_id` under `condition` as placeholder
     rows; save_turns fills in the rest on first submit. A slug already
     reserved in an earlier session is silently skipped, so callers must
@@ -481,6 +557,10 @@ def reserve_games(annotator_id, condition, game_slugs, session_index=1, conn=Non
            "     model_id, domain, game, experiment, instance, batch_id, template_id) "
            "VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) "
            "ON CONFLICT(game_slug, annotator_id, condition) DO NOTHING")
+    if prolific_session_id and has_session_id_column():
+        sql = sql.replace("template_id) ", "template_id, prolific_session_id) ") \
+                 .replace("%s, %s) ON", "%s, %s, %s) ON")
+        rows = [(*r, prolific_session_id) for r in rows]
     if conn is not None:
         cur = conn.cursor()
         cur.executemany(sql, rows)

@@ -93,6 +93,10 @@ def _verdict_scales_html():
     )
 
 
+START_LABEL = "Start Annotation →"
+START_LOADING = "Loading your session…"
+
+
 def _start(err, playlist, block, annotator):
     """Route the Start click: error banner > consent gate > playlist (resumes
     at the first game without a submitted verdict) > legacy single-game link."""
@@ -108,7 +112,10 @@ def _start(err, playlist, block, annotator):
                 gr.update(visible=True) if show_popup else gr.skip(), False)
 
     if err:
-        return stay("")
+        # The banner at the top already says why. Without a word here the
+        # button simply did nothing, a long scroll away from that banner.
+        return stay("There is nothing to start here — please see the message "
+                    "at the top of this page.")
 
     # has_consented("") is always False, so this only gates real participants.
     if annotator and not db.has_consented(annotator):
@@ -203,7 +210,13 @@ def build(welcome_page, annotation_page, training_page, error_state,
             @gr.render(inputs=[error_state])
             def _error_banner(msg):
                 if msg:
-                    gr.Markdown(f"**{msg}**", elem_classes=["info-box"],
+                    # Bold the first paragraph only. Markdown emphasis cannot
+                    # span a blank line, so wrapping a two-paragraph message
+                    # (the one carrying the completion link) printed the
+                    # asterisks instead.
+                    head, _, rest = msg.partition("\n\n")
+                    gr.Markdown(f"**{head}**" + (f"\n\n{rest}" if rest else ""),
+                                elem_classes=["info-box"],
                                 elem_id="welcome-error")
 
             gr.Markdown("# Human Annotation Study")
@@ -257,9 +270,17 @@ def build(welcome_page, annotation_page, training_page, error_state,
             status_note = gr.Markdown("", elem_id="welcome-status")
 
             # First chained click blanks the annotation page, then _start (below) mounts it fresh.
+            #
+            # Disabled until app.py's load event has worked out who this is and
+            # what they have been given; app.py switches it on. The page paints
+            # before that answer arrives, and with the server busy the gap is
+            # seconds. Pressed inside it, Start ran with no participant and no
+            # playlist and said "no participant link detected" - to someone on
+            # a perfectly good link, usually a returning participant who knows
+            # the page and clicks straight away.
             start_btn = gr.Button(
-                "Start Annotation →", variant="primary", size="lg",
-                elem_classes=["start-btn"],
+                START_LOADING, variant="primary", size="lg",
+                elem_classes=["start-btn"], interactive=False,
             )
 
             gr.Markdown(
@@ -305,3 +326,5 @@ def build(welcome_page, annotation_page, training_page, error_state,
             inputs=None,
             outputs=[consent_popup, popup_note, status_note],
         )
+
+    return start_btn

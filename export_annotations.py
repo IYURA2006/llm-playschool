@@ -498,6 +498,10 @@ _ANNOTATION_COLUMNS = [
     "game_key", "game_id", "game_name",
     "source_path", "has_reasoning", "annotator_id", "consented_at",
     "condition", "session_index",
+    # Prolific's SESSION_ID for the submission this sitting was done under.
+    # Join it to Prolific's own export to match a sitting to a payment. Empty
+    # for anyone who arrived without one, and for databases without the column.
+    "prolific_session_id",
     "session_day", "session_started_at", "started_at", "annotated_at", "verdict_at",
     "updated_at", "n_turns_rated", "strategic_coherence", "strategic_coherence_label",
     "overall_rating", "overall_rating_label", "whole_game_only", "verdict_comment",

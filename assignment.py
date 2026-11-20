@@ -32,9 +32,12 @@ import random
 from datetime import datetime, timedelta
 
 import db
+import study_profile
 import study_set
 
-COVERAGE_TARGET = 3     # independent annotators before a transcript is "covered"
+# Independent annotators before a transcript is "covered": 3 in the main study,
+# 2 in the pilot. Read from the profile GAMES_DIR selects.
+COVERAGE_TARGET = study_profile.ACTIVE.coverage_target
 CONDITION = "hybrid"    # the only condition the general study ever assigns
 
 # Abandoned reservations expire after this long. One hour was too short: a long
@@ -49,8 +52,9 @@ STALE_AFTER_HOURS = 2
 # (prolific_cost_final_with_abort_analysis_rerun1.xlsx, Assumptions!B15). Change
 # both together: the two drifting apart is what produced a headline cost that
 # was wrong for weeks. Note the spreadsheet uses this CAP as if it were the
-# mean, so its headcount is a floor.
-MAX_BATCHES = 8
+# mean, so its headcount is a floor. 8 in the main study; the pilot's value is
+# its own batch count (see study_profile).
+MAX_BATCHES = study_profile.ACTIVE.max_batches
 
 # Every batched transcript, read from the manifest rather than from disk, so it
 # does not depend on GAMES_DIR. preflight() checks the two agree.
@@ -205,16 +209,30 @@ def _log_short_sitting(annotator_id, session_index, batch_id, playlist):
               f"rest already reached COVERAGE_TARGET.")
 
 
-def build_playlist_for(annotator_id, condition=CONDITION):
+def build_playlist_for(annotator_id, condition=CONDITION, submission_id=None):
     """Entry point for a Prolific PID. Returns (playlist, error_message).
 
     One call reserves at most one batch. Resumes an unfinished sitting rather
     than re-picking, so the games cannot change under someone mid-sitting.
+
+    `submission_id` is Prolific's SESSION_ID, one per submission. With it, one
+    submission is one sitting: a link reopened after its sitting is finished
+    gets that same sitting back, complete, and reserves nothing - the caller
+    sees every game done and shows the completion link. Without it (no id in
+    the link, or a database that has no column to keep it in) every visit after
+    a finished sitting starts the next one, which is the only thing that can be
+    done when the two cases cannot be told apart.
     """
+    submission_id = (submission_id or "").strip() or None
+    if submission_id and not db.has_session_id_column():
+        submission_id = None
+
     summary = db.session_summary(annotator_id, condition=condition)
     resume_idx, completed = _resume_target(summary)
-    # Nothing to write for a capped-out participant, so skip the lock.
-    if resume_idx is None and completed >= MAX_BATCHES:
+    # Nothing to write for a capped-out participant, so skip the lock. Not when
+    # a submission id came with them: the sitting that took them to the cap may
+    # be the very one this link belongs to, and they are owed its link.
+    if resume_idx is None and completed >= MAX_BATCHES and not submission_id:
         return [], CAP_MESSAGE
 
     playlist, reason, picked_batch, new_idx = None, None, None, None
@@ -222,6 +240,19 @@ def build_playlist_for(annotator_id, condition=CONDITION):
         # Re-read under the lock, or two tabs would each reserve a batch.
         summary = db.session_summary(annotator_id, condition=condition, conn=conn)
         resume_idx, completed = _resume_target(summary)
+
+        if submission_id:
+            own = db.session_for_submission(annotator_id, submission_id,
+                                            condition, conn=conn)
+            done_sittings = {idx for idx, total, done in summary
+                             if total and done >= total}
+            if own in done_sittings:
+                # Finished, and back on the same submission's link. Hand the
+                # finished sitting back untouched; reserving another here is
+                # what used to leave people facing a second sitting when all
+                # they wanted was the link they had closed.
+                return db.assigned_games(annotator_id, condition=condition,
+                                         session_index=own, conn=conn), None
 
         if resume_idx is not None:
             db.prune_over_covered(annotator_id, condition, resume_idx,
@@ -234,6 +265,9 @@ def build_playlist_for(annotator_id, condition=CONDITION):
         if resume_idx is not None:
             playlist = db.assigned_games(annotator_id, condition=condition,
                                          session_index=resume_idx, conn=conn)
+            # An unfinished sitting answers to whichever submission finishes it.
+            db.stamp_submission(annotator_id, condition, resume_idx,
+                                submission_id, conn=conn)
 
         elif completed < MAX_BATCHES:
             new_idx = max((idx for idx, _, _ in summary), default=0) + 1
@@ -254,6 +288,7 @@ def build_playlist_for(annotator_id, condition=CONDITION):
                     session_index=new_idx, conn=conn,
                     batch_id=pick.batch_id,
                     dims_by_slug={s: study_set.dimensions(s) for s in pick.slugs},
+                    prolific_session_id=submission_id,
                 )
                 # Read back rather than building the list here, so both paths
                 # return the same shape. ON CONFLICT DO NOTHING also means an
@@ -288,7 +323,7 @@ def preflight():
     if missing:
         problems.append(
             f"{len(missing)}/{len(POOL_SLUGS)} batched transcripts do not "
-            f"resolve under GAMES_DIR={os.environ.get('GAMES_DIR', 'games_study')!r} "
+            f"resolve under GAMES_DIR={study_profile.GAMES_DIR!r} "
             f"(e.g. {missing[0]}) — the app is pointed at the wrong tree")
     if len(study_set.TEMPLATE_BATCHES) < MAX_BATCHES:
         problems.append(

@@ -9,8 +9,9 @@ from annotation import (DEFAULT_GAME, load_game, game_slug, slug_to_path,
                         plain_label, question_spec, question_spec_hash,
                         whole_game_questions, whole_game_only)
 
-# TODO: placeholder completion code — swap for the real one before going live.
-PROLIFIC_COMPLETION_URL = "https://app.prolific.com/submissions/complete?cc=C10WMMGK"
+# The completion code belongs to ONE Prolific study. This is the pilot's; the
+# main study gets its own from Prolific and readiness.py blocks until it is set.
+PROLIFIC_COMPLETION_URL = "https://app.prolific.com/submissions/complete?cc=C7ZBGQYY"
 
 COHERENCE = [
     ("1", "No plan",   "Each move seems disconnected from the last — no consistent logic across turns."),
@@ -53,6 +54,14 @@ def _overall_update(err):
     return gr.update(elem_classes=classes)
 
 
+# Every handler that writes into specific_state. Each one reads the dict, adds
+# its own answer and returns the result, so two that run at the same moment
+# both start from the same dict and the second overwrites the first: one of
+# two answers given in quick succession vanished, and the save was refused
+# with both visibly selected. Sharing a concurrency id makes them queue.
+_ONE_AT_A_TIME = {"concurrency_id": "verdict_specific", "concurrency_limit": 1}
+
+
 def _action_label(playlist, playlist_idx):
     """The merged save/advance button's label depends on where we are in the
     playlist — known at render time (no need to wait for a click)."""
@@ -86,13 +95,26 @@ def _verdict_save_and_clear(game_path, annotator_id, condition, playlist, playli
         err = not coherence or not overall_touched or specific_incomplete
 
     if err:
+        # Name what is missing. One generic line left people hunting: the
+        # slider shows a number before it has been touched, so it looks
+        # answered, and a missing game-specific answer was not marked at all.
+        missing = []
+        if not wg_only and not coherence:
+            missing.append("**G1** — choose one of the four options")
+        if not wg_only and not overall_touched:
+            missing.append("**G2** — set the slider (click or move it, even if "
+                           "the value you want is already showing)")
+        if specific_incomplete:
+            missing.append("**This game specifically** — answer every "
+                           "question in that box")
         return (
-            "Please fill in the highlighted fields before submitting.",
+            "Not saved yet. Still needed: " + "; ".join(missing) + ".",
             gr.skip(),                              # clearing_state
             gr.skip(),                               # coherence value
             *_col_updates(COHERENCE, coherence, err=True),
             *([gr.skip()] * 4),                      # coh_btns unchanged
-            _overall_update(err=True),
+            # Red only when the slider itself is what is missing.
+            _overall_update(err=not wg_only and not overall_touched),
             gr.skip(), gr.skip(),                     # overall_touched, comment
             gr.skip(),                                # specific_state unchanged
             False,                                    # verdict_ok_state
@@ -172,16 +194,56 @@ def _verdict_save_and_clear(game_path, annotator_id, condition, playlist, playli
     )
 
 
-def _verdict_finish(ok, playlist, playlist_idx):
+def _save_and_clear_flagged(*args):
+    """_verdict_save_and_clear plus one trailing output: "1" when it has just
+    asked for the page to be blanked, "" otherwise. The click chain's next step
+    is browser-side and needs to know which, and it cannot read a gr.State."""
+    out = _verdict_save_and_clear(*args)
+    return (*out, "1" if out[1] is True else "")
+
+
+# Runs in the browser between "blank the page" and "mount the next game", and
+# holds the chain until the old game's widgets have really left the DOM.
+#
+# Without it the two steps race. The blank is a render, the mount is a render,
+# and nothing made the second wait for the first; when the server or the
+# connection was slow enough for the mount to overtake, Gradio reused the old
+# widgets for the new game. The next transcript then opened with the previous
+# one's answers and comments already filled in, and they were saved as that
+# transcript's ratings unless the participant happened to change them. Seen in
+# about 1 of every 150 game switches with six people working at once.
+#
+# The timeout is a floor on how bad things can get, not the mechanism: after
+# 8 seconds it lets the chain continue rather than strand the participant.
+#
+# It is attached to _verdict_finish as that event's own js=, which Gradio
+# awaits before calling the server, and it hands its arguments back untouched.
+# A separate js-only step in between does not work: in this Gradio a .then()
+# after an event with no server function never fires, so the chain stopped
+# there and the next game never mounted.
+_AWAIT_BLANK_JS = """async (...args) => {
+    if (args[args.length - 1] === "1") {
+        const stale = () => document.querySelector(
+            '#annot-page .turn-anno-card, #verdict-page .g3-card');
+        const t0 = Date.now();
+        while (stale() && Date.now() - t0 < 8000) {
+            await new Promise((r) => setTimeout(r, 40));
+        }
+    }
+    return args;
+}"""
+
+
+def _verdict_finish(ok, playlist, playlist_idx, _await_blank=None):
     """Step 3 (chained via .then): route to the next game, or a static
     "saved"/"all done" status. Leaves clearing_state alone on the last-game
     branch — it only matters while still inside the annotation flow."""
     if not ok:
-        return (gr.skip(),) * 9
+        return (gr.skip(),) * 10
     if not playlist:
         return (
             gr.skip(), "Verdict saved.", gr.skip(), gr.skip(), gr.skip(),
-            gr.skip(), gr.skip(), gr.skip(), gr.skip(),
+            gr.skip(), gr.skip(), gr.skip(), gr.skip(), gr.skip(),
         )
     if playlist_idx + 1 >= len(playlist):
         return (
@@ -196,7 +258,12 @@ def _verdict_finish(ok, playlist, playlist_idx):
             gr.skip(), gr.skip(), gr.skip(), gr.skip(),
             gr.skip(),                   # annotation_page — never shown again
             gr.skip(),                   # verdict_page — STAYS visible, showing the message
-            gr.skip(),                   # action_btn — page is left behind
+            # Both buttons go. Left on screen they sat directly under the
+            # completion link, still live, and "Save & Finish Study" read as
+            # the thing to press - when the link above it is what gets a
+            # participant paid. Both are mounted, so hiding them is safe.
+            gr.update(visible=False),    # action_btn
+            gr.update(visible=False),    # back_btn
         )
     new_idx = playlist_idx + 1
     item = playlist[new_idx]
@@ -210,6 +277,7 @@ def _verdict_finish(ok, playlist, playlist_idx):
         gr.update(visible=False),     # verdict_page
         # Relabel here: a separate listener would race with annotation.py's render.
         gr.update(value=_action_label(playlist, new_idx)),
+        gr.skip(),                    # back_btn
     )
 
 
@@ -266,6 +334,9 @@ def build(welcome_page, annotation_page, verdict_page,
                     coh_cols.append(col)
                     coh_btns.append(btn)
             coherence = gr.Textbox(value="", visible=False)
+            # Set by the save step, read by _AWAIT_BLANK_JS. A Textbox rather
+            # than a State because the browser has to be able to read it.
+            await_blank = gr.Textbox(value="", visible=False)
 
         with gr.Group(elem_classes=["question-card", "g2-card"]):
             gr.Markdown("### G2 — Overall Game Quality")
@@ -296,13 +367,29 @@ def build(welcome_page, annotation_page, verdict_page,
         # specific_state, so the save chain keeps a fixed shape.
         specific_state = gr.State({})
 
-        @gr.render(inputs=[game_state, block_state])
-        def _specific_overall(path, block):
+        # clearing_state is an input for the same reason it is on the annotation
+        # page: rendering nothing between games is the only thing that unmounts
+        # these widgets. Without it Gradio reuses them, so the next game opened
+        # with the previous game's answer already selected - and because
+        # specific_state had been reset, clicking that same answer fired no
+        # change event and the verdict could not be submitted at all.
+        #
+        # triggers= is as important as the input. By default a render re-runs
+        # on a change to ANY input, and a game switch changes several, so the
+        # questions were being rebuilt two or three times in a row - each
+        # rebuild throwing away whatever had just been clicked. clearing_state
+        # flips exactly twice per switch: True to blank, False to mount.
+        @gr.render(inputs=[game_state, block_state, clearing_state],
+                   triggers=[clearing_state.change])
+        def _specific_overall(path, block, clearing):
+            if clearing:
+                return
             questions = whole_game_questions(path or DEFAULT_GAME, block)
             if not questions:
                 return
             slider_mode = whole_game_only(path or DEFAULT_GAME, block)
-            cls = ["question-card"] + (["wg-only"] if slider_mode else [])
+            # g3-card is what _AWAIT_BLANK_JS looks for.
+            cls = ["question-card", "g3-card"] + (["wg-only"] if slider_mode else [])
             with gr.Group(elem_classes=cls):
                 gr.Markdown("### This game specifically" if slider_mode
                             else "### G3 — This game specifically")
@@ -325,11 +412,20 @@ def build(welcome_page, annotation_page, verdict_page,
                         s = gr.Slider(minimum=1, maximum=n, step=1, value=(1 + n) // 2,
                                       label=f"{plain_label(q_md)}, 1 to {n}",
                                       show_label=False, elem_classes=["ovr-slider"])
-                        # .release only, so an untouched slider stays out of
-                        # specific_state and still counts as unanswered.
+                        # User-driven events only, never .change, so an untouched
+                        # slider stays out of specific_state and still counts as
+                        # unanswered.
                         s.release(
                             fn=lambda val, cur, k=qid: {**(cur or {}), k: str(int(val))},
                             inputs=[s, specific_state], outputs=[specific_state],
+                            **_ONE_AT_A_TIME,
+                        )
+                        # Keyboard users: see overall.input below.
+                        s.input(
+                            fn=lambda val, cur, k=qid: {**(cur or {}), k: str(int(val))},
+                            inputs=[s, specific_state], outputs=[specific_state],
+                            show_progress="hidden", trigger_mode="always_last",
+                            **_ONE_AT_A_TIME,
                         )
                     else:
                         r = gr.Radio(choices=choices, label=plain_label(q_md),
@@ -338,6 +434,7 @@ def build(welcome_page, annotation_page, verdict_page,
                         r.change(
                             fn=lambda val, cur, k=qid: {**(cur or {}), k: val},
                             inputs=[r, specific_state], outputs=[specific_state],
+                            **_ONE_AT_A_TIME,
                         )
 
         comment = gr.Textbox(
@@ -363,22 +460,31 @@ def build(welcome_page, annotation_page, verdict_page,
             )
 
         overall.release(fn=lambda: True, outputs=[overall_touched])
+        # .release is a pointer event, so the arrow keys never fired it and a
+        # keyboard user could move the slider but never have it count. .input
+        # fires on any change the user makes and not on the programmatic reset
+        # between games, which is the property overall_touched depends on.
+        overall.input(fn=lambda: True, outputs=[overall_touched],
+                      show_progress="hidden", trigger_mode="always_last")
 
         # See _verdict_save_and_clear's docstring for why save+clear stays one event.
         action_btn.click(
-            fn=_verdict_save_and_clear,
+            fn=_save_and_clear_flagged,
             inputs=[game_state, annotator_state, block_state, playlist_state,
                     playlist_idx_state, coherence, overall, overall_touched,
                     comment, specific_state],
             outputs=[status, clearing_state, coherence, *coh_cols, *coh_btns,
                      overall, overall_touched, comment, specific_state,
-                     verdict_ok_state],
+                     verdict_ok_state, await_blank],
         ).then(
             fn=_verdict_finish,
-            inputs=[verdict_ok_state, playlist_state, playlist_idx_state],
+            # await_blank last: _AWAIT_BLANK_JS reads it from that position.
+            inputs=[verdict_ok_state, playlist_state, playlist_idx_state,
+                    await_blank],
+            js=_AWAIT_BLANK_JS,
             outputs=[clearing_state, status, playlist_idx_state, game_state,
                      block_state, started_at_state, annotation_page, verdict_page,
-                     action_btn],
+                     action_btn, back_btn],
         ).then(
             # Move focus to the completion link: it is the last action of the
             # study and nothing else remains on the page.

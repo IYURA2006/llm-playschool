@@ -1,6 +1,9 @@
 import os
 
 import gradio as gr
+# Before any module that uses @gr.render: Gradio binds the render entry point
+# when the decorator runs, so patching afterwards would change nothing.
+import gradio_patches  # noqa: F401
 import db
 import welcome
 import training
@@ -875,14 +878,14 @@ fieldset[aria-invalid="true"] {
 .consent-sheet strong { color: #dbeafe !important; }
 .consent-sheet a { color: #7dd3fc !important; }
 /* The only way back to Prolific, so it is sized like a button, not a link. */
-#verdict-status a {
+#verdict-status a, #welcome-error a {
     display: inline-block;
     background: #1d4ed8; color: #fff !important;
     padding: 10px 18px; border-radius: 8px;
     font-weight: 700; text-decoration: none !important;
     min-height: 24px;
 }
-#verdict-status a:hover { background: #2563eb; }
+#verdict-status a:hover, #welcome-error a:hover { background: #2563eb; }
 
 /* Secondary to "I agree", but the dialog's only other way out. */
 .consent-decline-btn {
@@ -1571,6 +1574,19 @@ force_dark = """
     }
 })();
 </script>
+<script>
+// Turn ratings exist only in the browser until "Submit All" is pressed, so a
+// reload or a closed tab part-way through a transcript loses them. Ask first.
+// Scoped to the annotation page with at least one answer given: nothing is at
+// risk on any other screen, and the completion link must leave without a prompt.
+window.addEventListener('beforeunload', function (e) {
+    var page = document.getElementById('annot-page');
+    if (!page || getComputedStyle(page).display === 'none') return;
+    if (!page.querySelector('.scale-radio input:checked')) return;
+    e.preventDefault();
+    e.returnValue = '';
+});
+</script>
 """
 
 def _session_error(msg):
@@ -1592,20 +1608,32 @@ def _capture_session_params(request: gr.Request):
         # sends it.
         if len(prolific_pid) > 100:
             return _session_error("Malformed participant link.")
-        playlist, err_msg = assignment.build_playlist_for(prolific_pid)
+        # One per Prolific submission. It is what separates someone reopening a
+        # finished submission's link from someone starting their next one.
+        # Optional: a link without it behaves as it always did.
+        submission_id = next(
+            (v.strip() for k, v in qp.items() if k.upper() == "SESSION_ID" and v.strip()),
+            "",
+        )
+        if len(submission_id) > 100:
+            return _session_error("Malformed participant link.")
+        playlist, err_msg = assignment.build_playlist_for(
+            prolific_pid, submission_id=submission_id)
         if err_msg:
             return _session_error(err_msg)
         done = db.completed_pairs(prolific_pid)
         idx = next((i for i, it in enumerate(playlist)
                     if (it["game"], it["condition"]) not in done), None)
         if idx is None:
-            # They finished this sitting and came back. The completion link
-            # is how they get paid, and it is otherwise shown only on the
-            # screen right after the final verdict - so someone who closed
-            # that tab would have no way back to it.
+            # They finished this sitting and came back on the same
+            # submission's link (assignment.build_playlist_for returns the
+            # finished sitting only then). The completion link is how they
+            # get paid, and it is otherwise shown only on the screen right
+            # after the final verdict - so someone who closed that tab would
+            # have no way back to it.
             return _session_error(
-                f"You've already completed all {len(playlist)} tasks for "
-                f"this study. Thank you!\n\n"
+                f"You've already completed all {len(playlist)} transcripts in "
+                f"this session, and your work is saved. Thank you!\n\n"
                 f"[Return to Prolific to confirm completion]"
                 f"({annotation_verdict.PROLIFIC_COMPLETION_URL})"
             )
@@ -1653,16 +1681,17 @@ def _capture_session_params(request: gr.Request):
     )
 
 
-# Refuse to start a misconfigured study. A GAMES_DIR pointing anywhere but
-# games_study/ would run the study on the wrong corpus, and the error would
-# only appear after a participant's rows were already reserved.
+# Refuse to start a misconfigured study. A corpus that disagrees with its batch
+# file would hand out transcripts that do not exist, and the error would only
+# appear after a participant's rows were already reserved.
 _preflight = assignment.preflight()
 if _preflight:
     raise SystemExit(
         "Refusing to start — the study inventory does not check out:\n  "
         + "\n  ".join(f"- {p}" for p in _preflight)
-        + "\n\nFix the above (usually: GAMES_DIR=games_study in .env, or "
-          "re-run build_study_set.py / build_batches.py), then restart."
+        + "\n\nFix the above (usually: the corpus GAMES_DIR names in .env does "
+          "not match its batch file - re-run build_study_set.py and "
+          "build_batches.py, or build_pilot_set.py for the pilot), then restart."
     )
 
 with gr.Blocks(title="LM Playschool — Annotation Study") as app:
@@ -1693,11 +1722,12 @@ with gr.Blocks(title="LM Playschool — Annotation Study") as app:
     # Modal overlay, not a page — toggled by welcome._start / _confirm_consent.
     consent_popup = gr.Column(visible=False, elem_id="consent-modal")
 
-    welcome.build(welcome_page, annotation_page, training_page, error_state,
-                  playlist_state, started_at_state, session_started_at_state,
-                  annotator_state, block_state,
-                  game_state, playlist_idx_state, session_day_state,
-                  clearing_state, consent_popup)
+    start_btn = welcome.build(
+        welcome_page, annotation_page, training_page, error_state,
+        playlist_state, started_at_state, session_started_at_state,
+        annotator_state, block_state,
+        game_state, playlist_idx_state, session_day_state,
+        clearing_state, consent_popup)
     training.build(welcome_page, training_page, annotation_page, started_at_state,
                    annotator_state)
     annotation.build(welcome_page, annotation_page, verdict_page, game_state,
@@ -1711,7 +1741,14 @@ with gr.Blocks(title="LM Playschool — Annotation Study") as app:
 
     app.load(_capture_session_params, inputs=None,
               outputs=[annotator_state, block_state, game_state, error_state,
-                       playlist_state, playlist_idx_state, session_day_state])
+                       playlist_state, playlist_idx_state, session_day_state],
+    ).then(
+        # Only now is Start safe to press (see welcome.build). .then, not
+        # .success: if the lookup itself failed, a button that works and says
+        # so is better than one that stays grey for ever.
+        lambda: gr.update(value=welcome.START_LABEL, interactive=True),
+        outputs=[start_btn],
+    )
 
 # System fonts avoid a Google Fonts fetch on first paint. Must be
 # gr.themes.Font objects: a plain string crashes Gradio's font comparison.

@@ -1,0 +1,1514 @@
+{
+  "meta": {
+    "game_name": "codenames",
+    "experiment_name": "abstract",
+    "game_id": 8,
+    "results_folder": "CityUoL__qwen3.5-2b__Qwen-GuidePlay-2B-v1",
+    "clem_version": "3.7.2",
+    "round_count": 6,
+    "completed": true
+  },
+  "player_models": {
+    "0": {
+      "model_spec": {
+        "model_name": "CityUoL__qwen3.5-2b__Qwen-GuidePlay-2B-v1",
+        "_team": "CityUoL",
+        "_version": "Qwen-GuidePlay-2B-v1",
+        "backend": "huggingface_local",
+        "context_size": "262k",
+        "huggingface_id": "syedhuq/qwen-guideplay-2b",
+        "languages": [
+          "en"
+        ],
+        "license": {
+          "name": "Apache-2.0",
+          "url": "https://www.apache.org/licenses/LICENSE-2.0"
+        },
+        "lookup_source": "/project/mmanina/lm-playschool-test-set/playpen/model_registry.json",
+        "model_config": {
+          "premade_chat_template": true,
+          "eos_to_cull": "<\\|im_end\\|>|<\\|endoftext\\|>",
+          "chat_template_kwargs": {
+            "enable_thinking": false
+          },
+          "multimodality": {
+            "single_image": true,
+            "multiple_images": true,
+            "audio": false,
+            "video": true
+          }
+        },
+        "open_weight": true,
+        "parameters": "2B",
+        "release_date": "2026-07-06"
+      },
+      "gen_args": {
+        "temperature": 0.0,
+        "max_tokens": 5000
+      }
+    }
+  },
+  "players": {
+    "GM": {
+      "game_role": "Game Master",
+      "model_name": "programmatic"
+    },
+    "Player 1": {
+      "game_role": "ClueGiver",
+      "model_name": "CityUoL__qwen3.5-2b__Qwen-GuidePlay-2B-v1"
+    },
+    "Player 2": {
+      "game_role": "Guesser",
+      "model_name": "CityUoL__qwen3.5-2b__Qwen-GuidePlay-2B-v1"
+    }
+  },
+  "turns": [
+    [
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:51:19.719306",
+        "action": {
+          "type": "board status",
+          "content": {
+            "hidden": {
+              "team": [
+                "normalness",
+                "analogy",
+                "resourcefulness",
+                "possibility",
+                "ambivalence",
+                "nonchalance",
+                "willfulness",
+                "enrichment",
+                "discretion"
+              ],
+              "innocent": [
+                "shrewdness",
+                "ruse",
+                "principles",
+                "misapprehension",
+                "utilization",
+                "knowledge",
+                "randomization"
+              ],
+              "opponent": [
+                "persuasiveness",
+                "mindset",
+                "sexism",
+                "synthesis",
+                "expedience",
+                "inadequacy",
+                "psyche",
+                "concordance"
+              ],
+              "assassin": [
+                "refutation"
+              ]
+            },
+            "revealed": {
+              "team": {
+                "team": [],
+                "innocent": [],
+                "opponent": [],
+                "assassin": []
+              },
+              "opponent": {
+                "team": [],
+                "innocent": [],
+                "opponent": [],
+                "assassin": []
+              }
+            }
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 1",
+        "timestamp": "2026-07-09T07:51:45.319640",
+        "action": {
+          "type": "send message",
+          "content": "Provide one single-word clue that relates to some of your team's words from the list below. You can choose to how many and to which words your clue relates to.\nThe goal is to have your partner guess all of your team's words based on the clues you give them, before the other team has uncovered all of theirs. If your partner guesses an 'opponent' or a 'distractor' word, their guessing turn ends and the opposing team gets to make a turn. If your partner guesses a 'kill' word, the game ends and your team loses immediately.\nThe more words your clue relates to, the quicker you can win the game, but the harder the associations may be to guess for your partner, so choose your clue word wisely. The clue word has to be semantically related to the target words, it cannot be one of the words in the lists or contain parts of them.\n\nAlways give your single-word clue and your comma-separated list of related target words in the following format and make your answers as short as possible, never include any other text than is required in this form:\n\nCLUE: <WORD>\nTARGETS: <TARGETS>\n\nYour team words are: normalness, analogy, resourcefulness, possibility, ambivalence, nonchalance, willfulness, enrichment, discretion.\nYour opponent's team words are: persuasiveness, mindset, sexism, synthesis, expedience, inadequacy, psyche, concordance.\nDistractor words are: shrewdness, ruse, principles, misapprehension, utilization, knowledge, randomization.\nThe kill words are: refutation.",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 1",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:51:45.319656",
+        "action": {
+          "type": "get message",
+          "content": "CLUE: DECISION\nTARGETS: normalness, resourcefulness, possibility, ambivalence, nonchalance, willfulness, discretion",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:51:45.319905",
+        "action": {
+          "type": "clue",
+          "content": "decision"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:51:45.319938",
+        "action": {
+          "type": "targets",
+          "content": [
+            "normalness",
+            "resourcefulness",
+            "possibility",
+            "ambivalence",
+            "nonchalance",
+            "willfulness",
+            "discretion"
+          ]
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:51:45.319964",
+        "action": {
+          "type": "word targeted",
+          "content": {
+            "word": "normalness",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:51:45.319985",
+        "action": {
+          "type": "word targeted",
+          "content": {
+            "word": "resourcefulness",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:51:45.320004",
+        "action": {
+          "type": "word targeted",
+          "content": {
+            "word": "possibility",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:51:45.320022",
+        "action": {
+          "type": "word targeted",
+          "content": {
+            "word": "ambivalence",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:51:45.320040",
+        "action": {
+          "type": "word targeted",
+          "content": {
+            "word": "nonchalance",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:51:45.320058",
+        "action": {
+          "type": "word targeted",
+          "content": {
+            "word": "willfulness",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:51:45.320076",
+        "action": {
+          "type": "word targeted",
+          "content": {
+            "word": "discretion",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 2",
+        "timestamp": "2026-07-09T07:52:01.620643",
+        "action": {
+          "type": "send message",
+          "content": "Provide a comma-separated list of up to 7 words from the following list that best relate or are most closely associated with the word 'decision'. Always start your list of guess(es) with 'GUESS: ' and do not include any other text in your answer.\n\nanalogy, expedience, misapprehension, willfulness, enrichment, randomization, normalness, synthesis, ambivalence, sexism, persuasiveness, mindset, shrewdness, discretion, inadequacy, resourcefulness, refutation, concordance, ruse, knowledge, possibility, psyche, principles, nonchalance, utilization",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 2",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:52:01.620658",
+        "action": {
+          "type": "get message",
+          "content": "GUESS: willfulness, shrewdness, resourcefulness, knowledge, principles, utilization, discretion",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:52:01.620718",
+        "action": {
+          "type": "guesses",
+          "content": [
+            "willfulness",
+            "shrewdness",
+            "resourcefulness",
+            "knowledge",
+            "principles",
+            "utilization",
+            "discretion"
+          ]
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:52:01.620745",
+        "action": {
+          "type": "team revealed",
+          "content": {
+            "word": "willfulness",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:52:01.620766",
+        "action": {
+          "type": "target revealed",
+          "content": {
+            "word": "willfulness",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:52:01.620787",
+        "action": {
+          "type": "team revealed",
+          "content": {
+            "word": "shrewdness",
+            "assignment": "innocent"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:52:01.620806",
+        "action": {
+          "type": "turn end after",
+          "content": "shrewdness"
+        }
+      }
+    ],
+    [
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:52:01.620937",
+        "action": {
+          "type": "opponent revealed",
+          "content": {
+            "word": "psyche",
+            "assignment": "opponent"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:52:01.620964",
+        "action": {
+          "type": "board status",
+          "content": {
+            "hidden": {
+              "team": [
+                "normalness",
+                "analogy",
+                "resourcefulness",
+                "possibility",
+                "ambivalence",
+                "nonchalance",
+                "enrichment",
+                "discretion"
+              ],
+              "innocent": [
+                "ruse",
+                "principles",
+                "misapprehension",
+                "utilization",
+                "knowledge",
+                "randomization"
+              ],
+              "opponent": [
+                "persuasiveness",
+                "mindset",
+                "sexism",
+                "synthesis",
+                "expedience",
+                "inadequacy",
+                "concordance"
+              ],
+              "assassin": [
+                "refutation"
+              ]
+            },
+            "revealed": {
+              "team": {
+                "team": [
+                  "willfulness"
+                ],
+                "innocent": [
+                  "shrewdness"
+                ],
+                "opponent": [],
+                "assassin": []
+              },
+              "opponent": {
+                "team": [],
+                "innocent": [],
+                "opponent": [
+                  "psyche"
+                ],
+                "assassin": []
+              }
+            }
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 1",
+        "timestamp": "2026-07-09T07:52:20.675242",
+        "action": {
+          "type": "send message",
+          "content": "The word willfulness was guessed correctly. The word shrewdness was guessed but is an innocent word. Your teammate's turn ended there.\nNow provide another clue relating to some of your remaining team words and a list of the related target words. Remember to start your clue with 'CLUE: ', put a new line, and start your comma-separated list of target words with 'TARGETS: '. Notice: some words have been removed from the lists compared to previous requests.\n\nYour remaining team words are: normalness, analogy, resourcefulness, possibility, ambivalence, nonchalance, enrichment, discretion.\nRemaining words for your opponent are: persuasiveness, mindset, sexism, synthesis, expedience, inadequacy, psyche, concordance.\nRemaining distractor words are: ruse, principles, misapprehension, utilization, knowledge, randomization.\nRemaining kill words are: refutation.",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 1",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:52:20.675260",
+        "action": {
+          "type": "get message",
+          "content": "CLUE: RELUCTANCE\nTARGETS: ambivalence, nonchalance",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:52:20.675454",
+        "action": {
+          "type": "clue",
+          "content": "reluctance"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:52:20.675477",
+        "action": {
+          "type": "targets",
+          "content": [
+            "ambivalence",
+            "nonchalance"
+          ]
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:52:20.675498",
+        "action": {
+          "type": "word targeted",
+          "content": {
+            "word": "ambivalence",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:52:20.675517",
+        "action": {
+          "type": "word targeted",
+          "content": {
+            "word": "nonchalance",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 2",
+        "timestamp": "2026-07-09T07:52:34.049162",
+        "action": {
+          "type": "send message",
+          "content": "The word willfulness was guessed correctly. The word shrewdness was guessed but is an innocent word. Your turn ended there.\nNow provide another comma-separated list of at least 1 and up to 2 words from the following list of words that best relate or are most closely associated with the word 'reluctance'. Remember to start your answer with 'GUESS: '. Notice: some words have been removed from the list compared to previous requests.\n\nanalogy, expedience, misapprehension, enrichment, randomization, normalness, synthesis, ambivalence, sexism, persuasiveness, mindset, discretion, inadequacy, resourcefulness, refutation, concordance, ruse, knowledge, possibility, principles, nonchalance, utilization",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 2",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:52:34.049177",
+        "action": {
+          "type": "get message",
+          "content": "GUESS: ambivalence, nonchalance",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:52:34.049260",
+        "action": {
+          "type": "guesses",
+          "content": [
+            "ambivalence",
+            "nonchalance"
+          ]
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:52:34.049300",
+        "action": {
+          "type": "team revealed",
+          "content": {
+            "word": "ambivalence",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:52:34.049323",
+        "action": {
+          "type": "target revealed",
+          "content": {
+            "word": "ambivalence",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:52:34.049344",
+        "action": {
+          "type": "team revealed",
+          "content": {
+            "word": "nonchalance",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:52:34.049362",
+        "action": {
+          "type": "target revealed",
+          "content": {
+            "word": "nonchalance",
+            "assignment": "team"
+          }
+        }
+      }
+    ],
+    [
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:52:34.049638",
+        "action": {
+          "type": "opponent revealed",
+          "content": {
+            "word": "inadequacy",
+            "assignment": "opponent"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:52:34.049667",
+        "action": {
+          "type": "board status",
+          "content": {
+            "hidden": {
+              "team": [
+                "normalness",
+                "analogy",
+                "resourcefulness",
+                "possibility",
+                "enrichment",
+                "discretion"
+              ],
+              "innocent": [
+                "ruse",
+                "principles",
+                "misapprehension",
+                "utilization",
+                "knowledge",
+                "randomization"
+              ],
+              "opponent": [
+                "persuasiveness",
+                "mindset",
+                "sexism",
+                "synthesis",
+                "expedience",
+                "concordance"
+              ],
+              "assassin": [
+                "refutation"
+              ]
+            },
+            "revealed": {
+              "team": {
+                "team": [
+                  "willfulness",
+                  "ambivalence",
+                  "nonchalance"
+                ],
+                "innocent": [
+                  "shrewdness"
+                ],
+                "opponent": [],
+                "assassin": []
+              },
+              "opponent": {
+                "team": [],
+                "innocent": [],
+                "opponent": [
+                  "psyche",
+                  "inadequacy"
+                ],
+                "assassin": []
+              }
+            }
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 1",
+        "timestamp": "2026-07-09T07:52:50.416779",
+        "action": {
+          "type": "send message",
+          "content": "The words ambivalence, nonchalance were guessed correctly. Your teammate's turn ended there.\nNow provide another clue relating to some of your remaining team words and a list of the related target words. Remember to start your clue with 'CLUE: ', put a new line, and start your comma-separated list of target words with 'TARGETS: '. Notice: some words have been removed from the lists compared to previous requests.\n\nYour remaining team words are: normalness, analogy, resourcefulness, possibility, enrichment, discretion.\nRemaining words for your opponent are: persuasiveness, mindset, sexism, synthesis, expedience, inadequacy, concordance.\nRemaining distractor words are: ruse, principles, misapprehension, utilization, knowledge, randomization.\nRemaining kill words are: refutation.",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 1",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:52:50.416796",
+        "action": {
+          "type": "get message",
+          "content": "CLUE: SIMILARITY\nTARGETS: analogy, normalness",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:52:50.416955",
+        "action": {
+          "type": "clue",
+          "content": "similarity"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:52:50.416977",
+        "action": {
+          "type": "targets",
+          "content": [
+            "analogy",
+            "normalness"
+          ]
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:52:50.416997",
+        "action": {
+          "type": "word targeted",
+          "content": {
+            "word": "analogy",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:52:50.417015",
+        "action": {
+          "type": "word targeted",
+          "content": {
+            "word": "normalness",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 2",
+        "timestamp": "2026-07-09T07:53:00.750070",
+        "action": {
+          "type": "send message",
+          "content": "The words ambivalence, nonchalance were guessed correctly. Your turn ended there.\nNow provide another comma-separated list of at least 1 and up to 2 words from the following list of words that best relate or are most closely associated with the word 'similarity'. Remember to start your answer with 'GUESS: '. Notice: some words have been removed from the list compared to previous requests.\n\nanalogy, expedience, misapprehension, enrichment, randomization, normalness, synthesis, sexism, persuasiveness, mindset, discretion, resourcefulness, refutation, concordance, ruse, knowledge, possibility, principles, utilization",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 2",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:53:00.750086",
+        "action": {
+          "type": "get message",
+          "content": "GUESS: analogy, concordance",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:53:00.750138",
+        "action": {
+          "type": "guesses",
+          "content": [
+            "analogy",
+            "concordance"
+          ]
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:53:00.750162",
+        "action": {
+          "type": "team revealed",
+          "content": {
+            "word": "analogy",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:53:00.750182",
+        "action": {
+          "type": "target revealed",
+          "content": {
+            "word": "analogy",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:53:00.750202",
+        "action": {
+          "type": "team revealed",
+          "content": {
+            "word": "concordance",
+            "assignment": "opponent"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:53:00.750221",
+        "action": {
+          "type": "turn end after",
+          "content": "concordance"
+        }
+      }
+    ],
+    [
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:53:00.750356",
+        "action": {
+          "type": "opponent revealed",
+          "content": {
+            "word": "persuasiveness",
+            "assignment": "opponent"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:53:00.750383",
+        "action": {
+          "type": "board status",
+          "content": {
+            "hidden": {
+              "team": [
+                "normalness",
+                "resourcefulness",
+                "possibility",
+                "enrichment",
+                "discretion"
+              ],
+              "innocent": [
+                "ruse",
+                "principles",
+                "misapprehension",
+                "utilization",
+                "knowledge",
+                "randomization"
+              ],
+              "opponent": [
+                "mindset",
+                "sexism",
+                "synthesis",
+                "expedience"
+              ],
+              "assassin": [
+                "refutation"
+              ]
+            },
+            "revealed": {
+              "team": {
+                "team": [
+                  "willfulness",
+                  "ambivalence",
+                  "nonchalance",
+                  "analogy"
+                ],
+                "innocent": [
+                  "shrewdness"
+                ],
+                "opponent": [
+                  "concordance"
+                ],
+                "assassin": []
+              },
+              "opponent": {
+                "team": [],
+                "innocent": [],
+                "opponent": [
+                  "psyche",
+                  "inadequacy",
+                  "persuasiveness"
+                ],
+                "assassin": []
+              }
+            }
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 1",
+        "timestamp": "2026-07-09T07:53:13.286359",
+        "action": {
+          "type": "send message",
+          "content": "The word analogy was guessed correctly. The word concordance was guessed but is an opponent word. Your teammate's turn ended there.\nNow provide another clue relating to some of your remaining team words and a list of the related target words. Remember to start your clue with 'CLUE: ', put a new line, and start your comma-separated list of target words with 'TARGETS: '. Notice: some words have been removed from the lists compared to previous requests.\n\nYour remaining team words are: normalness, resourcefulness, possibility, enrichment, discretion.\nRemaining words for your opponent are: persuasiveness, mindset, sexism, synthesis, expedience.\nRemaining distractor words are: ruse, principles, misapprehension, utilization, knowledge, randomization.\nRemaining kill words are: refutation.",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 1",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:53:13.286375",
+        "action": {
+          "type": "get message",
+          "content": "CLUE: POTENTIAL\nTARGETS: possibility, resourcefulness",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:53:13.286576",
+        "action": {
+          "type": "clue",
+          "content": "potential"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:53:13.286608",
+        "action": {
+          "type": "targets",
+          "content": [
+            "possibility",
+            "resourcefulness"
+          ]
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:53:13.286632",
+        "action": {
+          "type": "word targeted",
+          "content": {
+            "word": "possibility",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:53:13.286653",
+        "action": {
+          "type": "word targeted",
+          "content": {
+            "word": "resourcefulness",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 2",
+        "timestamp": "2026-07-09T07:53:22.299180",
+        "action": {
+          "type": "send message",
+          "content": "The word analogy was guessed correctly. The word concordance was guessed but is an opponent word. Your turn ended there.\nNow provide another comma-separated list of at least 1 and up to 2 words from the following list of words that best relate or are most closely associated with the word 'potential'. Remember to start your answer with 'GUESS: '. Notice: some words have been removed from the list compared to previous requests.\n\nexpedience, misapprehension, enrichment, randomization, normalness, synthesis, sexism, mindset, discretion, resourcefulness, refutation, ruse, knowledge, possibility, principles, utilization",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 2",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:53:22.299209",
+        "action": {
+          "type": "get message",
+          "content": "GUESS: possibility, resourcefulness",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:53:22.299276",
+        "action": {
+          "type": "guesses",
+          "content": [
+            "possibility",
+            "resourcefulness"
+          ]
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:53:22.299312",
+        "action": {
+          "type": "team revealed",
+          "content": {
+            "word": "possibility",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:53:22.299337",
+        "action": {
+          "type": "target revealed",
+          "content": {
+            "word": "possibility",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:53:22.299361",
+        "action": {
+          "type": "team revealed",
+          "content": {
+            "word": "resourcefulness",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:53:22.299383",
+        "action": {
+          "type": "target revealed",
+          "content": {
+            "word": "resourcefulness",
+            "assignment": "team"
+          }
+        }
+      }
+    ],
+    [
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:53:22.299553",
+        "action": {
+          "type": "opponent revealed",
+          "content": {
+            "word": "mindset",
+            "assignment": "opponent"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:53:22.299588",
+        "action": {
+          "type": "board status",
+          "content": {
+            "hidden": {
+              "team": [
+                "normalness",
+                "enrichment",
+                "discretion"
+              ],
+              "innocent": [
+                "ruse",
+                "principles",
+                "misapprehension",
+                "utilization",
+                "knowledge",
+                "randomization"
+              ],
+              "opponent": [
+                "sexism",
+                "synthesis",
+                "expedience"
+              ],
+              "assassin": [
+                "refutation"
+              ]
+            },
+            "revealed": {
+              "team": {
+                "team": [
+                  "willfulness",
+                  "ambivalence",
+                  "nonchalance",
+                  "analogy",
+                  "possibility",
+                  "resourcefulness"
+                ],
+                "innocent": [
+                  "shrewdness"
+                ],
+                "opponent": [
+                  "concordance"
+                ],
+                "assassin": []
+              },
+              "opponent": {
+                "team": [],
+                "innocent": [],
+                "opponent": [
+                  "psyche",
+                  "inadequacy",
+                  "persuasiveness",
+                  "mindset"
+                ],
+                "assassin": []
+              }
+            }
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 1",
+        "timestamp": "2026-07-09T07:53:32.481969",
+        "action": {
+          "type": "send message",
+          "content": "The words possibility, resourcefulness were guessed correctly. Your teammate's turn ended there.\nNow provide another clue relating to some of your remaining team words and a list of the related target words. Remember to start your clue with 'CLUE: ', put a new line, and start your comma-separated list of target words with 'TARGETS: '. Notice: some words have been removed from the lists compared to previous requests.\n\nYour remaining team words are: normalness, enrichment, discretion.\nRemaining words for your opponent are: mindset, sexism, synthesis, expedience.\nRemaining distractor words are: ruse, principles, misapprehension, utilization, knowledge, randomization.\nRemaining kill words are: refutation.",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 1",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:53:32.481990",
+        "action": {
+          "type": "get message",
+          "content": "CLUE: BALANCE\nTARGETS: normalness, discretion",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:53:32.482159",
+        "action": {
+          "type": "clue",
+          "content": "balance"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:53:32.482183",
+        "action": {
+          "type": "targets",
+          "content": [
+            "normalness",
+            "discretion"
+          ]
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:53:32.482205",
+        "action": {
+          "type": "word targeted",
+          "content": {
+            "word": "normalness",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:53:32.482225",
+        "action": {
+          "type": "word targeted",
+          "content": {
+            "word": "discretion",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 2",
+        "timestamp": "2026-07-09T07:53:39.373628",
+        "action": {
+          "type": "send message",
+          "content": "The words possibility, resourcefulness were guessed correctly. Your turn ended there.\nNow provide another comma-separated list of at least 1 and up to 2 words from the following list of words that best relate or are most closely associated with the word 'balance'. Remember to start your answer with 'GUESS: '. Notice: some words have been removed from the list compared to previous requests.\n\nexpedience, misapprehension, enrichment, randomization, normalness, synthesis, sexism, discretion, refutation, ruse, knowledge, principles, utilization",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 2",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:53:39.373643",
+        "action": {
+          "type": "get message",
+          "content": "GUESS: principles, discretion",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:53:39.373694",
+        "action": {
+          "type": "guesses",
+          "content": [
+            "principles",
+            "discretion"
+          ]
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:53:39.373718",
+        "action": {
+          "type": "team revealed",
+          "content": {
+            "word": "principles",
+            "assignment": "innocent"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:53:39.373739",
+        "action": {
+          "type": "turn end after",
+          "content": "principles"
+        }
+      }
+    ],
+    [
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:53:39.373848",
+        "action": {
+          "type": "opponent revealed",
+          "content": {
+            "word": "sexism",
+            "assignment": "opponent"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:53:39.373887",
+        "action": {
+          "type": "board status",
+          "content": {
+            "hidden": {
+              "team": [
+                "normalness",
+                "enrichment",
+                "discretion"
+              ],
+              "innocent": [
+                "ruse",
+                "misapprehension",
+                "utilization",
+                "knowledge",
+                "randomization"
+              ],
+              "opponent": [
+                "synthesis",
+                "expedience"
+              ],
+              "assassin": [
+                "refutation"
+              ]
+            },
+            "revealed": {
+              "team": {
+                "team": [
+                  "willfulness",
+                  "ambivalence",
+                  "nonchalance",
+                  "analogy",
+                  "possibility",
+                  "resourcefulness"
+                ],
+                "innocent": [
+                  "shrewdness",
+                  "principles"
+                ],
+                "opponent": [
+                  "concordance"
+                ],
+                "assassin": []
+              },
+              "opponent": {
+                "team": [],
+                "innocent": [],
+                "opponent": [
+                  "psyche",
+                  "inadequacy",
+                  "persuasiveness",
+                  "mindset",
+                  "sexism"
+                ],
+                "assassin": []
+              }
+            }
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 1",
+        "timestamp": "2026-07-09T07:53:48.344803",
+        "action": {
+          "type": "send message",
+          "content": "The word principles was guessed but is an innocent word. Your teammate's turn ended there.\nNow provide another clue relating to some of your remaining team words and a list of the related target words. Remember to start your clue with 'CLUE: ', put a new line, and start your comma-separated list of target words with 'TARGETS: '. Notice: some words have been removed from the lists compared to previous requests.\n\nYour remaining team words are: normalness, enrichment, discretion.\nRemaining words for your opponent are: sexism, synthesis, expedience.\nRemaining distractor words are: ruse, misapprehension, utilization, knowledge, randomization.\nRemaining kill words are: refutation.",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 1",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:53:48.344824",
+        "action": {
+          "type": "get message",
+          "content": "CLUE: ADJUSTMENT\nTARGETS: normalness, enrichment, discretion",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:53:48.344959",
+        "action": {
+          "type": "clue",
+          "content": "adjustment"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:53:48.344984",
+        "action": {
+          "type": "targets",
+          "content": [
+            "normalness",
+            "enrichment",
+            "discretion"
+          ]
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:53:48.345006",
+        "action": {
+          "type": "word targeted",
+          "content": {
+            "word": "normalness",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:53:48.345026",
+        "action": {
+          "type": "word targeted",
+          "content": {
+            "word": "enrichment",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:53:48.345044",
+        "action": {
+          "type": "word targeted",
+          "content": {
+            "word": "discretion",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "Player 2",
+        "timestamp": "2026-07-09T07:53:54.207666",
+        "action": {
+          "type": "send message",
+          "content": "The word principles was guessed but is an innocent word. Your turn ended there.\nNow provide another comma-separated list of at least 1 and up to 3 words from the following list of words that best relate or are most closely associated with the word 'adjustment'. Remember to start your answer with 'GUESS: '. Notice: some words have been removed from the list compared to previous requests.\n\nexpedience, misapprehension, enrichment, randomization, normalness, synthesis, discretion, refutation, ruse, knowledge, utilization",
+          "label": "context"
+        }
+      },
+      {
+        "from": "Player 2",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:53:54.207700",
+        "action": {
+          "type": "get message",
+          "content": "GUESS: discretion, refutation, utilization",
+          "label": "response"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:53:54.207794",
+        "action": {
+          "type": "guesses",
+          "content": [
+            "discretion",
+            "refutation",
+            "utilization"
+          ]
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:53:54.207842",
+        "action": {
+          "type": "team revealed",
+          "content": {
+            "word": "discretion",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:53:54.207876",
+        "action": {
+          "type": "target revealed",
+          "content": {
+            "word": "discretion",
+            "assignment": "team"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:53:54.207910",
+        "action": {
+          "type": "team revealed",
+          "content": {
+            "word": "refutation",
+            "assignment": "assassin"
+          }
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:53:54.207941",
+        "action": {
+          "type": "turn end after",
+          "content": "refutation"
+        }
+      },
+      {
+        "from": "GM",
+        "to": "GM",
+        "timestamp": "2026-07-09T07:53:54.208468",
+        "action": {
+          "type": "game end",
+          "content": "opponent has won through assassin"
+        }
+      }
+    ]
+  ],
+  "board end status": {
+    "hidden": {
+      "team": [
+        "normalness",
+        "enrichment"
+      ],
+      "innocent": [
+        "ruse",
+        "misapprehension",
+        "utilization",
+        "knowledge",
+        "randomization"
+      ],
+      "opponent": [
+        "synthesis",
+        "expedience"
+      ],
+      "assassin": []
+    },
+    "revealed": {
+      "team": {
+        "team": [
+          "willfulness",
+          "ambivalence",
+          "nonchalance",
+          "analogy",
+          "possibility",
+          "resourcefulness",
+          "discretion"
+        ],
+        "innocent": [
+          "shrewdness",
+          "principles"
+        ],
+        "opponent": [
+          "concordance"
+        ],
+        "assassin": [
+          "refutation"
+        ]
+      },
+      "opponent": {
+        "team": [],
+        "innocent": [],
+        "opponent": [
+          "psyche",
+          "inadequacy",
+          "persuasiveness",
+          "mindset",
+          "sexism"
+        ],
+        "assassin": []
+      }
+    }
+  },
+  "Number of turns": 7,
+  "Aborted": false,
+  "Lose": true,
+  "Game ended through assassin": true,
+  "Request Count": 12,
+  "Parsed Request Count": 12,
+  "Violated Request Count": 0,
+  "Cluegiver engaged flags": {
+    "IGNORE RAMBLING": 0,
+    "IGNORE FALSE TARGETS OR GUESSES": 0,
+    "REPROMPT ON ERROR": 0,
+    "STRIP WORDS": 0,
+    "IGNORE NUMBER OF TARGETS": 0
+  },
+  "Guesser engaged flags": {
+    "IGNORE RAMBLING": 0,
+    "IGNORE FALSE TARGETS OR GUESSES": 0,
+    "REPROMPT ON ERROR": 0,
+    "STRIP WORDS": 0,
+    "IGNORE NUMBER OF TARGETS": 0
+  }
+}

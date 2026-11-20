@@ -9,15 +9,17 @@ import os
 import re
 
 import db
+import study_profile
 # Re-exported here because other modules read them off annotation.
 from questions import (BESPOKE_QUESTIONS, GENERIC_Q1, GENERIC_Q2,
                        GENERIC_Q3, SC_TICKS, SC_TICK_D)
 
 _dir = os.path.dirname(os.path.abspath(__file__))
-# GAMES_DIR picks the tree to serve; games_study/ is the only corpus now that
-# the games/ pilot pool is gone. game_key reads the 4th-from-last path part, so
-# the study tree's extra model level needs no other change.
-_games_dir = os.path.join(_dir, os.environ.get("GAMES_DIR", "games_study"))
+# GAMES_DIR picks the tree to serve: games_study/ for the study, games_pilot/
+# for the pilot. study_profile validates it and is the one place it is read.
+# game_key reads the 4th-from-last path part, so the tree's extra model level
+# needs no other change.
+_games_dir = os.path.join(_dir, study_profile.GAMES_DIR)
 
 
 def _discover_games():
@@ -1398,8 +1400,20 @@ def build(welcome_page, annotation_page, verdict_page, game_state, annotator_sta
 
         # Whole page re-renders whenever `game` or `block` changes, so game
         # loading is URL-driven rather than a fixed default game.
+        #
+        # triggers= matters as much as the inputs. By default a render re-runs
+        # when ANY input changes, and a game switch changes three of them, so
+        # the whole page was rebuilt two to four times in a row. Anything
+        # clicked between two of those rebuilds was wiped, and a button from
+        # the rebuild before last pointed at a handler the server had already
+        # dropped (KeyError in the log; for the participant, "Submit All" did
+        # nothing). clearing_state flips exactly twice per switch - True to
+        # blank, False to mount - and every route onto this page goes through
+        # it (welcome._start, annotation_verdict._verdict_finish), so it is the
+        # only trigger needed.
         @gr.render(inputs=[game_state, block_state, playlist_state,
-                           playlist_idx_state, clearing_state])
+                           playlist_idx_state, clearing_state],
+                   triggers=[clearing_state.change])
         def _render_annotation(path, block, playlist, playlist_idx, clearing):
             # Render nothing while clearing, so every widget unmounts before the
             # next game mounts. This is what stops answers carrying over.

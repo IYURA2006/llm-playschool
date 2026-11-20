@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """Is the study ready to recruit? One command, one answer.
 
-    python readiness.py              # go / no-go
+    python readiness.py              # go / no-go for the study
+    python readiness.py --pilot      # go / no-go for the pilot (games_pilot)
     python readiness.py --verbose    # show the checks that passed too
 
 Exits 0 only if every check that ran either passed or is a warning. Any BLOCKER
@@ -32,6 +33,18 @@ import re
 import subprocess
 import sys
 
+# --pilot has to act before study_profile is imported, because that module
+# reads GAMES_DIR once, at import. It only fills in a default: if .env already
+# names a corpus, that is what is being served, and check_participant_path
+# reports the disagreement instead of hiding it.
+_PILOT = "--pilot" in sys.argv[1:]
+if _PILOT:
+    from dotenv import load_dotenv
+    load_dotenv()
+    os.environ.setdefault("GAMES_DIR", "games_pilot")
+
+import study_profile  # noqa: E402
+
 BLOCKER, WARN, OK, SKIP = "BLOCKER", "WARN", "OK", "SKIP"
 _results = []
 
@@ -40,9 +53,9 @@ def record(group, name, status, detail=""):
     _results.append((group, name, status, detail))
 
 
-def _run(cmd):
+def _run(cmd, games_dir=None):
     """A subprocess, returning (rc, combined output)."""
-    env = {**os.environ, "GAMES_DIR": os.environ.get("GAMES_DIR", "games_study")}
+    env = {**os.environ, "GAMES_DIR": games_dir or study_profile.GAMES_DIR}
     p = subprocess.run(cmd, capture_output=True, text=True, env=env)
     return p.returncode, (p.stdout or "") + (p.stderr or "")
 
@@ -77,8 +90,8 @@ def check_study_set():
 
     import csv
     import collections
-    man = {r["transcript_id"] for r in csv.DictReader(open("study_manifest.csv"))}
-    rows = list(csv.DictReader(open("batches.csv")))
+    man = {r["transcript_id"] for r in csv.DictReader(open(study_set.MANIFEST))}
+    rows = list(csv.DictReader(open(study_set.BATCHES)))
     ids = [r["transcript_id"] for r in rows]
     missing, extra = man - set(ids), set(ids) - man
     dupes = [t for t, n in collections.Counter(ids).items() if n > 1]
@@ -115,7 +128,8 @@ def check_sitting_lengths():
                 "privateshared": 3.5, "wordle-crazy_withclue": 3.5,
                 "guesswhat": 2.5, "referencegame": 2.5, "ta_frozen_lake": 2.5}
     tot = collections.defaultdict(float)
-    for r in csv.DictReader(open("batches.csv")):
+    import study_set
+    for r in csv.DictReader(open(study_set.BATCHES)):
         if r["game"] not in MEASURED:
             record(g, "every game has a measured time", BLOCKER,
                    f"no measured minutes for {r['game']}")
@@ -142,7 +156,10 @@ def check_questions():
            OK if rc == 0 and errors == 0 else BLOCKER,
            "" if errors == 0 else f"{errors} error(s); run questions.py --check")
 
-    rc, out = _run([sys.executable, "questions.py", "--markdown"])
+    # question_set.md documents the study's eight games, so it is always
+    # generated against the study corpus, whichever one is being served.
+    rc, out = _run([sys.executable, "questions.py", "--markdown"],
+                   games_dir=study_profile.MAIN.games_dir)
     if rc != 0:
         record(g, "question_set.md is current", BLOCKER, "generator failed")
         return
@@ -162,12 +179,16 @@ def check_participant_path():
     m = re.search(r'PROLIFIC_COMPLETION_URL\s*=\s*["\']([^"\']+)', src)
     url = m.group(1) if m else ""
     placeholder = "C10WMMGK"
+    pilot_code = "C7ZBGQYY"     # the pilot's Prolific study; not the main one's
     todo = re.search(r"#\s*TODO[^\n]*\n\s*PROLIFIC_COMPLETION_URL", src)
     if not url:
         detail = "not found"
     elif placeholder in url or todo:
         detail = ("still the placeholder code - participants will finish the "
                   "work and not be marked complete, so they cannot be paid")
+    elif pilot_code in url and not _PILOT:
+        detail = ("still the PILOT study's code - the main study has its own "
+                  "on Prolific; set it in annotation_verdict.py")
     else:
         detail = ""
     record(g, "Prolific completion code is real",
@@ -219,11 +240,18 @@ def check_participant_path():
            "ALLOW_DEBUG_LINKS is set - the Prolific gate is bypassed and rows "
            "can be written under any id in the URL" if dbg else "")
 
-    games_dir = os.environ.get("GAMES_DIR", "games_study")
-    record(g, "GAMES_DIR is games_study",
-           OK if games_dir == "games_study" else BLOCKER,
-           "" if games_dir == "games_study" else
-           f"GAMES_DIR={games_dir!r} - the study would run on the wrong corpus")
+    # The corpus actually configured must be the one this run was asked about.
+    # Passing the study's checks while .env still says games_pilot (or the
+    # reverse) is exactly the mistake this line exists to catch.
+    want = study_profile.PILOT if _PILOT else study_profile.MAIN
+    games_dir = study_profile.GAMES_DIR
+    record(g, f"GAMES_DIR is {want.games_dir}",
+           OK if games_dir == want.games_dir else BLOCKER,
+           "" if games_dir == want.games_dir else
+           f"GAMES_DIR={games_dir!r} - " + (
+               "this is the PILOT corpus; set GAMES_DIR=games_study and redeploy "
+               "before recruiting for the study" if not _PILOT else
+               "asked to check the pilot, but .env serves the study"))
 
     for var, why in (("PORT", "Apache proxies to 3000; a mismatch is a 503"),
                      ("GRADIO_SERVER_NAME",
@@ -290,6 +318,19 @@ def check_database():
                    OK if not miss else BLOCKER,
                    "" if not miss else f"missing {miss} - run postgres_schema.sql")
 
+        # Optional to the app, not to the study: without it a participant who
+        # finishes, closes the tab and reopens the link is handed another
+        # sitting instead of their completion link.
+        cur.execute("SELECT 1 FROM information_schema.columns WHERE "
+                    "table_name='annotations' AND column_name='prolific_session_id'")
+        has_sid = cur.fetchone() is not None
+        record(g, "annotations can record the Prolific submission",
+               OK if has_sid else BLOCKER,
+               "" if has_sid else
+               "no prolific_session_id column - the app runs, but cannot give "
+               "a returning participant their completion link. Run "
+               "postgres_schema.sql as an admin (RUNBOOK, 'Database')")
+
         bad = []
         for t in sorted(need & have):
             cur.execute("SELECT has_table_privilege(current_user,%s,'INSERT'), "
@@ -313,9 +354,30 @@ def check_database():
                    BLOCKER if junk else OK,
                    f"{junk} row(s) from testing - delete them before recruiting"
                    if junk else "")
-            record(g, "database is empty before launch",
-                   WARN if total else OK,
-                   f"{total} annotation row(s) already present" if total else "")
+            # Pilot rows share the database with the study. Left in place they
+            # count toward a returning participant's MAX_BATCHES and turn up in
+            # the study's export as transcripts that are in no manifest.
+            cur.execute("SELECT count(*), count(DISTINCT annotator_id) "
+                        "FROM annotations WHERE batch_id LIKE %s",
+                        (study_profile.PILOT_PREFIX + "%",))
+            n_pilot, n_people = cur.fetchone()
+            if _PILOT:
+                record(g, "pilot rows so far", OK,
+                       f"{n_pilot} row(s) from {n_people} participant(s)")
+                other = total - n_pilot
+                record(g, "no study rows in the database during the pilot",
+                       WARN if other else OK,
+                       f"{other} non-pilot annotation row(s) present" if other else "")
+            else:
+                record(g, "pilot rows have been exported and removed",
+                       BLOCKER if n_pilot else OK,
+                       f"{n_pilot} pilot row(s) from {n_people} participant(s) - "
+                       f"run pilot_closeout.py, then pilot_closeout.py --delete"
+                       if n_pilot else "")
+                record(g, "database is empty before launch",
+                       WARN if total - n_pilot else OK,
+                       f"{total - n_pilot} annotation row(s) already present"
+                       if total - n_pilot else "")
     finally:
         conn.close()
 
@@ -348,6 +410,8 @@ def main(argv=None):
                                  formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--verbose", action="store_true",
                     help="list the checks that passed as well")
+    ap.add_argument("--pilot", action="store_true",
+                    help="check the pilot (games_pilot) instead of the study")
     args = ap.parse_args(argv)
 
     for fn in (check_study_set, check_sitting_lengths, check_questions,
@@ -388,7 +452,7 @@ def main(argv=None):
         for _, name, _, detail in skips:
             print(f"  - {name}{': ' + detail if detail else ''}")
     else:
-        print("\nREADY.")
+        print("\nREADY." if not _PILOT else "\nPILOT READY.")
     if warns:
         print("\nWorth looking at:")
         for _, name, _, detail in warns:

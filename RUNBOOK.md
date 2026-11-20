@@ -43,6 +43,82 @@ TEST_DB_NAME=study_test python _test_assignment.py
 70 checks, including the one that guarantees no participant ever rates the same
 game instance twice.
 
+And the browser test, after any change to a screen. It drives real browsers
+through whole sittings, several at once, and compares every answer clicked with
+the row stored. Clicking through alone does not find what this finds: the bugs
+it has caught so far only appeared with six people working at the same time.
+
+```bash
+GAMES_DIR=games_pilot DB_NAME=study_test PORT=3001 python app.py     # terminal 1
+GAMES_DIR=games_pilot python _test_e2e.py --participants 6 --rounds 5 --reset   # terminal 2
+```
+
+## The pilot
+
+A small dry run of the whole pipeline on real annotators, on transcripts the
+study does not use, so nothing in the 416 is spent on it.
+
+| | |
+|---|---|
+| Games | ReferenceGame, Deal or No Deal, Codenames |
+| Sittings | one per game: 8, 4 and 3 transcripts |
+| Annotators | 2 per sitting, so 6 sittings and 30 judgements |
+| One person | may take all three sittings (the cap is 3) |
+
+`build_pilot_set.py` wrote `games_pilot/`, `pilot_manifest.csv` and
+`pilot_batches.csv`. It refuses any instance that appears in
+`study_manifest.csv` under any model, so a pilot annotator who later joins the
+study has seen none of its game states.
+
+**Switching is one line in `.env`**, then a redeploy. `GAMES_DIR` selects the
+corpus and everything that has to agree with it — batch file, annotators per
+transcript, the per-person cap (`study_profile.py`):
+
+```bash
+sed -i 's/^GAMES_DIR=.*/GAMES_DIR=games_pilot/' /disk/data/s2634187/llm-playschool/.env
+APP_DIR=/disk/data/s2634187/llm-playschool bash vm/setup_vm.sh     # prints which corpus is live
+.venv/bin/python readiness.py --pilot
+```
+
+Participants use the same link as the study (see "The Prolific link" below).
+For people who are not on Prolific, give each a made-up id of their own,
+`https://breezy.inf.ed.ac.uk/?PROLIFIC_PID=<id>`; with no `SESSION_ID` in the
+link, the same id on a later visit is how they get their next sitting.
+
+Watch it while it runs:
+
+```bash
+.venv/bin/python export_annotations.py --check    # batch progress, who has data
+tail -f /disk/data/s2634187/app.log               # any Traceback here is worth reading
+```
+
+### After the pilot
+
+The pilot writes to the same database as the study, and `readiness.py` blocks
+the study while its rows remain: they would count toward a returning
+participant's cap and appear in the study's export as transcripts that are in
+no manifest. One command takes them out. Run it after the pilot has closed on
+Prolific, from the app directory on the VM:
+
+```bash
+.venv/bin/python pilot_closeout.py              # export + verify, deletes nothing
+.venv/bin/python pilot_closeout.py --delete     # the same, then delete what was exported
+```
+
+It writes `exports_pilot/pilot_<stamp>/` — a lossless raw dump of every pilot
+row plus the usual decoded CSVs — reads the files back, and only then deletes
+exactly those rows, in one transaction. If anyone saved a rating in between it
+deletes nothing and says so. Study rows, consent records and practice records
+are never touched. Copy the folder somewhere safe; it is gitignored on purpose.
+
+Then switch back:
+
+```bash
+sed -i 's/^GAMES_DIR=.*/GAMES_DIR=games_study/' .env
+APP_DIR=/disk/data/s2634187/llm-playschool bash vm/setup_vm.sh
+.venv/bin/python readiness.py
+```
+
 ## Deploy, or update
 
 ```bash
@@ -104,9 +180,9 @@ DB_GSSENCMODE=disable
 GAMES_DIR=games_study
 ```
 
-- `GAMES_DIR=games_study` is the default and the only supported value; any
-  other tree shares no slugs with the study's 416, and `app.py` refuses to
-  start if the corpus and the manifest disagree.
+- `GAMES_DIR=games_study` is the study and the default. `games_pilot` is the
+  pilot (see above). Nothing else is accepted, and `app.py` refuses to start if
+  the corpus and its batch file disagree.
 - **Do not set `PORT`** unless Apache is proxying somewhere other than 3000.
 - **Do not set `GRADIO_SERVER_NAME`.** Gradio's default 127.0.0.1 bind keeps
   Apache the only public entry point. `0.0.0.0` would publish the app directly
@@ -129,6 +205,36 @@ while silently dropping the data:
 psql "..." -c '\d annotations' | grep -E 'batch_id|template_id|question_set_hash'
 psql "..." -c '\d question_sets'
 ```
+
+### The Prolific link, and the column behind it
+
+Set the study URL on Prolific to pass all three ids:
+
+```
+https://breezy.inf.ed.ac.uk/?PROLIFIC_PID={{%PROLIFIC_PID%}}&STUDY_ID={{%STUDY_ID%}}&SESSION_ID={{%SESSION_ID%}}
+```
+
+`SESSION_ID` is one per submission, and the app treats one submission as one
+sitting. Someone who finishes, closes the tab and reopens the link gets their
+completion link back; a new submission gets the next sitting. Without it every
+return visit after a finished sitting starts another one, and the person who
+only wanted their link is looking at twenty more minutes of work.
+
+It is stored in `annotations.prolific_session_id`, which a database created
+before 2026-11-19 does not have. **The app runs without the column** — it just
+cannot make that distinction — so there is no order to get wrong: deploy
+whenever, add the column whenever, and the feature switches on at the next
+restart after both. `studyuser` cannot add it; run the schema as the admin role
+from a DICE desktop (it is idempotent, and a new column needs no new grant):
+
+```bash
+ssh s2634187@breezy.inf.ed.ac.uk cat /disk/data/s2634187/llm-playschool/postgres_schema.sql \
+  | psql "host=breezy.inf.ed.ac.uk dbname=study user=s2634187"
+```
+
+`readiness.py` reports it as blocking until it is there, and
+`export_annotations.py` carries the id on every row, to join against
+Prolific's own export.
 
 ## Port
 
@@ -204,7 +310,8 @@ gunzip -c /disk/data/s2634187/annotation-backups/study-<stamp>.sql.gz \
 |---|---|
 | Apache 503 right after a deploy, log path printed as `/afs/...` | `APP_DIR` not pinned — deployed onto AFS, unit dies unable to open its log |
 | Apache 503, app not listening | `.env` missing/incomplete → `RuntimeError: Missing required DB config` at import |
-| `Refusing to start — the study inventory does not check out` | `GAMES_DIR` not `games_study`, or the corpus doesn't match the manifest |
+| `Refusing to start — the study inventory does not check out` | The corpus `GAMES_DIR` names doesn't match its manifest — rebuild it (`build_study_set.py` / `build_pilot_set.py`) |
+| A button does nothing, `dictionary changed size during iteration` in the log | `gradio_patches.py` is not being imported first in `app.py`, or Gradio was upgraded past the pinned version |
 | Apache 503, app *is* listening | Port mismatch between the vhost and the app |
 | Works until you log out | Linger not enabled |
 | Pages load, controls hang | SSE buffered by the proxy — needs `flushpackets=on` |

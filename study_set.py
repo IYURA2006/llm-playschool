@@ -24,9 +24,15 @@ import csv
 import os
 from collections import defaultdict
 
+import study_profile
+
 _dir = os.path.dirname(os.path.abspath(__file__))
-MANIFEST = os.path.join(_dir, os.environ.get("STUDY_MANIFEST", "study_manifest.csv"))
-BATCHES = os.path.join(_dir, os.environ.get("STUDY_BATCHES", "batches.csv"))
+# Defaults follow GAMES_DIR (see study_profile), so the pilot corpus can never
+# be served against the main study's batch file or the other way round.
+MANIFEST = os.path.join(_dir, os.environ.get("STUDY_MANIFEST",
+                                             study_profile.ACTIVE.manifest))
+BATCHES = os.path.join(_dir, os.environ.get("STUDY_BATCHES",
+                                            study_profile.ACTIVE.batches))
 
 # Fields copied onto every annotation row. Names match the CSV headers exactly so
 # the DB columns, the manifest and the export all read the same.

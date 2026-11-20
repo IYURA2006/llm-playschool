@@ -93,17 +93,25 @@ if [ ! -f .env ]; then
     cp .env.example .env
     chmod 600 .env
     die ".env did not exist — a template was copied to $APP_DIR/.env.
-    Fill in DB_PASSWORD (and check DB_HOST), make sure GAMES_DIR=games_study,
-    then re-run this script."
+    Fill in DB_PASSWORD (and check DB_HOST), set GAMES_DIR to games_study
+    (the study) or games_pilot (the pilot), then re-run this script."
 fi
 chmod 600 .env
 for var in DB_HOST DB_NAME DB_USER DB_PASSWORD; do
     grep -qE "^${var}=.+" .env || die "$var is empty in $APP_DIR/.env — the app \
 cannot start without it. Fill it in and re-run."
 done
-grep -qE "^GAMES_DIR=games_study$" .env \
-    || die "GAMES_DIR must be games_study in $APP_DIR/.env, or the study runs \
-on the wrong corpus (app.py refuses to boot without it)."
+# Two corpora exist: games_study is the study, games_pilot the small pilot built
+# from transcripts the study does not use (see study_profile.py). Anything else
+# is a typo, and app.py would refuse to boot on it.
+CORPUS=$(sed -n 's/^GAMES_DIR=\(.*\)$/\1/p' .env | tail -1)
+case "$CORPUS" in
+    games_study) say "corpus: games_study — the MAIN STUDY (416 transcripts, 3 annotators each)" ;;
+    games_pilot) say "corpus: games_pilot — the PILOT (15 transcripts, 2 annotators each)"
+                 say "        set GAMES_DIR=games_study and re-run this before the study starts" ;;
+    *) die "GAMES_DIR must be games_study (the study) or games_pilot (the pilot) \
+in $APP_DIR/.env — found '${CORPUS:-<unset>}'." ;;
+esac
 
 # The port Apache must proxy to. app.py defaults to 3000; .env can override it.
 PORT=$(sed -n 's/^PORT=\([0-9]\+\).*/\1/p' .env | tail -1)

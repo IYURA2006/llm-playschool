@@ -706,15 +706,6 @@ run("voided session costs no cap slot", test_voided_session_costs_no_cap_slot)
 run("session lease refreshes the whole batch", test_session_lease_refreshes_whole_batch)
 
 
-reset_db()  # leave the test DB clean, it's shared across runs
-
-print("\n" + "=" * 60)
-if failures:
-    print(f"❌ {len(failures)} check(s) failed:")
-    for f in failures:
-        print(f"   - {f}")
-    raise SystemExit(1)
-print("✅ all checks passed")
 
 
 def test_never_rates_one_instance_twice():
@@ -758,5 +749,195 @@ def test_never_rates_one_instance_twice():
           len(models) > 1)
 
 
+
+
+# ---------------------------------------------------------------------------
+# One Prolific submission is one sitting. SESSION_ID arrives in the study link,
+# once per submission; build_playlist_for takes it as submission_id.
+
+def sitting_ids(pid, condition="hybrid"):
+    """{session_index: {prolific_session_id, ...}} as stored."""
+    with db._connect() as conn:
+        cur = conn.cursor()
+        cur.execute(
+            "SELECT COALESCE(session_index,1), prolific_session_id FROM annotations "
+            "WHERE annotator_id=%s AND condition=%s", (pid, condition))
+        rows = cur.fetchall()
+    out = {}
+    for idx, sid in rows:
+        out.setdefault(int(idx), set()).add(sid)
+    return out
+
+
+def test_same_submission_after_finishing_gets_the_link_not_a_sitting():
+    reset_db()
+    pid = "fakepid_sid"
+    first, err = assignment.build_playlist_for(pid, submission_id="SUB-A")
+    assert err is None and first, f"no first batch: {err}"
+    check("the sitting is stamped with its submission",
+          sitting_ids(pid) == {1: {"SUB-A"}})
+
+    mid, _ = assignment.build_playlist_for(pid, submission_id="SUB-A")
+    check("same submission mid-sitting resumes it", mid == first)
+
+    complete_session(pid)
+    before = _raw_reservation_counts()
+    again, err = assignment.build_playlist_for(pid, submission_id="SUB-A")
+    check("same submission after finishing returns the SAME sitting, no error",
+          err is None and again == first)
+    done = db.completed_pairs(pid)
+    check("and every game in it is complete, which is what makes app.py show "
+          "the completion link",
+          all((it["game"], it["condition"]) in done for it in again))
+    check("nothing new was reserved by coming back",
+          _raw_reservation_counts() == before
+          and len(db.session_summary(pid, condition="hybrid")) == 1)
+    for _ in range(5):
+        assignment.build_playlist_for(pid, submission_id="SUB-A")
+    check("however many times they reload",
+          len(db.session_summary(pid, condition="hybrid")) == 1)
+
+
+def test_new_submission_gets_the_next_sitting():
+    reset_db()
+    pid = "fakepid_sid2"
+    first, _ = assignment.build_playlist_for(pid, submission_id="SUB-A")
+    complete_session(pid)
+    second, err = assignment.build_playlist_for(pid, submission_id="SUB-B")
+    check("a new submission after a finished one gets a NEW sitting",
+          err is None and second and second != first)
+    check("each sitting carries its own submission id",
+          sitting_ids(pid) == {1: {"SUB-A"}, 2: {"SUB-B"}})
+    back, _ = assignment.build_playlist_for(pid, submission_id="SUB-A")
+    check("the first submission's link still leads to the first sitting, "
+          "even with a second one open", back == first)
+    check("and going back did not disturb the second",
+          sitting_ids(pid) == {1: {"SUB-A"}, 2: {"SUB-B"}}
+          and assignment.build_playlist_for(pid, submission_id="SUB-B")[0] == second)
+
+
+def test_abandoned_sitting_answers_to_the_submission_that_finishes_it():
+    reset_db()
+    pid = "fakepid_sid3"
+    first, _ = assignment.build_playlist_for(pid, submission_id="SUB-RETURNED")
+    # They return that submission on Prolific and take the study again.
+    resumed, err = assignment.build_playlist_for(pid, submission_id="SUB-NEW")
+    check("a new submission with a sitting still open resumes it rather than "
+          "reserving a second", err is None and resumed == first
+          and len(db.session_summary(pid, condition="hybrid")) == 1)
+    check("and the sitting is re-stamped to the submission that will be paid",
+          sitting_ids(pid) == {1: {"SUB-NEW"}})
+    complete_session(pid)
+    link, _ = assignment.build_playlist_for(pid, submission_id="SUB-NEW")
+    check("so the paying submission's link shows it complete", link == first)
+    other, err = assignment.build_playlist_for(pid, submission_id="SUB-RETURNED")
+    check("while the returned submission's link is just a new visit",
+          err is None and other and other != first)
+
+
+def test_submission_at_the_cap_still_gets_its_link():
+    reset_db()
+    pid = "fakepid_sidcap"
+    last = None
+    for n in range(assignment.MAX_BATCHES):
+        last, err = assignment.build_playlist_for(pid, submission_id=f"SUB-{n}")
+        assert err is None and last, f"sitting {n + 1} refused early: {err}"
+        complete_session(pid)
+    final_sid = f"SUB-{assignment.MAX_BATCHES - 1}"
+    again, err = assignment.build_playlist_for(pid, submission_id=final_sid)
+    check("the submission that reached the cap gets its finished sitting "
+          "back, not CAP_MESSAGE", err is None and again == last)
+    refused, err = assignment.build_playlist_for(pid, submission_id="SUB-EXTRA")
+    check("a further submission is refused with CAP_MESSAGE",
+          refused == [] and err == assignment.CAP_MESSAGE)
+    check("and reserved nothing",
+          len(db.session_summary(pid, condition="hybrid")) == assignment.MAX_BATCHES)
+
+
+def test_without_a_submission_id_nothing_changes():
+    reset_db()
+    pid = "fakepid_nosid"
+    first, _ = assignment.build_playlist_for(pid)
+    complete_session(pid)
+    second, err = assignment.build_playlist_for(pid)
+    check("no id in the link: a visit after finishing starts the next sitting, "
+          "as before", err is None and second and second != first)
+    check("and nothing is stamped", sitting_ids(pid) == {1: {None}, 2: {None}})
+    blank, _ = assignment.build_playlist_for(pid, submission_id="   ")
+    check("a blank id counts as none", blank == second)
+
+
+def test_database_without_the_column_falls_back():
+    """The VM's database has no prolific_session_id until an admin adds it, and
+    the app must run in the meantime exactly as it did."""
+    reset_db()
+    pid = "fakepid_nocol"
+    real = db.has_session_id_column
+    db.has_session_id_column = lambda refresh=False: False
+    try:
+        first, err = assignment.build_playlist_for(pid, submission_id="SUB-A")
+        check("reserving still works with an id and no column",
+              err is None and bool(first))
+        complete_session(pid)
+        second, err = assignment.build_playlist_for(pid, submission_id="SUB-A")
+        check("and falls back to the old rule: next sitting",
+              err is None and second and second != first)
+    finally:
+        db.has_session_id_column = real
+    check("nothing was written to the column it was told is absent",
+          sitting_ids(pid) == {1: {None}, 2: {None}})
+
+
+def test_two_tabs_same_submission_reserve_once():
+    reset_db()
+    pid = "fakepid_sidtabs"
+    with concurrent.futures.ThreadPoolExecutor(max_workers=8) as ex:
+        got = list(ex.map(
+            lambda _: assignment.build_playlist_for(pid, submission_id="SUB-A"),
+            range(8)))
+    lists = [g[0] for g in got]
+    check("eight simultaneous loads of one submission all get the same sitting",
+          all(g[1] is None for g in got) and all(l == lists[0] for l in lists))
+    check("and only one sitting exists",
+          len(db.session_summary(pid, condition="hybrid")) == 1)
+
+
+def test_one_submission_id_is_scoped_to_its_participant():
+    reset_db()
+    a, _ = assignment.build_playlist_for("fakepid_x", submission_id="SHARED")
+    complete_session("fakepid_x")
+    b, err = assignment.build_playlist_for("fakepid_y", submission_id="SHARED")
+    done_y = db.completed_pairs("fakepid_y")
+    check("a second participant arriving with someone else's submission id is "
+          "not handed their finished sitting",
+          err is None and b and not any(
+              (it["game"], it["condition"]) in done_y for it in b))
+
+
 run("practice completion is recorded once", test_practice_completion_is_recorded_once)
 run("never rates one instance twice", test_never_rates_one_instance_twice)
+
+check("this database has the prolific_session_id column (apply "
+      "postgres_schema.sql to the test database if not)",
+      db.has_session_id_column(refresh=True))
+run("same submission after finishing gets the link", test_same_submission_after_finishing_gets_the_link_not_a_sitting)
+run("new submission gets the next sitting", test_new_submission_gets_the_next_sitting)
+run("abandoned sitting follows the paying submission", test_abandoned_sitting_answers_to_the_submission_that_finishes_it)
+run("submission at the cap still gets its link", test_submission_at_the_cap_still_gets_its_link)
+run("no submission id: unchanged behaviour", test_without_a_submission_id_nothing_changes)
+run("database without the column falls back", test_database_without_the_column_falls_back)
+run("two tabs, one submission, one sitting", test_two_tabs_same_submission_reserve_once)
+run("submission id is scoped to its participant", test_one_submission_id_is_scoped_to_its_participant)
+
+
+# The verdict sits at the very end. It used to sit above the last two tests,
+# so a failure in either was printed and then ignored by the exit code.
+reset_db()  # leave the test DB clean, it's shared across runs
+
+print("\n" + "=" * 60)
+if failures:
+    print(f"❌ {len(failures)} check(s) failed:")
+    for f in failures:
+        print(f"   - {f}")
+    raise SystemExit(1)
+print("✅ all checks passed")
